@@ -57,7 +57,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     @Override
     public void onClickChoose() {
         runCompressVideo();
-        buildDialog(getResources().getString(R.string.trimming)).show();
+        buildDialog(getResources().getString(R.string.prepare_video)).show();
     }
 
     public void runCompressVideo(){

@@ -23,9 +23,11 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 
+import com.examples.atvizpro.ui.utils.CustomOnScaleDetector;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.CameraSetting;
@@ -47,7 +50,7 @@ import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.ui.utils.NotificationHelper;
 
 
-public class ControllerService extends Service{
+public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener{
     private static final String TAG = ControllerService.class.getSimpleName();
     private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
@@ -76,12 +79,10 @@ public class ControllerService extends Service{
     private int mCameraWidth = 160, mCameraHeight = 120;
     private StreamProfile mStreamProfile;
     private int mMode;
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if(intent==null)
             return START_NOT_STICKY;
-
         String action = intent.getAction();
         if(action!=null) {
             handleIncomeAction(intent);
@@ -301,26 +302,49 @@ public class ControllerService extends Service{
         if(cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
             toggleView(cameraPreview, View.GONE);
 
+        camWidth = camViewSize[camSize];  // ~270px
+        camHeight = camWidth * 4/3f;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int)camHeight));
+
+        final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
+
+        final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, customOnScaleDetector);
+
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y, xx, yy;
+            private int pointerId1, pointerId2;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
+                if (event.getPointerCount() > 1) {
+                    pointerId1 = event.getPointerId(0);
+                    pointerId2 = event.getPointerId(1);
+
+                    if (event.getX(pointerId1) < 0 || event.getX(pointerId2) < 0
+                            || event.getX(pointerId1) > v.getWidth() || event.getX(pointerId2) > v.getWidth()
+                            || event.getY(pointerId1) < 0 || event.getY(pointerId2) < 0
+                            || event.getY(pointerId1) > v.getHeight() || event.getY(pointerId2) > v.getHeight()) {
+                    } else scaleGestureDetector.onTouchEvent(event);
+                    hasZoom = true;
+                }
 
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
                         y = (int) event.getRawY();
-
-                        xx = (int) paramCam.x;
-                        yy = (int) paramCam.y;
-
+                        customOnScaleDetector.resetLast();
+                        hasZoom = false;
+                        xx = paramCam.x;
+                        yy = paramCam.y;
                     case MotionEvent.ACTION_MOVE:
-                        paramCam.x = xx - (int) (event.getRawX() - x);
-                        paramCam.y = yy - (int) (event.getRawY() - y);
+                        if (event.getPointerCount() < 2 && !hasZoom ){
+                            paramCam.x = xx - (int) (event.getRawX() - x);
+                            paramCam.y = yy - (int) (event.getRawY() - y);
 
-                        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                            mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        }
                     case MotionEvent.ACTION_UP:
                     default:
                         return true;
@@ -330,6 +354,11 @@ public class ControllerService extends Service{
         });
 
     }
+    float camWidth, camHeight;
+    int[] camViewSize = {180, 210, 240, 270, 300, 330, 360};
+
+    boolean hasZoom = false;
+
 
     private void calculateCameraSize(CameraSetting cameraProfile) {
         int factor;
@@ -773,5 +802,39 @@ public class ControllerService extends Service{
             mService.stopSelf();
             mRecordingServiceBound = false;
         }
+    }
+
+    private int camSize = 3;
+    @Override
+    public void zoomOut() {
+        camSize++;
+        if (camSize > 6) {
+            camSize = 6;
+            return;
+        }
+        camWidth = camViewSize[camSize];
+        camHeight = camWidth * 4/3f;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        paramCam.x = (int) (paramCam.x - (camWidth - camViewSize[camSize-1])/2f);
+        paramCam.y = (int) (paramCam.y - (camWidth - camViewSize[camSize-1])*2/3f);
+        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+        hasZoom = true;
+
+    }
+
+    @Override
+    public void zoomIn() {
+        camSize--;
+        if (camSize < 0) {
+            camSize = 0;
+            return;
+        }
+        camWidth = camViewSize[camSize];
+        camHeight = camWidth * 4/3f;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        paramCam.x = (int)(paramCam.x + (camViewSize[camSize+1] - camWidth)/2f);
+        paramCam.y = (int)(paramCam.y + (camViewSize[camSize+1] - camWidth)*2/3f);
+        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+        hasZoom = true;
     }
 }

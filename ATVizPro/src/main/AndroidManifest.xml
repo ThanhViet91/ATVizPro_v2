@@ -75,14 +75,19 @@
 <!--             </intent-filter>-->
         </activity>
 
-        <activity android:name=".ui.activities.ReactCamActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+        <activity android:name=".ui.activities.ReactCamActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateHidden"
-            android:label="ReactCam">
+            android:screenOrientation="portrait"
+
+            android:label="ReactCam"
+            tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.CompressBeforeReactCamActivity" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+        <activity android:name=".ui.activities.CompressBeforeReactCamActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateHidden"
-            android:label="TrimBeforeReactCam">
+            android:screenOrientation="portrait"
+            android:label="TrimBeforeReactCam"
+            tools:ignore="LockedOrientationActivity">
         </activity>
 
         <activity android:name=".ui.activities.MainActivity">

@@ -37,15 +37,8 @@ public class VideoUtil {
         String cmd = "ffmpeg -i " + overlayPath + " -i " + originalPath + " -filter_complex [0]scale="
                 + sizeCam + ":-1[overlay];[1][overlay]overlay="
                 + "enable='between(t," + parseSecond2Ms(startTime) + "," + parseSecond2Ms(endTime) + ")':x="+posX+":y="+posY+";[0:a][1:a]amix -preset ultrafast "+outputVideoPath;
-//        if (startTime > 0) {
-//            cmd = "ffmpeg -i " + overlayPath + " -i " + originalPath + " -filter_complex [0]scale="
-//                    + sizeCam + ":-1[overlay];[1][overlay]overlay="
-//                    + "enable='between(t," + startTime + "ms," + endTime + "ms)':x="+posX+":y="+posY+";[0:a][1:a]amix -preset ultrafast "+outputVideoPath;
-//        } else {
-//
-//        }
 
-        new TranscodingAsyncTask(act, cmd, "", callback).execute();
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
 
     }
 

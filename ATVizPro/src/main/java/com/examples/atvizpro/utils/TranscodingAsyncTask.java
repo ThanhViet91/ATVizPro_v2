@@ -108,7 +108,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         Log.i(Prefs.TAG, "onPostExecute");
 //        progressDialog.dismiss();
 
-        if (mCallback != null) mCallback.onFinishTranscoding("onPostExecute");
+        if (mCallback != null) mCallback.onFinishTranscoding(outputPath);
         super.onPostExecute(result);
         String rc = null;
         if (commandValidationFailedFlag) {

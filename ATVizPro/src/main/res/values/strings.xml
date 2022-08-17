@@ -22,7 +22,7 @@
     <string name="cancel">Cancel</string>
     <string name="choose">Choose</string>
     <string name="finish">Finish</string>
-    <string name="trimming">trimming video...</string>
+    <string name="prepare_video">Prepare video...</string>
     <string name="trimmed_done">video trim completed！</string>
 
     <string name="facebook_app_id">636414803521202</string>

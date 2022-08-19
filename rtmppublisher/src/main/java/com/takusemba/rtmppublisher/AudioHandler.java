@@ -1,7 +1,10 @@
 package com.takusemba.rtmppublisher;
 
+import android.media.MediaCodec;
 import android.os.Handler;
 import android.os.HandlerThread;
+
+import java.nio.ByteBuffer;
 
 class AudioHandler implements AudioRecorder.OnAudioRecorderStateChangedListener {
 
@@ -15,7 +18,7 @@ class AudioHandler implements AudioRecorder.OnAudioRecorderStateChangedListener 
     private AudioRecorder audioRecorder;
 
     interface OnAudioEncoderStateListener {
-        void onAudioDataEncoded(byte[] data, int size, int timestamp);
+        void onAudioDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info);
     }
 
     void setOnAudioEncoderStateListener(AudioHandler.OnAudioEncoderStateListener listener) {

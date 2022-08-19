@@ -1,5 +1,6 @@
 package com.takusemba.rtmppublisher;
 
+import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -7,6 +8,7 @@ import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 class VideoHandler {
 
@@ -16,7 +18,8 @@ class VideoHandler {
     private VideoEncoder videoEncoder;
 
     interface OnVideoEncoderStateListener {
-        void onVideoDataEncoded(byte[] data, int size, int timestamp);
+        void onSpsPps(ByteBuffer sps, ByteBuffer pps);
+        void onVideoDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info);
     }
 
     void setOnVideoEncoderStateListener(OnVideoEncoderStateListener listener) {
@@ -36,7 +39,13 @@ class VideoHandler {
             public void run() {
                 try {
                     videoEncoder.prepare(width, height, bitRate, FRAME_RATE, startStreamingAt, density);
-                    videoEncoder.start();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            videoEncoder.start();
+                        }
+                    }, 1000);
                 } catch (IOException ioe) {
                     throw new RuntimeException(ioe);
                 }
@@ -55,7 +64,4 @@ class VideoHandler {
         });
     }
 
-    private long getFrameInterval() {
-        return 1000 / FRAME_RATE;
-    }
 }

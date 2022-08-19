@@ -32,9 +32,13 @@
         <entry key="..\:/Mig/ATVizPro/src/main/res/layout/video_thumb_item_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/Mig/ATVizPro/src/main/res/layout/video_trimmer_view.xml" value="0.33" />
         <entry key="..\:/Mig/ATVizPro/src/main/res/menu/video_setting_menu.xml" value="0.18541666666666667" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_home.xml" value="0.1875" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_local_stream.xml" value="0.18802083333333333" />
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />

@@ -1,13 +1,19 @@
 package com.takusemba.rtmppublisher;
 
+import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import net.ossrs.rtmp.ConnectCheckerRtmp;
+import net.ossrs.rtmp.SrsFlvMuxer;
+
+import java.nio.ByteBuffer;
+
 
 class Streamer
-        implements VideoHandler.OnVideoEncoderStateListener, AudioHandler.OnAudioEncoderStateListener {
+        implements AudioHandler.OnAudioEncoderStateListener, VideoHandler.OnVideoEncoderStateListener {
 
     private static final String TAG = "Streamer_chienpm_log";
 
@@ -15,7 +21,8 @@ class Streamer
 
     private VideoHandler videoHandler;
     private AudioHandler audioHandler;
-    private Muxer muxer = new Muxer();
+
+    private SrsFlvMuxer srsFlvMuxer;
 
     Streamer(@NonNull MediaProjection mediaProjection) {
         this.videoHandler = new VideoHandler(mediaProjection);
@@ -24,13 +31,46 @@ class Streamer
 
     void open(String url, int width, int height) {
         if(DEBUG) Log.i(TAG, "open: "+url);
-        muxer.open(url, width, height);
+
+        srsFlvMuxer = new SrsFlvMuxer(new ConnectCheckerRtmp() {
+            @Override
+            public void onConnectionSuccessRtmp() {
+            }
+
+            @Override
+            public void onConnectionFailedRtmp(@NonNull String reason) {
+            }
+
+            @Override
+            public void onNewBitrateRtmp(long bitrate) {
+            }
+
+            @Override
+            public void onDisconnectRtmp() {
+
+            }
+
+            @Override
+            public void onAuthErrorRtmp() {
+
+            }
+
+            @Override
+            public void onAuthSuccessRtmp() {
+
+            }
+        });
+        srsFlvMuxer.setVideoResolution(width, height);
+        srsFlvMuxer.start(url);
+
+//        srsFlvMuxer.setIsStereo(true);
+//        srsFlvMuxer.setSampleRate(32000);
+
     }
 
-    void startStreaming(int width, int height, int audioBitrate,
-                        int videoBitrate, int density) {
+    void startStreamingSSL(int width, int height, int audioBitrate, int videoBitrate, int density) {
         int t = 0;
-        while (!muxer.isConnected()){
+        while (!srsFlvMuxer.isConnected()){
             try {
                 t+=100;
                 Thread.sleep(100);
@@ -40,43 +80,55 @@ class Streamer
                 e.printStackTrace();
             }
         }
-        if(muxer.isConnected()) {
+
+        if (srsFlvMuxer.isConnected()) {
             if(DEBUG) Log.i(TAG, "start Streaming: connected");
             long startStreamingAt = System.currentTimeMillis();
             videoHandler.setOnVideoEncoderStateListener(this);
             audioHandler.setOnAudioEncoderStateListener(this);
             videoHandler.start(width, height, videoBitrate, startStreamingAt, density);
             audioHandler.start(audioBitrate, startStreamingAt);
-        }
-        else{
-           Log.e(TAG, "startStreaming: failed coz muxer is not connected");
+        } else {
+            Log.e(TAG, "startStreaming: failed coz muxer is not connected");
         }
     }
 
     void stopStreaming() {
         videoHandler.stop();
         audioHandler.stop();
-        muxer.close();
+        srsFlvMuxer.stop();
+        oldTimeStamp = 0L;
     }
 
     boolean isStreaming() {
-        return muxer.isConnected();
+        return srsFlvMuxer.isConnected();
+    }
+
+
+    @Override
+    public void onAudioDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+        srsFlvMuxer.sendAudio(h264Buffer, info);
+
+        System.out.println("thanhlv sendAudio "+info.size);
     }
 
     @Override
-    public void onVideoDataEncoded(byte[] data, int size, int timestamp) {
-        if(DEBUG) Log.i(TAG, "onVideoDataEncoded: "+size+"byte, tsp: "+timestamp);
-        muxer.sendVideo(data, size, timestamp);
+    public void onSpsPps(ByteBuffer sps, ByteBuffer pps) {
+        srsFlvMuxer.setSpsPPs(sps, pps);
+        System.out.println("thanhlv onSpsPps "+sps.toString());
     }
 
     @Override
-    public void onAudioDataEncoded(byte[] data, int size, int timestamp) {
-        if(DEBUG) Log.i(TAG, "onAudioDataEncoded: "+size+"byte, tsp: "+timestamp);
-        muxer.sendAudio(data, size, timestamp);
+    public void onVideoDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+        srsFlvMuxer.sendVideo(h264Buffer, info);
+        System.out.println("thanhlv sendVideo "+info.size);
     }
-
-    void setMuxerListener(PublisherListener listener) {
-        muxer.setOnMuxerStateListener(listener);
+    long oldTimeStamp = 0L;
+    protected void fixTimeStamp(MediaCodec.BufferInfo info) {
+        if (oldTimeStamp > info.presentationTimeUs) {
+            info.presentationTimeUs = oldTimeStamp;
+        } else {
+            oldTimeStamp = info.presentationTimeUs;
+        }
     }
-
 }

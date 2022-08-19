@@ -50,7 +50,8 @@ public class MyUtils {
     public static final String KEY_CONTROLlER_MODE = "KEY_CONTROLLER_MODE";
     public static final String ACTION_INIT_CONTROLLER = "ACTION INIT CONTROLLER";
 //    public static final String SAMPLE_RMPT_URL = "rtmp://10.199.220.239/live/test";
-    public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/test";
+//    public static final String SAMPLE_RMPT_URL = "rtmps://live-api-s.facebook.com:443/rtmp/FB-2214421522061173-0-AbwXJyetmt7gRPGb";
+    public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/thanh";
     public static final String KEY_STREAM_URL = "rtmp stream";
     public static final String KEY_STREAM_LOG = "Stream log";
     public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
@@ -183,7 +184,7 @@ public class MyUtils {
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])" +
             "/\\S" +
             "/\\S$";
-    static String DOMAIN_PATTERN = "^rtmp://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]";
+    static String DOMAIN_PATTERN = "^rtmps?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]";
 
     public static final Pattern ipPattern = Pattern.compile(IP_ADDRESS_PATTERN);
     public static final Pattern domainPattern = Pattern.compile(DOMAIN_PATTERN);

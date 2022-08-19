@@ -4,7 +4,6 @@ import android.media.projection.MediaProjection;
 
 import androidx.annotation.NonNull;
 
-
 public interface Publisher {
 
     /**
@@ -136,8 +135,6 @@ public interface Publisher {
             return this;
         }
 
-
-
 //        /**
 //         * Set the {@link CameraMode}
 //         * this parameter is optional
@@ -159,7 +156,7 @@ public interface Publisher {
         /**
          * @return the created RtmpPublisher
          */
-        public RtmpPublisher build() {
+        public RtmpPublisherSSL build() {
 //            if (activity == null) {
 //                throw new IllegalStateException("activity should not be null");
 //            }
@@ -175,9 +172,6 @@ public interface Publisher {
             if (url == null || width <= 0) {
                 width = DEFAULT_WIDTH_LAND;
             }
-            if (url == null || audioBitrate <= 0) {
-                audioBitrate = DEFAULT_AUDIO_BITRATE;
-            }
             if (url == null || videoBitrate <= 0) {
                 videoBitrate = DEFAULT_VIDEO_BITRATE;
             }
@@ -191,7 +185,7 @@ public interface Publisher {
 //                mode = DEFAULT_MODE;
 //            }
 
-            return new RtmpPublisher(url, width, height, audioBitrate, videoBitrate, density, listener, mediaProjection);
+            return new RtmpPublisherSSL(url, width, height, audioBitrate, videoBitrate, density, mediaProjection);
         }
 
     }

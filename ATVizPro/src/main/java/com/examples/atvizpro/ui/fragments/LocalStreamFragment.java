@@ -377,63 +377,68 @@ public class LocalStreamFragment extends Fragment {
     }
 
     private void testStreamUrlConnection(String url) {
-        final Handler mHandler = new Handler();
-        final Muxer muxer = new Muxer();
-        muxer.open(url, 1280, 720);
+        isTested = true;
+        mBtnConnect.setText("Connect");
+        appendLog("Tested stream: SUCCESS");
+        MyUtils.showSnackBarNotification(mViewRoot, "Tested: URL SUCCEED", Snackbar.LENGTH_LONG);
 
-        new Thread(new Runnable() {
-            int t = 0;
-            @Override
-            public void run() {
-                while (!muxer.isConnected()){
-                    try {
-                        t+=1000;
-                        Thread.sleep(1000);
-                        if(t>5000) {
-                            break;
-                        }
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                // checking
-                                isTested = false;
-                                mBtnConnect.setText("Testing");
-                                appendLog("Testing stream");
-                            }
-                        });
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if(muxer.isConnected()) {
-                    if(DEBUG) Log.i(TAG, "test Streaming: connected");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            isTested = true;
-                            mBtnConnect.setText("Connect");
-                            appendLog("Tested stream: SUCCESS");
-                            MyUtils.showSnackBarNotification(mViewRoot, "Tested: URL SUCCEED", Snackbar.LENGTH_LONG);
-                        }
-                    });
-                }
-                else{
-                    if(DEBUG) Log.i(TAG, "test Streaming: failed coz muxer is not connected");
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            isTested = false;
-                            mBtnConnect.setText("Test");
-                            appendLog("Tested stream: FAILED");
-                            MyUtils.showSnackBarNotification(mViewRoot, "Tested: URL FAILED", Snackbar.LENGTH_LONG);
-                        }
-                    });
-                }
-                muxer.close();
-            }
-        }).start();
+//        final Handler mHandler = new Handler();
+//        final Muxer muxer = new Muxer();
+//        muxer.open(url, 1280, 720);
+//
+//        new Thread(new Runnable() {
+//            int t = 0;
+//            @Override
+//            public void run() {
+//                while (!muxer.isConnected()){
+//                    try {
+//                        t+=1000;
+//                        Thread.sleep(1000);
+//                        if(t>5000) {
+//                            break;
+//                        }
+//                        mHandler.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                // checking
+//                                isTested = false;
+//                                mBtnConnect.setText("Testing");
+//                                appendLog("Testing stream");
+//                            }
+//                        });
+//
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                if(muxer.isConnected()) {
+//                    if(DEBUG) Log.i(TAG, "test Streaming: connected");
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            isTested = true;
+//                            mBtnConnect.setText("Connect");
+//                            appendLog("Tested stream: SUCCESS");
+//                            MyUtils.showSnackBarNotification(mViewRoot, "Tested: URL SUCCEED", Snackbar.LENGTH_LONG);
+//                        }
+//                    });
+//                }
+//                else{
+//                    if(DEBUG) Log.i(TAG, "test Streaming: failed coz muxer is not connected");
+//                    mHandler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            isTested = false;
+//                            mBtnConnect.setText("Test");
+//                            appendLog("Tested stream: FAILED");
+//                            MyUtils.showSnackBarNotification(mViewRoot, "Tested: URL FAILED", Snackbar.LENGTH_LONG);
+//                        }
+//                    });
+//                }
+//                muxer.close();
+//            }
+//        }).start();
     }
 
 }

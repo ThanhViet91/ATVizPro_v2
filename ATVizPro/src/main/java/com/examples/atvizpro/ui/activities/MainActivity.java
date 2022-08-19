@@ -24,10 +24,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.examples.atvizpro.SimpleExample;
 import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
 import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
+import com.examples.atvizpro.ui.fragments.LocalStreamFragment;
 import com.examples.atvizpro.utils.PathUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -176,6 +178,18 @@ public class MainActivity extends AppCompatActivity {
                         showDialogPickFromGallery();
                     }
                 }).show(getSupportFragmentManager(), "");
+            }
+        });
+
+        ImageView btn_live = findViewById(R.id.img_live);
+        btn_live.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                LocalStreamFragment lcFrag = new LocalStreamFragment();
+                lcFrag.setContext(MainActivity.this);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(R.id.frame_layout_fragment, lcFrag).commit();
             }
         });
 

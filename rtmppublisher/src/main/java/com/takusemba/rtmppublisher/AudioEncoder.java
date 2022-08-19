@@ -7,7 +7,6 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Handler;
 import android.os.HandlerThread;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -118,19 +117,7 @@ class AudioEncoder implements Encoder {
                         if (encodedData == null) {
                             continue;
                         }
-
-                        encodedData.position(bufferInfo.offset);
-                        encodedData.limit(bufferInfo.offset + bufferInfo.size);
-
-                        byte[] data = new byte[bufferInfo.size];
-
-                        encodedData.get(data, 0, bufferInfo.size);
-                        encodedData.position(bufferInfo.offset);
-
-                        long currentTime = System.currentTimeMillis();
-                        int timestamp = (int) (currentTime - startedEncodingAt);
-                        listener.onAudioDataEncoded(data, bufferInfo.size, timestamp);
-
+                        listener.onAudioDataEncoded(encodedData, bufferInfo);
                         encoder.releaseOutputBuffer(outputBufferId, false);
                     } else if (outputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                         // format should not be changed

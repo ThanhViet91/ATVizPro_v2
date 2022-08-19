@@ -27,6 +27,7 @@ dependencies {
     implementation("com.serenegiant:common:0.0.3") {
         exclude module: 'support-v4'
     }
+    implementation project(path: ':rtmp')
 }
 
 def getBintrayUserProperty() {

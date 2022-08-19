@@ -1,11 +1,15 @@
 package com.examples.atvizpro.ui.services.streaming;
 
+import static com.examples.atvizpro.ui.utils.UIThreadUtil.runOnUiThread;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
@@ -16,6 +20,7 @@ import android.util.Size;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.pedro.encoder.video.GetVideoData;
 import com.takusemba.rtmppublisher.Publisher;
 import com.takusemba.rtmppublisher.PublisherListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -24,10 +29,11 @@ import com.examples.atvizpro.controllers.encoder.RenderUtil.CustomDecorator;
 import com.examples.atvizpro.ui.services.BaseService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class StreamingService extends BaseService implements PublisherListener {
-    private static final boolean DEBUG = MyUtils.DEBUG;	// TODO set false on release
+public class StreamingService extends BaseService implements PublisherListener, GetVideoData {
+    private static final boolean DEBUG = MyUtils.DEBUG;    // TODO set false on release
     public static final String KEY_NOTIFY_MSG = "stream service notify";
 
     public static final String NOTIFY_MSG_CONNECTION_FAILED = "Stream connection failed";
@@ -57,38 +63,58 @@ public class StreamingService extends BaseService implements PublisherListener {
     //Implement Publisher listener
     @Override
     public void onStarted() {
-        if(DEBUG) Log.i(TAG, "onStarted");
+        if (DEBUG) Log.i(TAG, "onStarted");
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_STARTED);
     }
 
     @Override
     public void onStopped() {
-        if(DEBUG) Log.i(TAG, "onStopped");
+        if (DEBUG) Log.i(TAG, "onStopped");
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
     }
 
     @Override
     public void onDisconnected() {
-        if(DEBUG) Log.i(TAG, "onDisconnected");
+        if (DEBUG) Log.i(TAG, "onDisconnected");
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_DISCONNECTED);
     }
 
     @Override
     public void onFailedToConnect() {
-        if(mPublisher!=null && mPublisher.isPublishing())
+        if (mPublisher != null && mPublisher.isPublishing())
             mPublisher.stopPublishing();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
-        if(DEBUG) Log.i(TAG, "onFailedToConnect");
+        if (DEBUG) Log.i(TAG, "onFailedToConnect");
         MyUtils.toast(getApplicationContext(), "Streaming Connection Failed", Toast.LENGTH_SHORT);
     }
 
     @Override
     public void onSentVideoData(int result, int timestamp) {
-        Log.i(TAG, "Sent video data at "+timestamp+" - result: "+result);
+        Log.i(TAG, "Sent video data at " + timestamp + " - result: " + result);
     }
 
-    public class StreamingBinder extends Binder{
-        public StreamingService getService(){
+    @Override
+    public void onSpsPps(ByteBuffer sps, ByteBuffer pps) {
+//        System.out.println("thanhlv onSpsPpsonSpsPpsonSpsPpsonSpsPps");
+    }
+
+    @Override
+    public void onSpsPpsVps(ByteBuffer sps, ByteBuffer pps, ByteBuffer vps) {
+
+    }
+
+    @Override
+    public void getVideoData(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+//        System.out.println("thanhlv getVideoDatagetVideoData " + info.size);
+    }
+
+    @Override
+    public void onVideoFormat(MediaFormat mediaFormat) {
+
+    }
+
+    public class StreamingBinder extends Binder {
+        public StreamingService getService() {
             return StreamingService.this;
         }
     }
@@ -97,8 +123,8 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     }
 
-    void notifyStreamingCallback(String notify_msg){
-        if(DEBUG) Log.i(TAG, "sent notify stream "+notify_msg);
+    void notifyStreamingCallback(String notify_msg) {
+        if (DEBUG) Log.i(TAG, "sent notify stream " + notify_msg);
         Intent intent = new Intent();
         intent.setAction(MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE);
         intent.putExtra(KEY_NOTIFY_MSG, notify_msg);
@@ -120,23 +146,21 @@ public class StreamingService extends BaseService implements PublisherListener {
         if (width > height) {
             final float scale_x = width / 1920f;
             final float scale_y = height / 1080f;
-            final float scale = Math.max(scale_x,  scale_y);
-            width = (int)(width / scale);
-            height = (int)(height / scale);
+            final float scale = Math.max(scale_x, scale_y);
+            width = (int) (width / scale);
+            height = (int) (height / scale);
         } else {
             final float scale_x = width / 1080f;
             final float scale_y = height / 1920f;
-            final float scale = Math.max(scale_x,  scale_y);
-            width = (int)(width / scale);
-            height = (int)(height / scale);
+            final float scale = Math.max(scale_x, scale_y);
+            width = (int) (width / scale);
+            height = (int) (height / scale);
         }
         //just support landscape
-        if(width>height)
-        {
+        if (width > height) {
             mScreenWidth = width;
             mScreenHeight = height;
-        }
-        else {
+        } else {
             mScreenWidth = height;
             mScreenHeight = width;
         }
@@ -144,13 +168,13 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public IBinder onBind(Intent intent) {
-        if(DEBUG) Log.i(TAG, "RecordingService: onBind()");
+        if (DEBUG) Log.i(TAG, "RecordingService: onBind()");
         mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
 
         mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
 
-        if(mStreamProfile == null)
+        if (mStreamProfile == null)
             throw new RuntimeException("Stream Profile is null");
         else
             mUrl = mStreamProfile.getStreamUrl();
@@ -168,33 +192,31 @@ public class StreamingService extends BaseService implements PublisherListener {
             throw new RuntimeException("No display found.");
         }
 
-        if(DEBUG) Log.d(TAG, "onBindStream: "+ mScreenCaptureIntent);
-        if(DEBUG) Log.d(TAG, "onBindStream: "+ mStreamProfile.toString());
+        if (DEBUG) Log.d(TAG, "onBindStream: " + mScreenCaptureIntent);
+        if (DEBUG) Log.d(TAG, "onBindStream: " + mStreamProfile.toString());
         return mIBinder;
     }
 
 
     @Override
     public void startPerformService() {
-        if(DEBUG) Log.i(TAG, "startPerformService: from StreamingService");
-        notifyStreamingCallback(NOTIFY_MSG_REQUEST_START+" "+ mUrl);
+        if (DEBUG) Log.i(TAG, "startPerformService: from StreamingService");
+        notifyStreamingCallback(NOTIFY_MSG_REQUEST_START + " " + mUrl);
         startStreaming();
     }
 
     @Override
     public void stopPerformService() {
-        if(DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
-        notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP+" "+ mUrl);
+        if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
+        notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP + " " + mUrl);
         stopStreaming();
     }
 
-
     public void startStreaming() {
         synchronized (sSync) {
-            if(mPublisher==null) {
+            if (mPublisher == null) {
                 if (DEBUG) Log.i(TAG, "startStreaming:");
                 try {
-
                     mPublisher = new Publisher.Builder()
                             .setUrl(mUrl)
                             .setSize(1280, 720)
@@ -202,26 +224,23 @@ public class StreamingService extends BaseService implements PublisherListener {
                             .setVideoBitrate(Publisher.Builder.DEFAULT_VIDEO_BITRATE)
                             .setDensity(mScreenDensity)
                             .setMediaProjection(mMediaProjection)
-                            .setListener(this)
                             .build();
-
                     mPublisher.startPublishing();
 
-
-                 } catch (final Exception e) {
+                } catch (final Exception e) {
                     Log.e(TAG, "startStreaming error:", e);
                     notifyStreamingCallback(NOTIFY_MSG_ERROR);
                 }
-            }else{
+            } else {
                 mPublisher.startPublishing();
             }
         }
 
     }
 
-    public void updateStreamProfile(StreamProfile profile){
+    public void updateStreamProfile(StreamProfile profile) {
         mStreamProfile = profile;
-        if(!mUrl.equals(profile.getStreamUrl())){
+        if (!mUrl.equals(profile.getStreamUrl())) {
             mUrl = profile.getStreamUrl();
             notifyStreamingCallback(NOTIFY_MSG_UPDATED_STREAM_PROFILE);
         }
@@ -231,7 +250,7 @@ public class StreamingService extends BaseService implements PublisherListener {
         ArrayList<CustomDecorator> list = new ArrayList<>();
 
         //watermask
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wartermark);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wartermark);
 
         list.add(new CustomDecorator(bitmap, new Size(240, 240), new Point(0, 0)));
 
@@ -239,7 +258,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     public void stopStreaming() {
-        if(mPublisher!=null && mPublisher.isPublishing()) {
+        if (mPublisher != null && mPublisher.isPublishing()) {
             mPublisher.stopPublishing();
         }
     }

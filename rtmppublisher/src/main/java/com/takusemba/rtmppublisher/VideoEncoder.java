@@ -49,14 +49,6 @@ public class VideoEncoder implements Encoder {
         this.listener = listener;
     }
 
-    long getLastFrameEncodedAt() {
-        return lastFrameEncodedAt;
-    }
-
-    Surface getInputSurface() {
-        return inputSurface;
-    }
-
     /**
      * prepare the Encoder. call this before start the encoder.
      */
@@ -83,14 +75,14 @@ public class VideoEncoder implements Encoder {
                 mWidth, mHeight, mDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 inputSurface, null, null
-                );
+        );
 
-        if(DEBUG) Log.i(TAG, "prepare: video encoder");
+        if (DEBUG) Log.i(TAG, "prepare: video encoder");
     }
 
     @Override
     public void start() {
-        if(DEBUG) Log.i(TAG, "start: video encoder");
+        if (DEBUG) Log.i(TAG, "start: video encoder");
         encoder.start();
         isEncoding = true;
         drain();
@@ -99,7 +91,7 @@ public class VideoEncoder implements Encoder {
     @Override
     public void stop() {
         if (isEncoding()) {
-            if(DEBUG) Log.i(TAG, "stop: video encoder");
+            if (DEBUG) Log.i(TAG, "stop: video encoder");
             encoder.signalEndOfInputStream();
         }
     }
@@ -108,6 +100,7 @@ public class VideoEncoder implements Encoder {
     public boolean isEncoding() {
         return encoder != null && isEncoding;
     }
+
     void drain() {
         HandlerThread handlerThread = new HandlerThread("VideoEncoder-drain");
         handlerThread.start();
@@ -121,41 +114,17 @@ public class VideoEncoder implements Encoder {
                     ByteBuffer[] encoderOutputBuffers = encoder.getOutputBuffers();
                     int inputBufferId = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
                     if (inputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-
                         MediaFormat newFormat = encoder.getOutputFormat();
                         ByteBuffer sps = newFormat.getByteBuffer("csd-0");
                         ByteBuffer pps = newFormat.getByteBuffer("csd-1");
-                        byte[] config = new byte[sps.limit() + pps.limit()];
-                        sps.get(config, 0, sps.limit());
-                        pps.get(config, sps.limit(), pps.limit());
-
-                        listener.onVideoDataEncoded(config, config.length, 0);
+                        listener.onSpsPps(sps, pps);
                     } else {
-                        if (inputBufferId > 0) {
+                        if (inputBufferId >= 0) {
                             ByteBuffer encodedData = encoderOutputBuffers[inputBufferId];
                             if (encodedData == null) {
                                 continue;
                             }
-
-                            if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-                                bufferInfo.size = 0;
-                            }
-
-                            if (bufferInfo.size != 0) {
-
-                                encodedData.position(bufferInfo.offset);
-                                encodedData.limit(bufferInfo.offset + bufferInfo.size);
-
-                                long currentTime = System.currentTimeMillis();
-                                int timestamp = (int) (currentTime - startStreamingAt);
-                                byte[] data = new byte[bufferInfo.size];
-                                encodedData.get(data, 0, bufferInfo.size);
-                                encodedData.position(bufferInfo.offset);
-
-                                if(DEBUG) Log.i(TAG, "prepare to invoke to onVideoDataEncoded: "+bufferInfo.size+" bytes");
-                                listener.onVideoDataEncoded(data, bufferInfo.size, timestamp);
-                                lastFrameEncodedAt = currentTime;
-                            }
+                            listener.onVideoDataEncoded(encodedData, bufferInfo);
                             encoder.releaseOutputBuffer(inputBufferId, false);
                         } else if (inputBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                             continue;

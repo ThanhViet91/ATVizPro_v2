@@ -355,7 +355,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
     }
     float camWidth, camHeight;
-    int[] camViewSize = {180, 210, 240, 270, 300, 330, 360};
+    int[] camViewSize = {240, 270, 300, 330, 360, 390, 420};
 
     boolean hasZoom = false;
 

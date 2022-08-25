@@ -7,7 +7,7 @@ package com.examples.atvizpro.ui;
  * Describe:
  */
 public interface VideoStreamListener {
-    void onClickDone();
+    void onClickNext();
     void onStartRecord();
     void onStopRecord();
     void onDeleteRecord();

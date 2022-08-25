@@ -27,8 +27,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.examples.atvizpro.ui.fragments.DialogBitrate;
+import com.examples.atvizpro.ui.fragments.DialogFrameRate;
 import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
 import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
+import com.examples.atvizpro.ui.fragments.DialogSettingsHome;
+import com.examples.atvizpro.ui.fragments.DialogVideoResolution;
 import com.examples.atvizpro.ui.fragments.FragmentFAQ;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.fragments.ProjectsFragment;
@@ -124,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ImageView mImgRec, mImgFAQ;
+    private ImageView mImgRec, mImgFAQ, btn_setting;
+
+    private LinearLayout btn_set_resolution, bnt_set_bitrate, btn_set_fps;
 
     private void initViews() {
 
@@ -134,6 +140,86 @@ public class MainActivity extends AppCompatActivity {
 
         //
         mImgRec =  findViewById(R.id.img_record);
+        btn_setting =  findViewById(R.id.img_settings);
+        btn_set_resolution =  findViewById(R.id.set_video_resolution);
+        bnt_set_bitrate =  findViewById(R.id.set_bitrate);
+        btn_set_fps =  findViewById(R.id.set_frame_rate);
+
+
+        btn_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DialogSettingsHome().show(getSupportFragmentManager(), "");
+            }
+        });
+
+        btn_set_resolution.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DialogVideoResolution(new DialogFragmentBase.CallbackFragment() {
+                    @Override
+                    public void onClick() {
+
+                    }
+
+                    @Override
+                    public void onClickCameraRoll() {
+
+                    }
+
+                    @Override
+                    public void onClickMyRecordings() {
+
+                    }
+                }).show(getSupportFragmentManager(), "");
+            }
+        });
+
+
+        bnt_set_bitrate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DialogBitrate(new DialogFragmentBase.CallbackFragment() {
+                    @Override
+                    public void onClick() {
+
+                    }
+
+                    @Override
+                    public void onClickCameraRoll() {
+
+                    }
+
+                    @Override
+                    public void onClickMyRecordings() {
+
+                    }
+                }).show(getSupportFragmentManager(), "");
+            }
+        });
+
+        btn_set_fps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DialogFrameRate(new DialogFragmentBase.CallbackFragment() {
+                    @Override
+                    public void onClick() {
+
+                    }
+
+                    @Override
+                    public void onClickCameraRoll() {
+
+                    }
+
+                    @Override
+                    public void onClickMyRecordings() {
+
+                    }
+                }).show(getSupportFragmentManager(), "");
+            }
+        });
+
 
         mImgRec.setOnClickListener(new View.OnClickListener() {
             @Override

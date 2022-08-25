@@ -31,14 +31,15 @@ public class OptionTrimFragment extends DialogFragmentBase {
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = ProjectsFragment.class.getSimpleName();
 
-    public static OptionTrimFragment newInstance(Bundle args) {
-        OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment();
+    public static OptionTrimFragment newInstance(IOptionFragmentListener callback, Bundle args) {
+        OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public CallbackFragment callback = null;
+    public IOptionFragmentListener callback = null;
 
-    public OptionTrimFragment() {
+    public OptionTrimFragment(IOptionFragmentListener callback) {
+        this.callback =  callback;
 
     }
     @Override
@@ -114,15 +115,17 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
     private void processingTrimming() {
 
+        callback.onClickDone();
+
         new VideoUtil().trimVideo(getActivity(), video_path, startTime, endTime, new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
-                buildDialog("compression...");
             }
 
             @Override
             public void onFinishTranscoding(String code) {
-                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+                dismiss();
+                callback.onFinishProcess();
             }
 
             @Override
@@ -131,15 +134,6 @@ public class OptionTrimFragment extends DialogFragmentBase {
             }
         });
 
-    }
-
-    private ProgressDialog mProgressDialog;
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getContext(), "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
     }
 
 

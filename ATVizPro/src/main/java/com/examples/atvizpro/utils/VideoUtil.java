@@ -65,9 +65,9 @@ public class VideoUtil {
 
     public void addText(Activity act, String originalVideoPath, String text, String color, String size, String position, ITranscoding callback){
         String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
-        String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
-        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf drawtext=fontfile= "+ fontPath + ": text=" + text+ ": fontcolor=" + color
-                + ": fontsize=" + size+ ": " + position + " -c:v libx264 -c:a copy -movflags +faststart" +outputVideoPath;
+//        String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
+//        String fontPath = "/storage/emulated/0/MarvelEditor/.Font/roboto_black.ttf";
+        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf drawtext=text=" + text + ":fontcolor=#ffffff:fontsize=40:" + position + " -c:v libx264 -c:a copy  " +outputVideoPath;
 
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
@@ -77,9 +77,17 @@ public class VideoUtil {
     public void changeSpeed(Activity act, String originalVideoPath, String text, String color, String size, String position, ITranscoding callback){
         String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
         String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
-        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf drawtext=fontfile= "+ fontPath + ": text=" + text+ ": fontcolor=" + color
+        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf \"drawtext=fontfile= "+ fontPath + ": text=\'" + text+ "\': fontcolor=" + color
                 + ": fontsize=" + size+ ": " + position + " -c:v libx264 -c:a copy -movflags +faststart" +outputVideoPath;
 
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+    }
+
+    public void addImage(Activity act, String originalVideoPath, String imagePath, String position, ITranscoding callback){
+        String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
+
+        String cmd = "ffmpeg -i " +  originalVideoPath + " -i " + imagePath+ " -filter_complex " + position +  " -c:a copy " + outputVideoPath;
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
     }

@@ -1,7 +1,10 @@
 package com.examples.atvizpro.ui.fragments;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +19,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.BasicAdapter;
-import com.examples.atvizpro.adapter.PhotoAdapter;
 import com.examples.atvizpro.adapter.StickerAdapter;
 import com.examples.atvizpro.model.PhotoModel;
 import com.examples.atvizpro.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +78,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         btn_done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                processingAddText();
+                processingAddImage();
             }
         });
 
@@ -102,24 +108,71 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     }
 
+    int[] resourceID = {R.drawable.sticker_1,
+                        R.drawable.sticker_2,
+                        R.drawable.sticker_3,
+                        R.drawable.sticker_4,
+                        R.drawable.sticker_5,
+                        R.drawable.sticker_6,
+                        R.drawable.sticker_7,
+                        R.drawable.sticker_8,
+                        R.drawable.sticker_9,
+                        R.drawable.sticker_10,
+                        R.drawable.sticker_11,
+                        R.drawable.sticker_12,
+                        R.drawable.sticker_13,
+                        R.drawable.sticker_14,
+                        R.drawable.sticker_15,
+                        R.drawable.sticker_16,
+                        R.drawable.sticker_17,
+                        R.drawable.sticker_18,
+                        R.drawable.sticker_19,
+    };
     private List<PhotoModel> getListSticker() {
 
         List<PhotoModel> listSticker;
         listSticker = new ArrayList<>();
-        listSticker.add(new PhotoModel(R.drawable.facebook_slider1));
-        listSticker.add(new PhotoModel(R.drawable.bg_page_fb_2));
-        listSticker.add(new PhotoModel(R.drawable.bg_page_fb_2));
-        listSticker.add(new PhotoModel(R.drawable.bg_page_fb_2));
-        listSticker.add(new PhotoModel(R.drawable.bg_page_fb_2));
-        listSticker.add(new PhotoModel(R.drawable.bg_page_fb_3));
 
-
+        for (int i = 1; i < 20; i ++){
+            listSticker.add(new PhotoModel(resourceID[i-1]));
+            copyResourceToFile("sticker_"+i+".png", resourceID[i-1]);
+        }
         return listSticker;
     }
 
-    private void processingAddText() {
+    public void copyResourceToFile(String resourceName, int id) {
 
-        new VideoUtil().addText(getActivity(), video_path, "startTime", "endTime", "", "", new VideoUtil.ITranscoding() {
+        Bitmap bm = BitmapFactory.decodeResource( getResources(), R.drawable.sticker_19);
+
+        String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
+
+        File file = new File(extStorageDirectory, resourceName);
+        FileOutputStream outStream = null;
+        try {
+            outStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        bm.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        try {
+            if (outStream != null) {
+                outStream.flush();
+            }
+
+            if (outStream != null) {
+                outStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    private void processingAddImage() {
+
+        new VideoUtil().addImage(getActivity(), video_path, "/sdcard/thanh.png", "x=10:y=10",  new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
                 buildDialog("compression...");

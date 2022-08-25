@@ -7,16 +7,19 @@ import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoOptionAdapter;
 import com.examples.atvizpro.ui.VideoEditorView;
-import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
+import com.examples.atvizpro.ui.VideoStreamListener;
+import com.examples.atvizpro.ui.fragments.IOptionFragmentListener;
 import com.examples.atvizpro.ui.fragments.OptionAddImageFragment;
 import com.examples.atvizpro.ui.fragments.OptionAddTextFragment;
 import com.examples.atvizpro.ui.fragments.OptionChangeSpeedFragment;
@@ -26,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class VideoEditorActivity extends AppCompatActivity implements VideoOptionAdapter.VideoOptionListener{
+public class VideoEditorActivity extends AppCompatActivity implements VideoOptionAdapter.VideoOptionListener, IOptionFragmentListener, VideoStreamListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
@@ -37,6 +40,8 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
     private ArrayList<String> videoOptions = new ArrayList<>();
     private VideoOptionAdapter mAdapter;
 
+    private LottieAnimationView animationView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +50,7 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         videoEditorView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
-//        videoEditorView.setOnTrimVideoListener(this);
+        videoEditorView.setOnEditVideoListener(this);
         videoEditorView.initVideoByURI(Uri.parse(pathOriginalVideo));
 
         videoOptions.add("Trim");
@@ -61,6 +66,9 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         recyclerView.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        animationView = findViewById(R.id.animation_view);
+        animationView.setVisibility(View.GONE);
 
     }
 
@@ -116,7 +124,7 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         switch (opt) {
             case "Trim":
 
-                OptionTrimFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
+                OptionTrimFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
             case "Text":
 
@@ -135,4 +143,48 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         }
 
     }
+
+    @Override
+    public void onClickClose() {
+    }
+
+    @Override
+    public void onClickDone() {
+
+        animationView.setVisibility(View.VISIBLE);
+        animationView.playAnimation();
+    }
+
+    @Override
+    public void onClickNext() {
+
+    }
+    @Override
+    public void onFinishProcess() {
+
+        animationView.pauseAnimation();
+        animationView.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    public void onStartRecord() {
+
+    }
+
+    @Override
+    public void onStopRecord() {
+
+    }
+
+    @Override
+    public void onDeleteRecord() {
+
+    }
+
+    @Override
+    public void onCancel() {
+        finish();
+    }
+
 }

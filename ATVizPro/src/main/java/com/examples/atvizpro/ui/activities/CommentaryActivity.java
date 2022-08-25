@@ -91,7 +91,7 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
     }
 
     @Override
-    public void onClickDone() {
+    public void onClickNext() {
         if (!pathOriginalVideo.equals("") && !cacheAudioFilePath.equals("")) {
             new VideoUtil().commentaryAudio(this, pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
                 @Override

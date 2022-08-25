@@ -11,7 +11,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -59,7 +58,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     private float mAverageMsPx;//每毫秒所占的px
     private float averagePxMs;//每px所占用的ms毫秒
     private Uri mSourceUri;
-    private VideoStreamListener mOnTrimVideoListener;
+    private VideoStreamListener videoStreamListener;
     private int mDuration = 0;
     private VideoTrimmerAdapter mVideoThumbAdapter;
     private boolean isFromRestore = false;
@@ -165,7 +164,8 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     }
 
     private void onCancelClicked() {
-        mOnTrimVideoListener.onCancel();
+        if (videoStreamListener != null)
+            videoStreamListener.onCancel();
     }
 
     private void videoPrepared(MediaPlayer mp) {
@@ -216,46 +216,6 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         mVideoView.pause();
     }
 
-    private boolean completed = false;
-
-    private void handlerPlayVideoOrPause() {
-        mRedProgressBarPos = mVideoView.getCurrentPosition();
-        if (mVideoView.isPlaying()) {
-            mVideoView.pause();
-            pauseRedProgressAnimation();
-            completedCommentary();
-        } else if (!completed) {
-            new CountDownTimer(2900, 1000) {
-                public void onTick(long millisUntilFinished) {
-                    layoutCountdown.setVisibility(VISIBLE);
-                    number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
-                }
-
-                public void onFinish() {
-                    layoutCountdown.setVisibility(GONE);
-                    mRedProgressBarPos = mVideoView.getCurrentPosition();
-                    mVideoView.start();
-                    mOnTrimVideoListener.onStartRecord();
-                    playingRedProgressAnimation();
-                }
-            }.start();
-        } else {
-            //TODO completed commentary
-            System.out.println("thanhlv delelelet");
-            seekTo(0);
-            completed = false;
-            mOnTrimVideoListener.onDeleteRecord();
-            mRedProgressIcon.setVisibility(GONE);
-            btn_done.setVisibility(GONE);
-        }
-    }
-
-    private void completedCommentary() {
-        mOnTrimVideoListener.onStopRecord();
-        completed = true;
-        btn_done.setVisibility(VISIBLE);
-    }
-
     public void onVideoPause() {
         if (mVideoView.isPlaying()) {
             seekTo(mLeftProgressPos);//复位
@@ -264,8 +224,8 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         }
     }
 
-    public void setOnTrimVideoListener(VideoStreamListener onStreamVideoListener) {
-        mOnTrimVideoListener = onStreamVideoListener;
+    public void setOnEditVideoListener(VideoStreamListener onStreamVideoListener) {
+        videoStreamListener = onStreamVideoListener;
     }
 
     private void setUpListeners() {
@@ -299,7 +259,8 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     }
 
     private void onDoneClicked() {
-        mOnTrimVideoListener.onClickDone();
+        if (videoStreamListener != null)
+        videoStreamListener.onClickNext();
     }
 
 

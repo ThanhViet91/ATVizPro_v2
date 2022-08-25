@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -54,6 +55,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
     }
 
     String video_path;
+    EditText inputText;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
 
         ImageView btn_close = view.findViewById(R.id.iv_close);
         ImageView btn_done = view.findViewById(R.id.iv_done);
+        inputText = view.findViewById(R.id.edt_input);
 
         btn_close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +100,8 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
 
     private void processingAddText() {
 
-        new VideoUtil().addText(getActivity(), video_path, "startTime", "endTime", "", "", new VideoUtil.ITranscoding() {
+        if (inputText.getText().toString().equals("")) return;
+        new VideoUtil().addText(getActivity(), video_path, inputText.getText().toString(), "endTime", "", "x=(w-text_w)/2:y=(h-text_h)/2", new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
                 buildDialog("compression...");

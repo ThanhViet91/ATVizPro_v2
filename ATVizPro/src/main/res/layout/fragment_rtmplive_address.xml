@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/custom_background">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/Title_Box_White"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="Livestreaming" />
+
+        <ImageView
+            android:id="@+id/img_back_rtmp"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:paddingStart="10dp"
+            android:src="@drawable/ic_back_header_24" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:text="RTMP address"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <FrameLayout
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:hint="rtmp://"
+            android:paddingLeft="10dp"
+            android:id="@+id/edt_rtmp_address"
+            android:background="@drawable/custom_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_paste_rtmp_address"
+            android:layout_marginRight="7dp"
+            android:text="Paste"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:layout_gravity="right|center"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:text="Steam key"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <FrameLayout
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:paddingLeft="10dp"
+            android:id="@+id/edt_stream_key"
+            android:background="@drawable/custom_edt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_paste_stream_key"
+            android:layout_marginRight="7dp"
+            android:text="Paste"
+            android:padding="5dp"
+            android:textStyle="bold"
+            android:layout_gravity="right|center"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+    <TextView
+        android:layout_marginTop="8dp"
+        android:text="@string/enter_key"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/tv_start_livestreaming"
+        android:background="@drawable/custom_background_tv_startlivestreaming"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:text="@string/start_livestreming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

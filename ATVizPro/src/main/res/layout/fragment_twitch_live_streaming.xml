@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/custom_background"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/Title_Box_White"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:text="Twitch livestreaming" />
+
+        <ImageView
+            android:id="@+id/img_back_tw_slider"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:paddingStart="10dp"
+            android:src="@drawable/ic_back_header_24" />
+    </RelativeLayout>
+
+    <TextView
+        style="@style/Text_Description_White_15_400"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginRight="15dp"
+        android:text="@string/description_fb_live" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager_img_twitch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp" />
+
+        <me.relex.circleindicator.CircleIndicator3
+            android:id="@+id/circle_indicator_twitch"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|center"
+            app:ci_drawable="@drawable/select_img"
+            app:ci_drawable_unselected="@drawable/un_select_img"
+            app:ci_height="8dp"
+            app:ci_width="8dp" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/btn_continue_twitch_livestreaming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/custom_btn"
+        android:gravity="center"
+        android:text="@string/continue_"
+        android:textColor="#FF694C"
+        android:textSize="20dp"
+        android:textStyle="bold" />
+</LinearLayout>

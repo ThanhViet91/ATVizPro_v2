@@ -22,5 +22,5 @@ android {
 dependencies {
   api project(':encoder')
   api project(':rtmp')
-  api project(':rtsp')
+//  api project(':rtsp')
 }

@@ -93,6 +93,22 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="select_video_source">Select Video Source</string>
     <string name="react_to_videos_from_camera_roll">React to videos from Camera Roll</string>
+    <string name="edit_video_from_my_recordings_or_camera_roll">Edit video from my recordings or Camera Roll</string>
+    <string name="add_commentary_to_video_from_my_recordings_or_camera_roll">Add commentary to video from my recordings or Camera Roll</string>
     <string name="camera_roll">Camera Roll</string>
+    <string name="react_cam">React Cam</string>
+    <string name="video_editor">Video Editor</string>
+    <string name="commentary">Commentary</string>
+
+
+    <string name="description_fb_live">Get the facebook livestream URL and start livestreaming at the RTMP URL page. The livestream URL can be saved in the RTMP page. After settingthe livecode, you can use it all the time unless you change it.</string>
+    <string name="continue_">Continue</string>
+    <string name="paste">Paste</string>
+    <string name="start_livestreming">Start Livestreaming</string>
+    <string name="enter_key">Please enter stream key here.</string>
+    <string name="new_">New</string>
+    <string name="save_to_gallery">Saved to gallery</string>
+    <string name="share">Share</string>
+    <string name="my_recordings">My Recordings</string>
 
 </resources>

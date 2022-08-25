@@ -18,7 +18,7 @@
 
 
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
 
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -45,6 +45,12 @@
     <style name="Title_Box_White" parent="White_Text">
         <item name="android:textSize">24sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
+    </style>
+
+
+    <style name="Text_Description_White_15_400" parent="White_Text">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>
 
     <style name="Body_List_Item_White" parent="White_Text">

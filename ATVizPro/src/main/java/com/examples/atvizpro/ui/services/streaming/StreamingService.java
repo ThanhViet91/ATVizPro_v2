@@ -32,7 +32,7 @@ import com.examples.atvizpro.ui.utils.MyUtils;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class StreamingService extends BaseService implements PublisherListener, GetVideoData {
+public class StreamingService extends BaseService implements PublisherListener {
     private static final boolean DEBUG = MyUtils.DEBUG;    // TODO set false on release
     public static final String KEY_NOTIFY_MSG = "stream service notify";
 
@@ -91,26 +91,6 @@ public class StreamingService extends BaseService implements PublisherListener, 
     @Override
     public void onSentVideoData(int result, int timestamp) {
         Log.i(TAG, "Sent video data at " + timestamp + " - result: " + result);
-    }
-
-    @Override
-    public void onSpsPps(ByteBuffer sps, ByteBuffer pps) {
-//        System.out.println("thanhlv onSpsPpsonSpsPpsonSpsPpsonSpsPps");
-    }
-
-    @Override
-    public void onSpsPpsVps(ByteBuffer sps, ByteBuffer pps, ByteBuffer vps) {
-
-    }
-
-    @Override
-    public void getVideoData(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
-//        System.out.println("thanhlv getVideoDatagetVideoData " + info.size);
-    }
-
-    @Override
-    public void onVideoFormat(MediaFormat mediaFormat) {
-
     }
 
     public class StreamingBinder extends Binder {

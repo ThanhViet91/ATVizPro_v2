@@ -63,8 +63,8 @@ class Streamer
         srsFlvMuxer.setVideoResolution(width, height);
         srsFlvMuxer.start(url);
 
-//        srsFlvMuxer.setIsStereo(true);
-//        srsFlvMuxer.setSampleRate(32000);
+        srsFlvMuxer.setIsStereo(true);
+        srsFlvMuxer.setSampleRate(44100);
 
     }
 
@@ -107,6 +107,7 @@ class Streamer
 
     @Override
     public void onAudioDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+        fixTimeStamp(info);
         srsFlvMuxer.sendAudio(h264Buffer, info);
 
         System.out.println("thanhlv sendAudio "+info.size);
@@ -120,6 +121,7 @@ class Streamer
 
     @Override
     public void onVideoDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
+        fixTimeStamp(info);
         srsFlvMuxer.sendVideo(h264Buffer, info);
         System.out.println("thanhlv sendVideo "+info.size);
     }

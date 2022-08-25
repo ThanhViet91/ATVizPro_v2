@@ -31,48 +31,33 @@
         android:supportsRtl="true"
         android:extractNativeLibs="true"
         android:roundIcon="@drawable/icon"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/AppTheme">
+
 
         <activity android:name=".SimpleExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateHidden"
                   android:label="Simple Example">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--             </intent-filter>-->
         </activity>
         
         <activity android:name=".Main" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateHidden"
                   android:label="@string/app_name">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--             </intent-filter>-->
         </activity>
         
         <activity android:name=".ProgressBarExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateHidden"
                   android:label="ProgressBar Example">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--             </intent-filter>-->
         </activity>
         
         
         <activity android:name=".ProgressBarWithNotificationExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateHidden"
                   android:label="ProgressBar and Notification">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--             </intent-filter>-->
         </activity>
         
         <activity android:name=".MultipleCommandsExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateHidden"
                   android:label="Multiple commands">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--             </intent-filter>-->
         </activity>
 
         <activity android:name=".ui.activities.ReactCamActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
@@ -89,6 +74,23 @@
             android:label="TrimBeforeReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
+
+
+        <activity android:name=".ui.activities.CommentaryActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
+            android:label="TrimBeforeReactCam"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
+        <activity android:name=".ui.activities.VideoEditorActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
+            android:label="TrimBeforeReactCam"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
+
 
         <activity android:name=".ui.activities.MainActivity">
             <intent-filter>
@@ -114,10 +116,6 @@
             android:parentActivityName="ui.activities.MainActivity"
             tools:ignore="MissingClass">
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ui.activities.MainActivity" />

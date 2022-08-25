@@ -31,6 +31,8 @@ public class DialogFragmentBase extends DialogFragment {
 
     public interface CallbackFragment{
         void onClick();
+        void onClickCameraRoll();
+        void onClickMyRecordings();
     }
     @Override
     @Nullable

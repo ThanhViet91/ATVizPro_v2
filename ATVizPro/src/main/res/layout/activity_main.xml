@@ -306,8 +306,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/ic_react_cam" />
 
@@ -344,6 +344,7 @@
                 android:adjustViewBounds="true"
                 android:src="@drawable/bg_item" />
             <LinearLayout
+                android:id="@+id/ln_btn_video_editor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/bg_item_video_editor"
@@ -353,8 +354,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/ic_video_editor" />
 
@@ -394,6 +395,7 @@
                 android:adjustViewBounds="true"
                 android:src="@drawable/bg_item" />
             <LinearLayout
+                android:id="@+id/ln_btn_commentary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/bg_item_commentary"
@@ -403,10 +405,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="20dp"
+                    android:layout_height="40dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_commentory" />
+                    android:src="@drawable/ic_microphone" />
 
                 <TextView
                     android:layout_marginTop="4dp"
@@ -482,6 +484,7 @@
                 android:adjustViewBounds="true"
                 android:src="@drawable/bg_item_lager" />
             <LinearLayout
+                android:id="@+id/ln_btn_projects"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/bg_item_projects"
@@ -528,6 +531,7 @@
                 android:adjustViewBounds="true"
                 android:src="@drawable/bg_item_lager" />
             <LinearLayout
+                android:id="@+id/ln_btn_faq"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/bg_item_faq"

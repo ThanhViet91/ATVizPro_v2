@@ -1,6 +1,8 @@
 package com.examples.atvizpro.ui.activities;
 
 import static com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
+import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
+import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM2;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
@@ -24,12 +26,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.examples.atvizpro.SimpleExample;
-import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
 import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
-import com.examples.atvizpro.ui.fragments.LocalStreamFragment;
+import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
+import com.examples.atvizpro.ui.fragments.FragmentFAQ;
+import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
+import com.examples.atvizpro.ui.fragments.ProjectsFragment;
 import com.examples.atvizpro.utils.PathUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -45,7 +47,9 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_VIDEO_TRIMMER = 1102;
+    public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
+    public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
+    public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
     public static boolean active = false;
     private static final boolean DEBUG = MyUtils.DEBUG;
     private static final int PERMISSION_REQUEST_CODE = 3004;
@@ -130,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
 
         //
         mImgRec =  findViewById(R.id.img_record);
-        mImgFAQ =  findViewById(R.id.img_btn_faq);
 
         mImgRec.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,17 +154,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mImgFAQ.setOnClickListener(new View.OnClickListener() {
+        LinearLayout lnFAQ = findViewById(R.id.ln_btn_faq);
+        lnFAQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                getSupportFragmentManager()
-//                        .beginTransaction()
-//                        .add(R.id.frame_layout_fragment, new FragmentFAQ(), "")
-//                        .addToBackStack("")
-//                        .commit();
-                Intent intent = new Intent(MainActivity.this, SimpleExample.class);
-                startActivity(intent);
-
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new FragmentFAQ(), "")
+                        .addToBackStack("")
+                        .commit();
             }
         });
 
@@ -169,15 +170,7 @@ public class MainActivity extends AppCompatActivity {
         react_cam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
-//                startActivity(intent);
-
-                new DialogSelectVideoSource(new DialogFragmentBase.CallbackFragment() {
-                    @Override
-                    public void onClick() {
-                        showDialogPickFromGallery();
-                    }
-                }).show(getSupportFragmentManager(), "");
+                showDialogPickVideo(REQUEST_VIDEO_FOR_REACT_CAM);
             }
         });
 
@@ -185,54 +178,111 @@ public class MainActivity extends AppCompatActivity {
         btn_live.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new LiveStreamingFragment(), "")
+                        .addToBackStack("")
+                        .commit();
+            }
+        });
 
-                LocalStreamFragment lcFrag = new LocalStreamFragment();
-                lcFrag.setContext(MainActivity.this);
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.add(R.id.frame_layout_fragment, lcFrag).commit();
+
+        LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
+        btn_commentary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY);
+            }
+        });
+
+        LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
+        btn_projects.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new ProjectsFragment(), "")
+                        .addToBackStack("")
+                        .commit();
+            }
+        });
+
+        LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
+        btn_editor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT);
             }
         });
 
     }
 
-    public void showDialogPickFromGallery() {
+    private void showDialogPickVideo(int requestVideoFor) {
+        Bundle bundle = new Bundle();
+        bundle.putInt(ARG_PARAM1, requestVideoFor);
+        DialogSelectVideoSource.newInstance(new DialogFragmentBase.CallbackFragment() {
+            @Override
+            public void onClick() {
+            }
+
+            @Override
+            public void onClickCameraRoll() {
+                showDialogPickFromGallery(requestVideoFor);
+            }
+
+            @Override
+            public void onClickMyRecordings() {
+                showMyRecordings(requestVideoFor);
+            }
+        }, bundle).show(getSupportFragmentManager(), "");
+    }
+
+    private void showMyRecordings(int from_code) {
+
+        Bundle bundle = new Bundle();
+        bundle.putInt("key_from_code", from_code);
+//        ProjectsFragment projectsFragment = ProjectsFragment.newInstance(bundle);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, ProjectsFragment.newInstance(bundle), "")
+                .addToBackStack("")
+                .commit();
+    }
+
+    public void showDialogPickFromGallery(int from_code) {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI); // todo: this thing might need some work :/, eg open from google drive, stuff like that
         intent.setTypeAndNormalize("video/*");
 //            intent.setAction(Intent.ACTION_GET_CONTENT);
 //            intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), REQUEST_VIDEO_TRIMMER);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
     }
 
     private void requestPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            // PERMISSION DRAW OVER
-            if(!Settings.canDrawOverlays(this)){
-                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName()));
-                startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
-            }
-            ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
-
+        // PERMISSION DRAW OVER
+        if(!Settings.canDrawOverlays(this)){
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
         }
+        ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_CODE: {
-                if (grantResults.length > 0) {
-                    int granted = PackageManager.PERMISSION_GRANTED;
-                    for(int i = 0; i < grantResults.length; i++) {
-                        if (grantResults[i] != granted) {
-                            MyUtils.showSnackBarNotification(mImgRec,"Please grant all permissions to record screen.", Snackbar.LENGTH_LONG);
-                            return;
-                        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0) {
+                int granted = PackageManager.PERMISSION_GRANTED;
+                for (int grantResult : grantResults) {
+                    if (grantResult != granted) {
+                        MyUtils.showSnackBarNotification(mImgRec, "Please grant all permissions to record screen.", Snackbar.LENGTH_LONG);
+                        return;
                     }
-                    shouldStartControllerService();
                 }
-                break;
+                shouldStartControllerService();
             }
         }
     }
@@ -248,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions();
 //            if(!hasCaptureIntent())
 //                requestScreenCaptureIntent();
-
         }
     }
 
@@ -259,25 +308,17 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_VIDEO_TRIMMER && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
             System.out.println("thanhlv REQUEST_VIDEO_TRIMMER");
             final Uri selectedUri = data.getData();
 
             if (selectedUri != null) {
                 String pathVideo = "";
-                System.out.println("thanhlv REQUEST_VIDEO_TRIMMER === " + selectedUri);
-//                Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
                 try {
                     pathVideo = PathUtil.getPath(this, selectedUri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-//                final String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
-//                if (!checkDataValid(cursor)) {
-//                    return;
-//                }
-//                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-//                startActivity(intent);
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);
                 Intent intent = new Intent(MainActivity.this, CompressBeforeReactCamActivity.class);
@@ -287,6 +328,50 @@ public class MainActivity extends AppCompatActivity {
 //                Toast.makeText(MainActivity.this, "R.string.toast_cannot_retrieve_selected_video", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (requestCode == REQUEST_VIDEO_FOR_COMMENTARY && resultCode == RESULT_OK) {
+            System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY");
+            final Uri selectedUri = data.getData();
+
+            if (selectedUri != null) {
+                String pathVideo = "";
+
+                try {
+                    pathVideo = PathUtil.getPath(this, selectedUri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY === " + pathVideo);
+                Bundle bundle = new Bundle();
+                bundle.putString(VIDEO_PATH_KEY, pathVideo);
+                Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        }
+
+
+        if (requestCode == REQUEST_VIDEO_FOR_VIDEO_EDIT && resultCode == RESULT_OK) {
+            System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY");
+            final Uri selectedUri = data.getData();
+
+            if (selectedUri != null) {
+                String pathVideo = "";
+
+                try {
+                    pathVideo = PathUtil.getPath(this, selectedUri);
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY === " + pathVideo);
+                Bundle bundle = new Bundle();
+                bundle.putString(VIDEO_PATH_KEY, pathVideo);
+                Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        }
+
 
         if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
 
@@ -342,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
     }
 
-     /** Check if this device has a camera */
+    /** Check if this device has a camera */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
             // this device has a camera
@@ -359,10 +444,10 @@ public class MainActivity extends AppCompatActivity {
 
         return ContextCompat.checkSelfPermission(this, mPermission[0]) == granted
                 && ContextCompat.checkSelfPermission(this, mPermission[1]) == granted
-                    && ContextCompat.checkSelfPermission(this, mPermission[2]) == granted
-                        && Settings.canDrawOverlays(this)
-                            && mScreenCaptureIntent != null
-                                && mScreenCaptureResultCode != MyUtils.RESULT_CODE_FAILED;
+                && ContextCompat.checkSelfPermission(this, mPermission[2]) == granted
+                && Settings.canDrawOverlays(this)
+                && mScreenCaptureIntent != null
+                && mScreenCaptureResultCode != MyUtils.RESULT_CODE_FAILED;
     }
 
     public void setStreamProfile(StreamProfile streamProfile) {

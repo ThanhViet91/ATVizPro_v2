@@ -27,7 +27,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideStatusBar(this);
-        setContentView(R.layout.react_cam_trim_layout);
+        setContentView(R.layout.react_cam_prepare_layout);
         trimmerView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);

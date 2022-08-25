@@ -3,6 +3,9 @@ package com.examples.atvizpro.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 
+import com.examples.atvizpro.R;
+
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -41,6 +44,46 @@ public class VideoUtil {
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
 
     }
+
+
+    public void commentaryAudio(Activity act, String originalVideoPath, String audioPath, ITranscoding callback){
+        String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
+        String cmd = "ffmpeg -i "+ originalVideoPath +" -i "+ audioPath +" -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a "+outputVideoPath;
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+
+    }
+
+
+
+    public void trimVideo(Activity act, String originalVideoPath, long startTime, long endTime, ITranscoding callback){
+        String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
+        String cmd = "ffmpeg -ss "+ parseSecond2Ms(startTime) + " -i "+ originalVideoPath + " -to " +parseSecond2Ms(endTime) + " -c:v copy -c:a copy " +outputVideoPath;
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+    }
+
+    public void addText(Activity act, String originalVideoPath, String text, String color, String size, String position, ITranscoding callback){
+        String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
+        String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
+        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf drawtext=fontfile= "+ fontPath + ": text=" + text+ ": fontcolor=" + color
+                + ": fontsize=" + size+ ": " + position + " -c:v libx264 -c:a copy -movflags +faststart" +outputVideoPath;
+
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+    }
+
+
+    public void changeSpeed(Activity act, String originalVideoPath, String text, String color, String size, String position, ITranscoding callback){
+        String outputVideoPath = "/sdcard/thanhtest"+ getTimeStamp() +".mp4";
+        String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
+        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf drawtext=fontfile= "+ fontPath + ": text=" + text+ ": fontcolor=" + color
+                + ": fontsize=" + size+ ": " + position + " -c:v libx264 -c:a copy -movflags +faststart" +outputVideoPath;
+
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+    }
+
 
     public String parseSecond2Ms(long second) {
         String ms = "";

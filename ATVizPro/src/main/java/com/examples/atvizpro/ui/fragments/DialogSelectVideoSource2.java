@@ -1,44 +1,34 @@
 package com.examples.atvizpro.ui.fragments;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
-import com.examples.atvizpro.adapter.VideoSettingsAdapter;
-import com.examples.atvizpro.model.VideoProperties;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
-public class DialogSelectVideoSource extends DialogFragmentBase {
+public class DialogSelectVideoSource2 extends DialogFragmentBase {
 
-    static DialogSelectVideoSource newInstance(CallbackFragment callBack) {
-        return new DialogSelectVideoSource(callBack);
+    static DialogSelectVideoSource2 newInstance(CallbackFragment callBack) {
+        return new DialogSelectVideoSource2(callBack);
     }
     public CallbackFragment callback = null;
 
-    public DialogSelectVideoSource(CallbackFragment callback) {
+    public DialogSelectVideoSource2(CallbackFragment callback) {
         this.callback = callback;
     }
     @Override
     public int getLayout() {
-        return R.layout.dialog_select_video_source;
+        return R.layout.dialog_select_video_source2;
     }
 
     @Nullable
@@ -51,11 +41,12 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        Objects.requireNonNull(getDialog()).setCanceledOnTouchOutside(true);
         LinearLayout buttonSelectVideo = view.findViewById(R.id.ln_select_video);
         buttonSelectVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (callback != null) callback.onClick();
+                if (callback != null) callback.onClickCameraRoll();
                 dismiss();
             }
         });

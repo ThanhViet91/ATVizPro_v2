@@ -58,8 +58,8 @@ public class RecordingService extends BaseService {
     private VideoSetting2 mCurrentVideoSetting;
     private VideoSetting2 mResultVideo;
 
-    public class RecordingBinder extends Binder{
-        public RecordingService getService(){
+    public class RecordingBinder extends Binder {
+        public RecordingService getService() {
             return RecordingService.this;
         }
     }
@@ -84,15 +84,15 @@ public class RecordingService extends BaseService {
         if (width > height) {
             final float scale_x = width / 1920f;
             final float scale_y = height / 1080f;
-            final float scale = Math.max(scale_x,  scale_y);
-            width = (int)(width / scale);
-            height = (int)(height / scale);
+            final float scale = Math.max(scale_x, scale_y);
+            width = (int) (width / scale);
+            height = (int) (height / scale);
         } else {
             final float scale_x = width / 1080f;
             final float scale_y = height / 1920f;
-            final float scale = Math.max(scale_x,  scale_y);
-            width = (int)(width / scale);
-            height = (int)(height / scale);
+            final float scale = Math.max(scale_x, scale_y);
+            width = (int) (width / scale);
+            height = (int) (height / scale);
         }
         mScreenWidth = width;
         mScreenHeight = height;
@@ -103,7 +103,7 @@ public class RecordingService extends BaseService {
         Log.i(TAG, "RecordingService: onBind()");
         mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
-        Log.i(TAG, "onBind: "+ mScreenCaptureIntent);
+        Log.i(TAG, "onBind: " + mScreenCaptureIntent);
         return mIBinder;
     }
 
@@ -119,10 +119,9 @@ public class RecordingService extends BaseService {
         mResultVideo = v;
     }
 
-
     public void startRecording() {
         synchronized (sSync) {
-            if(mMuxer==null) {
+            if (mMuxer == null) {
                 getScreenSize();
                 mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
                 DisplayManager dm = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
@@ -142,22 +141,10 @@ public class RecordingService extends BaseService {
                     mMuxer = new MediaMuxerWrapper(this, ".mp4");    // if you record audio only, ".m4a" is also OK.
                     if (true) {
                         // for screen capturing
-                        //todo: setting video parameter here
-//                        VideoSetting videoSetting = SettingManager.getVideoProfile(getApplicationContext());
-//                        Log.i(TAG, "Video config: "+videoSetting.toString());
-//                        mCurrentVideoSetting = videoSetting;
 
                         VideoSetting2 videoSetting2 = SettingManager2.getVideoProfile(getApplicationContext());
                         mCurrentVideoSetting = videoSetting2;
-
-                        List<CustomDecorator> decors = createDecorators();
-
-//                        if(MyUtils.isRunningOnEmulator()) {
-//                            new MediaScreenEncoder(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity, decors);
-//                        }
-//                        else {
-                            new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
-//                        }
+                        new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
                     }
                     if (true) {
                         // for audio capturing
@@ -172,33 +159,6 @@ public class RecordingService extends BaseService {
             }
         }
     }
-
-    private ArrayList<CustomDecorator> createDecorators() {
-        ArrayList<CustomDecorator> list = new ArrayList<>();
-        //main screen
-//        list.add(new CustomDecorator(null, new Size(mCurrentVideoSetting.getWidth(), mCurrentVideoSetting.getHeight()), new Point(0,0)));
-
-        //logo
-//        list.add(new CustomDecorator( "/storage/emulated/0/Download/image.jpeg", new Size(30, 30), new Point(10, 10)));
-
-
-
-        //watermask
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.wartermark_small);
-
-//        Bitmap watermark = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(watermark);
-//        Paint paint = new Paint();
-//        canvas.drawBitmap(bitmap, 0, 0, paint);
-//        bitmap.recycle();
-
-        list.add(new CustomDecorator(bitmap, new Size(200, 200), new Point(0, 0)));
-
-        return list;
-    }
-
-
-
 
     public void pauseScreenRecord() {
         synchronized (sSync) {
@@ -238,7 +198,7 @@ public class RecordingService extends BaseService {
     public void insertVideoToGallery() {
         Log.i(TAG, "insertVideoToGallery: ");
         String outputFile = mResultVideo.getOutputPath();
-        if(TextUtils.isEmpty(outputFile))
+        if (TextUtils.isEmpty(outputFile))
             return;
 
         //send video to gallery
@@ -251,12 +211,10 @@ public class RecordingService extends BaseService {
 
         // Add a new record (identified by uri) without the video, but with the values just set.
         Uri uri = cr.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
-        Log.i(TAG, "insertVideoToGallery: "+uri.getPath());
+        Log.i(TAG, "insertVideoToGallery: " + uri.getPath());
 
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
     }
-
-
 
 
     private static final MediaEncoder.MediaEncoderListener mMediaEncoderListener = new MediaEncoder.MediaEncoderListener() {

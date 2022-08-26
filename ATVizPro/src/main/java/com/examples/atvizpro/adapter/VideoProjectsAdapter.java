@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.examples.atvizpro.R;
@@ -59,7 +60,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         if (video != null) {
             Glide.with(context)
                     .load(video.getThumb())
-                    .transform(new CenterInside(),new RoundedCorners(25))
+                    .transform(new CenterCrop(),new RoundedCorners(25))
                     .into(holder.img);
             holder.name.setText(video.getName());
         }

@@ -31,7 +31,9 @@ import com.examples.atvizpro.controllers.encoder.MediaScreenEncoder;
 import com.examples.atvizpro.controllers.encoder.MediaScreenEncoderHard;
 import com.examples.atvizpro.controllers.encoder.RenderUtil.CustomDecorator;
 import com.examples.atvizpro.controllers.settings.SettingManager;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.controllers.settings.VideoSetting;
+import com.examples.atvizpro.controllers.settings.VideoSetting2;
 import com.examples.atvizpro.data.database.VideoDatabase;
 import com.examples.atvizpro.data.entities.Video;
 import com.examples.atvizpro.ui.activities.MainActivity;
@@ -53,8 +55,8 @@ public class RecordingService extends BaseService {
     private int mScreenWidth, mScreenHeight, mScreenDensity;
     private MediaMuxerWrapper mMuxer;
     private static final Object sSync = new Object();
-    private VideoSetting mCurrentVideoSetting;
-    private VideoSetting mResultVideo;
+    private VideoSetting2 mCurrentVideoSetting;
+    private VideoSetting2 mResultVideo;
 
     public class RecordingBinder extends Binder{
         public RecordingService getService(){
@@ -113,11 +115,10 @@ public class RecordingService extends BaseService {
 
     @Override
     public void stopPerformService() {
-        VideoSetting v = stopRecording();
+        VideoSetting2 v = stopRecording();
         mResultVideo = v;
     }
 
-    public VideoSetting getResultVideo(){return mResultVideo;}
 
     public void startRecording() {
         synchronized (sSync) {
@@ -142,22 +143,21 @@ public class RecordingService extends BaseService {
                     if (true) {
                         // for screen capturing
                         //todo: setting video parameter here
-                        VideoSetting videoSetting = SettingManager.getVideoProfile(getApplicationContext());
-                        Log.i(TAG, "Video config: "+videoSetting.toString());
-                        mCurrentVideoSetting = videoSetting;
+//                        VideoSetting videoSetting = SettingManager.getVideoProfile(getApplicationContext());
+//                        Log.i(TAG, "Video config: "+videoSetting.toString());
+//                        mCurrentVideoSetting = videoSetting;
+
+                        VideoSetting2 videoSetting2 = SettingManager2.getVideoProfile(getApplicationContext());
+                        mCurrentVideoSetting = videoSetting2;
 
                         List<CustomDecorator> decors = createDecorators();
 
-                        //todo: test HWencoder
-
-//                         new TestMediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity, decors);
-
-                        if(MyUtils.isRunningOnEmulator()) {
-                            new MediaScreenEncoder(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity, decors);
-                        }
-                        else {
-                            new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity, decors);
-                        }
+//                        if(MyUtils.isRunningOnEmulator()) {
+//                            new MediaScreenEncoder(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity, decors);
+//                        }
+//                        else {
+                            new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
+//                        }
                     }
                     if (true) {
                         // for audio capturing
@@ -217,7 +217,7 @@ public class RecordingService extends BaseService {
     }
 
     //Return output file
-    public VideoSetting stopRecording() {
+    public VideoSetting2 stopRecording() {
         if (DEBUG) Log.v(TAG, "stopStreaming:mMuxer=" + mMuxer);
 
         String outputFile = "";
@@ -233,32 +233,6 @@ public class RecordingService extends BaseService {
             }
         }
         return mCurrentVideoSetting;
-    }
-
-    public void saveVideoToDatabase() {
-        String outputFile = mResultVideo.getOutputPath();
-        if(TextUtils.isEmpty(outputFile))
-            return;
-        MyUtils.toast(getApplicationContext(), "Recording Stopped"+outputFile, Toast.LENGTH_LONG);
-
-        final Video mVideo = MyUtils.tryToExtractVideoInfoFile(getApplicationContext(), mResultVideo);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if(mVideo !=null){
-                    if(DEBUG) Log.i(TAG, "onSaveVideo: "+mVideo.toString());
-                    synchronized (mVideo) {
-                        VideoDatabase.getInstance(getApplicationContext()).getVideoDao().insertVideo(mVideo);
-                    }
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.setAction(MyUtils.ACTION_OPEN_VIDEO_MANAGER_ACTIVITY);
-                    startActivity(intent);
-
-                }
-            }
-        }).start();
     }
 
     public void insertVideoToGallery() {

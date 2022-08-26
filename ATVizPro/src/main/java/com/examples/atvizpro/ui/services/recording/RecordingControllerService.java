@@ -36,6 +36,7 @@ import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.CameraSetting;
 import com.examples.atvizpro.controllers.settings.SettingManager;
 import com.examples.atvizpro.controllers.settings.VideoSetting;
+import com.examples.atvizpro.controllers.settings.VideoSetting2;
 import com.examples.atvizpro.data.database.VideoDatabase;
 import com.examples.atvizpro.data.entities.Video;
 import com.examples.atvizpro.ui.activities.MainActivity;
@@ -417,13 +418,13 @@ public class RecordingControllerService extends Service {
                 if(mRecordingServiceBound){
                     mRecordingStarted = false;
 
-                    final VideoSetting videoSetting = mRecordingService.stopRecording();
+                    final VideoSetting2 videoSetting = mRecordingService.stopRecording();
 
                     if(videoSetting != null ){
 
                         insertVideoToGallery(videoSetting);
 
-                        saveVideoToDatabase(videoSetting);
+//                        saveVideoToDatabase(videoSetting);
 
                     }
                     else{
@@ -527,7 +528,7 @@ public class RecordingControllerService extends Service {
         });
     }
 
-    private void insertVideoToGallery(VideoSetting videoSetting) {
+    private void insertVideoToGallery(VideoSetting2 videoSetting) {
         Log.i(TAG, "insertVideoToGallery: ");
         //send video to gallery
         ContentResolver cr = getContentResolver();

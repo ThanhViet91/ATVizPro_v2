@@ -44,7 +44,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public CallbackFragment callback = null;
+    public ISelectVideoSourceListener callback = null;
 
     public OptionAddImageFragment() {
     }

@@ -9,14 +9,14 @@
     <TextView
         android:id="@+id/title_app"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
         android:fontFamily="@font/roboto_regular"
         android:gravity="center"
-        android:text="Screen Recorder"
+        android:text="@string/screen_recorder"
         android:textColor="@color/white"
         android:textFontWeight="700"
-        android:textSize="24dp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -207,23 +207,23 @@
         android:layout_marginTop="6dp"
         android:fontFamily="@font/roboto_regular"
         android:gravity="center"
-        android:text="Tap to start\nrecording screen"
+        android:text="@string/tap_to_start_nrecording_screen"
         android:textColor="@color/white"
-        android:textFontWeight="700"
-        android:textSize="26dp"
+        android:textFontWeight="600"
+        android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/box_settings" />
 
     <pl.bclogic.pulsator4droid.library.PulsatorLayout
         android:id="@+id/pulsator"
-        android:layout_width="260dp"
-        android:layout_height="260dp"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias=".37"
+        app:layout_constraintVertical_bias=".33"
         app:pulse_color="#FFFFFF"
         app:pulse_count="4"
         app:pulse_duration="3000"
@@ -232,11 +232,11 @@
         app:pulse_startFromScratch="true">
 
         <ImageView
-            android:padding="20dp"
             android:id="@+id/img_record"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_centerInParent="true"
+            android:padding="20dp"
             android:src="@drawable/img_btn_record_home" />
     </pl.bclogic.pulsator4droid.library.PulsatorLayout>
 
@@ -244,7 +244,7 @@
     <ImageView
         android:id="@+id/img_live"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="90dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="18dp"
         android:src="@drawable/bg_livestream_home"
@@ -260,7 +260,7 @@
         android:text="Livestreaming"
         android:textColor="@color/white"
         android:textFontWeight="500"
-        android:textSize="28dp"
+        android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="@id/img_live"
         app:layout_constraintEnd_toEndOf="@id/img_live"
         app:layout_constraintStart_toStartOf="@id/img_live"
@@ -269,7 +269,7 @@
     <LinearLayout
         android:id="@+id/item_func_row1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="18dp"
@@ -427,37 +427,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:adjustViewBounds="true"
-                android:src="@drawable/bg_item" />
-
-            <TextView
-                android:id="@+id/img_item_commentary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:layout_marginStart="6dp"
-                android:text="abc" />
-
-        </RelativeLayout>
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/item_func_row2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="110dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="18dp"
@@ -494,8 +469,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="60dp"
+                    android:layout_height="40dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/ic_projects" />
 
@@ -542,8 +517,8 @@
                 android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/img_btn_faq"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:adjustViewBounds="true"
                     android:src="@drawable/ic_faq" />
 
@@ -563,6 +538,20 @@
 
     </LinearLayout>
 
+    <com.google.android.gms.ads.AdView
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
 
     <FrameLayout
         android:id="@+id/frame_layout_fragment"

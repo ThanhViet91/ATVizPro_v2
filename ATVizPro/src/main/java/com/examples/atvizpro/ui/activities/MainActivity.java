@@ -2,13 +2,13 @@ package com.examples.atvizpro.ui.activities;
 
 import static com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
 import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
-import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM2;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -19,6 +19,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,22 +28,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.examples.atvizpro.Constants;
+import com.examples.atvizpro.Core;
+import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.fragments.DialogBitrate;
+import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
 import com.examples.atvizpro.ui.fragments.DialogFrameRate;
 import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
-import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
-import com.examples.atvizpro.ui.fragments.DialogSettingsHome;
 import com.examples.atvizpro.ui.fragments.DialogVideoResolution;
 import com.examples.atvizpro.ui.fragments.FragmentFAQ;
+import com.examples.atvizpro.ui.fragments.FragmentSettings;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.fragments.ProjectsFragment;
-import com.examples.atvizpro.utils.PathUtil;
-import com.google.android.material.snackbar.Snackbar;
-import com.takusemba.rtmppublisher.helper.StreamProfile;
-import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.services.ControllerService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
+import com.examples.atvizpro.utils.PathUtil;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.material.snackbar.Snackbar;
+import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -104,11 +114,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         hideStatusBar(this);
         setContentView(R.layout.activity_main);
+
+        initAds();
         initViews();
 
         Intent intent = getIntent();
         if(intent!=null)
             handleIncomingRequest(intent);
+    }
+
+    private void initAds() {
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+
+        AdView mAdView = findViewById(R.id.adView);
+
+//        mAdView.setAdSize(AdSize.BANNER);
+
+//        mAdView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
     }
 
     private void handleIncomingRequest(Intent intent) {
@@ -138,6 +169,11 @@ public class MainActivity extends AppCompatActivity {
         PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
+
+        //initData()
+        generateVideoSettings();
+        updateUI();
+
         //
         mImgRec =  findViewById(R.id.img_record);
         btn_setting =  findViewById(R.id.img_settings);
@@ -149,50 +185,34 @@ public class MainActivity extends AppCompatActivity {
         btn_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DialogSettingsHome().show(getSupportFragmentManager(), "");
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new FragmentSettings(), "")
+                        .addToBackStack("")
+                        .commit();
+
             }
         });
 
         btn_set_resolution.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DialogVideoResolution(new DialogFragmentBase.CallbackFragment() {
+                new DialogVideoResolution(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-
-                    }
-
-                    @Override
-                    public void onClickCameraRoll() {
-
-                    }
-
-                    @Override
-                    public void onClickMyRecordings() {
-
+                        updateUI();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
         });
 
-
         bnt_set_bitrate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DialogBitrate(new DialogFragmentBase.CallbackFragment() {
+                new DialogBitrate(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-
-                    }
-
-                    @Override
-                    public void onClickCameraRoll() {
-
-                    }
-
-                    @Override
-                    public void onClickMyRecordings() {
-
+                        updateUI();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
@@ -201,20 +221,10 @@ public class MainActivity extends AppCompatActivity {
         btn_set_fps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new DialogFrameRate(new DialogFragmentBase.CallbackFragment() {
+                new DialogFrameRate(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-
-                    }
-
-                    @Override
-                    public void onClickCameraRoll() {
-
-                    }
-
-                    @Override
-                    public void onClickMyRecordings() {
-
+                        updateUI();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
@@ -303,10 +313,29 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void updateUI() {
+
+        TextView tv_resolution = findViewById(R.id.tv_video_resolution);
+        TextView tv_bitrate = findViewById(R.id.tv_bitrate);
+        TextView tv_frame_rate = findViewById(R.id.tv_frame_rate);
+
+        tv_resolution.setText(SettingManager2.getVideoResolution(this));
+        tv_bitrate.setText(SettingManager2.getVideoBitrate(this));
+        tv_frame_rate.setText(SettingManager2.getVideoFPS(this));
+    }
+
+    private void generateVideoSettings() {
+//        SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
+
+        Core.resolution = SettingManager2.getVideoResolution(this);
+        Core.bitrate = SettingManager2.getVideoBitrate(this);
+        Core.frameRate =  SettingManager2.getVideoFPS(this);
+    }
+
     private void showDialogPickVideo(int requestVideoFor) {
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_PARAM1, requestVideoFor);
-        DialogSelectVideoSource.newInstance(new DialogFragmentBase.CallbackFragment() {
+        DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
             @Override
             public void onClick() {
             }
@@ -368,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
-                shouldStartControllerService();
+//                shouldStartControllerService();
             }
         }
     }

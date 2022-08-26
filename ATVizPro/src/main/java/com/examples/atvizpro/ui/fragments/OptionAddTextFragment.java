@@ -1,6 +1,5 @@
 package com.examples.atvizpro.ui.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -10,7 +9,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +22,6 @@ import com.examples.atvizpro.utils.VideoUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class OptionAddTextFragment extends DialogFragmentBase implements BasicAdapter.BasicAdapterListener {
 
@@ -38,7 +35,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public CallbackFragment callback = null;
+    public ISelectVideoSourceListener callback = null;
 
     public OptionAddTextFragment() {
 

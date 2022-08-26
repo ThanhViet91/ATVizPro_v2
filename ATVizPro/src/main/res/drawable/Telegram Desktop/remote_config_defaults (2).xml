@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>configs</key>
+    <value>{   "dataURL": "https://atsoft.io/api/feet_datas.json",         "showAdsPercent": 50,         "shareText": "Feet Finder 2022",         "feedbackEmail": "vuquynh04011990@gmail.com",         "iOSShareURL": "https://itunes.apple.com/us/app/id1638036830",         "AndroidShareURL": "https://zing.vn/",         "policyURL": "https://www.freeprivacypolicy.com/live/4c707b2c-9953-430c-929f-9b7b6b66cb82"     }</value>
+  </entry>
+</defaults>

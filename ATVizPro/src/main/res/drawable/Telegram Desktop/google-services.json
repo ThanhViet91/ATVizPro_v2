@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1077278141499",
+    "project_id": "scannerqrcode-53f5c",
+    "storage_bucket": "scannerqrcode-53f5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1077278141499:android:8cab9788b061c46787c01e",
+        "android_client_info": {
+          "package_name": "com.zzic.scanqrcode"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1077278141499-7it667omlje87dub3sfke8uk70m96ns9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHnzWPDB-GWpLShlu8IeC-aysN3ww6BZ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1077278141499-7it667omlje87dub3sfke8uk70m96ns9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -28,14 +28,14 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = ProjectsFragment.class.getSimpleName();
 
-    public static DialogSelectVideoSource newInstance(CallbackFragment callBack, Bundle args) {
+    public static DialogSelectVideoSource newInstance(ISelectVideoSourceListener callBack, Bundle args) {
         DialogSelectVideoSource dialogSelectVideoSource = new DialogSelectVideoSource(callBack);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public CallbackFragment callback = null;
+    public ISelectVideoSourceListener callback = null;
 
-    public DialogSelectVideoSource(CallbackFragment callback) {
+    public DialogSelectVideoSource(ISelectVideoSourceListener callback) {
         this.callback = callback;
     }
     @Override

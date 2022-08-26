@@ -34,7 +34,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public CallbackFragment callback = null;
+    public ISelectVideoSourceListener callback = null;
 
     public OptionChangeSpeedFragment() {
     }

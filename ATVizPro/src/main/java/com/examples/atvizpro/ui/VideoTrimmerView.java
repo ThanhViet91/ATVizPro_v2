@@ -136,6 +136,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
   }
 
   private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {
+    mVideoThumbAdapter.resetBitmap();
     VideoTrimmerUtil.shootVideoThumbInBackground(context, videoUri, totalThumbsCount, startPosition, endPosition,
         new SingleCallback<Bitmap, Integer>() {
           @Override public void onSingleCallback(final Bitmap bitmap, final Integer interval) {
@@ -191,6 +192,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
       seekTo((int) mRedProgressBarPos);
     }
     initRangeSeekBarView();
+
     startShootVideoThumbs(mContext, mSourceUri, mThumbsTotalCount, 0, mDuration);
   }
 

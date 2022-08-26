@@ -17,6 +17,7 @@ import android.view.Surface;
 
 import com.examples.atvizpro.controllers.encoder.RenderUtil.CustomDecorator;
 import com.examples.atvizpro.controllers.settings.VideoSetting;
+import com.examples.atvizpro.controllers.settings.VideoSetting2;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
@@ -39,7 +40,7 @@ public class MediaScreenEncoderHard extends MediaVideoEncoderBase {
     private final Handler mHandler;
 	private List<CustomDecorator> mDecors;
 
-	public MediaScreenEncoderHard(MediaMuxerWrapper muxer, MediaEncoderListener listener, MediaProjection projection, VideoSetting videoSetting, int density, List<CustomDecorator> decorators) {
+	public MediaScreenEncoderHard(MediaMuxerWrapper muxer, MediaEncoderListener listener, MediaProjection projection, VideoSetting2 videoSetting, int density) {
 		super(muxer, listener, videoSetting.getWidth(), videoSetting.getHeight(), videoSetting.getOrientation());
 		mMediaProjection = projection;
 		mDensity = density;
@@ -51,7 +52,6 @@ public class MediaScreenEncoderHard extends MediaVideoEncoderBase {
 		final HandlerThread thread = new HandlerThread(TAG);
 		thread.start();
 		mHandler = new Handler(thread.getLooper());
-		mDecors = decorators;
 	}
 
 	@Override

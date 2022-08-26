@@ -27,6 +27,7 @@ import com.examples.atvizpro.model.VideoModel;
 import com.examples.atvizpro.ui.activities.CommentaryActivity;
 import com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity;
 import com.examples.atvizpro.ui.activities.VideoEditorActivity;
+import com.examples.atvizpro.ui.utils.MyUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -121,8 +122,7 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
     }
 
     private void readData() {
-
-        listFilesForFolder(new File("/sdcard/Screen"));
+        listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
 
     }
     public void listFilesForFolder(final File folder) {

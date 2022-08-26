@@ -79,8 +79,6 @@ public class StreamingActivity extends AppCompatActivity {
             requestFullLiveProfile(AccessToken.getCurrentAccessToken());
         }
         else{
-//            signIn();
-//            toggleAccountProfileInfo(false);
             MyUtils.showSnackBarNotification(mViewRoot, "Authentication failed!", Snackbar.LENGTH_INDEFINITE);
         }
     }

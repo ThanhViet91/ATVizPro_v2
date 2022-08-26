@@ -52,6 +52,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 		super(muxer, listener);
 		mWidth = width;
 		mHeight = height;
+		System.out.println("thanhlv dddddd" + width + " llll "+height);
 	}
 
 	/**
@@ -62,8 +63,8 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 	 * @return
 	 */
 	protected MediaFormat create_encoder_format(final String mime, final int frame_rate, final int bitrate) {
-//		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
-		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 1920, 1080);
+		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+//		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 1920, 1080);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);	// API >= 18
         format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate > 0 ? bitrate : calcBitRate(frame_rate));
         format.setInteger(MediaFormat.KEY_FRAME_RATE, frame_rate);

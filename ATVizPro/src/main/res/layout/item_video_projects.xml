@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/img_item_video_thumb"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:src="@drawable/youtube_slider1" />
 
     <TextView

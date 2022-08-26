@@ -53,6 +53,11 @@ public class VideoTrimmerAdapter extends RecyclerView.Adapter {
     notifyDataSetChanged();
   }
 
+
+  public void resetBitmap() {
+    mBitmaps = new ArrayList<>();
+    mBitmaps.clear();
+  }
   private final class TrimmerViewHolder extends RecyclerView.ViewHolder {
     ImageView thumbImageView;
 

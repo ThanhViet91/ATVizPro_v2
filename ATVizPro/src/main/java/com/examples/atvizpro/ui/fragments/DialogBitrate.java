@@ -2,6 +2,8 @@ package com.examples.atvizpro.ui.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static com.examples.atvizpro.Constants.DEFAULT_BITRATE;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,23 +17,25 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.examples.atvizpro.Constants;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoSettingsAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.VideoProperties;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class DialogBitrate extends DialogFragmentBase {
     RecyclerView recyclerView;
     ArrayList<VideoProperties> mBitrates;
-    SharedPreferences pref;
 
-    public CallbackFragment callback;
+    public IVideoSettingListener callback;
 
-    public DialogBitrate(CallbackFragment callback) {
+    public DialogBitrate(IVideoSettingListener callback) {
         this.callback = callback;
     }
 
@@ -43,13 +47,13 @@ public class DialogBitrate extends DialogFragmentBase {
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        pref = requireActivity().getSharedPreferences("DataSettings", MODE_PRIVATE);
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
         recyclerView = view.findViewById(R.id.rc_item);
 
@@ -60,7 +64,7 @@ public class DialogBitrate extends DialogFragmentBase {
             @Override
             public void onClick(View v) {
                 updateUI();
-                dismissAllowingStateLoss();
+                dismiss();
             }
         });
 
@@ -76,9 +80,7 @@ public class DialogBitrate extends DialogFragmentBase {
 
     @Override
     public void updateUI() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("Bitrate", Core.bitrate);
-        editor.apply();
+        SettingManager2.setVideoBitrate(requireContext(), Core.bitrate);
         callback.onClick();
     }
 
@@ -104,9 +106,9 @@ public class DialogBitrate extends DialogFragmentBase {
         mBitrates.add(new VideoProperties("2Mbps", false));
         mBitrates.add(new VideoProperties("1Mbps", false));
 
-        String resolutionSelected = pref.getString("Bitrate", "4Mbps");
+        String bitrate = SettingManager2.getVideoBitrate(requireContext());
         for (VideoProperties selected: mBitrates) {
-            selected.setCheck(selected.getValue().contains(resolutionSelected));
+            selected.setCheck(selected.getValue().contains(bitrate));
         }
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,6 +46,14 @@ public class FragmentFAQ extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(linearLayoutManager);
+
+        ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
+        btn_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getParentFragmentManager().popBackStack();
+            }
+        });
     }
 
     @Override

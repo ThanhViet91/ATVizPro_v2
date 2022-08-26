@@ -18,12 +18,12 @@ import java.util.Objects;
 
 public class DialogSelectVideoSource2 extends DialogFragmentBase {
 
-    static DialogSelectVideoSource2 newInstance(CallbackFragment callBack) {
+    static DialogSelectVideoSource2 newInstance(ISelectVideoSourceListener callBack) {
         return new DialogSelectVideoSource2(callBack);
     }
-    public CallbackFragment callback = null;
+    public ISelectVideoSourceListener callback = null;
 
-    public DialogSelectVideoSource2(CallbackFragment callback) {
+    public DialogSelectVideoSource2(ISelectVideoSourceListener callback) {
         this.callback = callback;
     }
     @Override

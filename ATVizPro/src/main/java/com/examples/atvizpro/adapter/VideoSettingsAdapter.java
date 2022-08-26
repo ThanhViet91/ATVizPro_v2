@@ -36,10 +36,16 @@ public class VideoSettingsAdapter extends RecyclerView.Adapter<VideoSettingsAdap
         }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoProperties item = mVideoProperties.get(position);
         holder.radio_check.setChecked(item.getCheck());
         holder.tv_value.setText(item.getValue());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeCheckList(position);
+            }
+        });
     }
 
 
@@ -57,12 +63,7 @@ public class VideoSettingsAdapter extends RecyclerView.Adapter<VideoSettingsAdap
             tv_value = itemView.findViewById(R.id.tv_value);
             radio_check = itemView.findViewById(R.id.radio_check);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    changeCheckList(getAdapterPosition());
-                }
-            });
+
         }
     }
 
@@ -70,8 +71,8 @@ public class VideoSettingsAdapter extends RecyclerView.Adapter<VideoSettingsAdap
     private void changeCheckList(int itemId) {
         for (int i = 0; i < mVideoProperties.size(); i++) {
             mVideoProperties.get(i).setCheck(i==itemId);
-            notifyDataSetChanged();
         }
+        notifyDataSetChanged();
         if (mType == 1) Core.resolution = mVideoProperties.get(itemId).getValue();
         if (mType == 2) Core.bitrate = mVideoProperties.get(itemId).getValue();
         if (mType == 3) Core.frameRate = mVideoProperties.get(itemId).getValue();

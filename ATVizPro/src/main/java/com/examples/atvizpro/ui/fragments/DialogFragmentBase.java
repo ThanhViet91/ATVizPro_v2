@@ -29,10 +29,14 @@ public class DialogFragmentBase extends DialogFragment {
     }
 
 
-    public interface CallbackFragment{
+    public interface ISelectVideoSourceListener {
         void onClick();
         void onClickCameraRoll();
         void onClickMyRecordings();
+    }
+
+    public interface IVideoSettingListener {
+        void onClick();
     }
     @Override
     @Nullable

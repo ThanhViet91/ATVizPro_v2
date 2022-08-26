@@ -110,5 +110,7 @@
     <string name="save_to_gallery">Saved to gallery</string>
     <string name="share">Share</string>
     <string name="my_recordings">My Recordings</string>
+    <string name="screen_recorder">Screen Recorder</string>
+    <string name="tap_to_start_nrecording_screen">Tap to start\nrecording screen</string>
 
 </resources>

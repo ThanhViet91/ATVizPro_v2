@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -27,6 +28,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,14 +67,18 @@ public class MyUtils {
 
     @NonNull
     public static String createFileName(@NonNull String ext) {
-        return "Zecorder-" +
-                Long.toHexString(System.currentTimeMillis()) + ext;
+        return "Recorder-" +getTimeStamp()+ ext;
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    public static String getTimeStamp() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
     @NonNull
     public static String getBaseStorageDirectory() {
         return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES) + "/Zecorder";
+                Environment.DIRECTORY_MOVIES) + "/Recorder";
     }
 
     public static void showSnackBarNotification(View view, String msg, int length) {

@@ -16,9 +16,11 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.examples.atvizpro.Constants;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoSettingsAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.VideoProperties;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +32,8 @@ public class DialogVideoResolution extends DialogFragmentBase{
     RecyclerView recyclerView;
     ArrayList<VideoProperties> mVideoResolutions;
     SharedPreferences pref;
-    public CallbackFragment callback;
-    public DialogVideoResolution(CallbackFragment callback) {
+    public IVideoSettingListener callback;
+    public DialogVideoResolution(IVideoSettingListener callback) {
         this.callback = callback;
     }
 
@@ -49,7 +51,7 @@ public class DialogVideoResolution extends DialogFragmentBase{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        pref = requireActivity().getSharedPreferences("DataSettings", MODE_PRIVATE);
+        pref = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
         recyclerView = view.findViewById(R.id.rc_item);
 
@@ -60,7 +62,7 @@ public class DialogVideoResolution extends DialogFragmentBase{
             @Override
             public void onClick(View v) {
                 updateUI();
-                dismissAllowingStateLoss();
+                dismiss();
             }
         });
 
@@ -76,9 +78,8 @@ public class DialogVideoResolution extends DialogFragmentBase{
 
     @Override
     public void updateUI() {
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("VideoResolution", Core.resolution);
-        editor.apply();
+
+        SettingManager2.setVideoResolution(requireContext(), Core.resolution);
         callback.onClick();
     }
 
@@ -100,9 +101,9 @@ public class DialogVideoResolution extends DialogFragmentBase{
         mVideoResolutions.add(new VideoProperties("480p (SD)", false));
         mVideoResolutions.add(new VideoProperties("360p (SD)", false));
 
-        String resolutionSelected = pref.getString("VideoResolution", "480p (SD)");
+        String resolution = SettingManager2.getVideoResolution(requireContext());
         for (VideoProperties selected: mVideoResolutions) {
-            selected.setCheck(selected.getValue().contains(resolutionSelected));
+            selected.setCheck(selected.getValue().contains(resolution));
         }
     }
 }

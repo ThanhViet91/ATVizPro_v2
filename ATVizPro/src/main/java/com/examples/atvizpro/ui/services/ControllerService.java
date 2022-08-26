@@ -551,8 +551,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                     if(mMode==MyUtils.MODE_RECORDING){
                         ((RecordingService)mService).insertVideoToGallery();
-//                        ((RecordingService)mService).saveVideoToDatabase();
-                        MyUtils.toast(getApplicationContext(), "Recording Service Closed", Toast.LENGTH_LONG);
+                        MyUtils.toast(getApplicationContext(), "Recording Service Stopped", Toast.LENGTH_LONG);
                         return;
                     }
 

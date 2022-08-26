@@ -87,8 +87,8 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvPasteRTMPAddress = view.findViewById(R.id.tv_paste_rtmp_address);
         tvPasteStreamKey = view.findViewById(R.id.tv_paste_stream_key);
 
-        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
-        edtStreamKey.setText("test");
+//        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
+//        edtStreamKey.setText("test");
 
 
         imgBack.setOnClickListener(new View.OnClickListener() {
@@ -104,11 +104,11 @@ public class RTMPLiveAddressFragment extends Fragment {
                 mParentActivity.mMode = MyUtils.MODE_STREAMING;
                 mUrl = edtRTMPAddress.getText().toString() + edtStreamKey.getText().toString();
                 if (!MyUtils.isValidStreamUrlFormat(mUrl)) {
-                    MyUtils.showSnackBarNotification(view, "Wrong stream url format (ex: rtmp://127.192.123.1/live/stream)", Snackbar.LENGTH_INDEFINITE);
+                    MyUtils.showSnackBarNotification(view, "Wrong stream url format (ex: rtmp://127.192.123.1/live/stream)", Snackbar.LENGTH_LONG);
                     edtRTMPAddress.requestFocus();
                 } else {
                     if (isMyServiceRunning(getContext(), RecordingService.class)) {
-                        MyUtils.showSnackBarNotification(view, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_INDEFINITE);
+                        MyUtils.showSnackBarNotification(view, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
                         return;
                     }
                     mParentActivity.mMode = MyUtils.MODE_STREAMING;

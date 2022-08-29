@@ -28,6 +28,7 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.ZVideoView;
 import com.examples.atvizpro.ui.utils.CustomOnScaleDetector;
@@ -52,11 +53,16 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private ImageView toggleReactCam;
     private TextView saveReactCam;
 
+    private LottieAnimationView animationView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideStatusBar(this);
         setContentView(R.layout.activity_react_cam);
+
+        animationView = findViewById(R.id.animation_view);
+        animationView.setVisibility(View.GONE);
 
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
         toggleReactCam.setOnClickListener(this);
@@ -288,7 +294,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         return file_path.getAbsolutePath() + File.separator + getTimeStamp() + ".mp4";
     }
 
-    String cameraCahePath;
+    String cameraCahePath, cameraCahePath_flip;
 
     boolean hasVideoReactCam = false;
     boolean isPlaying = false;
@@ -348,7 +354,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (v == findViewById(R.id.tv_share_react_cam)) {
-            new VideoUtil().reactCamera(this, videoFile, cameraCahePath, startTime, endTime, camOverlaySize[camSize],
+            new VideoUtil().reactCamera(this, videoFile, cameraCahePath_flip, startTime, endTime, camOverlaySize[camSize],
                     posX, posY, false, false, new VideoUtil.ITranscoding() {
                         @Override
                         public void onStartTranscoding(String outputCachePath) {
@@ -374,7 +380,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     private void reviewReactCam() {
         if (isPlaying) {
-            stopPlayReviewReactCam();
+            pauseReviewReactCam();
             toggleReactCam.setImageResource(R.drawable.btn_react_cam_play);
         } else {
             playReviewReactCam();
@@ -382,35 +388,62 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
+    Handler handlerPlayOverlayVideo;
+    long start_review_time = 0, restTime = 0;
+    boolean isPauseReview = false;
     private void playReviewReactCam() {
-        videoView.setVideoPath(videoFile);
-        videoView.seekTo(0);
-        initOverlayVideoView();
+        start_review_time = System.currentTimeMillis();
+        if (isPauseReview) {
+        } else {
+            videoView.setVideoPath(videoFile);
+            videoView.seekTo(0);
+            initOverlayVideoView();
+        }
+
+        isPauseReview = false;
         videoView.start();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                overlayVideo.setVisibility(View.VISIBLE);
-                overlayVideo.start();
-            }
-        }, startTime);
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                cameraPreview.setVisibility(View.VISIBLE);
-//                overlayVideo.start();
-//            }
-//        }, startTime);
+
+        if (startTime - restTime >=0) {
+
+            handlerPlayOverlayVideo = new Handler();
+            handlerPlayOverlayVideo.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    overlayVideo.setVisibility(View.VISIBLE);
+                    overlayVideo.start();
+                }
+            }, startTime - restTime);
+
+            overlayVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    overlayVideo.stopPlayback();
+                    overlayVideo.setVisibility(View.GONE);
+                    restTime = 0;
+                }
+            });
+
+
+        }
+
     }
 
 
-    private void stopPlayReviewReactCam() {
+    private void pauseReviewReactCam() {
+        isPauseReview = true;
+        handlerPlayOverlayVideo.removeCallbacksAndMessages(null);
+        restTime = System.currentTimeMillis() - start_review_time;
+        if (videoView.isPlaying())
+            videoView.pause();
+        if (overlayVideo.isPlaying())
+            overlayVideo.pause();
 
     }
 
     VideoView overlayVideo;
     private void initOverlayVideoView() {
-        overlayVideo.setVideoPath(cameraCahePath);
+        overlayVideo.setVideoPath(cameraCahePath_flip);
         overlayVideo.setX(mCameraLayout.getX());
         overlayVideo.setY(mCameraLayout.getY());
         overlayVideo.setLayoutParams(new RelativeLayout.LayoutParams((int) camWidth, (int) camHeight));
@@ -426,8 +459,33 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         hasVideoReactCam = true;
         endTime = mediaPlayer.getCurrentPosition();
         videoView.stopPlayback();
-        toggleReactCam.setImageResource(R.drawable.btn_react_cam_play);
-        saveReactCam.setVisibility(View.VISIBLE);
+        flipCamera();
+    }
+
+    private void flipCamera() {
+
+        new VideoUtil().flipHorizontal(this, cameraCahePath, new VideoUtil.ITranscoding() {
+            @Override
+            public void onStartTranscoding(String outputCachePath) {
+                animationView.setVisibility(View.VISIBLE);
+                animationView.playAnimation();
+                cameraCahePath_flip = outputCachePath;
+            }
+
+            @Override
+            public void onFinishTranscoding(String code) {
+                toggleReactCam.setImageResource(R.drawable.btn_react_cam_play);
+                saveReactCam.setVisibility(View.VISIBLE);
+                animationView.pauseAnimation();
+                animationView.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onUpdateProgressTranscoding(int progress) {
+
+            }
+        });
+
     }
 
     long startTime, endTime = 0;

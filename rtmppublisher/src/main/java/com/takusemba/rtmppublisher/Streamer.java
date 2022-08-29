@@ -2,6 +2,7 @@ package com.takusemba.rtmppublisher;
 
 import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -94,10 +95,15 @@ class Streamer
     }
 
     void stopStreaming() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                srsFlvMuxer.stop();
+                oldTimeStamp = 0L;
+            }
+        }, 1000);
         videoHandler.stop();
         audioHandler.stop();
-        srsFlvMuxer.stop();
-        oldTimeStamp = 0L;
     }
 
     boolean isStreaming() {

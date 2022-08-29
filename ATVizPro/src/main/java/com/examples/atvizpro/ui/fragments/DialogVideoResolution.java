@@ -51,7 +51,6 @@ public class DialogVideoResolution extends DialogFragmentBase{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        pref = requireActivity().getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
         recyclerView = view.findViewById(R.id.rc_item);
 
@@ -78,7 +77,6 @@ public class DialogVideoResolution extends DialogFragmentBase{
 
     @Override
     public void updateUI() {
-
         SettingManager2.setVideoResolution(requireContext(), Core.resolution);
         callback.onClick();
     }
@@ -96,7 +94,7 @@ public class DialogVideoResolution extends DialogFragmentBase{
     private void initChecked() {
 
         mVideoResolutions = new ArrayList<>();
-        mVideoResolutions.add(new VideoProperties("1080p (HD)", false));
+        mVideoResolutions.add(new VideoProperties("1080p (FHD)", false));
         mVideoResolutions.add(new VideoProperties("720p (HD)", false));
         mVideoResolutions.add(new VideoProperties("480p (SD)", false));
         mVideoResolutions.add(new VideoProperties("360p (SD)", false));

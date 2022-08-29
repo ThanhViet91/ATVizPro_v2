@@ -8,7 +8,6 @@ import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -28,7 +27,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.examples.atvizpro.Constants;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
@@ -44,9 +42,8 @@ import com.examples.atvizpro.ui.fragments.ProjectsFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
+import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -127,15 +124,14 @@ public class MainActivity extends AppCompatActivity {
 
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+
+                AdView mAdView = findViewById(R.id.adView);
+                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+
             }
         });
 
-        AdView mAdView = findViewById(R.id.adView);
-
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
     }
 
@@ -322,8 +318,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void generateVideoSettings() {
-//        SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.SHARED_PREFERENCES, MODE_PRIVATE);
-
         Core.resolution = SettingManager2.getVideoResolution(this);
         Core.bitrate = SettingManager2.getVideoBitrate(this);
         Core.frameRate =  SettingManager2.getVideoFPS(this);
@@ -353,7 +347,6 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle bundle = new Bundle();
         bundle.putInt("key_from_code", from_code);
-//        ProjectsFragment projectsFragment = ProjectsFragment.newInstance(bundle);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.frame_layout_fragment, ProjectsFragment.newInstance(bundle), "")

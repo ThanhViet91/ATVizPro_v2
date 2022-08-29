@@ -5,11 +5,11 @@ import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR
 import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -17,21 +17,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoProjectsAdapter;
 import com.examples.atvizpro.model.VideoModel;
 import com.examples.atvizpro.ui.activities.CommentaryActivity;
 import com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity;
+import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.ui.activities.VideoEditorActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 /**
@@ -44,12 +48,22 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
 
     private static final String TAG = ProjectsFragment.class.getSimpleName();
     private View mViewRoot;
-    private Menu mMenu;
-    RecyclerView recyclerView;
-    TextView mTvEmpty;
+    private RecyclerView recyclerView;
+    private TextView btn_cancel, tv_nodata;
     private VideoProjectsAdapter mAdapter;
     private Object mSync = new Object();
     private final String VIDEO_PATH_KEY = "video-file-path";
+    private MainActivity mParentActivity = null;
+    private App mApplication;
+    private FragmentManager mFragmentManager;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.mParentActivity = (MainActivity) context;
+        this.mApplication = (App) context.getApplicationContext();
+        mFragmentManager = getParentFragmentManager();
+    }
 
     public ProjectsFragment() {
         // Required empty public constructor
@@ -83,11 +97,25 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
     @Override
     public void onResume() {
         super.onResume();
+        reloadData();
+        if (videoList == null || videoList.size() == 0) {
+            tv_nodata.setVisibility(View.VISIBLE);
+        } else {
+            tv_nodata.setVisibility(View.GONE);
+        }
     }
 
     private void initViews() {
         recyclerView = (RecyclerView) mViewRoot.findViewById(R.id.list_videos);
-        mTvEmpty = mViewRoot.findViewById(R.id.tvEmpty);
+        btn_cancel = mViewRoot.findViewById(R.id.tv_btn_cancel_projects);
+        tv_nodata = mViewRoot.findViewById(R.id.tvEmpty);
+
+        btn_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mFragmentManager.popBackStack();
+            }
+        });
 
         final SwipeRefreshLayout srl = (SwipeRefreshLayout) mViewRoot.findViewById(R.id.swipeLayout);
         srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -111,6 +139,8 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
+        AdView mAdView = mViewRoot.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
 
     }
 

@@ -87,8 +87,8 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvPasteRTMPAddress = view.findViewById(R.id.tv_paste_rtmp_address);
         tvPasteStreamKey = view.findViewById(R.id.tv_paste_stream_key);
 
-//        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
-//        edtStreamKey.setText("test");
+        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
+        edtStreamKey.setText("test");
 
 
         imgBack.setOnClickListener(new View.OnClickListener() {

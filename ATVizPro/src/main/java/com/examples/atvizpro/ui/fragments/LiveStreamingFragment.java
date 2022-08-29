@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentManager;
 import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.activities.MainActivity;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -82,6 +84,9 @@ public class LiveStreamingFragment extends Fragment {
                         .commit();
             }
         });
+
+        AdView mAdView = view.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override

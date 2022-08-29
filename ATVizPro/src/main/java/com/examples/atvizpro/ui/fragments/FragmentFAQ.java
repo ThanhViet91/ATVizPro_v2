@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.model.FAQItem;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,6 +56,9 @@ public class FragmentFAQ extends Fragment {
                 getParentFragmentManager().popBackStack();
             }
         });
+
+        AdView mAdView = view.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override

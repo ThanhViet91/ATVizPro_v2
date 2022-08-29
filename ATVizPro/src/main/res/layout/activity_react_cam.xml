@@ -75,6 +75,16 @@
 
         </FrameLayout>
 
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:id="@+id/animation_view"
+            app:lottie_rawRes="@raw/reload"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"/>
+
     </RelativeLayout>
 
     <RelativeLayout

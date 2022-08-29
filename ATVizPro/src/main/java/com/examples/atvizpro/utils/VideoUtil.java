@@ -111,6 +111,15 @@ public class VideoUtil {
     }
 
 
+    public void flipHorizontal (Activity act, String originalVideoPath, ITranscoding callback){
+        outputVideoPath = generteFileOutput();
+
+        String cmd = "ffmpeg -i " +  originalVideoPath + " -vf hflip " + outputVideoPath;
+
+        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+    }
+
+
     public String parseSecond2Ms(long second) {
         String ms = "";
         return ms + second/1000 + "." + second % 1000;

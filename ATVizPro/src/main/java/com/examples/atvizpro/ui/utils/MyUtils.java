@@ -67,7 +67,7 @@ public class MyUtils {
 
     @NonNull
     public static String createFileName(@NonNull String ext) {
-        return "Recorder-" +getTimeStamp()+ ext;
+        return "Record-" +getTimeStamp()+ ext;
     }
 
     @SuppressLint("SimpleDateFormat")

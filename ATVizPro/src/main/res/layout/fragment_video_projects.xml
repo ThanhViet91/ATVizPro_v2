@@ -2,12 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:clickable="true"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:background="@drawable/bg_home">
 
     <TextView
-        android:id="@+id/tv_btn_cancel"
+        android:id="@+id/tv_btn_cancel_projects"
         style="@style/Title_Box_White"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="36dp"
         android:padding="6dp"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:textFontWeight="600"
         android:textSize="18sp"
         tools:targetApi="p" />
@@ -27,7 +28,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
-        android:text="My Recording"
+        android:text="@string/my_recording"
         android:textFontWeight="700"
         android:textSize="24sp"
         tools:targetApi="p" />
@@ -36,12 +37,11 @@
         android:id="@+id/swipeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="100dp"
         android:paddingStart="10dp"
 
-        android:paddingTop="100dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="10dp">
+        android:layout_marginTop="100dp"
+        android:paddingEnd="10dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_videos"
@@ -55,11 +55,24 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
-        android:text="No Video!"
+        android:text="@string/no_video"
         android:visibility="gone"
         android:id="@+id/tvEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         />
+
+    <com.google.android.gms.ads.AdView
+        android:layout_marginBottom="48dp"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
+
 </RelativeLayout>

@@ -87,6 +87,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
         Intent intent = new Intent(CompressBeforeReactCamActivity.this, ReactCamActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, outputCachePath);
         startActivity(intent);
+        finish();
     }
 
     @Override

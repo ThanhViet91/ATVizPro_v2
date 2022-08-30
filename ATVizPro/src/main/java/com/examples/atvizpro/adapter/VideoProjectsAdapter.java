@@ -2,6 +2,7 @@ package com.examples.atvizpro.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +20,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.model.VideoModel;
 
+import java.io.File;
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
@@ -68,6 +71,28 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             @Override
             public void onClick(View view) {
                 listener.onSelected(list.get(position).getThumb());
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Delete Video")
+                        .setMessage("Are you sure you want to delete this video?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @SuppressLint("NotifyDataSetChanged")
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                if (new File(list.get(position).getThumb()).delete()) {
+                                    list.remove(list.get(position));
+                                    notifyDataSetChanged();
+                                }
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return false;
             }
         });
     }

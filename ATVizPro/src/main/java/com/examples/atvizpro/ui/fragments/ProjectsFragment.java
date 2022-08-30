@@ -131,7 +131,7 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
         // Create a new {@link ArrayAdapter} of earthquakes: gắn cái datalist vào layout
         readData();
         mAdapter = new VideoProjectsAdapter(
-                getActivity(), videoList);
+                getActivity(), videoList_revert);
         mAdapter.setVideoProjectsListener(this);
         // Set the mAdapter on the {@link ListView}
         // so the list can be populated in the user interface
@@ -145,14 +145,23 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
     }
 
     private ArrayList<VideoModel> videoList = new ArrayList<VideoModel>();
+    private ArrayList<VideoModel> videoList_revert = new ArrayList<VideoModel>();
     private void reloadData() {
         videoList.clear();
+        videoList_revert.clear();
         readData();
-        mAdapter.reloadData(videoList);
+
+        mAdapter.reloadData(videoList_revert);
     }
+
 
     private void readData() {
         listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
+        if (videoList != null && videoList.size() > 0) {
+            for (int i = videoList.size()-1; i >=0; i--) {
+                videoList_revert.add(videoList.get(i));
+            }
+        }
 
     }
     public void listFilesForFolder(final File folder) {

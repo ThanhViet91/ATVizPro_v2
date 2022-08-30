@@ -72,7 +72,7 @@ public class MyUtils {
 
     @SuppressLint("SimpleDateFormat")
     public static String getTimeStamp() {
-        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        return new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
     }
 
     @NonNull

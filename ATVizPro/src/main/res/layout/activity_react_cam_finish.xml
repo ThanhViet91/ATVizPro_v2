@@ -8,12 +8,6 @@
     android:background="@drawable/bg_home"
     tools:context=".ui.activities.ReactCamActivity">
 
-    <VideoView
-        android:id="@+id/overlay_video"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
-
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -38,18 +32,6 @@
             android:paddingStart="10dp"
             android:src="@drawable/ic_back_header_24" />
 
-        <TextView
-            android:id="@+id/tv_share_react_cam"
-            style="@style/Title_Box_White"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_marginEnd="20dp"
-            android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:text="Share"
-            android:textFontWeight="400"
-            android:textSize="18sp"
-            android:visibility="gone" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -66,24 +48,13 @@
             android:layout_height="wrap_content"
             android:background="@color/black">
 
-            <com.examples.atvizpro.ui.ZVideoView
+            <VideoView
                 android:id="@+id/video_main"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" />
 
-
         </FrameLayout>
-
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:layout_centerInParent="true"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:id="@+id/animation_view"
-            app:lottie_rawRes="@raw/reload"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"/>
 
     </RelativeLayout>
 
@@ -93,26 +64,28 @@
         android:layout_height="200dp"
         android:layout_alignParentBottom="true">
 
-        <SeekBar
-            android:id="@+id/seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="16dp" />
+        <ImageView
+            android:id="@+id/img_btn_save"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="8dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="40dp"
+            android:src="@drawable/ic_save" />
 
         <ImageView
-            android:id="@+id/img_btn_react_cam"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_below="@id/seekbar"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/ic_play_react" />
+            android:id="@+id/img_btn_share"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="8dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="40dp"
+            android:src="@drawable/ic_share" />
 
     </RelativeLayout>
-
-
 
 </RelativeLayout>

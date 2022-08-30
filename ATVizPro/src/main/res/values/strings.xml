@@ -66,10 +66,10 @@
     <string name="video_resolution">Video Resolution</string>
     <string name="bitrate">Bitrate</string>
     <string name="frame_rate">Frame rate</string>
-    <string name="_1080p_hd">1080p (HD)</string>
+    <string name="_1080p_fhd">1080p (HD)</string>
     <string name="_720p_hd">720p (HD)</string>
-    <string name="_480p_hd">480p (SD)</string>
-    <string name="_360p_hd">360p (SD)</string>
+    <string name="_480p_sd">480p (SD)</string>
+    <string name="_360p_ssd">360p (SD)</string>
     <string name="settings">Settings</string>
     <string name="how_to_record_your_screen">How to record your screen</string>
     <string name="upgrade_to_pro">Upgrade to Pro</string>
@@ -117,5 +117,9 @@
     <string name="no_video">No Video!</string>
     <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="admob_intersitial_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="resolution">Resolution</string>
+    <string name="_4mbps">4Mbps</string>
+    <string name="_30fps">30fps</string>
+    <string name="framerate">Framerate</string>
 
 </resources>

@@ -1,33 +1,22 @@
 package com.examples.atvizpro.ui.fragments;
 
-import static android.content.Context.MODE_PRIVATE;
-
-import static com.examples.atvizpro.Constants.DEFAULT_BITRATE;
-
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.examples.atvizpro.Constants;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoSettingsAdapter;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.VideoProperties;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DialogBitrate extends DialogFragmentBase {
     RecyclerView recyclerView;

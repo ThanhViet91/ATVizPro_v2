@@ -66,6 +66,7 @@ class AudioEncoder implements Encoder {
         if (isEncoding) {
             int inputBufferId = encoder.dequeueInputBuffer(TIMEOUT_USEC);
             encoder.queueInputBuffer(inputBufferId, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+            isEncoding = false;
         }
     }
 

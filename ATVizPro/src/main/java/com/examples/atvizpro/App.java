@@ -10,11 +10,15 @@ import android.content.pm.ShortcutManager;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 import java.util.Arrays;
 
@@ -27,19 +31,31 @@ public class App extends Application {
         return App.context;
     }
 
+
+    private static AppOpenManager appOpenManager;
+
     @Override
     public void onCreate() {
         super.onCreate();
         App.context = getApplicationContext();
-        if (Build.VERSION.SDK_INT >= 25) {
-//            createShortcut();
-            if(Build.VERSION.SDK_INT >=26){
-//                pinShortcut();
-            }
+        MobileAds.initialize(
+                this,
+                new OnInitializationCompleteListener() {
+                    @Override
+                    public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {}
+                });
 
-        }else{
-            removeShortcuts();
-        }
+        appOpenManager = new AppOpenManager(this);
+
+//        if (Build.VERSION.SDK_INT >= 25) {
+////            createShortcut();
+//            if(Build.VERSION.SDK_INT >=26){
+////                pinShortcut();
+//            }
+//
+//        }else{
+//            removeShortcuts();
+//        }
     }
 
 
@@ -56,7 +72,7 @@ public class App extends Application {
                 .setShortLabel("Start Now")
                 .setLongLabel("Start Service Now")
                 .setDisabledMessage("Permission Denied, open app to resolve it")
-                .setIcon(Icon.createWithResource(this, R.mipmap.ic_launcher))
+                .setIcon(Icon.createWithResource(this, R.drawable.ic_app))
                 .build();
 
         sM.setDynamicShortcuts(Arrays.asList(shortcut1));

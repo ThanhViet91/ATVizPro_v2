@@ -11,7 +11,7 @@
             android:id="@+id/tvCountDown"
             android:text="3"
             android:textSize="120sp"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/color_home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"

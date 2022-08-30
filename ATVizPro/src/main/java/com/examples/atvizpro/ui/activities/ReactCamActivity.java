@@ -5,6 +5,7 @@ import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -54,6 +55,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private TextView saveReactCam;
 
     private LottieAnimationView animationView;
+    private boolean onProcessReact = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -227,6 +229,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
+                if (onProcessReact) return true;
+
                 if (event.getPointerCount() > 1) {
                     pointerId1 = event.getPointerId(0);
                     pointerId2 = event.getPointerId(1);
@@ -303,14 +307,15 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         if (v == findViewById(R.id.img_btn_react_cam)) {
 
+            onProcessReact = false;
             if (hasVideoReactCam) {
                 reviewReactCam();
                 isPlaying = !isPlaying;
                 return;
             }
             if (!rtmpCamera.isRecording()) {
+                onProcessReact = true;
                 cameraCahePath = StorageUtil.getCacheDir() + "/CacheCamOverlay_" + getTimeStamp() + ".mp4";
-                System.out.println("thanhlv file  cammmm = " + cameraCahePath);
                 try {
                     if (!rtmpCamera.isStreaming()) {
                         if (rtmpCamera.prepareAudio() && rtmpCamera.prepareVideo()) {
@@ -337,7 +342,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             } else {
                 getEndReactCam();
                 rtmpCamera.stopRecord();
-
                 Toast.makeText(this, "saved file " + cameraCahePath, Toast.LENGTH_SHORT).show();
             }
         }
@@ -358,16 +362,18 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     posX, posY, false, false, new VideoUtil.ITranscoding() {
                         @Override
                         public void onStartTranscoding(String outputCachePath) {
-                            if (mProgressDialog == null) {
-                                mProgressDialog = ProgressDialog.show(ReactCamActivity.this, "", "Compressing...");
-                            }
-                            mProgressDialog.setMessage("Compressing...");
+
+                            animationView.setVisibility(View.VISIBLE);
+                            animationView.playAnimation();
                         }
 
                         @Override
                         public void onFinishTranscoding(String code) {
-                            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+
+                            animationView.pauseAnimation();
+                            animationView.setVisibility(View.GONE);
                             finishReactCam(code);
+
                         }
 
                         @Override
@@ -453,9 +459,23 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     ProgressDialog mProgressDialog;
     private void finishReactCam(String ouputCacheFile) {
         Toast.makeText(this, ouputCacheFile, Toast.LENGTH_SHORT).show();
+
+        hasVideoReactCam = false;
+        if (new File(cameraCahePath).delete()) {
+//            System.out.println("thanhlv deletellllllllll");
+        }
+        mCameraLayout.setVisibility(View.VISIBLE);
+        toggleReactCam.setImageResource(R.drawable.ic_play_react);
+
+        Intent intent = new Intent(ReactCamActivity.this, ReactCamFinishActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, ouputCacheFile);
+        startActivity(intent);
+
     }
 
     private void getEndReactCam() {
+
+        mCameraLayout.setVisibility(View.GONE);
         hasVideoReactCam = true;
         endTime = mediaPlayer.getCurrentPosition();
         videoView.stopPlayback();

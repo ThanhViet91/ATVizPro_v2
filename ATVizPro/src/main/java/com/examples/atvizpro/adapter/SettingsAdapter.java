@@ -18,27 +18,45 @@ import com.examples.atvizpro.model.SettingsItem;
 
 import java.util.ArrayList;
 
-public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHolder>{
+public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHolder> {
     private final Context mContext;
     private ArrayList<SettingsItem> mFAQs;
+
+    public interface SettingsListener {
+
+        void onClickItem(String code);
+    }
+
+    private SettingsListener listener;
 
     public SettingsAdapter(Context context, ArrayList<SettingsItem> list) {
         this.mContext = context;
         this.mFAQs = list;
     }
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            View view = inflater.inflate(R.layout.layout_item_settings, parent, false);
-            return new ViewHolder(view);
-        }
+
+    public void setListener(SettingsListener listener) {
+        this.listener = listener;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View view = inflater.inflate(R.layout.layout_item_settings, parent, false);
+        return new ViewHolder(view);
+    }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         SettingsItem item = mFAQs.get(position);
         holder.content_settings.setText(item.getContent());
         holder.ava_settings.setBackgroundResource(item.getResourceId());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
+            }
+        });
     }
 
 
@@ -58,7 +76,6 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHo
 
         }
     }
-
 
 
 }

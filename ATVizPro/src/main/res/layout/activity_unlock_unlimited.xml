@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_dismiss_subscription"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+
+
+    <TextView
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:padding="8dp"
+        android:text="Restore"
+        android:textColor="#BBBBBB"
+        android:textSize="18sp"
+        android:textFontWeight="500"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        tools:targetApi="p" />
+
+    <ImageView
+        android:id="@+id/ava"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="60dp"
+        android:src="@drawable/ic_app"
+        android:layout_width="100dp"
+        android:layout_height="100dp"/>
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_below="@id/ava"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
+        style="@style/Black_Text"
+        android:text="@string/record_screen"
+        android:textSize="18sp"
+        android:textFontWeight="700"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:targetApi="p" />
+
+
+    <TextView
+        android:id="@+id/tv_unlock"
+        android:layout_below="@id/app_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        style="@style/Black_Text"
+        android:text="@string/unlock_unlimited"
+        android:textSize="26sp"
+        android:textFontWeight="700"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:targetApi="p" />
+
+    <LinearLayout
+        android:id="@+id/benefit"
+        android:layout_below="@id/tv_unlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_unlimited"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+            <TextView
+                android:layout_gravity="center_vertical"
+                style="@style/Black_Text"
+                android:layout_marginStart="10dp"
+                android:text="@string/unlimited_duration_of_videos"
+                android:textSize="20sp"
+                android:textFontWeight="500"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:targetApi="p" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_youcan_live"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+            <TextView
+                android:layout_gravity="center_vertical"
+                style="@style/Black_Text"
+                android:layout_marginStart="10dp"
+                android:text="@string/you_can_live_stream"
+                android:textSize="20sp"
+                android:textFontWeight="500"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:targetApi="p" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/ic_remove_ads"
+                android:layout_width="40dp"
+                android:layout_height="40dp"/>
+            <TextView
+                android:layout_gravity="center_vertical"
+                style="@style/Black_Text"
+                android:layout_marginStart="10dp"
+                android:text="@string/remove_ads"
+                android:textSize="20sp"
+                android:textFontWeight="500"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:targetApi="p" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_below="@id/benefit"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:background="@drawable/shape_round_purcharse"
+            android:layout_width="350dp"
+            android:layout_height="56dp">
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:background="@drawable/shape_round_purcharse"
+            android:layout_width="350dp"
+            android:layout_height="56dp">
+
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:background="@drawable/shape_round_purcharse"
+            android:layout_width="350dp"
+            android:layout_height="56dp">
+
+
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

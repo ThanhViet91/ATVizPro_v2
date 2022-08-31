@@ -74,8 +74,8 @@
     <string name="how_to_record_your_screen">How to record your screen</string>
     <string name="upgrade_to_pro">Upgrade to Pro</string>
     <string name="restore_purchase">Restore Purchase</string>
-    <string name="available_storage_2_43gb">Available Storage: 2,43GB</string>
-    <string name="recording_cache_0_kb">Recording Cache: 0 KB</string>
+    <string name="available_storage_2_43gb">Available Storage: </string>
+    <string name="recording_cache_0_kb">Recording Cache: </string>
     <string name="support_us_by_rating_our_app">Support us by rating our app</string>
     <string name="contact_us">Contact us</string>
     <string name="personalized_ads_off">Personalized Ads: Off</string>
@@ -116,10 +116,15 @@
     <string name="my_recording">My Recording</string>
     <string name="no_video">No Video!</string>
     <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="admob_intersitial_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_intersitial_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="resolution">Resolution</string>
     <string name="_4mbps">4Mbps</string>
     <string name="_30fps">30fps</string>
     <string name="framerate">Framerate</string>
+    <string name="record_screen">Record Screen</string>
+    <string name="unlock_unlimited">Unlock Unlimited</string>
+    <string name="unlimited_duration_of_videos">Unlimited duration of videos</string>
+    <string name="you_can_live_stream">You can live stream</string>
+    <string name="remove_ads">Remove Ads</string>
 
 </resources>

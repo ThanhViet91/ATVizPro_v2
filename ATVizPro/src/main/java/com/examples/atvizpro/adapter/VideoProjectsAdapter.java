@@ -76,6 +76,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                holder.itemView.setAlpha(0.5f);
                 new AlertDialog.Builder(context)
                         .setTitle("Delete Video")
                         .setMessage("Are you sure you want to delete this video?")
@@ -89,7 +90,12 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                                 }
                             }
                         })
-                        .setNegativeButton(android.R.string.no, null)
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                holder.itemView.setAlpha(1);
+                            }
+                        })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
                 return false;

@@ -70,19 +70,16 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.ViewHolder>{
             ic_down = itemView.findViewById(R.id.ic_down);
             rl_head_faq = itemView.findViewById(R.id.rl_head_faq);
 
-            ic_down.setOnClickListener(new View.OnClickListener() {
+            rl_head_faq.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (mFAQs.get(getLayoutPosition()).getShown()) {
+                        hideAnswer(getLayoutPosition());
+                    } else
                     showAnswer(getLayoutPosition());
                 }
             });
 
-            ic_up.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    hideAnswer(getLayoutPosition());
-                }
-            });
         }
     }
 

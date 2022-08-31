@@ -6,6 +6,7 @@ import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -27,6 +29,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.ProductDetailsResponseListener;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchaseHistoryResponseListener;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchaseHistoryParams;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
@@ -49,9 +67,11 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Objects;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
@@ -66,6 +86,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
+
+    public static final String KEY_PATH_VIDEO = "key_video_selected_path";
+
+    public void showProductRemoveAds(){
+        handlerProductList(mProductDetailsList);
+    }
+
     private static String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
@@ -89,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if(savedInstanceState!=null){
+        if (savedInstanceState != null) {
             mMode = savedInstanceState.getInt(MyUtils.KEY_CONTROLlER_MODE);
         }
     }
@@ -106,18 +133,218 @@ public class MainActivity extends AppCompatActivity {
         active = false;
     }
 
+
+    void handlePurchase(Purchase purchase) {
+        // Purchase retrieved from BillingClient#queryPurchasesAsync or your PurchasesUpdatedListener.
+
+        // Verify the purchase.
+        // Ensure entitlement was not already granted for this purchaseToken.
+        // Grant entitlement to the user.
+        if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
+            if (!purchase.isAcknowledged()) {
+                AcknowledgePurchaseParams acknowledgePurchaseParams =
+                        AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.getPurchaseToken())
+                                .build();
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, new AcknowledgePurchaseResponseListener() {
+                    @Override
+                    public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
+                        if (billingResult.getResponseCode() == 0){
+
+                        }
+                    }
+                });
+            }
+        }
+
+
+//        ConsumeParams consumeParams =
+//                ConsumeParams.newBuilder()
+//                        .setPurchaseToken(purchase.getPurchaseToken())
+//                        .build();
+//
+//        ConsumeResponseListener listener = new ConsumeResponseListener() {
+//            @Override
+//            public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
+//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+//                    // Handle the success of the consume operation.
+//
+//                }
+//            }
+//        };
+//
+//        billingClient.consumeAsync(consumeParams, listener);
+    }
+
+
+    private PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
+        @Override
+        public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
+            // To be implemented in a later section.
+
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
+                    && purchases != null) {
+                for (Purchase purchase : purchases) {
+                    handlePurchase(purchase);
+                }
+            } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+                // Handle an error caused by a user cancelling the purchase flow.
+            } else {
+                // Handle any other error codes.
+            }
+
+        }
+    };
+
+    private BillingClient billingClient;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideStatusBar(this);
         setContentView(R.layout.activity_main);
 
+        billingClient = BillingClient.newBuilder(this)
+                .setListener(purchasesUpdatedListener)
+                .enablePendingPurchases()
+                .build();
+
+        connectGooglePlayBilling();
+
         initAds();
+
         initViews();
 
         Intent intent = getIntent();
-        if(intent!=null)
+        if (intent != null)
             handleIncomingRequest(intent);
+
+    }
+
+    private void connectGooglePlayBilling() {
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    // The BillingClient is ready. You can query purchases here.
+                    showProducts();
+                    getPurchaseHistory();
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to
+                // Google Play by calling the startConnection() method.
+            }
+        });
+
+    }
+
+    private List<ProductDetails> mProductDetailsList;
+    private void showProducts() {
+        QueryProductDetailsParams queryProductDetailsParams =
+                QueryProductDetailsParams.newBuilder()
+                        .setProductList(
+                                ImmutableList.of(
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("test_remove_ads_1")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build()
+                                )
+                        ).build();
+
+        billingClient.queryProductDetailsAsync(
+                queryProductDetailsParams,
+                new ProductDetailsResponseListener() {
+                    public void onProductDetailsResponse(BillingResult billingResult,
+                                                         List<ProductDetails> productDetailsList) {
+                        // check billingResult
+                        // process returned productDetailsList
+                        mProductDetailsList = productDetailsList;
+//                        handlerProductList(productDetailsList);
+                    }
+                }
+        );
+
+
+    }
+
+    private void handlerProductList(List<ProductDetails> productDetailsList) {
+        ImmutableList productDetailsParamsList =
+                ImmutableList.of(
+                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                                // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
+                                .setProductDetails(productDetailsList.get(0))
+                                // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
+                                // for a list of offers that are available to the user
+//                                                .setOfferToken(productDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken())
+                                .build()
+                );
+
+        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build();
+
+        // Launch the billing flow
+        BillingResult billingResult = billingClient.launchBillingFlow(this, billingFlowParams);
+    }
+
+    public void getPurchaseHistory(){
+        billingClient.queryPurchaseHistoryAsync(
+                QueryPurchaseHistoryParams.newBuilder()
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                new PurchaseHistoryResponseListener() {
+                    public void onPurchaseHistoryResponse(
+                            BillingResult billingResult, List purchasesHistoryList) {
+                        // check billingResult
+                        // process returned purchase history list, e.g. display purchase history
+
+                    }
+                }
+        );
+    }
+
+    void confirmPurchase(Purchase purchase) {
+
+        Log.d("TestINAPP", purchase.getProducts().get(0));
+        Log.d("TestINAPP", purchase.getQuantity() + " Quantity");
+
+
+    }
+
+    void verifyPurchase(Purchase purchase) {
+        ConsumeParams consumeParams = ConsumeParams.newBuilder()
+                .setPurchaseToken(purchase.getPurchaseToken())
+                .build();
+        ConsumeResponseListener listener = (billingResult, s) -> {
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                confirmPurchase(purchase);
+            }
+        };
+        billingClient.consumeAsync(consumeParams, listener);
+    }
+
+
+    protected void onResume() {
+        super.onResume();
+
+
+        billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
+                (billingResult, list) -> {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                        for (Purchase purchase : list) {
+                            if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged()) {
+                                verifyPurchase(purchase);
+                            }
+                        }
+                    }
+                }
+        );
+
     }
 
     private void initAds() {
@@ -136,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleIncomingRequest(Intent intent) {
-        if(intent != null) {
+        if (intent != null) {
             switch (Objects.requireNonNull(intent.getAction())) {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
@@ -146,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestScreenCaptureIntent() {
-        if(mScreenCaptureIntent == null){
+        if (mScreenCaptureIntent == null) {
             MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
         }
@@ -168,11 +395,11 @@ public class MainActivity extends AppCompatActivity {
         updateUI();
 
         //
-        mImgRec =  findViewById(R.id.img_record);
-        btn_setting =  findViewById(R.id.img_settings);
-        btn_set_resolution =  findViewById(R.id.set_video_resolution);
-        bnt_set_bitrate =  findViewById(R.id.set_bitrate);
-        btn_set_fps =  findViewById(R.id.set_frame_rate);
+        mImgRec = findViewById(R.id.img_record);
+        btn_setting = findViewById(R.id.img_settings);
+        btn_set_resolution = findViewById(R.id.set_video_resolution);
+        bnt_set_bitrate = findViewById(R.id.set_bitrate);
+        btn_set_fps = findViewById(R.id.set_frame_rate);
 
 
         btn_setting.setOnClickListener(new View.OnClickListener() {
@@ -227,13 +454,12 @@ public class MainActivity extends AppCompatActivity {
         mImgRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isMyServiceRunning(getApplicationContext(), StreamingService.class))
-                {
+                if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
                     MyUtils.showSnackBarNotification(mImgRec, "You are in Streaming Mode. Please close stream controller", Snackbar.LENGTH_INDEFINITE);
                     return;
                 }
-                if(isMyServiceRunning(getApplicationContext(), ControllerService.class)){
-                    MyUtils.showSnackBarNotification(mImgRec,"Recording service is running!", Snackbar.LENGTH_LONG);
+                if (isMyServiceRunning(getApplicationContext(), ControllerService.class)) {
+                    MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
                     return;
                 }
                 mMode = MyUtils.MODE_RECORDING;
@@ -320,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
     private void generateVideoSettings() {
         Core.resolution = SettingManager2.getVideoResolution(this);
         Core.bitrate = SettingManager2.getVideoBitrate(this);
-        Core.frameRate =  SettingManager2.getVideoFPS(this);
+        Core.frameRate = SettingManager2.getVideoFPS(this);
     }
 
     private void showDialogPickVideo(int requestVideoFor) {
@@ -365,7 +591,7 @@ public class MainActivity extends AppCompatActivity {
     private void requestPermissions() {
 
         // PERMISSION DRAW OVER
-        if(!Settings.canDrawOverlays(this)){
+        if (!Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
@@ -393,13 +619,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void shouldStartControllerService() {
-        if(!hasCaptureIntent())
+        if (!hasCaptureIntent())
             requestScreenCaptureIntent();
 
-        if(hasPermission()) {
+        if (hasPermission()) {
             startControllerService();
-        }
-        else{
+        } else {
             requestPermissions();
 //            if(!hasCaptureIntent())
 //                requestScreenCaptureIntent();
@@ -410,7 +635,7 @@ public class MainActivity extends AppCompatActivity {
         return mScreenCaptureIntent != null;// || mScreenCaptureResultCode == MyUtils.RESULT_CODE_FAILED;
     }
 
-    public static final String KEY_PATH_VIDEO = "key_video_selected_path";
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
@@ -482,23 +707,20 @@ public class MainActivity extends AppCompatActivity {
 
             //Check if the permission is granted or not.
             if (resultCode != RESULT_OK) { //Permission is not available
-                MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.",Snackbar.LENGTH_SHORT);
+                MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);
             }
-        }
-        else if( requestCode == PERMISSION_RECORD_DISPLAY) {
-            if(resultCode != RESULT_OK){
-                MyUtils.showSnackBarNotification(mImgRec, "Recording display permission not available.",Snackbar.LENGTH_SHORT);
+        } else if (requestCode == PERMISSION_RECORD_DISPLAY) {
+            if (resultCode != RESULT_OK) {
+                MyUtils.showSnackBarNotification(mImgRec, "Recording display permission not available.", Snackbar.LENGTH_SHORT);
                 mScreenCaptureIntent = null;
-            }
-            else{
+            } else {
                 mScreenCaptureIntent = data;
                 mScreenCaptureIntent.putExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, resultCode);
                 mScreenCaptureResultCode = resultCode;
 
                 shouldStartControllerService();
             }
-        }
-        else{
+        } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -514,7 +736,7 @@ public class MainActivity extends AppCompatActivity {
 
         controller.putExtra(Intent.EXTRA_INTENT, mScreenCaptureIntent);
 
-        if(mMode == MyUtils.MODE_STREAMING) {
+        if (mMode == MyUtils.MODE_STREAMING) {
             Bundle bundle = new Bundle();
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
             controller.putExtras(bundle);
@@ -523,18 +745,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(controller);
-        }
-        else{
+        } else {
             startService(controller);
         }
 
-        if(mMode==MyUtils.MODE_RECORDING)
+        if (mMode == MyUtils.MODE_RECORDING)
             finish();
     }
 
-    /** Check if this device has a camera */
+    /**
+     * Check if this device has a camera
+     */
     private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             // this device has a camera
             return true;
         } else {
@@ -544,7 +767,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public boolean hasPermission(){
+    public boolean hasPermission() {
         int granted = PackageManager.PERMISSION_GRANTED;
 
         return ContextCompat.checkSelfPermission(this, mPermission[0]) == granted
@@ -561,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void notifyUpdateStreamProfile() {
-        if(mMode == MyUtils.MODE_STREAMING){
+        if (mMode == MyUtils.MODE_STREAMING) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
 
             controller.setAction(MyUtils.ACTION_UPDATE_STREAM_PROFILE);

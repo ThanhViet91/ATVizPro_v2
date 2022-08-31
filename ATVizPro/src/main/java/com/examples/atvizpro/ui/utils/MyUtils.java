@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.StatFs;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.examples.atvizpro.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.examples.atvizpro.controllers.settings.VideoSetting;
 import com.examples.atvizpro.data.entities.Video;
@@ -73,6 +75,25 @@ public class MyUtils {
     @SuppressLint("SimpleDateFormat")
     public static String getTimeStamp() {
         return new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+    }
+
+    public static double getCacheSize() { //MB
+        long size = 0;
+        File[] files = new File(StorageUtil.getCacheDir()).listFiles();
+        assert files != null;
+        for (File f:files) {
+            size = size+f.length();
+        }
+
+        return (double) size/(1024*1024);
+    }
+
+
+    public static double getAvailableSizeExternal() {
+        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
+        long blockSize = statFs.getBlockSize();
+        return (double) statFs.getAvailableBlocks()*blockSize/(1024*1024*1024);
+
     }
 
     @NonNull

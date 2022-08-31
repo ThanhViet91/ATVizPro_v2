@@ -1,5 +1,9 @@
 package com.examples.atvizpro.ui.fragments;
 
+import static com.examples.atvizpro.ui.utils.MyUtils.getAvailableSizeExternal;
+import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,16 +21,19 @@ import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.adapter.SettingsAdapter;
 import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
+import com.examples.atvizpro.ui.activities.MainActivity;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class FragmentSettings extends Fragment {
+public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
     RecyclerView recyclerView;
     ArrayList<SettingsItem> settingsItems = new ArrayList<>();
 
+    @SuppressLint("DefaultLocale")
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -34,10 +41,10 @@ public class FragmentSettings extends Fragment {
         View mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
-        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
-        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
-        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb), R.drawable.ic_available_storage));
-        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb), R.drawable.ic_recording_cache));
+//        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
+//        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
+        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
+        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " "+String.format("%.1f",getCacheSize()) + " MB", R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
@@ -50,6 +57,7 @@ public class FragmentSettings extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.recycler_view);
         SettingsAdapter adapter = new SettingsAdapter(getContext(), settingsItems);
+        adapter.setListener(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -74,4 +82,13 @@ public class FragmentSettings extends Fragment {
     }
 
 
+    @Override
+    public void onClickItem(String code) {
+
+        if (code.equals(getString(R.string.upgrade_to_pro))) {
+            System.out.println("thanhlv ddddddddddddddd");
+            ((MainActivity) requireActivity()).showProductRemoveAds();
+        }
+
+    }
 }

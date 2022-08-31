@@ -1,5 +1,7 @@
 package com.examples.atvizpro.utils;
 
+import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -9,6 +11,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.ui.activities.ReactCamActivity;
+import com.examples.atvizpro.ui.activities.ReactCamFinishActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
@@ -72,57 +76,81 @@ public class AdUtil {
         return a < 70;
     }
 
-    static InterstitialAd mInterstitialAdAdmob;
 
-    public static void createInterstitialAdmob(Context context) {
+
+    public static InterstitialAd mInterstitialAd;
+    public static InterstitialAd createInterstitialAdmob(Context context) {
 
 
         AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(context, context.getResources().getString(R.string.admob_intersitial_id), adRequest,
+
+        InterstitialAd.load(context,"ca-app-pub-3940256099942544/1033173712", adRequest,
                 new InterstitialAdLoadCallback() {
                     @Override
                     public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        mInterstitialAdAdmob = interstitialAd;
-                        mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-                            @Override
-                            public void onAdDismissedFullScreenContent() {
-
-                                createInterstitialAdmob(context);
-
-                                Log.d("TAG", "The ad was dismissed.");
-//                                if (startScreen == 1) {
-//                                    startActivity(new Intent(MainActivity.this, ScanActivity.class));
-//                                }
-//                                if (startScreen == 2) {
-//                                    startActivity(new Intent(MainActivity.this, CreateActivity.class));
-//                                }
-//                                if (startScreen == 3) {
-//                                    startActivity(new Intent(MainActivity.this, HistoryActivity.class));
-//                                }
-//                                if (startScreen == 4) {
-//                                    startActivity(new Intent(MainActivity.this, SettingActivity.class));
-//                                }
-                            }
-
-                            @Override
-                            public void onAdFailedToShowFullScreenContent(AdError adError) {
-                                Log.d("TAG", "The ad failed to show.");
-                            }
-
-                            @Override
-                            public void onAdShowedFullScreenContent() {
-                                mInterstitialAdAdmob = null;
-                                Log.d("TAG", "The ad was shown.");
-                            }
-                        });
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAd =  interstitialAd;
                     }
 
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        mInterstitialAdAdmob = null;
+                        // Handle the error
+                        mInterstitialAd = null;
                         createInterstitialAdmob(context);
                     }
                 });
+
+
+        return mInterstitialAd;
     }
+
+
+
+
+    public static int startScreen = 0;
+//    public static void createInterstitialAdmob(Context context, String value) {
+//
+//
+//        AdRequest adRequest = new AdRequest.Builder().build();
+//        InterstitialAd.load(context, context.getResources().getString(R.string.admob_intersitial_id), adRequest,
+//                new InterstitialAdLoadCallback() {
+//                    @Override
+//                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+//                        mInterstitialAdAdmob = interstitialAd;
+//                        mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
+//                            @Override
+//                            public void onAdDismissedFullScreenContent() {
+//
+////                                createInterstitialAdmob(context);
+//
+//                                Log.d("TAG", "The ad was dismissed.");
+//                                if (startScreen == 1) {
+//                                    Intent intent = new Intent(context, ReactCamFinishActivity.class);
+//                                    intent.putExtra(KEY_PATH_VIDEO, value);
+//                                    context.startActivity(intent);
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onAdFailedToShowFullScreenContent(AdError adError) {
+//                                Log.d("TAG", "The ad failed to show.");
+//                            }
+//
+//                            @Override
+//                            public void onAdShowedFullScreenContent() {
+//                                mInterstitialAdAdmob = null;
+//                                Log.d("TAG", "The ad was shown.");
+//                            }
+//                        });
+//                    }
+//
+//                    @Override
+//                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+//                        mInterstitialAdAdmob = null;
+//                        createInterstitialAdmob(context);
+//                    }
+//                });
+//    }
 
 }

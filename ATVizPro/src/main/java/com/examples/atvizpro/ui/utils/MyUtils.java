@@ -98,8 +98,10 @@ public class MyUtils {
 
     @NonNull
     public static String getBaseStorageDirectory() {
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES) + "/Recorder";
+        File directory = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_MOVIES) + "/Recorder");
+        if (!directory.exists()) directory.mkdirs();
+        return directory.getAbsolutePath();
     }
 
     public static void showSnackBarNotification(View view, String msg, int length) {

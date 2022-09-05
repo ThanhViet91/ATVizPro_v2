@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="Facebook livestreaming" />
+            android:text="@string/how_to_record_your_screen" />
 
         <ImageView
             android:id="@+id/img_back_fb_slider"
@@ -34,12 +34,16 @@
     <TextView
         android:id="@+id/tv_decs"
         style="@style/Text_Description_White_15_400"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:textFontWeight="600"
         android:layout_marginTop="18dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:text="@string/description_fb_live"
+        android:text="Step 1:...."
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        tools:targetApi="p" />
     <FrameLayout
         android:layout_marginTop="20dp"
         android:orientation="vertical"

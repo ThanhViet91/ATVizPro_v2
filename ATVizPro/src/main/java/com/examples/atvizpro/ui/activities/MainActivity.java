@@ -14,6 +14,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -70,6 +71,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import org.json.JSONObject;
+import org.json.JSONStringer;
+
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
 
-    public void showProductRemoveAds(){
+    public void showProductRemoveAds() {
         handlerProductList(mProductDetailsList);
     }
 
@@ -149,8 +153,10 @@ public class MainActivity extends AppCompatActivity {
                 billingClient.acknowledgePurchase(acknowledgePurchaseParams, new AcknowledgePurchaseResponseListener() {
                     @Override
                     public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
-                        if (billingResult.getResponseCode() == 0){
-
+                        if (billingResult.getResponseCode() == 0) {
+                            if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
+                                SettingManager2.setRemoveAds(getApplicationContext(), true);
+                            }
                         }
                     }
                 });
@@ -158,22 +164,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-//        ConsumeParams consumeParams =
-//                ConsumeParams.newBuilder()
-//                        .setPurchaseToken(purchase.getPurchaseToken())
-//                        .build();
-//
-//        ConsumeResponseListener listener = new ConsumeResponseListener() {
-//            @Override
-//            public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
-//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-//                    // Handle the success of the consume operation.
-//
-//                }
-//            }
-//        };
-//
-//        billingClient.consumeAsync(consumeParams, listener);
     }
 
 
@@ -198,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
 
     private BillingClient billingClient;
 
+    private boolean initialAds = false;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,11 +203,11 @@ public class MainActivity extends AppCompatActivity {
                 .enablePendingPurchases()
                 .build();
 
-        connectGooglePlayBilling();
-
-        initAds();
-
         initViews();
+
+
+        SettingManager2.setRemoveAds(getApplicationContext(), false);
+        connectGooglePlayBilling();
 
         Intent intent = getIntent();
         if (intent != null)
@@ -243,13 +236,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private List<ProductDetails> mProductDetailsList;
+
     private void showProducts() {
         QueryProductDetailsParams queryProductDetailsParams =
                 QueryProductDetailsParams.newBuilder()
                         .setProductList(
                                 ImmutableList.of(
                                         QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("test_remove_ads_1")
+                                                .setProductId(getString(R.string.product_id_remove_ads))
                                                 .setProductType(BillingClient.ProductType.INAPP)
                                                 .build()
                                 )
@@ -263,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
                         // check billingResult
                         // process returned productDetailsList
                         mProductDetailsList = productDetailsList;
-//                        handlerProductList(productDetailsList);
                     }
                 }
         );
@@ -272,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handlerProductList(List<ProductDetails> productDetailsList) {
+        if (productDetailsList == null || productDetailsList.size() == 0) return;
         ImmutableList productDetailsParamsList =
                 ImmutableList.of(
                         BillingFlowParams.ProductDetailsParams.newBuilder()
@@ -291,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         BillingResult billingResult = billingClient.launchBillingFlow(this, billingFlowParams);
     }
 
-    public void getPurchaseHistory(){
+    public void getPurchaseHistory() {
         billingClient.queryPurchaseHistoryAsync(
                 QueryPurchaseHistoryParams.newBuilder()
                         .setProductType(BillingClient.ProductType.INAPP)
@@ -301,6 +295,17 @@ public class MainActivity extends AppCompatActivity {
                             BillingResult billingResult, List purchasesHistoryList) {
                         // check billingResult
                         // process returned purchase history list, e.g. display purchase history
+
+                        for (Object purchase : purchasesHistoryList) {
+                            if (purchase.toString().contains(getString(R.string.product_id_remove_ads))) {
+                                SettingManager2.setRemoveAds(getApplicationContext(), true);
+                                break;
+                            }
+                        }
+
+                        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                            initAds();
+                        }
 
                     }
                 }
@@ -312,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d("TestINAPP", purchase.getProducts().get(0));
         Log.d("TestINAPP", purchase.getQuantity() + " Quantity");
 
+        if (purchase.getProducts().get(0).equals(getString(R.string.product_id_remove_ads)))
+            SettingManager2.setRemoveAds(this, true);
 
     }
 
@@ -330,8 +337,6 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onResume() {
         super.onResume();
-
-
         billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
                 (billingResult, list) -> {
@@ -345,17 +350,33 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        if (initialAds) {
+            if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+            } else {
+                mAdView.setVisibility(View.GONE);
+            }
+        }
+
+
     }
 
     private void initAds() {
 
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+        MobileAds.initialize(getApplicationContext(), new OnInitializationCompleteListener() {
             @Override
             public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                initialAds = true;
+                if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+//                            mAdView.setVisibility(View.VISIBLE);
+                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                        }
+                    });
 
-                AdView mAdView = findViewById(R.id.adView);
-                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-
+                }
             }
         });
 
@@ -384,6 +405,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout btn_set_resolution, bnt_set_bitrate, btn_set_fps;
 
     private void initViews() {
+
+        mAdView = findViewById(R.id.adView);
 
         // initialise pulsator layout
         PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);

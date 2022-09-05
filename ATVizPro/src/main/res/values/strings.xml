@@ -28,6 +28,9 @@
     <string name="facebook_app_id">636414803521202</string>
     <string name="fb_login_protocol_scheme">fb636414803521202</string>
 
+    <!--RemoveAds settings-->
+    <string name="setting_remove_ads">setting_remove_ads</string>
+
     <!--Video settings-->
     <string name="setting_video_bitrate">setting_video_bitrate</string>
     <string name="setting_video_resolution">setting_video_resolution</string>
@@ -126,5 +129,16 @@
     <string name="unlimited_duration_of_videos">Unlimited duration of videos</string>
     <string name="you_can_live_stream">You can live stream</string>
     <string name="remove_ads">Remove Ads</string>
+
+<!--    product_id_remove_ads-->
+    <string name="product_id_remove_ads">test_remove_ads_70</string>
+
+<!--    guideline_record-->
+    <string name="guideline_record_step_1">Step 1: Tap the flashing icon</string>
+    <string name="guideline_record_step_2">Step 2: record confirmation</string>
+    <string name="guideline_record_step_3">Step 3: record icon is displayed</string>
+    <string name="guideline_record_step_4">Step 4: tap on the icon and click button record</string>
+    <string name="guideline_record_step_5">Step5: Wait 3s and the screen starts recording</string>
+
 
 </resources>

@@ -3,6 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
 
+    signingConfigs {
+        release {
+            storeFile file('D:\\Repo v2\\ATVizPro_v3\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
+            storePassword 'recorder'
+            keyAlias 'recorder'
+            keyPassword 'recorder'
+        }
+    }
     compileSdkVersion 31
     defaultConfig {
         applicationId "com.examples.atvizpro"
@@ -19,6 +27,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            signingConfig signingConfigs.release
         }
     }
 

@@ -4,6 +4,7 @@ import static com.examples.atvizpro.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +14,11 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.adapter.SettingsAdapter;
@@ -32,6 +35,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
     RecyclerView recyclerView;
     ArrayList<SettingsItem> settingsItems = new ArrayList<>();
+    private FragmentManager mFragmentManager;
 
     @SuppressLint("DefaultLocale")
     @Nullable
@@ -39,6 +43,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
+        settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
@@ -72,6 +77,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mFragmentManager = getParentFragmentManager();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
     }
@@ -88,6 +99,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv ddddddddddddddd");
             ((MainActivity) requireActivity()).showProductRemoveAds();
+        }
+
+        if (code.equals(getString(R.string.how_to_record_your_screen))) {
+            System.out.println("thanhlv how_to_record_your_screen");
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment())
+                    .addToBackStack("")
+                    .commit();
         }
 
     }

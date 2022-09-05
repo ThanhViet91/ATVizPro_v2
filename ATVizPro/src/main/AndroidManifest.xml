@@ -11,17 +11,17 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-<!--    <uses-permission android:name="android.permission.CAMERA" />-->
-<!--    <uses-permission android:name="android.permission.RECORD_AUDIO" />-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission." />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="true" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
-    <uses-feature android:name="android.hardware.camera.front" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     
     <application
         android:name=".App"
@@ -30,6 +30,7 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:extractNativeLibs="true"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_app"
         android:theme="@style/AppTheme">
 
@@ -138,18 +139,22 @@
             android:exported="false"/>
         <service
             android:name=".ui.services.recording.RecordingControllerService"
+
+            android:foregroundServiceType="mediaProjection"
             android:enabled="true"
             android:exported="false" />
         <service
             android:name=".ui.services.recording.RecordingService"
-            tools:targetApi="q"
+            android:stopWithTask="true"
             android:foregroundServiceType="mediaProjection"
             android:enabled="true"
             android:exported="false" />
         <service android:name=".ui.services.streaming.StreamingControllerService" />
         <service android:name=".ui.services.streaming.StreamingService" />
         <service android:name=".ui.services.sync.SyncService" />
-        <service android:name=".ui.services.ControllerService" />
+        <service
+            android:foregroundServiceType="mediaProjection"
+            android:name=".ui.services.ControllerService" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

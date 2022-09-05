@@ -18,8 +18,22 @@ import com.examples.atvizpro.ui.utils.MyUtils;
 public class SettingManager2 {
 
 
+    public static void setRemoveAds(Context context, boolean value){
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_remove_ads);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getRemoveAds(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_remove_ads);
+        return preferences.getBoolean(key, false);
+    }
+
     public static void setVideoBitrate(Context context, String value){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_bitrate);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
@@ -27,14 +41,14 @@ public class SettingManager2 {
     }
 
     public static String getVideoBitrate(Context context){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_bitrate);
         String defValue = getStringRes(context, R.string.default_setting_bitrate);
         return preferences.getString(key, defValue);
     }
 
     public static void setVideoResolution(Context context, String value){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_resolution);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
@@ -42,7 +56,7 @@ public class SettingManager2 {
     }
 
     public static String getVideoResolution(Context context){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_resolution);
         String defValue = getStringRes(context, R.string.default_setting_resolution);
 
@@ -50,7 +64,7 @@ public class SettingManager2 {
     }
 
     public static void setVideoFPS(Context context, String value){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_fps);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(key, value);
@@ -58,7 +72,7 @@ public class SettingManager2 {
     }
 
     public static String getVideoFPS(Context context){
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_countdown), MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_fps);
         String defValue = getStringRes(context, R.string.default_setting_fps);
         return preferences.getString(key, defValue);

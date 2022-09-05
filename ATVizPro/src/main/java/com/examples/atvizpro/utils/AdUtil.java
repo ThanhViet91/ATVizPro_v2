@@ -7,10 +7,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.activities.ReactCamActivity;
 import com.examples.atvizpro.ui.activities.ReactCamFinishActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
@@ -35,27 +37,38 @@ import java.util.Random;
 public class AdUtil {
 
     public static void createBannerAdmob(Context context, AdView adView) {
+        if (SettingManager2.getRemoveAds(context.getApplicationContext())) {
+            adView.setVisibility(View.GONE);
+            return;
+        }
+        adView.setVisibility(View.VISIBLE);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
+                System.out.println("thanhlv createBannerAdmob  onAdLoaded");
             }
 
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
                 // Code to be executed when an ad request fails.
+                System.out.println("thanhlv createBannerAdmob  onAdFailedToLoad");
             }
 
             @Override
             public void onAdOpened() {
+                System.out.println("thanhlv createBannerAdmob  onAdOpened");
             }
 
             @Override
             public void onAdClicked() {
+                System.out.println("thanhlv createBannerAdmob  onAdClicked");
+
             }
 
             @Override
             public void onAdClosed() {
+                System.out.println("thanhlv createBannerAdmob  onAdClosed");
             }
         });
         adView.loadAd(adRequest);
@@ -104,53 +117,4 @@ public class AdUtil {
 
         return mInterstitialAd;
     }
-
-
-
-
-    public static int startScreen = 0;
-//    public static void createInterstitialAdmob(Context context, String value) {
-//
-//
-//        AdRequest adRequest = new AdRequest.Builder().build();
-//        InterstitialAd.load(context, context.getResources().getString(R.string.admob_intersitial_id), adRequest,
-//                new InterstitialAdLoadCallback() {
-//                    @Override
-//                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-//                        mInterstitialAdAdmob = interstitialAd;
-//                        mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-//                            @Override
-//                            public void onAdDismissedFullScreenContent() {
-//
-////                                createInterstitialAdmob(context);
-//
-//                                Log.d("TAG", "The ad was dismissed.");
-//                                if (startScreen == 1) {
-//                                    Intent intent = new Intent(context, ReactCamFinishActivity.class);
-//                                    intent.putExtra(KEY_PATH_VIDEO, value);
-//                                    context.startActivity(intent);
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onAdFailedToShowFullScreenContent(AdError adError) {
-//                                Log.d("TAG", "The ad failed to show.");
-//                            }
-//
-//                            @Override
-//                            public void onAdShowedFullScreenContent() {
-//                                mInterstitialAdAdmob = null;
-//                                Log.d("TAG", "The ad was shown.");
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-//                        mInterstitialAdAdmob = null;
-//                        createInterstitialAdmob(context);
-//                    }
-//                });
-//    }
-
 }

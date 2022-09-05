@@ -6,7 +6,6 @@ import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
@@ -71,9 +69,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-import org.json.JSONObject;
-import org.json.JSONStringer;
-
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
@@ -112,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
     private StreamProfile mStreamProfile;
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(MyUtils.KEY_CONTROLlER_MODE, mMode);
     }
@@ -205,7 +200,6 @@ public class MainActivity extends AppCompatActivity {
 
         initViews();
 
-
         SettingManager2.setRemoveAds(getApplicationContext(), false);
         connectGooglePlayBilling();
 
@@ -223,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
                     // The BillingClient is ready. You can query purchases here.
                     showProducts();
                     getPurchaseHistory();
+                } else {
+                    initAds();
                 }
             }
 

@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_react_cam.xml" value="0.25416666666666665" />
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_react_cam_finish.xml" value="0.25416666666666665" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_border_header_settings.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/buttonstate.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_baseline_close_24px.xml" value="0.206" />
@@ -57,6 +60,7 @@
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

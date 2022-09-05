@@ -33,10 +33,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.ZVideoView;
 import com.examples.atvizpro.ui.utils.CustomOnScaleDetector;
+import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.StorageUtil;
 import com.examples.atvizpro.utils.VideoUtil;
+import com.google.android.gms.ads.AdView;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 
 import java.io.File;
@@ -53,6 +56,7 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
     private ImageView btn_share_video;
     private ImageView btn_back;
     private boolean isSaved = false;
+    private AdView mAdView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,7 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
 
         btn_save_video = findViewById(R.id.img_btn_save);
         btn_share_video = findViewById(R.id.img_btn_share);
+        mAdView = findViewById(R.id.adView);
 
         btn_share_video.setOnClickListener(this);
         btn_save_video.setOnClickListener(this);
@@ -71,8 +76,16 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
         addVideoView();
+        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+            AdUtil.initAds(getApplicationContext());
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+    }
 
     MediaPlayer mediaPlayer;
     String videoFile;
@@ -86,6 +99,7 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         videoView.setVideoPath(videoFile);
         videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
+        videoView.start();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(final MediaPlayer mp) {

@@ -16,10 +16,10 @@ android {
         applicationId "com.examples.atvizpro"
         minSdkVersion 23
         targetSdkVersion 31
-        ndk {
-            abiFilter "armeabi-v7a"
-            abiFilter "arm64-v8a"
-        }
+//        ndk {
+//            abiFilter "armeabi-v7a"
+//            abiFilter "arm64-v8a"
+//        }
         multiDexEnabled true
     }
 

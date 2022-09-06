@@ -20,14 +20,14 @@ import net.ossrs.rtmp.SrsFlvMuxer;
  * Created by pedro on 25/01/17.
  */
 
-public class RtmpCamera1 extends Camera1Base {
+public class RtmpLiveStream extends Camera1Base {
 
   private SrsFlvMuxer srsFlvMuxer = null;
 
-  public RtmpCamera1(SurfaceView surfaceView) {
+  public RtmpLiveStream(SurfaceView surfaceView) {
     super(surfaceView);
   }
-  public RtmpCamera1(SurfaceView surfaceView, ConnectCheckerRtmp connectChecker) {
+  public RtmpLiveStream(SurfaceView surfaceView, ConnectCheckerRtmp connectChecker) {
     super(surfaceView);
     srsFlvMuxer = new SrsFlvMuxer(connectChecker);
   }

@@ -22,6 +22,7 @@ import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.adapter.SettingsAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
 import com.examples.atvizpro.ui.activities.MainActivity;
@@ -99,6 +100,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv ddddddddddddddd");
             ((MainActivity) requireActivity()).showProductRemoveAds();
+            SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
         }
 
         if (code.equals(getString(R.string.how_to_record_your_screen))) {

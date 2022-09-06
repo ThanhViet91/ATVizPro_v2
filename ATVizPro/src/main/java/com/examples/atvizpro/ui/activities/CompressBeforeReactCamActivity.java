@@ -24,6 +24,12 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     private String pathOriginalVideo = "";
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        System.out.println("thanhlv onStart CompressBeforeReactCamActivity");
+    }
+
+    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         hideStatusBar(this);

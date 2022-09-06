@@ -428,7 +428,7 @@ public abstract class Camera1Base
    * com.pedro.encoder.input.video.CameraHelper#getCameraOrientation(Context)}
    */
   public void startPreview(CameraHelper.Facing cameraFacing, int width, int height, int rotation) {
-    if (!isStreaming() && !onPreview && !(glInterface instanceof OffScreenGlThread)) {
+    if (!isStreaming() && !onPreview /*&& !(glInterface instanceof OffScreenGlThread)*/) {
       previewWidth = width;
       previewHeight = height;
 //      if (glInterface != null && Build.VERSION.SDK_INT >= 18) {
@@ -482,10 +482,10 @@ public abstract class Camera1Base
     if (!isStreaming()
         && !isRecording()
         && onPreview
-        && !(glInterface instanceof OffScreenGlThread)) {
-      if (glInterface != null && Build.VERSION.SDK_INT >= 18) {
+        /*&& !(glInterface instanceof OffScreenGlThread)*/) {
+      /*if (glInterface != null && Build.VERSION.SDK_INT >= 18) {
         glInterface.stop();
-      }
+      }*/
       cameraManager.stop();
       onPreview = false;
       previewWidth = 0;

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.google.android.gms.ads.MobileAds;
@@ -32,17 +33,20 @@ public class App extends Application {
     }
 
 
-    private static AppOpenManager appOpenManager;
+    public static AppOpenManager appOpenManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         App.context = getApplicationContext();
+        if (!SettingManager2.getRemoveAds(this))
         MobileAds.initialize(
                 this,
                 new OnInitializationCompleteListener() {
                     @Override
-                    public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {}
+                    public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                    }
                 });
 
         appOpenManager = new AppOpenManager(this);

@@ -44,6 +44,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
@@ -124,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         active = true;
+        System.out.println("thanhlv onStart MainActivity");
     }
 
     @Override
@@ -657,8 +659,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        App.appOpenManager.isPickFromGallery = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
-            System.out.println("thanhlv REQUEST_VIDEO_TRIMMER");
+            assert data != null;
+
             final Uri selectedUri = data.getData();
 
             if (selectedUri != null) {
@@ -679,7 +683,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (requestCode == REQUEST_VIDEO_FOR_COMMENTARY && resultCode == RESULT_OK) {
-            System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY");
             final Uri selectedUri = data.getData();
 
             if (selectedUri != null) {

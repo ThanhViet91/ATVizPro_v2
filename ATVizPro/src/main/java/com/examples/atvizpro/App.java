@@ -4,6 +4,8 @@ import static com.examples.atvizpro.ui.activities.MainActivity.initialAds;
 
 import android.annotation.TargetApi;
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 
 public class App extends Application {
 
+    public static final String CHANNEL_ID = "channel_service_id";
     private static Application context;
 
 
@@ -38,8 +41,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        System.out.println("thanhlv Apppppppppppppp creeeeeeeeeeeeeeeeat");
         App.context = this;
         if (!SettingManager2.getRemoveAds(this)) {
             MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -52,6 +53,8 @@ public class App extends Application {
 
         appOpenManager = new AppOpenManager(this);
 
+        createChannelNotification();
+
 //        if (Build.VERSION.SDK_INT >= 25) {
 ////            createShortcut();
 //            if(Build.VERSION.SDK_INT >=26){
@@ -61,6 +64,17 @@ public class App extends Application {
 //        }else{
 //            removeShortcuts();
 //        }
+    }
+
+    private void createChannelNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                    "AT Screen Recorder", NotificationManager.IMPORTANCE_NONE);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
+        }
     }
 
 

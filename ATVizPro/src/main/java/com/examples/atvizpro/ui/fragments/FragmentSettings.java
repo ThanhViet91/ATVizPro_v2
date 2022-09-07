@@ -5,6 +5,7 @@ import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
 import com.examples.atvizpro.ui.activities.MainActivity;
+import com.examples.atvizpro.ui.services.ExecuteService;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -110,6 +112,13 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                     .addToBackStack("")
                     .commit();
         }
+
+        if (code.equals(getString(R.string.contact_us))) {
+            System.out.println("thanhlv kkkfsdfghsodfisdf");
+            Intent intent = new Intent(getActivity(), ExecuteService.class);
+            requireActivity().startService(intent);
+        }
+
 
     }
 }

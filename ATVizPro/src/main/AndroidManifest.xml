@@ -123,7 +123,7 @@
         </activity>
         <receiver
             android:exported="true"
-            android:name="ui.activities.SyncActivity$NetworkChangeReceiver"
+            android:name=".ui.activities.SyncActivity$NetworkChangeReceiver"
             android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
@@ -152,6 +152,7 @@
         <service android:name=".ui.services.streaming.StreamingControllerService" />
         <service android:name=".ui.services.streaming.StreamingService" />
         <service android:name=".ui.services.sync.SyncService" />
+
         <service
             android:foregroundServiceType="mediaProjection"
             android:name=".ui.services.ControllerService" />
@@ -160,6 +161,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713"/>
 
+        <service android:name=".ui.services.ExecuteService" />
 
     </application>
    

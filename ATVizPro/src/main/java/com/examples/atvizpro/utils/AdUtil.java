@@ -1,27 +1,14 @@
 package com.examples.atvizpro.utils;
 
-import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
-import com.examples.atvizpro.ui.activities.ReactCamActivity;
-import com.examples.atvizpro.ui.activities.ReactCamFinishActivity;
-import com.examples.atvizpro.ui.utils.MyUtils;
-import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
@@ -29,15 +16,12 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Random;
 
 public class AdUtil {
 
     public static void createBannerAdmob(Context context, AdView adView) {
-        if (SettingManager2.getRemoveAds(context.getApplicationContext())) {
+        if (SettingManager2.getRemoveAds(context)) {
             adView.setVisibility(View.GONE);
             return;
         }

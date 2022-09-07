@@ -1,9 +1,10 @@
 package com.examples.atvizpro;
 
+import static com.examples.atvizpro.ui.activities.MainActivity.initialAds;
+
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
@@ -13,7 +14,6 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.ui.utils.MyUtils;
@@ -25,29 +25,30 @@ import java.util.Arrays;
 
 public class App extends Application {
 
-    private static Context context;
+    private static Application context;
 
 
-    public static Context getAppContext() {
+    public static Application getAppContext() {
         return App.context;
     }
 
 
-    public static AppOpenManager appOpenManager;
+    public AppOpenManager appOpenManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        App.context = getApplicationContext();
-        if (!SettingManager2.getRemoveAds(this))
-        MobileAds.initialize(
-                this,
-                new OnInitializationCompleteListener() {
-                    @Override
-                    public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
-                    }
-                });
+        System.out.println("thanhlv Apppppppppppppp creeeeeeeeeeeeeeeeat");
+        App.context = this;
+        if (!SettingManager2.getRemoveAds(this)) {
+            MobileAds.initialize(this, new OnInitializationCompleteListener() {
+                @Override
+                public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+                    initialAds = true;
+                }
+            });
+        }
 
         appOpenManager = new AppOpenManager(this);
 
@@ -61,7 +62,6 @@ public class App extends Application {
 //            removeShortcuts();
 //        }
     }
-
 
 
     @TargetApi(25)

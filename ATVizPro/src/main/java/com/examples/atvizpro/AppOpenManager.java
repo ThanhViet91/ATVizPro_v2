@@ -4,7 +4,6 @@ import static androidx.lifecycle.Lifecycle.Event.ON_START;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -21,7 +20,6 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 
 import java.util.Date;
-import java.util.Objects;
 
 /** Prefetches App Open Ads. */
 public class AppOpenManager implements LifecycleObserver, Application.ActivityLifecycleCallbacks {
@@ -35,7 +33,7 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
 
     private Activity currentActivity;
     private boolean isFirstTime = true;
-    public boolean isPickFromGallery = false;
+    public static boolean isPickFromGallery = false;
 
     /** Constructor */
     public AppOpenManager(App myApplication) {
@@ -205,7 +203,6 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-
     }
 
     @Override

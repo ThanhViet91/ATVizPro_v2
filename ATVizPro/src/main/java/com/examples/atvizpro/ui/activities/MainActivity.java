@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,7 +43,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
-import com.examples.atvizpro.App;
+import com.examples.atvizpro.AppOpenManager;
 import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
@@ -63,9 +62,6 @@ import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -125,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         active = true;
-        System.out.println("thanhlv onStart MainActivity");
     }
 
     @Override
@@ -134,10 +129,8 @@ public class MainActivity extends AppCompatActivity {
         active = false;
     }
 
-
     void handlePurchase(Purchase purchase) {
         // Purchase retrieved from BillingClient#queryPurchasesAsync or your PurchasesUpdatedListener.
-
         // Verify the purchase.
         // Ensure entitlement was not already granted for this purchaseToken.
         // Grant entitlement to the user.
@@ -153,14 +146,13 @@ public class MainActivity extends AppCompatActivity {
                         if (billingResult.getResponseCode() == 0) {
                             if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
                                 SettingManager2.setRemoveAds(getApplicationContext(), true);
+                                initialAds = false;
                             }
                         }
                     }
                 });
             }
         }
-
-
     }
 
 
@@ -184,8 +176,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private BillingClient billingClient;
-
-    private boolean initialAds = false;
 
     private AdView mAdView;
 
@@ -220,7 +210,16 @@ public class MainActivity extends AppCompatActivity {
                     showProducts();
                     getPurchaseHistory();
                 } else {
-                    initAds();
+                    //check show ad banner when connectGGBill fail
+                    if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                System.out.println("thanhlv createBannerAdmob connectGooglePlayBilling ");
+                                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                            }
+                        });
+                    }
                 }
             }
 
@@ -239,11 +238,10 @@ public class MainActivity extends AppCompatActivity {
         QueryProductDetailsParams queryProductDetailsParams =
                 QueryProductDetailsParams.newBuilder()
                         .setProductList(
-                                ImmutableList.of(
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId(getString(R.string.product_id_remove_ads))
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build()
+                                ImmutableList.of(QueryProductDetailsParams.Product.newBuilder()
+                                        .setProductId(getString(R.string.product_id_remove_ads))
+                                        .setProductType(BillingClient.ProductType.INAPP)
+                                        .build()
                                 )
                         ).build();
 
@@ -297,27 +295,29 @@ public class MainActivity extends AppCompatActivity {
                         for (Object purchase : purchasesHistoryList) {
                             if (purchase.toString().contains(getString(R.string.product_id_remove_ads))) {
                                 SettingManager2.setRemoveAds(getApplicationContext(), true);
+                                initialAds = false;
                                 break;
                             }
                         }
-
                         if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                            initAds();
-                        }
 
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
+                                        AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                                    }
+                                });
+
+                        }
                     }
                 }
         );
     }
 
     void confirmPurchase(Purchase purchase) {
-
-        Log.d("TestINAPP", purchase.getProducts().get(0));
-        Log.d("TestINAPP", purchase.getQuantity() + " Quantity");
-
         if (purchase.getProducts().get(0).equals(getString(R.string.product_id_remove_ads)))
             SettingManager2.setRemoveAds(this, true);
-
     }
 
     void verifyPurchase(Purchase purchase) {
@@ -333,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public static boolean initialAds = false;
     protected void onResume() {
         super.onResume();
         billingClient.queryPurchasesAsync(
@@ -350,33 +351,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (initialAds) {
             if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                System.out.println("thanhlv createBannerAdmob onresum");
                 AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
             } else {
                 mAdView.setVisibility(View.GONE);
             }
         }
-
-
-    }
-
-    private void initAds() {
-
-        MobileAds.initialize(getApplicationContext(), new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
-                initialAds = true;
-                if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-//                            mAdView.setVisibility(View.VISIBLE);
-                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-                        }
-                    });
-
-                }
-            }
-        });
 
 
     }
@@ -398,9 +378,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ImageView mImgRec, mImgFAQ, btn_setting;
-
-    private LinearLayout btn_set_resolution, bnt_set_bitrate, btn_set_fps;
+    private ImageView mImgRec;
 
     private void initViews() {
 
@@ -410,17 +388,16 @@ public class MainActivity extends AppCompatActivity {
         PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
-
         //initData()
         generateVideoSettings();
         updateUI();
 
         //
         mImgRec = findViewById(R.id.img_record);
-        btn_setting = findViewById(R.id.img_settings);
-        btn_set_resolution = findViewById(R.id.set_video_resolution);
-        bnt_set_bitrate = findViewById(R.id.set_bitrate);
-        btn_set_fps = findViewById(R.id.set_frame_rate);
+        ImageView btn_setting = findViewById(R.id.img_settings);
+        LinearLayout btn_set_resolution = findViewById(R.id.set_video_resolution);
+        LinearLayout bnt_set_bitrate = findViewById(R.id.set_bitrate);
+        LinearLayout btn_set_fps = findViewById(R.id.set_frame_rate);
 
 
         btn_setting.setOnClickListener(new View.OnClickListener() {
@@ -521,7 +498,6 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
             }
         });
-
 
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
         btn_commentary.setOnClickListener(new View.OnClickListener() {
@@ -659,7 +635,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        App.appOpenManager.isPickFromGallery = true;
+        AppOpenManager.isPickFromGallery = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
             assert data != null;
 

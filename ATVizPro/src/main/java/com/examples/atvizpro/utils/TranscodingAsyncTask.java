@@ -2,11 +2,10 @@ package com.examples.atvizpro.utils;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.examples.atvizpro.App;
 import com.netcompss.ffmpeg4android.CommandValidationException;
@@ -14,34 +13,29 @@ import com.netcompss.ffmpeg4android.GeneralUtils;
 import com.netcompss.ffmpeg4android.Prefs;
 import com.netcompss.loader.LoadJNI;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
+    public static final String ERROR_CODE = "error_code";
     ProgressDialog progressDialog;
     String workFolder = null;
     String demoVideoFolder = null;
     String demoVideoPath = null;
     String vkLogPath = null;
     private boolean commandValidationFailedFlag = false;
-    Activity activity;
+    Context context;
     String commandStr;
     String outputPath;
     VideoUtil.ITranscoding mCallback = null;
 
-    public TranscodingAsyncTask (Activity act, String command, String outPath, VideoUtil.ITranscoding callback) {
-        activity = act;
+    public TranscodingAsyncTask (Context act, String command, String outPath, VideoUtil.ITranscoding callback) {
+        context = act;
         commandStr = command;
         outputPath = outPath;
         mCallback = callback;
-//        demoVideoFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/videokit/";
-//        demoVideoPath = demoVideoFolder + "in.mp4";
 
-        workFolder = activity.getFilesDir().getAbsolutePath() + "/";
+        workFolder = App.getAppContext().getFilesDir().getAbsolutePath() + "/";
         vkLogPath = workFolder + "vk.log";
 
-        GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(activity, workFolder);
-//        GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(activity, demoVideoFolder);
+        GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(context, workFolder);
     }
 
 
@@ -49,9 +43,6 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPreExecute() {
         if (mCallback != null) mCallback.onStartTranscoding(outputPath);
-//        progressDialog = new ProgressDialog(activity);
-//        progressDialog.setMessage("Transcoding in progress...");
-//        progressDialog.show();
     }
 
     protected Integer doInBackground(String... paths) {
@@ -62,7 +53,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         Log.i(Prefs.TAG, "vk deleted: " + isDeleted);
 
 
-        PowerManager powerManager = (PowerManager) activity.getSystemService(Activity.POWER_SERVICE);
+        PowerManager powerManager = (PowerManager) context.getSystemService(Activity.POWER_SERVICE);
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VK_LOCK");
         Log.d(Prefs.TAG, "Acquire wake lock");
         wakeLock.acquire();
@@ -71,7 +62,6 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         LoadJNI vk = new LoadJNI();
         try {
             vk.run(GeneralUtils.utilConvertToComplex(commandStr), workFolder, App.getAppContext());
-//            GeneralUtils.copyFileToFolder(vkLogPath, demoVideoFolder);
 
         } catch (CommandValidationException e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);
@@ -97,8 +87,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onCancelled() {
         Log.i(Prefs.TAG, "onCancelled");
-//        progressDialog.dismiss();
-        if (mCallback != null) mCallback.onFinishTranscoding("onCancelled");
+        if (mCallback != null) mCallback.onFinishTranscoding(ERROR_CODE);
         super.onCancelled();
     }
 
@@ -106,7 +95,6 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer result) {
         Log.i(Prefs.TAG, "onPostExecute");
-//        progressDialog.dismiss();
 
         if (mCallback != null) mCallback.onFinishTranscoding(outputPath);
         super.onPostExecute(result);
@@ -118,14 +106,15 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
             rc = GeneralUtils.getReturnCodeFromLog(vkLogPath);
         }
         final String status = rc;
-        activity.runOnUiThread(new Runnable() {
-            public void run() {
-                Toast.makeText(activity, status, Toast.LENGTH_LONG).show();
-                if (status.equals("Transcoding Status: Failed")) {
-                    Toast.makeText(activity, "Check: " + vkLogPath + " for more information.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+        System.out.println("thanhlv dddddddddddddddd === "+commandStr +" "+status);
+//        activity.runOnUiThread(new Runnable() {
+//            public void run() {
+//                Toast.makeText(activity, status, Toast.LENGTH_LONG).show();
+//                if (status.equals("Transcoding Status: Failed")) {
+//                    Toast.makeText(activity, "Check: " + vkLogPath + " for more information.", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
     }
 
 }

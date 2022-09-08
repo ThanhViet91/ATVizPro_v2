@@ -140,5 +140,7 @@
     <string name="guideline_record_step_4">Step 4: tap on the icon and click button record</string>
     <string name="guideline_record_step_5">Step5: Wait 3s and the screen starts recording</string>
 
+<!--    ConfirmExecute-->
+    <string name="confirm_execute_react_cam">This video is being processed in the background. This may take some time depending on the size of the video and the power of your device.</string>
 
 </resources>

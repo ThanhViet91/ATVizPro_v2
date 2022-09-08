@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
+import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdView;
@@ -55,6 +56,8 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
         addVideoView();
+
+        System.out.println("thanhlv FinishReact intent === action : "+ getIntent().getAction());
 //        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
 //            AdUtil.initAds(getApplicationContext());
 //        }
@@ -67,13 +70,25 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
     }
 
     MediaPlayer mediaPlayer;
-    String videoFile;
+    String videoFile = "";
     VideoView videoView;
 
     private void addVideoView() {
         videoView = findViewById(R.id.video_main);
-        videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
-        videoView.setVideoPath(videoFile);
+        if (getIntent() != null){
+            videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
+            System.out.println("thanhlv addVideoView hhhhhh "+videoFile);
+            if (getIntent().getBooleanExtra("from_notification", false)){
+                Intent intent1 = new Intent(this, ExecuteService.class);
+                stopService(intent1);
+            }
+        }
+
+        if (videoFile == null) return;
+        if (!videoFile.equals("")){
+            videoView.setVideoPath(videoFile);
+
+        }
         videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
         videoView.start();

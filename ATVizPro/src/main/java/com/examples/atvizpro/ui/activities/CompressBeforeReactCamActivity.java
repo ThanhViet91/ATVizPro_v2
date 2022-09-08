@@ -68,7 +68,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
 
     public void runCompressVideo(){
         if (!pathOriginalVideo.equals("")) {
-            new VideoUtil().compression(this, pathOriginalVideo, new VideoUtil.ITranscoding() {
+            new VideoUtil().compression(pathOriginalVideo, new VideoUtil.ITranscoding() {
                 @Override
                 public void onStartTranscoding(String outPath) {
                     outputCachePath = outPath;

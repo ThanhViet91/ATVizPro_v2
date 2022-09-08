@@ -57,6 +57,7 @@ import com.examples.atvizpro.ui.fragments.FragmentSettings;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.fragments.ProjectsFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
+import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
@@ -362,10 +363,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleIncomingRequest(Intent intent) {
-        if (intent != null) {
-            switch (Objects.requireNonNull(intent.getAction())) {
+        if (intent.getAction() != null) {
+            System.out.println("thanhlv Main intent === action : "+ intent.getAction());
+            switch (intent.getAction()) {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
+                    break;
+
+                case "from_notification":
+//                    Intent intent1 = new Intent(this, ExecuteService.class);
+//                    stopService(intent1);
                     break;
             }
         }

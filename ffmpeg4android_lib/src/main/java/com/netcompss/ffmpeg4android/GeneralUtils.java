@@ -366,13 +366,13 @@ public class GeneralUtils {
 		
 	}
 	
-	public static void copyLicenseFromAssetsToSDIfNeeded(Activity act, String destinationFolderPath) {
+	public static void copyLicenseFromAssetsToSDIfNeeded(Context act, String destinationFolderPath) {
 		InputStream is = null;
 		BufferedOutputStream o = null;
 		boolean copyLic = true;
 		File destLic = null;
 		try {
-			is = act.getApplication().getAssets().open("ffmpeglicense.lic");
+			is = act.getAssets().open("ffmpeglicense.lic");
 		} catch (Exception e) {
 			Log.i(Prefs.TAG, "License file does not exist in the assets.");
 			copyLic = false;

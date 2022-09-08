@@ -31,7 +31,7 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
 
     private final App myApplication;
 
-    private Activity currentActivity;
+    private static Activity currentActivity;
     private boolean isFirstTime = true;
     public static boolean isPickFromGallery = false;
 
@@ -44,6 +44,9 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
         ProcessLifecycleOwner.get().getLifecycle().addObserver((this));
     }
 
+    public static Activity getCurrentActivity() {
+        return currentActivity;
+    }
 
     /** LifecycleObserver methods */
     @OnLifecycleEvent(ON_START)

@@ -147,6 +147,7 @@ public class ExecuteService extends Service {
         intent.putExtra("from_notification", true);
         System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(100), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         notificationBuilder.setContentIntent(pendingIntent);
 
     }

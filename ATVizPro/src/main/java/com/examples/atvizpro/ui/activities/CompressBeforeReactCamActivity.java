@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,8 +63,15 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
 
     @Override
     public void onClickChoose() {
-        runCompressVideo();
+//        runCompressVideo();
         buildDialog(getResources().getString(R.string.prepare_video)).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+                nextToReactCam();
+            }
+        }, 3000);
     }
 
     public void runCompressVideo(){
@@ -91,7 +99,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     String outputCachePath;
     private void nextToReactCam() {
         Intent intent = new Intent(CompressBeforeReactCamActivity.this, ReactCamActivity.class);
-        intent.putExtra(KEY_PATH_VIDEO, outputCachePath);
+        intent.putExtra(KEY_PATH_VIDEO, pathOriginalVideo);
         startActivity(intent);
         finish();
     }

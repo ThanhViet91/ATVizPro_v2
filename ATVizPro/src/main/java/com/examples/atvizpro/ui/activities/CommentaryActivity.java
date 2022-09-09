@@ -10,10 +10,12 @@ import android.content.res.Configuration;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.VideoStreamListener;
 import com.examples.atvizpro.ui.VideoStreamView2;
@@ -30,6 +32,7 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
     private ProgressDialog mProgressDialog;
     private VideoStreamView2 videoStreamView;
     private String pathOriginalVideo = "";
+    private LottieAnimationView animationView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +44,9 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
         videoStreamView.setOnTrimVideoListener(this);
         videoStreamView.initVideoByURI(Uri.parse(pathOriginalVideo));
+
+        animationView = findViewById(R.id.animation_view);
+        animationView.setVisibility(View.GONE);
 
         prepareAudioRecorder();
     }
@@ -96,12 +102,16 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
             new VideoUtil().commentaryAudio(this, pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
                 @Override
                 public void onStartTranscoding(String outPath) {
-                    buildDialog("compression...");
+//                    buildDialog("compression...");
+                    animationView.setVisibility(View.VISIBLE);
+                    animationView.playAnimation();
                 }
 
                 @Override
                 public void onFinishTranscoding(String code) {
-                    if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+//                    if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+                    animationView.pauseAnimation();
+                    animationView.setVisibility(View.GONE);
                 }
 
                 @Override

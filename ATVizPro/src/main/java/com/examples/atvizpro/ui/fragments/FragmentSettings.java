@@ -28,6 +28,8 @@ import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
 import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.ui.services.ExecuteService;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +49,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         View mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
         settingsItems.clear();
-        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
@@ -77,6 +80,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                 getParentFragmentManager().popBackStack();
             }
         });
+
+        AdView mAdView = view.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override

@@ -116,7 +116,8 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
     mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
     mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
-    mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
+//    mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
+    mRangeSeekBarView.setMinShootTime(mDuration);
     mRangeSeekBarView.setNotifyWhileDragging(true);
     mRangeSeekBarView.setOnRangeSeekBarChangeListener(mOnRangeSeekBarChangeListener);
     mSeekBarLayout.addView(mRangeSeekBarView);

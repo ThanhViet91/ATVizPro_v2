@@ -35,7 +35,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
     CircleIndicator3 circleIndicator3;
     PhotoAdapter photoAdapter;
     TextView btnContinue;
-    ImageView imgBack;
+    TextView imgBack;
     int i = 0;
 
     private MainActivity mParentActivity = null;
@@ -103,9 +103,12 @@ public class GuidelineScreenRecordFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 i = i +1;
-                if (i>=getListPhoto().size()){
-                    i = 0;
-
+                if (i == getListPhoto().size() - 1){
+                    btnContinue.setText(getString(R.string.done_));
+                }
+                if (i >= getListPhoto().size()) {
+                    mFragmentManager.popBackStack();
+                    return;
                 }
                 viewPager2.setCurrentItem(i);
                 setDecs(i);

@@ -4,6 +4,7 @@ import static com.examples.atvizpro.App.CHANNEL_ID;
 import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atvizpro.utils.TranscodingAsyncTask.ERROR_CODE;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -146,8 +147,8 @@ public class ExecuteService extends Service {
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent.putExtra("from_notification", true);
         System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, new Random().nextInt(100), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        @SuppressLint("UnspecifiedImmutableFlag")
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilder.setContentIntent(pendingIntent);
 
     }
@@ -163,20 +164,16 @@ public class ExecuteService extends Service {
         createNotification();
     }
 
-    NotificationManager notificationManager;
     Notification.Builder notificationBuilder = null;
     Notification notification;
 
     private void createNotification() {
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setAction("from_notification");
+        @SuppressLint("UnspecifiedImmutableFlag")
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        //Set notification information:
-
+        //Set notification information
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notificationBuilder = new Notification.Builder(this, CHANNEL_ID);
         } else
@@ -184,12 +181,14 @@ public class ExecuteService extends Service {
         notificationBuilder
                 .setOngoing(true)
                 .setVibrate(new long[]{0L})
-                .setContentTitle("AT Screen Record")
+                .setContentTitle("AT Screen Recorder")
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
                 .setContentIntent(pendingIntent)
                 .setProgress(100, 0, false);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            notificationBuilder.setCategory(Notification.CATEGORY_NAVIGATION);
+        }
         //Send the notification:
         notification = notificationBuilder.build();
         startForeground(NOTIFICATION_ID, notification);

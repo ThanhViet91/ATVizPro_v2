@@ -108,7 +108,7 @@ public class RangeSeekBarView extends View {
     thumbImageRight = thumbImageLeft;
     thumbPressedImage = thumbImageLeft;
     thumbWidth = newWidth;
-    thumbHalfWidth = thumbWidth / 2;
+    thumbHalfWidth = thumbWidth / 2f;
     int shadowColor = getContext().getResources().getColor(R.color.shadow_color);
     mShadow.setAntiAlias(true);
     mShadow.setColor(shadowColor);

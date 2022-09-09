@@ -97,10 +97,17 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                             }
                         })
                         .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                        .show()
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                holder.itemView.setAlpha(1);
+                            }
+                        });
                 return false;
             }
         });
+
     }
 
     @Override

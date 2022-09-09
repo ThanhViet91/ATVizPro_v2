@@ -100,7 +100,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mPlayView = findViewById(R.id.toggle_record);
         mSeekBarLayout = findViewById(R.id.seekBarLayout);
         mRedProgressIcon = findViewById(R.id.positionIcon);
-//    mVideoShootTipTv = findViewById(R.id.video_shoot_tip);
+//        mVideoShootTipTv = findViewById(R.id.video_shoot_tip);
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
@@ -124,7 +124,8 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
         mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
         mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
-        mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
+//        mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
+        mRangeSeekBarView.setMinShootTime(mDuration);
         mRangeSeekBarView.setNotifyWhileDragging(true);
         mRangeSeekBarView.setOnRangeSeekBarChangeListener(mOnRangeSeekBarChangeListener);
         mSeekBarLayout.addView(mRangeSeekBarView);
@@ -143,6 +144,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
     }
 
     private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {
+        mVideoThumbAdapter.resetBitmap();
         VideoTrimmerUtil.shootVideoThumbInBackground(context, videoUri, totalThumbsCount, startPosition, endPosition,
                 new SingleCallback<Bitmap, Integer>() {
                     @Override
@@ -186,9 +188,8 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
                 lpVideo.height = (int) (lpVideo.width / videoRatio);
             } else {
                 //fit height
-                lpVideo.height = screenHeight + 2;
+                lpVideo.height = screenHeight + 1;
                 lpVideo.width = (int) (lpVideo.height * videoRatio);
-
             }
         }
         mVideoView.setLayoutParams(lpVideo);
@@ -205,13 +206,11 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
 
     private void videoCompleted() {
         seekTo(mLeftProgressPos);
-//    setPlayPauseViewIcon(false);
         setToggleViewIcon(0);
     }
 
     private void onVideoReset() {
         mVideoView.pause();
-//    setPlayPauseViewIcon(false);
         setToggleViewIcon(0);
     }
 

@@ -9,9 +9,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
@@ -23,9 +21,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -39,7 +35,6 @@ import com.examples.atvizpro.ui.ZVideoView;
 import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.ui.utils.CustomOnScaleDetector;
 import com.examples.atvizpro.utils.StorageUtil;
-import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -65,7 +60,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private ImageView toggleReactCam;
 
     private LottieAnimationView animationView;
-    private boolean onProcessReact = false;
+    private boolean inRecording = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,18 +76,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         seekbar = findViewById(R.id.seekbar);
 
+
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
 
         cameraView = new SurfaceView(this);
-        if (rtmpCamera == null) rtmpCamera = new RtmpLiveStream(cameraView);
+        rtmpCamera = new RtmpLiveStream(cameraView);
         addVideoView();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initCamView();
-            }
-        }, 2000);
+
 
         if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
     }
@@ -106,17 +97,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if(root!=null){
-//            mWindowManager.removeViewImmediate(mViewRoot);
-//        }
-        if (mCameraLayout != null) {
-            root.removeView(mCameraLayout);
-            rtmpCamera.stopPreview();
-        }
-        if (mCameraLayout != null) {
-            root.removeView(mCameraLayout);
-            rtmpCamera.stopPreview();
-        }
+        rtmpCamera = null;
     }
 
     MediaPlayer mediaPlayer;
@@ -134,27 +115,31 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             public void onPrepared(final MediaPlayer mp) {
                 videoDuration = mp.getDuration();
                 System.out.println("thanhlv addVideoView duration===  "+ videoDuration);
-//                videoDuration = videoView.getDuration();
-                seekbar.setMax(videoDuration / 1000);
+                seekbar.setMax(videoDuration);
                 mediaPlayer = mp;
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
+                initCamView();
 
-            }
-        });
+                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
 
-        seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
+                seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser)
+                            mediaPlayer.seekTo(progress);
+                    }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
 
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) videoView.seekTo(progress * 1000);
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
             }
         });
     }
@@ -210,19 +195,19 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onPause() {
         super.onPause();
+        //pause seekbar
+        mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
     }
 
     RelativeLayout root;
 
     private void initCamView() {
         root = findViewById(R.id.root_container);
-        mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
+        mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, null, false);
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
-
-//        if (cameraView.getParent() != null) {
-//            ((ViewGroup) cameraView.getParent()).removeView(cameraView);
-//        }
-//        cameraPreview.removeView(cameraView);
+        if(cameraView.getParent() != null) {
+            ((ViewGroup)cameraView.getParent()).removeView(cameraView); // <- fix
+        }
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
         mHolder.addCallback(this);
@@ -243,7 +228,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             }
         });
         videoView.seekTo(0);
-
         root.addView(mCameraLayout);
         final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
         final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, customOnScaleDetector);
@@ -254,7 +238,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (onProcessReact) return true;
+                if (inRecording) return true;
                 if (event.getPointerCount() > 1) {
                     pointerId1 = event.getPointerId(0);
                     pointerId2 = event.getPointerId(1);
@@ -309,14 +293,20 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    String cameraCahePath = "", cameraCahePath_flip = "";
+    String cameraCahePath = "";
+    boolean hasCamVideo = false;
 
     public void onClick(View v) {
 
         if (v == findViewById(R.id.img_btn_react_cam)) {
-            onProcessReact = false;
+            inRecording = false;
+            if (hasCamVideo) {
+                showDialogConfirmExecute();
+                return;
+            }
+
             if (!rtmpCamera.isRecording()) {
-                onProcessReact = true;
+                inRecording = true;
                 cameraCahePath = StorageUtil.getCacheDir() + "/CacheCamOverlay_" + getTimeStamp() + ".mp4";
                 try {
                     if (!rtmpCamera.isStreaming()) {
@@ -338,18 +328,21 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             } else {
-                getEndReactCam();
                 rtmpCamera.stopRecord();
+                getEndReactCam();
             }
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            if (!cameraCahePath.equals("") && !cameraCahePath_flip.equals("")) {
-                boolean deleteCamCache = new File(cameraCahePath).delete() && new File(cameraCahePath_flip).delete();
-            }
             mCameraLayout.setVisibility(View.VISIBLE);
-//            onBackPressed();
-            finish();
+            if (!cameraCahePath.equals("")) {
+                boolean deleteCamCache = new File(cameraCahePath).delete();
+                cameraCahePath = "";
+                hasCamVideo = false;
+                addVideoView();
+            } else {
+                finish();
+            }
         }
     }
 
@@ -419,10 +412,44 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void getEndReactCam() {
-        endTime = mediaPlayer.getCurrentPosition();
-        videoView.stopPlayback();
+    public void showInterstitialAd(){
+        if (mInterstitialAdAdmob != null) {
+            mInterstitialAdAdmob.show(this);
+            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdClicked() {
+                }
 
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    createInterstitialAdmob();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                }
+
+                @Override
+                public void onAdImpression() {
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                }
+            });
+        }
+    }
+
+    private Handler mSeekbarUpdateHandler = new Handler();
+    private Runnable mUpdateSeekbar = new Runnable() {
+        @Override
+        public void run() {
+            seekbar.setProgress(mediaPlayer.getCurrentPosition());
+            mSeekbarUpdateHandler.postDelayed(this, 50);
+        }
+    };
+
+    public void showDialogConfirmExecute(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirmation").setMessage(getString(R.string.confirm_execute_react_cam));
         builder.setCancelable(true);
@@ -436,54 +463,20 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 intent.putExtras(bundle);
                 intent.putExtra("bundle_video_react_time", (long)((endTime - startTime + videoDuration)/2.5));
                 startService(intent);
+                finish();
             }
         });
         AlertDialog alert = builder.create();
         alert.show();
-
     }
-
-    private void flipCamera() {
-        new VideoUtil().flipHorizontal(cameraCahePath, new VideoUtil.ITranscoding() {
-            @Override
-            public void onStartTranscoding(String outputCachePath) {
-                animationView.setVisibility(View.VISIBLE);
-                animationView.playAnimation();
-                cameraCahePath_flip = outputCachePath;
-            }
-
-            @Override
-            public void onFinishTranscoding(String code) {
-                executeFFmpegReactCam();
-            }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-            }
-        });
-    }
-
-    public void executeFFmpegReactCam() {
-
-
-                new VideoUtil().reactCamera(videoFile, cameraCahePath_flip, startTime, endTime, camOverlaySize[camSize],
-                        posX, posY, false, false, new VideoUtil.ITranscoding() {
-                            @Override
-                            public void onStartTranscoding(String outputCachePath) {
-                            }
-
-                            @Override
-                            public void onFinishTranscoding(String code) {
-                                animationView.pauseAnimation();
-                                animationView.setVisibility(View.GONE);
-                                finishReactCam(code);
-                            }
-
-                            @Override
-                            public void onUpdateProgressTranscoding(int progress) {
-                            }
-                        });
-
+    private void getEndReactCam() {
+        mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
+        endTime = mediaPlayer.getCurrentPosition();
+        videoView.stopPlayback();
+        hasCamVideo = true;
+        mCameraLayout.setVisibility(View.GONE);
+        showDialogConfirmExecute();
+        showInterstitialAd();
     }
 
     long startTime, endTime = 0;
@@ -494,6 +487,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         videoView.start();
         posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
         posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);
+        hasCamVideo = false;
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -522,6 +516,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         System.out.println("thanhlv surfaceDestroyed");
         mHolder.removeCallback(null);
         mHolder = null;
+//        rtmpCamera=null;
     }
 
     private int camSize = 3;

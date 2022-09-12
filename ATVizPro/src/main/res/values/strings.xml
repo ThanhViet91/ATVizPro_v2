@@ -84,9 +84,6 @@
     <string name="contact_us">Contact us</string>
     <string name="personalized_ads_off">Personalized Ads: Off</string>
     <string name="label_permissions">Please enable Microphone and Storage permissions.</string>
-    <string name="faq">FAQ</string>
-    <string name="before_starting_your_screen_recording_make_sure_your_phone_is_not_in_slient_mode_and_the_volume_is_on_some_apps_do_not_allow_the_sound_to_be_recorded_and_it_is_a_limitation_we_cannot_bypass">Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.</string>
-    <string name="sound_is_not_working">Sound is not working</string>
     <string name="title_activity_react_cam">ReactCamActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -145,5 +142,11 @@
 <!--    ConfirmExecute-->
     <string name="confirm_execute_react_cam">This video is being processed in the background. This may take some time depending on the size of the video and the power of your device.</string>
     <string name="skip">Skip</string>
+
+<!--    FAQ fragment-->
+
+    <string name="faq">FAQ</string>
+    <string name="before_starting_your_screen_recording_make_sure_your_phone_is_not_in_slient_mode_and_the_volume_is_on_some_apps_do_not_allow_the_sound_to_be_recorded_and_it_is_a_limitation_we_cannot_bypass">Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.</string>
+    <string name="sound_is_not_working">Sound is not working</string>
 
 </resources>

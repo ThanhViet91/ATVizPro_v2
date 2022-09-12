@@ -1,6 +1,8 @@
 package com.examples.atvizpro.ui.fragments;
 
+import static com.examples.atvizpro.ui.utils.MyUtils.dirSize;
 import static com.examples.atvizpro.ui.utils.MyUtils.getAvailableSizeExternal;
+import static com.examples.atvizpro.ui.utils.MyUtils.getBaseStorageDirectory;
 import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
 
 import android.annotation.SuppressLint;
@@ -33,6 +35,7 @@ import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -55,7 +58,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
-        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " "+String.format("%.1f",getCacheSize()) + " MB", R.drawable.ic_recording_cache));
+        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " "+String.format("%.1f",dirSize(new File(getBaseStorageDirectory()))*1f/(1024*1024)) + " MB", R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 

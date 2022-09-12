@@ -141,7 +141,7 @@
 
 <!--    ConfirmExecute-->
     <string name="confirm_execute_react_cam">This video is being processed in the background. This may take some time depending on the size of the video and the power of your device.</string>
-    <string name="skip">Skip</string>
+    <string name="skip"><u>Skip</u></string>
 
 <!--    FAQ fragment-->
 

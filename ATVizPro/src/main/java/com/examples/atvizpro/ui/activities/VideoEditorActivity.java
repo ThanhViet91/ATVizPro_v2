@@ -45,8 +45,8 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideStatusBar(this);
         setContentView(R.layout.video_editor_layout);
+        hideStatusBar(this);
         videoEditorView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
@@ -54,7 +54,7 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         videoEditorView.initVideoByURI(Uri.parse(pathOriginalVideo));
 
         videoOptions.add("Trim");
-        videoOptions.add("Music");
+//        videoOptions.add("Music");
         videoOptions.add("Speed");
         videoOptions.add("Text");
         videoOptions.add("Image");

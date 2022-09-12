@@ -33,13 +33,20 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideStatusBar(this);
         setContentView(R.layout.react_cam_prepare_layout);
+        hideStatusBar(this);
         trimmerView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
         trimmerView.setOnTrimVideoListener(this);
         trimmerView.initVideoByURI(Uri.parse(pathOriginalVideo));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        trimmerView.showOrHideAdBanner();
+        System.out.println("thanhlv CompressBeforeReactCamActivity onResume ");
     }
 
     @Override

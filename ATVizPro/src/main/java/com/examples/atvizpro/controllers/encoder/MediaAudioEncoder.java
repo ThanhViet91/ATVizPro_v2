@@ -20,8 +20,10 @@ package com.examples.atvizpro.controllers.encoder;
  *  limitations under the License.
  *
  * All files in the folder are under this Apache License, Version 2.0.
-*/
+ */
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaCodec;
@@ -36,16 +38,20 @@ import java.nio.ByteBuffer;
 
 import static com.examples.atvizpro.ui.utils.MyUtils.DEBUG;
 
+import androidx.core.app.ActivityCompat;
+
+import com.examples.atvizpro.App;
+
 public class MediaAudioEncoder extends MediaEncoder {
 	private static final String TAG = MediaAudioEncoder.class.getSimpleName();
 
 	private static final String MIME_TYPE = "audio/mp4a-latm";
-    private static final int SAMPLE_RATE = 44100;	// 44.1[KHz] is only setting guaranteed to be available on all devices.
-    private static final int BIT_RATE = 64000;
-	public static final int SAMPLES_PER_FRAME = 1024;	// AAC, bytes/frame/channel
-	public static final int FRAMES_PER_BUFFER = 25; 	// AAC, frame/buffer/sec
+	private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
+	private static final int BIT_RATE = 64000;
+	public static final int SAMPLES_PER_FRAME = 1024;    // AAC, bytes/frame/channel
+	public static final int FRAMES_PER_BUFFER = 25;    // AAC, frame/buffer/sec
 
-    private AudioThread mAudioThread = null;
+	private AudioThread mAudioThread = null;
 
 	public MediaAudioEncoder(final MediaMuxerWrapper muxer, final MediaEncoderListener listener) {
 		super(muxer, listener);
@@ -54,70 +60,70 @@ public class MediaAudioEncoder extends MediaEncoder {
 	@Override
 	public void prepare() throws IOException {
 		if (DEBUG) Log.i(TAG, "prepare:");
-        mTrackIndex = -1;
-        mMuxerStarted = mIsEOS = false;
-        // prepare MediaCodec for AAC encoding of audio data from inernal mic.
-        final MediaCodecInfo audioCodecInfo = selectAudioCodec(MIME_TYPE);
-        if (audioCodecInfo == null) {
-            Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
-            return;
-        }
+		mTrackIndex = -1;
+		mMuxerStarted = mIsEOS = false;
+		// prepare MediaCodec for AAC encoding of audio data from inernal mic.
+		final MediaCodecInfo audioCodecInfo = selectAudioCodec(MIME_TYPE);
+		if (audioCodecInfo == null) {
+			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
+			return;
+		}
 		if (DEBUG) Log.i(TAG, "selected codec: " + audioCodecInfo.getName());
 
-        final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
+		final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
 		audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
 		audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);
 		audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
 		audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
 		if (DEBUG) Log.i(TAG, "format: " + audioFormat);
-        mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
-        mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        mMediaCodec.start();
-        if (DEBUG) Log.i(TAG, "prepare finishing");
-        if (mListener != null) {
-        	try {
-        		mListener.onPrepared(this);
-        	} catch (final Exception e) {
-        		Log.e(TAG, "prepare:", e);
-        	}
-        }
+		mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
+		mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+		mMediaCodec.start();
+		if (DEBUG) Log.i(TAG, "prepare finishing");
+		if (mListener != null) {
+			try {
+				mListener.onPrepared(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "prepare:", e);
+			}
+		}
 	}
 
-    @Override
+	@Override
 	public void startRecording() {
 		super.startRecording();
 		// create and execute audio capturing thread using internal mic
 		if (mAudioThread == null) {
-	        mAudioThread = new AudioThread();
+			mAudioThread = new AudioThread();
 			mAudioThread.start();
 		}
 	}
 
 	@Override
-    protected void release() {
+	protected void release() {
 		mAudioThread = null;
 		super.release();
-    }
+	}
 
-	private static final int[] AUDIO_SOURCES = new int[] {
-		MediaRecorder.AudioSource.CAMCORDER,
-		MediaRecorder.AudioSource.MIC,
-		MediaRecorder.AudioSource.DEFAULT,
-		MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-		MediaRecorder.AudioSource.VOICE_RECOGNITION,
+	private static final int[] AUDIO_SOURCES = new int[]{
+			MediaRecorder.AudioSource.CAMCORDER,
+			MediaRecorder.AudioSource.MIC,
+			MediaRecorder.AudioSource.DEFAULT,
+			MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+			MediaRecorder.AudioSource.VOICE_RECOGNITION,
 	};
 
 	/**
 	 * Thread to capture audio data from internal mic as uncompressed 16bit PCM data
 	 * and write them to the MediaCodec encoder
 	 */
-    private class AudioThread extends Thread {
-    	@Override
-    	public void run() {
-    		try {
+	private class AudioThread extends Thread {
+		@Override
+		public void run() {
+			try {
 				final int min_buffer_size = AudioRecord.getMinBufferSize(
-					SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
-					AudioFormat.ENCODING_PCM_16BIT);
+						SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO,
+						AudioFormat.ENCODING_PCM_16BIT);
 				int buffer_size = SAMPLES_PER_FRAME * FRAMES_PER_BUFFER;
 				if (buffer_size < min_buffer_size)
 					buffer_size = ((min_buffer_size / SAMPLES_PER_FRAME) + 1) * SAMPLES_PER_FRAME * 2;
@@ -125,9 +131,19 @@ public class MediaAudioEncoder extends MediaEncoder {
 				AudioRecord audioRecord = null;
 				for (final int source : AUDIO_SOURCES) {
 					try {
+						if (ActivityCompat.checkSelfPermission(App.getAppContext(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+							// TODO: Consider calling
+							//    ActivityCompat#requestPermissions
+							// here to request the missing permissions, and then overriding
+							//   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+							//                                          int[] grantResults)
+							// to handle the case where the user grants the permission. See the documentation
+							// for ActivityCompat#requestPermissions for more details.
+							return;
+						}
 						audioRecord = new AudioRecord(
-							source, SAMPLE_RATE,
-							AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
+								source, SAMPLE_RATE,
+								AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
 						if (audioRecord != null) {
 		    	            if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
 		    	            	audioRecord.release();

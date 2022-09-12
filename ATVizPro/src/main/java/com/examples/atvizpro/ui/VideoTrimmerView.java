@@ -30,6 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdView;
 
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -73,6 +76,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
   private int mThumbsTotalCount;
   private ValueAnimator mRedProgressAnimator;
   private Handler mAnimationHandler = new Handler();
+  private AdView mAdview;
 
   public VideoTrimmerView(Context context, AttributeSet attrs) {
     this(context, attrs, 0);
@@ -92,13 +96,45 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     mPlayView = findViewById(R.id.icon_video_play);
     mSeekBarLayout = findViewById(R.id.seekBarLayout);
     mRedProgressIcon = findViewById(R.id.positionIcon);
+    mAdview = findViewById(R.id.adView);
 //    mVideoShootTipTv = findViewById(R.id.video_shoot_tip);
     mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
     mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
     mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
     mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
     mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
+
     setUpListeners();
+  }
+
+  public void showOrHideAdBanner(){
+    AdUtil.createBannerAdmob(mContext, mAdview);
+    mAdview.setAdListener(new AdListener() {
+      @Override
+      public void onAdLoaded() {
+        super.onAdLoaded();
+        if (mediaPlayer != null) {
+          hasChangeVideoView();
+        }
+      }
+    });
+  }
+  boolean ss = false;
+  private void hasChangeVideoView() {
+    if (mLinearVideo == null) return;
+    int screenWidth = mLinearVideo.getWidth();
+    int screenHeight = mLinearVideo.getHeight();
+    ss = false;
+    mLinearVideo.post(new Runnable() {
+      @Override
+      public void run() {
+        if (screenWidth != mLinearVideo.getWidth()
+                || screenHeight != mLinearVideo.getHeight()) {
+          ss = true;
+          updateVideoView(mediaPlayer);
+        }
+      }
+    });
   }
 
   private void initRangeSeekBarView() {
@@ -156,7 +192,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     mOnTrimVideoListener.onCancel();
   }
 
-  private void videoPrepared(MediaPlayer mp) {
+  private void updateVideoView(MediaPlayer mp) {
     ViewGroup.LayoutParams lpVideo = mVideoView.getLayoutParams();
     int videoWidth = mp.getVideoWidth();
     int videoHeight = mp.getVideoHeight();
@@ -185,6 +221,9 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
       }
     }
     mVideoView.setLayoutParams(lpVideo);
+  }
+  private void videoPrepared(MediaPlayer mp) {
+    updateVideoView(mp);
     mDuration = mVideoView.getDuration();
     if (!getRestoreState()) {
       seekTo((int) mRedProgressBarPos);
@@ -232,6 +271,7 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     mOnTrimVideoListener = onTrimVideoListener;
   }
 
+  MediaPlayer mediaPlayer;
   private void setUpListeners() {
     findViewById(R.id.cancelBtn).setOnClickListener(new OnClickListener() {
       @Override public void onClick(View view) {
@@ -247,6 +287,8 @@ public class VideoTrimmerView extends FrameLayout implements IVideoTrimmerView {
     mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
       @Override public void onPrepared(MediaPlayer mp) {
         mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+
+        mediaPlayer = mp;
         videoPrepared(mp);
       }
     });

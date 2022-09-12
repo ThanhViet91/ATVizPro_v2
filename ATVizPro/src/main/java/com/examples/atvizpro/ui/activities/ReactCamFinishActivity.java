@@ -22,6 +22,7 @@ import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.VideoUtil;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
 
 import java.io.File;
@@ -41,8 +42,8 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideStatusBar(this);
         setContentView(R.layout.activity_react_cam_finish);
+        hideStatusBar(this);
 
         isSaved = false;
 
@@ -58,15 +59,21 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         addVideoView();
 
         System.out.println("thanhlv FinishReact intent === action : "+ getIntent().getAction());
-//        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-//            AdUtil.initAds(getApplicationContext());
-//        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (mediaPlayer != null) {
+                    checkHasChangeVideoCamView();
+                }
+            }
+        });
     }
 
     MediaPlayer mediaPlayer;
@@ -103,7 +110,25 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
 
     }
 
+    private void checkHasChangeVideoCamView() {
+        if (screenVideo == null) {
+            return;
+        }
+        int oldScreenWidth = screenVideo.getWidth();
+        int oldScreenHeight = screenVideo.getHeight();
+        screenVideo.post(new Runnable() {
+            @Override
+            public void run() {
+                if (oldScreenWidth != screenVideo.getWidth()
+                        || oldScreenHeight != screenVideo.getHeight()) {
+                    videoPrepared(mediaPlayer);
+                }
+            }
+        });
+    }
+
     private int videoWidth, videoHeight;
+    RelativeLayout screenVideo;
 
     private void videoPrepared(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = videoView.getLayoutParams();
@@ -111,7 +136,7 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         videoHeight = mp.getVideoHeight();
         double videoRatio = (double) videoWidth / (double) videoHeight;
 
-        RelativeLayout screenVideo = findViewById(R.id.screenVideo);
+        screenVideo = findViewById(R.id.screenVideo);
         int screenWidth = screenVideo.getWidth();
         int screenHeight = screenVideo.getHeight();
         double screenRatio = (double) screenWidth / (double) screenHeight;

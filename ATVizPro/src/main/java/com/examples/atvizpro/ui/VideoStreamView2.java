@@ -30,6 +30,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdView;
 
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -76,7 +79,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
 
     private TextView btn_cancel, btn_done, number_countdown;
     private LinearLayout layoutCountdown;
-
+    private AdView mAdview;
 
     public VideoStreamView2(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -100,6 +103,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mPlayView = findViewById(R.id.toggle_record);
         mSeekBarLayout = findViewById(R.id.seekBarLayout);
         mRedProgressIcon = findViewById(R.id.positionIcon);
+        mAdview = findViewById(R.id.adView);
 //        mVideoShootTipTv = findViewById(R.id.video_shoot_tip);
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
@@ -165,7 +169,37 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mOnTrimVideoListener.onCancel();
     }
 
-    private void videoPrepared(MediaPlayer mp) {
+    public void showOrHideAdBanner(){
+        AdUtil.createBannerAdmob(mContext, mAdview);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (mediaPlayer != null) {
+                    hasChangeVideoView();
+                }
+            }
+        });
+    }
+    boolean ss = false;
+    private void hasChangeVideoView() {
+        if (mLinearVideo == null) return;
+        int screenWidth = mLinearVideo.getWidth();
+        int screenHeight = mLinearVideo.getHeight();
+        ss = false;
+        mLinearVideo.post(new Runnable() {
+            @Override
+            public void run() {
+                if (screenWidth != mLinearVideo.getWidth()
+                        || screenHeight != mLinearVideo.getHeight()) {
+                    ss = true;
+                    updateVideoView(mediaPlayer);
+                }
+            }
+        });
+    }
+
+    private void updateVideoView(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = mVideoView.getLayoutParams();
         int videoWidth = mp.getVideoWidth();
         int videoHeight = mp.getVideoHeight();
@@ -177,7 +211,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
 
         double viewRatio = (double) screenWidth / (double) screenHeight;
 
-        double diffRatio = videoRatio / viewRatio - 1;
+        double diffRatio = videoRatio/viewRatio - 1;
 
         if (Math.abs(diffRatio) < 0.01) {
             // very good
@@ -188,11 +222,16 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
                 lpVideo.height = (int) (lpVideo.width / videoRatio);
             } else {
                 //fit height
-                lpVideo.height = screenHeight + 1;
+                lpVideo.height = screenHeight + 2;
                 lpVideo.width = (int) (lpVideo.height * videoRatio);
+
             }
         }
         mVideoView.setLayoutParams(lpVideo);
+    }
+
+    private void videoPrepared(MediaPlayer mp) {
+        updateVideoView(mp);
         mDuration = mVideoView.getDuration();
         if (!getRestoreState()) {
             seekTo((int) mRedProgressBarPos);
@@ -215,7 +254,25 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
     }
 
     private boolean completed = false;
+//    private boolean hasCancel = false;
 
+    private CountDownTimer countDownTimer = new CountDownTimer(2900, 1000) {
+        public void onTick(long millisUntilFinished) {
+//            if (hasCancel) return;
+            layoutCountdown.setVisibility(VISIBLE);
+            number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
+        }
+
+        public void onFinish() {
+//            if (hasCancel) return;
+            layoutCountdown.setVisibility(GONE);
+            mRedProgressBarPos = mVideoView.getCurrentPosition();
+            mVideoView.start();
+            mOnTrimVideoListener.onStartRecord();
+            setToggleViewIcon(1);
+            playingRedProgressAnimation();
+        }
+    };
     private void handlerPlayVideoOrPause() {
         mRedProgressBarPos = mVideoView.getCurrentPosition();
         if (mVideoView.isPlaying()) {
@@ -223,27 +280,18 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
             pauseRedProgressAnimation();
             completedCommentary();
         } else if (!completed) {
-            new CountDownTimer(2900, 1000) {
-                public void onTick(long millisUntilFinished) {
-                    layoutCountdown.setVisibility(VISIBLE);
-                    number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
-                }
-
-                public void onFinish() {
-                    layoutCountdown.setVisibility(GONE);
-                    mRedProgressBarPos = mVideoView.getCurrentPosition();
-                    mVideoView.start();
-                    mOnTrimVideoListener.onStartRecord();
-                    setToggleViewIcon(1);
-                    playingRedProgressAnimation();
-                }
-            }.start();
+            countDownTimer.start();
+            completed = true;
+//            hasCancel = false;
         } else {
-            //TODO completed commentary
+            //TODO completed commentary and show delete
+
+//            layoutCountdown.setVisibility(GONE);
             System.out.println("thanhlv delelelet");
             seekTo(0);
             setToggleViewIcon(0);
             completed = false;
+//            hasCancel = true;
             mOnTrimVideoListener.onDeleteRecord();
             mRedProgressIcon.setVisibility(GONE);
             btn_done.setVisibility(GONE);
@@ -274,6 +322,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mOnTrimVideoListener = onStreamVideoListener;
     }
 
+    MediaPlayer mediaPlayer;
     private void setUpListeners() {
         findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnClickListener() {
             @Override
@@ -292,6 +341,7 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
         mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                mediaPlayer = mp;
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
             }

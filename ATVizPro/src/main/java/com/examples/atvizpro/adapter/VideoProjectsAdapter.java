@@ -3,6 +3,9 @@ package com.examples.atvizpro.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +20,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.model.VideoModel;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
@@ -39,7 +44,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         this.list = list;
     }
 
-    public void setVideoProjectsListener(VideoProjectsListener listener){
+    public void setVideoProjectsListener(VideoProjectsListener listener) {
         this.listener = listener;
     }
 
@@ -60,10 +65,11 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
+        holder.itemView.setAlpha(1);
         if (video != null) {
             Glide.with(context)
                     .load(video.getThumb())
-                    .transform(new CenterCrop(),new RoundedCorners(25))
+                    .transform(new CenterCrop(), new RoundedCorners(25))
                     .into(holder.img);
             holder.name.setText(video.getName());
         }

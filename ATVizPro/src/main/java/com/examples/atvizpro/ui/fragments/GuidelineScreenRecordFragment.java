@@ -95,8 +95,13 @@ public class GuidelineScreenRecordFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+                if (position == getListPhoto().size()-1) {
+                    btnContinue.setText(getString(R.string.done_));
+                } else {
+                    btnContinue.setText(getString(R.string.continue_));
+                }
+                setDecs(position);
                 i = position;
-                setDecs(i);
             }
         });
         btnContinue.setOnClickListener(new View.OnClickListener() {

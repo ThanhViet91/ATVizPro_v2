@@ -12,15 +12,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.VideoStreamListener;
 import com.examples.atvizpro.ui.VideoStreamView2;
 import com.examples.atvizpro.utils.StorageUtil;
 import com.examples.atvizpro.utils.VideoUtil;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -37,8 +45,8 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideStatusBar(this);
         setContentView(R.layout.commentary_layout);
+        hideStatusBar(this);
         videoStreamView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
@@ -49,6 +57,13 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
         animationView.setVisibility(View.GONE);
 
         prepareAudioRecorder();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
+        videoStreamView.showOrHideAdBanner();
     }
 
     @Override
@@ -96,8 +111,66 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
         }
     }
 
-    @Override
-    public void onClickNext() {
+    InterstitialAd mInterstitialAdAdmob = null;
+
+    public void createInterstitialAdmob() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAdAdmob = interstitialAd;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        mInterstitialAdAdmob = null;
+                        createInterstitialAdmob();
+                    }
+                });
+    }
+
+    public void showInterstitialAd(){
+        if (mInterstitialAdAdmob != null) {
+            mInterstitialAdAdmob.show(this);
+            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdClicked() {
+                }
+
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    Intent intent = new Intent(CommentaryActivity.this, ReactCamFinishActivity.class);
+                    intent.putExtra(KEY_PATH_VIDEO, videoPath);
+                    startActivity(intent);
+                    createInterstitialAdmob();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                }
+
+                @Override
+                public void onAdImpression() {
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                }
+            });
+        } else {
+            Intent intent = new Intent(CommentaryActivity.this, ReactCamFinishActivity.class);
+            intent.putExtra(KEY_PATH_VIDEO, videoPath);
+            startActivity(intent);
+        }
+    }
+
+
+    String videoPath;
+    private void doExecuteCommentary() {
         if (!pathOriginalVideo.equals("") && !cacheAudioFilePath.equals("")) {
             new VideoUtil().commentaryAudio(this, pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
                 @Override
@@ -112,6 +185,8 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
 //                    if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
                     animationView.pauseAnimation();
                     animationView.setVisibility(View.GONE);
+                    videoPath = code;
+                    showInterstitialAd();
                 }
 
                 @Override
@@ -120,6 +195,10 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
                 }
             });
         }
+    }
+    @Override
+    public void onClickNext() {
+        doExecuteCommentary();
 
     }
 

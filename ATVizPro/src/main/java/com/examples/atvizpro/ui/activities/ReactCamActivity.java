@@ -34,9 +34,12 @@ import com.examples.atvizpro.model.VideoReactCamExecute;
 import com.examples.atvizpro.ui.ZVideoView;
 import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.ui.utils.CustomOnScaleDetector;
+import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.StorageUtil;
 import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -65,8 +68,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        hideStatusBar(this);
         setContentView(R.layout.activity_react_cam);
+        hideStatusBar(this);
 
         animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
@@ -83,15 +86,23 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         cameraView = new SurfaceView(this);
         rtmpCamera = new RtmpLiveStream(cameraView);
         addVideoView();
-
-
-        if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (SettingManager2.getRemoveAds(getApplicationContext())) mInterstitialAdAdmob = null;
+        if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
+        AdView mAdview = findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(this, mAdview);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (mediaPlayer != null) {
+                    checkHasChangeVideoCamView();
+                }
+            }
+        });
     }
 
     @Override
@@ -145,6 +156,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private int videoWidth, videoHeight, newVideoWidth, newVideoHeight;
+    RelativeLayout screenVideo;
+    boolean hasChangeViewPos = false;
 
     private void videoPrepared(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = videoView.getLayoutParams();
@@ -152,7 +165,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         videoHeight = mp.getVideoHeight();
         double videoRatio = (double) videoWidth / (double) videoHeight;
 
-        RelativeLayout screenVideo = findViewById(R.id.screenVideo);
+        screenVideo = findViewById(R.id.screenVideo);
         int screenWidth = screenVideo.getWidth();
         int screenHeight = screenVideo.getHeight();
         double screenRatio = (double) screenWidth / (double) screenHeight;
@@ -173,6 +186,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
         videoView.setLayoutParams(lpVideo);
 
+        if (hasChangeViewPos) {
+            xLeftOld = xLeft;
+            yTopOld = yTop;
+        }
         xLeft = (screenWidth - lpVideo.width) / 2f;
         xRight = xLeft + lpVideo.width;
         yTop = screenVideo.getY() + (screenHeight + 1 - lpVideo.height) / 2f;
@@ -182,7 +199,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         newVideoHeight = lpVideo.height;
     }
 
-    float yTop, yBottom, xLeft, xRight;
+    float yTop, yBottom, xLeft, xRight, yTopOld, xLeftOld;
     LinearLayout cameraPreview;
     SurfaceView cameraView;
     View mCameraLayout;
@@ -201,6 +218,45 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     RelativeLayout root;
 
+    private void updateCamView(float scale) {
+        for (int i = 0; i < 7; i++) {
+            camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
+        }
+        camWidth = camViewSize[camSize];  // ~240px
+        camHeight = camWidth * 4 / 3f;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        mCameraLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("thanhlv updateCamview gggg");
+
+                float newY = (mCameraLayout.getY() -yTopOld)*scale + yTop;
+                float newX = (mCameraLayout.getX() -xLeftOld)*scale + xLeft;
+
+                mCameraLayout.setX(newX);
+                mCameraLayout.setY(newY);
+            }
+        });
+    }
+    private void checkHasChangeVideoCamView() {
+        hasChangeViewPos = false;
+        if (screenVideo == null) {
+            return;
+        }
+        int oldScreenWidth = screenVideo.getWidth();
+        int oldScreenHeight = screenVideo.getHeight();
+        screenVideo.post(new Runnable() {
+            @Override
+            public void run() {
+                    if (oldScreenWidth != screenVideo.getWidth()
+                            || oldScreenHeight != screenVideo.getHeight()) {
+                        hasChangeViewPos = true;
+                        videoPrepared(mediaPlayer);
+                        updateCamView(Math.min(screenVideo.getWidth()*1f/oldScreenWidth, screenVideo.getHeight()*1f/oldScreenHeight));
+                    }
+            }
+        });
+    }
     private void initCamView() {
         root = findViewById(R.id.root_container);
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, null, false);
@@ -348,7 +404,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     String finalVideoPath = "";
 
-    private void finishReactCam(String ouputCacheFile) {
+    /*private void finishReactCam(String ouputCacheFile) {
         Toast.makeText(this, ouputCacheFile, Toast.LENGTH_SHORT).show();
         finalVideoPath = ouputCacheFile;
         if (!cameraCahePath.equals("")) {
@@ -388,7 +444,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             intent.putExtra(KEY_PATH_VIDEO, ouputCacheFile);
             startActivity(intent);
         }
-    }
+    }*/
 
     InterstitialAd mInterstitialAdAdmob = null;
 
@@ -463,6 +519,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 intent.putExtras(bundle);
                 intent.putExtra("bundle_video_react_time", (long)((endTime - startTime + videoDuration)/2.5));
                 startService(intent);
+                showInterstitialAd();
                 finish();
             }
         });
@@ -476,7 +533,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         hasCamVideo = true;
         mCameraLayout.setVisibility(View.GONE);
         showDialogConfirmExecute();
-        showInterstitialAd();
     }
 
     long startTime, endTime = 0;

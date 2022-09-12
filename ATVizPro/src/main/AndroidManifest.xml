@@ -111,42 +111,42 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name="ui.activities.SyncActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:parentActivityName="ui.activities.MainActivity"
-            tools:ignore="MissingClass">
+<!--        <activity-->
+<!--            android:name="ui.activities.SyncActivity"-->
+<!--            android:configChanges="keyboardHidden|orientation"-->
+<!--            android:parentActivityName="ui.activities.MainActivity"-->
+<!--            tools:ignore="MissingClass">-->
 
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ui.activities.MainActivity" />
-        </activity>
-        <receiver
-            android:exported="true"
-            android:name=".ui.activities.SyncActivity$NetworkChangeReceiver"
-            android:label="NetworkChangeReceiver">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
+<!--            <meta-data-->
+<!--                android:name="android.support.PARENT_ACTIVITY"-->
+<!--                android:value="ui.activities.MainActivity" />-->
+<!--        </activity>-->
+<!--        <receiver-->
+<!--            android:exported="true"-->
+<!--            android:name=".ui.activities.SyncActivity$NetworkChangeReceiver"-->
+<!--            android:label="NetworkChangeReceiver">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"-->
+<!--                    tools:ignore="BatteryLife" />-->
+<!--                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
         <service
             android:name=".ui.services.BaseService"
-            android:foregroundServiceType="mediaProjection"
+            android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false"/>
         <service
             android:name=".ui.services.recording.RecordingControllerService"
 
-            android:foregroundServiceType="mediaProjection"
+            android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false" />
         <service
             android:name=".ui.services.recording.RecordingService"
             android:stopWithTask="true"
-            android:foregroundServiceType="mediaProjection"
+            android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false" />
         <service android:name=".ui.services.streaming.StreamingControllerService" />
@@ -154,7 +154,7 @@
         <service android:name=".ui.services.sync.SyncService" />
 
         <service
-            android:foregroundServiceType="mediaProjection"
+            android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:name=".ui.services.ControllerService" />
 
         <meta-data

@@ -5,17 +5,20 @@
     android:gravity="center"
     android:orientation="vertical"
     android:id="@+id/view_item_root"
-    android:padding="10dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="6dp">
 
     <ImageView
         android:id="@+id/img_item_video_thumb"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:src="@drawable/youtube_slider1" />
 
     <TextView
         android:textColor="@color/white"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:id="@+id/tv_video_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

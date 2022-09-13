@@ -440,14 +440,14 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgRec = mViewRoot.findViewById(R.id.imgRec);
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
         mImgClose = mViewRoot.findViewById(R.id.imgClose);
-        mImgLive = mViewRoot.findViewById(R.id.imgLive);
-        mImgPause = mViewRoot.findViewById(R.id.imgPause);
+//        mImgLive = mViewRoot.findViewById(R.id.imgLive);
+//        mImgPause = mViewRoot.findViewById(R.id.imgPause);
         mImgStart = mViewRoot.findViewById(R.id.imgStart);
         mImgSetting = mViewRoot.findViewById(R.id.imgSetting);
         mImgStop = mViewRoot.findViewById(R.id.imgStop);
-        mImgResume = mViewRoot.findViewById(R.id.imgResume);
+//        mImgResume = mViewRoot.findViewById(R.id.imgResume);
 
-        toggleView(mImgResume, View.GONE);
+//        toggleView(mImgResume, View.GONE);
         toggleView(mImgStop, View.GONE);
         toggleNavigationButton(View.GONE);
 
@@ -465,29 +465,29 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
 
-        mImgPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Pause will available soon!", Toast.LENGTH_SHORT);
-                toggleNavigationButton(View.GONE);
+//        mImgPause.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MyUtils.toast(getApplicationContext(), "Pause will available soon!", Toast.LENGTH_SHORT);
+//                toggleNavigationButton(View.GONE);
+//
+//                mRecordingPaused = true;
+//            }
+//        });
 
-                mRecordingPaused = true;
-            }
-        });
-
-        mImgResume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Resume will available soon!", Toast.LENGTH_SHORT);
-                toggleNavigationButton(View.GONE);
-                mRecordingPaused = false;
-            }
-        });
+//        mImgResume.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MyUtils.toast(getApplicationContext(), "Resume will available soon!", Toast.LENGTH_SHORT);
+//                toggleNavigationButton(View.GONE);
+//                mRecordingPaused = false;
+//            }
+//        });
 
         mImgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Setting clicked", Toast.LENGTH_SHORT);
+                MyUtils.toast(getApplicationContext(), "Go home!", Toast.LENGTH_SHORT);
                 toggleNavigationButton(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -550,8 +550,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                     mService.stopPerformService();
 
                     if(mMode==MyUtils.MODE_RECORDING){
-                        ((RecordingService)mService).insertVideoToGallery();
-                        MyUtils.toast(getApplicationContext(), "Recording Service Stopped", Toast.LENGTH_LONG);
+//                        ((RecordingService)mService).insertVideoToGallery();
+                        MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
                         return;
                     }
 
@@ -563,18 +563,18 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
 
-        mImgLive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleNavigationButton(View.GONE);
-                if(!MainActivity.active) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
-                    startActivity(intent);
-                }
-            }
-        });
+//        mImgLive.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                toggleNavigationButton(View.GONE);
+//                if(!MainActivity.active) {
+//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
+//                    startActivity(intent);
+//                }
+//            }
+//        });
 
         mImgClose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -748,12 +748,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         mImgStart.setVisibility(viewMode);
         mImgSetting.setVisibility(viewMode);
-        mImgPause.setVisibility(viewMode);
+//        mImgPause.setVisibility(viewMode);
         mImgCapture.setVisibility(viewMode);
-        mImgLive.setVisibility(viewMode);
+//        mImgLive.setVisibility(viewMode);
         mImgClose.setVisibility(viewMode);
         mImgStop.setVisibility(viewMode);
-        mImgResume.setVisibility(viewMode);
+//        mImgResume.setVisibility(viewMode);
 
         if(viewMode == View.GONE){
             mViewRoot.setPadding(32,32, 32, 32);
@@ -765,12 +765,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 mImgStop.setVisibility(View.GONE);
             }
 
-            if(mRecordingPaused){
-                mImgPause.setVisibility(View.GONE);
-            }
-            else{
-                mImgResume.setVisibility(View.GONE);
-            }
+//            if(mRecordingPaused){
+//                mImgPause.setVisibility(View.GONE);
+//            }
+//            else{
+//                mImgResume.setVisibility(View.GONE);
+//            }
             mViewRoot.setPadding(32,48, 32, 48);
         }
     }

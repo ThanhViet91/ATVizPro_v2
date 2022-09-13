@@ -30,6 +30,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.adapter.VideoOptionAdapter;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdView;
+
+import java.util.ArrayList;
 
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -41,7 +47,7 @@ import iknow.android.utils.thread.UiThreadExecutor;
  * Email： who_know_me@163.com
  * Describe:
  */
-public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
+public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, VideoOptionAdapter.VideoOptionListener {
 
     private static final String TAG = VideoEditorView.class.getSimpleName();
 
@@ -50,7 +56,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     private RelativeLayout mLinearVideo;
     private ZVideoView mVideoView;
     private ImageView mPlayView;
-    private RecyclerView mVideoThumbRecyclerView;
+    private RecyclerView mVideoThumbRecyclerView, rcVideoOptions;
     private RangeSeekBarView mRangeSeekBarView;
     private LinearLayout mSeekBarLayout;
     private ImageView mRedProgressIcon;
@@ -77,6 +83,21 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     private TextView btn_cancel, btn_done, number_countdown;
     private LinearLayout layoutCountdown;
 
+    private ArrayList<String> videoOptions = new ArrayList<>();
+    private VideoOptionAdapter mAdapter;
+
+    private AdView mAdview;
+    private MediaPlayer mediaPlayer;
+
+    public interface VideoEditorListener {
+        void onClickVideoOption(String opt);
+    }
+
+    private VideoEditorListener videoEditorListener;
+
+    public void setVideoEditorListener(VideoEditorListener videoEditorListener){
+        this.videoEditorListener = videoEditorListener;
+    }
 
     public VideoEditorView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
@@ -86,6 +107,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         super(context, attrs, defStyleAttr);
         init(context);
     }
+
 
     private void init(Context context) {
         this.mContext = context;
@@ -101,12 +123,55 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         mVideoView.setMediaController(mediaController);
         mSeekBarLayout = findViewById(R.id.seekBarLayout);
         mRedProgressIcon = findViewById(R.id.positionIcon);
+
+        mAdview = findViewById(R.id.adView);
+
+        videoOptions.add("Trim");
+        videoOptions.add("Music");
+        videoOptions.add("Speed");
+        videoOptions.add("Text");
+        videoOptions.add("Image");
+        videoOptions.add("Merge");
+        rcVideoOptions = findViewById(R.id.recycler_view);
+        mAdapter = new VideoOptionAdapter(context, videoOptions, this);
+        rcVideoOptions.setAdapter(mAdapter);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
+        rcVideoOptions.setLayoutManager(linearLayoutManager);
+
+
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
         mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
         mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
         setUpListeners();
+    }
+
+    public void showOrHideAdBanner(){
+        AdUtil.createBannerAdmob(mContext, mAdview);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (mediaPlayer != null) {
+                    hasChangeVideoView();
+                }
+            }
+        });
+    }
+    private void hasChangeVideoView() {
+        if (mLinearVideo == null) return;
+        int screenWidth = mLinearVideo.getWidth();
+        int screenHeight = mLinearVideo.getHeight();
+        mLinearVideo.post(new Runnable() {
+            @Override
+            public void run() {
+                if (screenWidth != mLinearVideo.getWidth()
+                        || screenHeight != mLinearVideo.getHeight()) {
+                    updateVideoView(mediaPlayer);
+                }
+            }
+        });
     }
 
     public long getVideoDuration() {
@@ -167,8 +232,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         if (videoStreamListener != null)
             videoStreamListener.onCancel();
     }
-
-    private void videoPrepared(MediaPlayer mp) {
+    private void updateVideoView(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = mVideoView.getLayoutParams();
         int videoWidth = mp.getVideoWidth();
         int videoHeight = mp.getVideoHeight();
@@ -180,7 +244,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
 
         double viewRatio = (double) screenWidth / (double) screenHeight;
 
-        double diffRatio = videoRatio / viewRatio - 1;
+        double diffRatio = videoRatio/viewRatio - 1;
 
         if (Math.abs(diffRatio) < 0.01) {
             // very good
@@ -197,6 +261,9 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
             }
         }
         mVideoView.setLayoutParams(lpVideo);
+    }
+    private void videoPrepared(MediaPlayer mp) {
+        updateVideoView(mp);
         mDuration = mVideoView.getDuration();
         if (!getRestoreState()) {
             seekTo((int) mRedProgressBarPos);
@@ -246,6 +313,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
         mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                mediaPlayer = mp;
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
             }
@@ -421,5 +489,12 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView {
     public void onDestroy() {
         BackgroundExecutor.cancelAll("", true);
         UiThreadExecutor.cancelAll("");
+    }
+
+    //callback click video options
+    @Override
+    public void onClickItem(String text) {
+        if (videoEditorListener != null)
+            videoEditorListener.onClickVideoOption(text);
     }
 }

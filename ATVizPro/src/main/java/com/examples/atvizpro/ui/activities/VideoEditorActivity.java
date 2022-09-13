@@ -24,21 +24,21 @@ import com.examples.atvizpro.ui.fragments.OptionAddImageFragment;
 import com.examples.atvizpro.ui.fragments.OptionAddTextFragment;
 import com.examples.atvizpro.ui.fragments.OptionChangeSpeedFragment;
 import com.examples.atvizpro.ui.fragments.OptionTrimFragment;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class VideoEditorActivity extends AppCompatActivity implements VideoOptionAdapter.VideoOptionListener, IOptionFragmentListener, VideoStreamListener {
+public class VideoEditorActivity extends AppCompatActivity implements IOptionFragmentListener,
+        VideoStreamListener, VideoEditorView.VideoEditorListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
     private VideoEditorView videoEditorView;
     private String pathOriginalVideo = "";
-    private RecyclerView recyclerView;
-
-    private ArrayList<String> videoOptions = new ArrayList<>();
-    private VideoOptionAdapter mAdapter;
 
     private LottieAnimationView animationView;
 
@@ -52,24 +52,15 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
         videoEditorView.setOnEditVideoListener(this);
         videoEditorView.initVideoByURI(Uri.parse(pathOriginalVideo));
-
-        videoOptions.add("Trim");
-//        videoOptions.add("Music");
-        videoOptions.add("Speed");
-        videoOptions.add("Text");
-        videoOptions.add("Image");
-        videoOptions.add("Merge");
-        recyclerView = findViewById(R.id.recycler_view);
-        mAdapter = new VideoOptionAdapter(this, videoOptions, this);
-        // Set the mAdapter on the {@link ListView}
-        // so the list can be populated in the user interface
-        recyclerView.setAdapter(mAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(linearLayoutManager);
-
+        videoEditorView.setVideoEditorListener(this);
         animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        videoEditorView.showOrHideAdBanner();
     }
 
     @Override
@@ -107,14 +98,6 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         return mProgressDialog;
     }
 
-    @Override
-    public void onClickItem(String text) {
-
-        if (!text.equals("")) {
-            showOptionFragment(text);
-        }
-    }
-
 
     private void showOptionFragment(String opt) {
         Bundle bundle = new Bundle();
@@ -125,6 +108,7 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
             case "Trim":
 
                 OptionTrimFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
+
                 break;
             case "Text":
 
@@ -187,4 +171,10 @@ public class VideoEditorActivity extends AppCompatActivity implements VideoOptio
         finish();
     }
 
+    @Override
+    public void onClickVideoOption(String opt) {
+        if (!opt.equals("")) {
+            showOptionFragment(opt);
+        }
+    }
 }

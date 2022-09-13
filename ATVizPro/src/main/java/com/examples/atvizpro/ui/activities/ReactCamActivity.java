@@ -7,7 +7,10 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
@@ -19,9 +22,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -55,7 +60,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         SurfaceHolder.Callback, CustomOnScaleDetector.OnScaleListener {
 
     private SurfaceHolder mHolder;
-    ZVideoView videoView;
+    VideoView videoView;
     private SeekBar seekbar;
 
     public static RtmpLiveStream rtmpCamera;
@@ -83,15 +88,15 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
 
-        cameraView = new SurfaceView(this);
-        rtmpCamera = new RtmpLiveStream(cameraView);
-        addVideoView();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
+
+        addVideoView();
         AdView mAdview = findViewById(R.id.adView);
         AdUtil.createBannerAdmob(this, mAdview);
         mAdview.setAdListener(new AdListener() {
@@ -112,26 +117,35 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     MediaPlayer mediaPlayer;
-    String videoFile;
+    String videoFile="";
     int videoDuration = 0;
 
+    SurfaceHolder surfaceholder;
     private void addVideoView() {
-        videoView = findViewById(R.id.video_main);
+        videoView = findViewById(R.id.video_main1);
         videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
-        videoView.setVideoPath(videoFile);
+        if (!videoFile.equals(""))
+                    videoView.setVideoPath(videoFile);
+
 //        videoView.setMediaController(new MediaController(this));
-        videoView.requestFocus();
+                videoView.requestFocus();
+                videoView.start();
+//        videoView.start();
+//        videoView.setBackgroundColor(Color.WHITE);
+//        videoView.animate().alpha(1);
+//        videoView.seekTo(1);
+//        videoView.setZOrderOnTop(true);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(final MediaPlayer mp) {
+//                videoView.setBackgroundColor(Color.TRANSPARENT);
                 videoDuration = mp.getDuration();
-                System.out.println("thanhlv addVideoView duration===  "+ videoDuration);
+//                System.out.println("thanhlv addVideoView duration===  "+ videoDuration);
                 seekbar.setMax(videoDuration);
-                mediaPlayer = mp;
+
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
-                initCamView();
-
+                mediaPlayer = mp;
                 mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
 
                 seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -151,6 +165,19 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
                     }
                 });
+                initCamView();
+//                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+//                    @Override
+//                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+////                        Log.d(TAG, "onInfo, what = " + what);
+//                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
+//                            // video started; hide the placeholder.
+////                            surfaceholder.set
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
             }
         });
     }
@@ -169,6 +196,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         int screenWidth = screenVideo.getWidth();
         int screenHeight = screenVideo.getHeight();
         double screenRatio = (double) screenWidth / (double) screenHeight;
+
         double diffRatio = videoRatio / screenRatio - 1;
 
         if (Math.abs(diffRatio) < 0.01) {
@@ -259,11 +287,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
     private void initCamView() {
         root = findViewById(R.id.root_container);
-        mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, null, false);
-        cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
+        mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
+        cameraView = new SurfaceView(this);
+        rtmpCamera = new RtmpLiveStream(cameraView);
         if(cameraView.getParent() != null) {
             ((ViewGroup)cameraView.getParent()).removeView(cameraView); // <- fix
         }
+
+        cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
         mHolder.addCallback(this);
@@ -402,50 +433,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    String finalVideoPath = "";
-
-    /*private void finishReactCam(String ouputCacheFile) {
-        Toast.makeText(this, ouputCacheFile, Toast.LENGTH_SHORT).show();
-        finalVideoPath = ouputCacheFile;
-        if (!cameraCahePath.equals("")) {
-            boolean deleteCameraCache = new File(cameraCahePath).delete();
-        }
-        mCameraLayout.setVisibility(View.GONE);
-
-        if (mInterstitialAdAdmob != null) {
-            mInterstitialAdAdmob.show(this);
-            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdClicked() {
-                }
-
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    createInterstitialAdmob();
-                    Intent intent = new Intent(ReactCamActivity.this, ReactCamFinishActivity.class);
-                    intent.putExtra(KEY_PATH_VIDEO, finalVideoPath);
-                    startActivity(intent);
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-                }
-
-                @Override
-                public void onAdImpression() {
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-                }
-            });
-        } else {
-            Intent intent = new Intent(ReactCamActivity.this, ReactCamFinishActivity.class);
-            intent.putExtra(KEY_PATH_VIDEO, ouputCacheFile);
-            startActivity(intent);
-        }
-    }*/
-
     InterstitialAd mInterstitialAdAdmob = null;
 
     public void createInterstitialAdmob() {
@@ -572,7 +559,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         System.out.println("thanhlv surfaceDestroyed");
         mHolder.removeCallback(null);
         mHolder = null;
-//        rtmpCamera=null;
+        rtmpCamera = null;
     }
 
     private int camSize = 3;

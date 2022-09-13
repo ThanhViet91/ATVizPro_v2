@@ -34,16 +34,16 @@ public class ZVideoView extends VideoView {
   @Override
   public void setVideoURI(Uri uri) {
     super.setVideoURI(uri);
-    MediaMetadataRetriever retr = new MediaMetadataRetriever();
-    retr.setDataSource(uri.getPath());
-    String height = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-    String width = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-    try {
-      videoRealH = Integer.parseInt(height);
-      videoRealW = Integer.parseInt(width);
-    } catch (NumberFormatException e) {
-      e.printStackTrace();
-    }
+//    MediaMetadataRetriever retr = new MediaMetadataRetriever();
+//    retr.setDataSource(uri.getPath());
+//    String height = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+//    String width = retr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+//    try {
+//      videoRealH = Integer.parseInt(height);
+//      videoRealW = Integer.parseInt(width);
+//    } catch (NumberFormatException e) {
+//      e.printStackTrace();
+//    }
   }
 
   @Override

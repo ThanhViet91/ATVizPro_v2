@@ -37,12 +37,6 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
         this.listener = listener;
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void reloadData(ArrayList<String> listNew) {
-        this.list = listNew;
-        notifyDataSetChanged();
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,7 +45,7 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String videoOpt = list.get(position);
         holder.name.setText(videoOpt);
         switch (videoOpt) {

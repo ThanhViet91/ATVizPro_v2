@@ -1,9 +1,11 @@
 package com.examples.atvizpro.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.util.Log;
 
@@ -31,11 +33,14 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         commandStr = command;
         outputPath = outPath;
         mCallback = callback;
-
+        demoVideoFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/videokit/";
+        demoVideoPath = demoVideoFolder + "in.mp4";
         workFolder = App.getAppContext().getFilesDir().getAbsolutePath() + "/";
         vkLogPath = workFolder + "vk.log";
-
         GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(context, workFolder);
+        GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(context, demoVideoFolder);
+        int rc = GeneralUtils.isLicenseValid(App.getAppContext(), workFolder);
+        System.out.println("thanhlv isLicenseValid ====== " + rc);
     }
 
 
@@ -61,7 +66,9 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 
         LoadJNI vk = new LoadJNI();
         try {
+            System.out.println("thanhlv commandStr ====== " + commandStr);
             vk.run(GeneralUtils.utilConvertToComplex(commandStr), workFolder, App.getAppContext());
+
 
         } catch (CommandValidationException e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);

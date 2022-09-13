@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.services.recording;
 
+import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atvizpro.ui.utils.MyUtils.DEBUG;
 
 import android.content.ContentResolver;
@@ -14,6 +15,7 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -37,6 +39,7 @@ import com.examples.atvizpro.controllers.settings.VideoSetting2;
 import com.examples.atvizpro.data.database.VideoDatabase;
 import com.examples.atvizpro.data.entities.Video;
 import com.examples.atvizpro.ui.activities.MainActivity;
+import com.examples.atvizpro.ui.activities.ReactCamFinishActivity;
 import com.examples.atvizpro.ui.services.BaseService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 
@@ -176,11 +179,12 @@ public class RecordingService extends BaseService {
         }
     }
 
+    String outputFile;
     //Return output file
     public VideoSetting2 stopRecording() {
         if (DEBUG) Log.v(TAG, "stopStreaming:mMuxer=" + mMuxer);
 
-        String outputFile = "";
+        outputFile = "";
 
         synchronized (sSync) {
             if (mMuxer != null) {
@@ -189,10 +193,26 @@ public class RecordingService extends BaseService {
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
                 mMuxer = null;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        showResultActivity(outputFile);
+                    }
+                }, 1500);
                 // you should not wait here
             }
         }
         return mCurrentVideoSetting;
+    }
+
+    public void showResultActivity(String finalVideoCachePath) {
+        Intent intent = new Intent(this, ReactCamFinishActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
+        intent.putExtra("from_screen_recorder", true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        System.out.println("thanhlv showResultActivity "+finalVideoCachePath);
+        startActivity(intent);
     }
 
     public void insertVideoToGallery() {

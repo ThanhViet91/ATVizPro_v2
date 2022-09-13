@@ -354,12 +354,12 @@ public class StreamingControllerService extends Service{
         mImgRec = mViewRoot.findViewById(R.id.imgRec);
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
         mImgClose = mViewRoot.findViewById(R.id.imgClose);
-        mImgLive = mViewRoot.findViewById(R.id.imgLive);
-        mImgPause = mViewRoot.findViewById(R.id.imgPause);
+//        mImgLive = mViewRoot.findViewById(R.id.imgLive);
+//        mImgPause = mViewRoot.findViewById(R.id.imgPause);
         mImgStart = mViewRoot.findViewById(R.id.imgStart);
         mImgSetting = mViewRoot.findViewById(R.id.imgSetting);
         mImgStop = mViewRoot.findViewById(R.id.imgStop);
-        mImgResume = mViewRoot.findViewById(R.id.imgResume);
+//        mImgResume = mViewRoot.findViewById(R.id.imgResume);
 
         toggleView(mImgResume, View.GONE);
         toggleView(mImgStop, View.GONE);
@@ -379,24 +379,24 @@ public class StreamingControllerService extends Service{
             }
         });
 
-        mImgPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Pause recording!", Toast.LENGTH_SHORT);
-                toggleNavigationButton(View.GONE);
-
-                mRecordingPaused = true;
-            }
-        });
-
-        mImgResume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Resume recording!", Toast.LENGTH_SHORT);
-                toggleNavigationButton(View.GONE);
-                mRecordingPaused = false;
-            }
-        });
+//        mImgPause.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MyUtils.toast(getApplicationContext(), "Pause recording!", Toast.LENGTH_SHORT);
+//                toggleNavigationButton(View.GONE);
+//
+//                mRecordingPaused = true;
+//            }
+//        });
+//
+//        mImgResume.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                MyUtils.toast(getApplicationContext(), "Resume recording!", Toast.LENGTH_SHORT);
+//                toggleNavigationButton(View.GONE);
+//                mRecordingPaused = false;
+//            }
+//        });
 
         mImgSetting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -465,14 +465,14 @@ public class StreamingControllerService extends Service{
             }
         });
 
-        mImgLive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Live clicked", Toast.LENGTH_SHORT).show();
-                toggleNavigationButton(View.GONE);
-
-            }
-        });
+//        mImgLive.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(getApplicationContext(), "Live clicked", Toast.LENGTH_SHORT).show();
+//                toggleNavigationButton(View.GONE);
+//
+//            }
+//        });
 
         mImgClose.setOnClickListener(new View.OnClickListener() {
             @Override

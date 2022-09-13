@@ -20,27 +20,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/imgPause"
-            android:layout_width="@dimen/recording_icon_square"
-            android:layout_height="@dimen/recording_icon_square"
-            android:src="@drawable/ic_pause"
-            app:layout_constraintCircle="@+id/imgRec"
-            app:layout_constraintCircleAngle="30"
-            app:layout_constraintCircleRadius="@dimen/recording_button_distance"
-            tools:ignore="MissingConstraints" />
+<!--        <ImageView-->
+<!--            android:id="@+id/imgPause"-->
+<!--            android:layout_width="@dimen/recording_icon_square"-->
+<!--            android:layout_height="@dimen/recording_icon_square"-->
+<!--            android:src="@drawable/ic_pause"-->
+<!--            app:layout_constraintCircle="@+id/imgRec"-->
+<!--            app:layout_constraintCircleAngle="30"-->
+<!--            app:layout_constraintCircleRadius="@dimen/recording_button_distance"-->
+<!--            tools:ignore="MissingConstraints" />-->
 
-        <ImageView
-            android:id="@+id/imgResume"
-            android:layout_width="@dimen/recording_icon_square"
-            android:layout_height="@dimen/recording_icon_square"
-            android:src="@drawable/ic_resume"
-            app:layout_constraintCircle="@+id/imgRec"
-            app:layout_constraintCircleAngle="30"
-            app:layout_constraintCircleRadius="@dimen/recording_button_distance"
-            tools:ignore="MissingConstraints"
-            android:visibility="gone"
-            />
+<!--        <ImageView-->
+<!--            android:id="@+id/imgResume"-->
+<!--            android:layout_width="@dimen/recording_icon_square"-->
+<!--            android:layout_height="@dimen/recording_icon_square"-->
+<!--            android:src="@drawable/ic_resume"-->
+<!--            app:layout_constraintCircle="@+id/imgRec"-->
+<!--            app:layout_constraintCircleAngle="30"-->
+<!--            app:layout_constraintCircleRadius="@dimen/recording_button_distance"-->
+<!--            tools:ignore="MissingConstraints"-->
+<!--            android:visibility="gone"-->
+<!--            />-->
 
 
         <ImageView
@@ -83,29 +83,30 @@
             android:layout_height="@dimen/recording_icon_square"
             android:src="@drawable/ic_close"
             app:layout_constraintCircle="@+id/imgRec"
-            app:layout_constraintCircleAngle="210"
+            app:layout_constraintCircleAngle="180"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"
             tools:ignore="MissingConstraints" />
 
-        <ImageView
-            android:id="@+id/imgLive"
-            android:layout_width="@dimen/recording_icon_square"
-            android:layout_height="@dimen/recording_icon_square"
-            android:padding="3dp"
-            android:src="@drawable/ic_live"
-            app:layout_constraintCircle="@+id/imgRec"
-            app:layout_constraintCircleAngle="150"
-            app:layout_constraintCircleRadius="@dimen/recording_button_distance"
-            tools:ignore="MissingConstraints" />
+<!--        <ImageView-->
+<!--            android:id="@+id/imgLive"-->
+<!--            android:layout_width="@dimen/recording_icon_square"-->
+<!--            android:layout_height="@dimen/recording_icon_square"-->
+<!--            android:padding="3dp"-->
+<!--            android:src="@drawable/ic_live"-->
+<!--            app:layout_constraintCircle="@+id/imgRec"-->
+<!--            app:layout_constraintCircleAngle="150"-->
+<!--            app:layout_constraintCircleRadius="@dimen/recording_button_distance"-->
+<!--            tools:ignore="MissingConstraints" />-->
 
 
         <ImageView
             android:id="@+id/imgSetting"
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
-            android:src="@drawable/ic_setting"
+            android:src="@drawable/ic_home2"
+            android:padding="2.5dp"
             app:layout_constraintCircle="@+id/imgRec"
-            app:layout_constraintCircleAngle="330"
+            app:layout_constraintCircleAngle="360"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"
             tools:ignore="MissingConstraints" />
 

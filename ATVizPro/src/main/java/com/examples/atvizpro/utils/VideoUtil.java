@@ -59,7 +59,7 @@ public class VideoUtil {
                             int sizeCam, int posX, int posY, boolean isMuteAudioOriginal, boolean isMuteAudioOverlay, ITranscoding callback){
 
 //        outputVideoPath = generateFileOutput();
-        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_flip_" + getTimeStamp() + ".mp4";
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheReactCam_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -i " + overlayPath + " -i " + originalPath + " -filter_complex [0]scale="
                 + sizeCam + ":-1[overlay];[1][overlay]overlay="
                 + "enable='between(t," + parseSecond2Ms(startTime) + "," + parseSecond2Ms(endTime) + ")':x="+posX+":y="+posY+";[0:a][1:a]amix -preset ultrafast "+outputVideoPath;
@@ -70,7 +70,8 @@ public class VideoUtil {
 
 
     public void commentaryAudio(Activity act, String originalVideoPath, String audioPath, ITranscoding callback){
-        outputVideoPath = generateFileOutput();
+//        outputVideoPath = generateFileOutput();
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCommentaryAudio_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -i "+ originalVideoPath +" -i "+ audioPath +" -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a "+outputVideoPath;
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
@@ -80,7 +81,8 @@ public class VideoUtil {
 
 
     public void trimVideo(Activity act, String originalVideoPath, long startTime, long endTime, ITranscoding callback){
-        outputVideoPath = generateFileOutput();
+//        outputVideoPath = generateFileOutput();
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheTrimVideo_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -ss "+ parseSecond2Ms(startTime) + " -i "+ originalVideoPath + " -to " +parseSecond2Ms(endTime) + " -c:v copy -c:a copy " +outputVideoPath;
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();

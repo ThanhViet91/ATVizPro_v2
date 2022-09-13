@@ -30,6 +30,7 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_app"
         android:theme="@style/AppTheme">
@@ -61,7 +62,10 @@
                   android:label="Multiple commands">
         </activity>
 
-        <activity android:name=".ui.activities.ReactCamActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+        <activity
+            android:name=".ui.activities.ReactCamActivity"
+            android:hardwareAccelerated="true"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait"
 

@@ -73,12 +73,12 @@ public class MyUtils {
 
     @NonNull
     public static String createFileName(@NonNull String ext) {
-        return "Record-" +getTimeStamp()+ ext;
+        return "Record_" +getTimeStamp()+ ext;
     }
 
     @SuppressLint("SimpleDateFormat")
     public static String getTimeStamp() {
-        return new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
     public static double getCacheSize() { //MB
@@ -127,6 +127,14 @@ public class MyUtils {
         if (!directory.exists()) directory.mkdirs();
         return directory.getAbsolutePath();
     }
+
+    @NonNull
+    public static String getCacheDirectory() {
+        File directory = new File(StorageUtil.getCacheDir().toString());
+        if (!directory.exists()) directory.mkdirs();
+        return directory.getAbsolutePath();
+    }
+
 
     public static void showSnackBarNotification(View view, String msg, int length) {
         Snackbar.make(view, msg, length).show();

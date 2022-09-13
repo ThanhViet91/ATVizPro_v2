@@ -524,7 +524,7 @@ public class GeneralUtils {
 		return f.mkdirs();
 	}
 	
-	public static void copyDemoVideoFromAssetsToSDIfNeeded(Activity act, String destinationFolderPath) {
+	public static void copyDemoVideoFromAssetsToSDIfNeeded(Context act, String destinationFolderPath) {
 		File destVid = null;
 		try {
 			if (!GeneralUtils.checkIfFolderExists(destinationFolderPath)) {

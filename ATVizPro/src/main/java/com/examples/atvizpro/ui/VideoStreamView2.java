@@ -181,18 +181,15 @@ public class VideoStreamView2 extends FrameLayout implements IVideoTrimmerView {
             }
         });
     }
-    boolean ss = false;
     private void hasChangeVideoView() {
         if (mLinearVideo == null) return;
         int screenWidth = mLinearVideo.getWidth();
         int screenHeight = mLinearVideo.getHeight();
-        ss = false;
         mLinearVideo.post(new Runnable() {
             @Override
             public void run() {
                 if (screenWidth != mLinearVideo.getWidth()
                         || screenHeight != mLinearVideo.getHeight()) {
-                    ss = true;
                     updateVideoView(mediaPlayer);
                 }
             }

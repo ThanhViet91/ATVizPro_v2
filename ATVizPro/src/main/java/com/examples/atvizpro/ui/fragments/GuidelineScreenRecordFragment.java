@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -38,7 +40,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
     TextView imgBack;
     int i = 0;
 
-    private MainActivity mParentActivity = null;
+    private Activity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
     private TextView tvDecs;
@@ -122,7 +124,10 @@ public class GuidelineScreenRecordFragment extends Fragment {
         imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragmentManager.popBackStack();
+//                if (mFragmentManager != null) {
+//                    mFragmentManager.popBackStack();
+//                } else
+                    mParentActivity.onBackPressed();
             }
         });
 

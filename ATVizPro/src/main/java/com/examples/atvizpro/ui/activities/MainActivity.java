@@ -59,10 +59,10 @@ import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
 import com.examples.atvizpro.ui.fragments.DialogVideoResolution;
 import com.examples.atvizpro.ui.fragments.FragmentFAQ;
 import com.examples.atvizpro.ui.fragments.FragmentSettings;
+import com.examples.atvizpro.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.fragments.ProjectsFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
-import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
@@ -74,7 +74,6 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
@@ -83,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
+    private static final String ACTION_SCREEN_RECORD = "action_record";
     public static boolean active = false;
     private static final boolean DEBUG = MyUtils.DEBUG;
     private static final int PERMISSION_REQUEST_CODE = 3004;
@@ -485,8 +485,9 @@ public class MainActivity extends AppCompatActivity {
         mImgRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isFirstTimeReach(ACTION_SCREEN_RECORD)) return;
                 if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                    MyUtils.showSnackBarNotification(mImgRec, "You are in Streaming Mode. Please close stream controller", Snackbar.LENGTH_INDEFINITE);
+                    MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_INDEFINITE);
                     return;
                 }
                 if (isMyServiceRunning(getApplicationContext(), ControllerService.class)) {
@@ -524,6 +525,10 @@ public class MainActivity extends AppCompatActivity {
         btn_live.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+//                if (isFirstTimeReach(ACTION_SCREEN_LIVESTREAM)) {
+//                    return;
+//                }
                 getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.frame_layout_fragment, new LiveStreamingFragment(), "")
@@ -560,6 +565,25 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private boolean isFirstTimeReach(String type) {
+        if (type.equals(ACTION_SCREEN_RECORD))
+        if (SettingManager2.getFirstTimeRecord(this)) {
+            showTutorialScreenRecord();
+            SettingManager2.setFirstTimeRecord(this, false);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void showTutorialScreenRecord() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment())
+                .addToBackStack("")
+                .commit();
     }
 
     private void updateUI() {

@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.fragments;
 
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.activities.MainActivity;
 import com.examples.atvizpro.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
@@ -24,6 +26,7 @@ public class LiveStreamingFragment extends Fragment {
 
     ImageView imgBack, imgFacebook, imgYoutube, imgTwitch;
 
+    private static final String ACTION_SCREEN_LIVESTREAM = "action_livestream";
     private MainActivity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
@@ -60,8 +63,15 @@ public class LiveStreamingFragment extends Fragment {
         imgYoutube.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (isFirstTimeReach(ACTION_SCREEN_LIVESTREAM)) {
+                    mFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
+                            .addToBackStack("")
+                            .commit();
+                    return;
+                }
                 mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
+                        .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
                         .addToBackStack("")
                         .commit();
             }
@@ -88,6 +98,21 @@ public class LiveStreamingFragment extends Fragment {
         AdView mAdView = view.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);
     }
+
+
+    private boolean isFirstTimeReach(String type) {
+
+        if (type.equals(ACTION_SCREEN_LIVESTREAM))
+            if (SettingManager2.getFirstTimeLiveStream(getContext())) {
+                showTutorialScreenLiveStream();
+                return true;
+            }
+        return false;
+    }
+
+    private void showTutorialScreenLiveStream() {
+    }
+
 
     @Override
     public void onStart() {

@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.PhotoAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.PhotoModel;
 import com.examples.atvizpro.ui.activities.MainActivity;
 
@@ -27,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -39,7 +43,7 @@ public class YoutubeLiveStreamingFragment extends Fragment {
     ImageView imgBack;
     int i = 0;
 
-    private MainActivity mParentActivity = null;
+    private Activity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
 
@@ -91,18 +95,32 @@ public class YoutubeLiveStreamingFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 i = position;
+                if (i == getListPhoto().size() - 1) {
+                    if (!SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    }
+                }
             }
         });
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 i = i+1;
-                if (i>=getListPhoto().size()){
-                    mFragmentManager.beginTransaction()
-                            .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
-                            .addToBackStack("")
-                            .commit();
-                    return;
+                if (i == getListPhoto().size() - 1) {
+                    if (!SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    }
+                }
+                if (i==getListPhoto().size()){
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        mFragmentManager.beginTransaction()
+                                .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
+                                .addToBackStack("")
+                                .commit();
+                    } else {
+                        mFragmentManager.popBackStack();
+                    }
+                    SettingManager2.setFirstTimeLiveStream(requireContext(), false);
                 }
                 viewPager2.setCurrentItem(i);
             }

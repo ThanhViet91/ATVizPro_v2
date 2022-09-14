@@ -39,41 +39,64 @@
         android:layout_below="@id/header"
         android:gravity="center"
         android:layout_marginTop="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/img_facebook_livestreaming"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_gravity="center"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/bg_facebook" />
+        <LinearLayout
+            android:weightSum="2"
+            android:id="@+id/line1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/img_facebook_livestreaming"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/bg_facebook" />
 
-        <ImageView
-            android:id="@+id/img_twitch_livestreaming"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_toEndOf="@+id/img_facebook_livestreaming"
-            android:src="@drawable/bg_twitch" />
+            <ImageView
+                android:id="@+id/img_twitch_livestreaming"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/bg_twitch" />
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/img_youtube_livestreaming"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_below="@id/img_facebook_livestreaming"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/bg_youtube" />
+
+        <LinearLayout
+            android:layout_below="@id/line1"
+            android:weightSum="2"
+            android:id="@+id/line2"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/img_youtube_livestreaming"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="160dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/bg_youtube" />
+
+            <View
+                android:id="@+id/invisible"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="160dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/bg_youtube" />
+        </LinearLayout>
+
     </RelativeLayout>
 
     <com.google.android.gms.ads.AdView

@@ -45,7 +45,7 @@ public class RTMPLiveAddressFragment extends Fragment {
     ImageView imgBack;
     TextView tvStartLiveStream;
     EditText edtRTMPAddress, edtStreamKey;
-    TextView tvPasteRTMPAddress, tvPasteStreamKey;
+    TextView tvPasteRTMPAddress, tvPasteStreamKey, tvTutorial;
 
 
     String mUrl;
@@ -86,6 +86,7 @@ public class RTMPLiveAddressFragment extends Fragment {
         edtStreamKey = view.findViewById(R.id.edt_stream_key);
         tvPasteRTMPAddress = view.findViewById(R.id.tv_paste_rtmp_address);
         tvPasteStreamKey = view.findViewById(R.id.tv_paste_stream_key);
+        tvTutorial = view.findViewById(R.id.tv_tutorial);
 
         edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
         edtStreamKey.setText("test");
@@ -156,6 +157,15 @@ public class RTMPLiveAddressFragment extends Fragment {
             }
         });
 
+        tvTutorial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
+                        .addToBackStack("")
+                        .commit();
+            }
+        });
     }
 
     private void registerSyncServiceReceiver() {

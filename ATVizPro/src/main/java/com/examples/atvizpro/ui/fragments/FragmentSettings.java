@@ -8,11 +8,13 @@ import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,7 +56,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
-        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
+//        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
@@ -108,8 +110,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onClickItem(String code) {
 
+
         if (code.equals(getString(R.string.upgrade_to_pro))) {
-            System.out.println("thanhlv ddddddddddddddd");
+            System.out.println("thanhlv upgrade_to_pro");
             ((MainActivity) requireActivity()).showProductRemoveAds();
             SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
         }
@@ -123,9 +126,25 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
 
         if (code.equals(getString(R.string.contact_us))) {
-            System.out.println("thanhlv kkkfsdfghsodfisdf");
-            Intent intent = new Intent(getActivity(), ExecuteService.class);
-            requireActivity().startService(intent);
+            System.out.println("thanhlv contact_us");
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"infoboy.ftu.edu@gmail.com"});
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Hi ATSoft");
+            intent.putExtra(Intent.EXTRA_TEXT   , "Hi ATSoft,\n");
+            try {
+                startActivity(Intent.createChooser(intent, "Send mail"));
+            } catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(getContext(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (code.equals(getString(R.string.support_us_by_rating_our_app))) {
+            System.out.println("thanhlv support_us_by_rating_our_app");
+            String url = "https://play.google.com/store/apps/developer?id=Zzic&hl=vi&gl=US";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         }
 
 

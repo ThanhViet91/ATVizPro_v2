@@ -18,7 +18,36 @@ import com.examples.atvizpro.ui.utils.MyUtils;
 public class SettingManager2 {
 
 
-    public static void setRemoveAds(Context context, boolean value){
+    public static void setFirstTimeRecord(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_record);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getFirstTimeRecord(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_record);
+        return preferences.getBoolean(key, true);
+    }
+
+    public static void setFirstTimeLiveStream(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getFirstTimeLiveStream(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        return preferences.getBoolean(key, true);
+    }
+
+
+    public static void setRemoveAds(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_remove_ads);
         SharedPreferences.Editor editor = preferences.edit();
@@ -26,13 +55,13 @@ public class SettingManager2 {
         editor.apply();
     }
 
-    public static boolean getRemoveAds(Context context){
+    public static boolean getRemoveAds(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_remove_ads);
         return preferences.getBoolean(key, false);
     }
 
-    public static void setVideoBitrate(Context context, String value){
+    public static void setVideoBitrate(Context context, String value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_bitrate);
         SharedPreferences.Editor editor = preferences.edit();
@@ -40,14 +69,14 @@ public class SettingManager2 {
         editor.apply();
     }
 
-    public static String getVideoBitrate(Context context){
+    public static String getVideoBitrate(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_bitrate);
         String defValue = getStringRes(context, R.string.default_setting_bitrate);
         return preferences.getString(key, defValue);
     }
 
-    public static void setVideoResolution(Context context, String value){
+    public static void setVideoResolution(Context context, String value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_resolution);
         SharedPreferences.Editor editor = preferences.edit();
@@ -55,7 +84,7 @@ public class SettingManager2 {
         editor.apply();
     }
 
-    public static String getVideoResolution(Context context){
+    public static String getVideoResolution(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_resolution);
         String defValue = getStringRes(context, R.string.default_setting_resolution);
@@ -63,7 +92,7 @@ public class SettingManager2 {
         return preferences.getString(key, defValue);
     }
 
-    public static void setVideoFPS(Context context, String value){
+    public static void setVideoFPS(Context context, String value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_fps);
         SharedPreferences.Editor editor = preferences.edit();
@@ -71,7 +100,7 @@ public class SettingManager2 {
         editor.apply();
     }
 
-    public static String getVideoFPS(Context context){
+    public static String getVideoFPS(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_video_fps);
         String defValue = getStringRes(context, R.string.default_setting_fps);
@@ -91,11 +120,19 @@ public class SettingManager2 {
         String resolution = getVideoResolution(context);
 
 
-        switch (resolution){
-            case "360p (SD)": videoSetting = VideoSetting2.VIDEO_PROFILE_SSD; break;
-            case "480p (SD)": videoSetting = VideoSetting2.VIDEO_PROFILE_SD; break;
-            case "1080p (FHD)": videoSetting =  VideoSetting2.VIDEO_PROFILE_FHD; break;
-            default: videoSetting = VideoSetting2.VIDEO_PROFILE_HD; break;
+        switch (resolution) {
+            case "360p (SD)":
+                videoSetting = VideoSetting2.VIDEO_PROFILE_SSD;
+                break;
+            case "480p (SD)":
+                videoSetting = VideoSetting2.VIDEO_PROFILE_SD;
+                break;
+            case "1080p (FHD)":
+                videoSetting = VideoSetting2.VIDEO_PROFILE_FHD;
+                break;
+            default:
+                videoSetting = VideoSetting2.VIDEO_PROFILE_HD;
+                break;
         }
 
         String fps = getVideoFPS(context);
@@ -147,8 +184,6 @@ public class SettingManager2 {
                 videoSetting.setBitrate(1000);
                 break;
         }
-
-
 
 
         return videoSetting;

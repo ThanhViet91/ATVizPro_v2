@@ -540,11 +540,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showInterstitialAd(0);
-//                getSupportFragmentManager()
-//                        .beginTransaction()
-//                        .add(R.id.frame_layout_fragment, new ProjectsFragment(), "")
-//                        .addToBackStack("")
-//                        .commit();
             }
         });
 

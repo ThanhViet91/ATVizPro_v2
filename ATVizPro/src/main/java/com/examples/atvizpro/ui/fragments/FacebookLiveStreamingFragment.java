@@ -1,5 +1,8 @@
 package com.examples.atvizpro.ui.fragments;
 
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.PhotoAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.PhotoModel;
 import com.examples.atvizpro.ui.activities.MainActivity;
 
@@ -64,9 +68,9 @@ public class FacebookLiveStreamingFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewPager2 = view.findViewById(R.id.view_pager_img_facebook);
-        circleIndicator3 = view. findViewById(R.id.circle_indicator_facebook);
-        btnContinue =  view.findViewById(R.id.btn_continue_facebook_livestreaming);
-        imgBack =  view.findViewById(R.id.img_back_fb_slider);
+        circleIndicator3 = view.findViewById(R.id.circle_indicator_facebook);
+        btnContinue = view.findViewById(R.id.btn_continue_facebook_livestreaming);
+        imgBack = view.findViewById(R.id.img_back_fb_slider);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
         viewPager2.setAdapter(photoAdapter);
@@ -83,7 +87,7 @@ public class FacebookLiveStreamingFragment extends Fragment {
             @Override
             public void transformPage(@NonNull View page, float position) {
                 float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r*0.15f);
+                page.setScaleY(0.85f + r * 0.15f);
             }
         });
 
@@ -93,18 +97,36 @@ public class FacebookLiveStreamingFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 i = position;
+                if (i == getListPhoto().size() - 1)
+                    if (!SettingManager2.getFirstTimeLiveStreamFacebook(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    } else {
+                        btnContinue.setText(getString(R.string.continue_));
+                    }
+
             }
         });
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                i = i +1;
-                if (i>=getListPhoto().size()){
-                    mFragmentManager.beginTransaction()
-                            .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
-                            .addToBackStack("")
-                            .commit();
-                    return;
+                i = i + 1;
+                if (i == getListPhoto().size() - 1)
+                    if (!SettingManager2.getFirstTimeLiveStreamFacebook(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    }
+
+                if (i == getListPhoto().size()) {
+                    if (SettingManager2.getFirstTimeLiveStreamFacebook(requireContext())) {
+                        RTMPLiveAddressFragment fragment = new RTMPLiveAddressFragment();
+                        fragment.setSocialType(SOCIAL_TYPE_FACEBOOK);
+                        mFragmentManager.beginTransaction()
+                                .replace(R.id.frame_layout_fragment, fragment)
+                                .addToBackStack("")
+                                .commit();
+                    } else {
+                        mFragmentManager.popBackStack();
+                    }
+                    SettingManager2.setFirstTimeLiveStreamFacebook(requireContext(), false);
                 }
                 viewPager2.setCurrentItem(i);
             }
@@ -118,7 +140,7 @@ public class FacebookLiveStreamingFragment extends Fragment {
 
     }
 
-    public List<PhotoModel> getListPhoto(){
+    public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
         mListPhoto.add(new PhotoModel(R.drawable.facebook_slider1));

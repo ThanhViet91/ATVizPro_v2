@@ -1,5 +1,8 @@
 package com.examples.atvizpro.ui.fragments;
 
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +23,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.PhotoAdapter;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.PhotoModel;
 import com.examples.atvizpro.ui.activities.MainActivity;
 
@@ -84,7 +88,7 @@ public class TwitchLiveStreamingFragment extends Fragment {
             @Override
             public void transformPage(@NonNull View page, float position) {
                 float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r*0.15f);
+                page.setScaleY(0.85f + r * 0.15f);
             }
         });
 
@@ -94,18 +98,36 @@ public class TwitchLiveStreamingFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 i = position;
+                if (i == getListPhoto().size() - 1)
+                    if (!SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    } else {
+                        btnContinue.setText(getString(R.string.continue_));
+                    }
+
             }
         });
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                i = i+1;
-                if (i>=getListPhoto().size()){
-                    mFragmentManager.beginTransaction()
-                            .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
-                            .addToBackStack("")
-                            .commit();
-                    return;
+                i = i + 1;
+                if (i == getListPhoto().size() - 1)
+                    if (!SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
+                        btnContinue.setText(getString(R.string.done_));
+                    }
+
+                if (i == getListPhoto().size()) {
+                    if (SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
+                        RTMPLiveAddressFragment fragment = new RTMPLiveAddressFragment();
+                        fragment.setSocialType(SOCIAL_TYPE_TWITCH);
+                        mFragmentManager.beginTransaction()
+                                .replace(R.id.frame_layout_fragment, fragment)
+                                .addToBackStack("")
+                                .commit();
+                    } else {
+                        mFragmentManager.popBackStack();
+                    }
+                    SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
                 }
                 viewPager2.setCurrentItem(i);
             }
@@ -120,7 +142,7 @@ public class TwitchLiveStreamingFragment extends Fragment {
     }
 
 
-    public List<PhotoModel> getListPhoto(){
+    public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
         mListPhoto.add(new PhotoModel(R.drawable.twitch_slider1));

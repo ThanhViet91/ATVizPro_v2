@@ -94,7 +94,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
-        if (!SettingManager2.getRemoveAds(getApplicationContext())) createInterstitialAdmob();
+        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+            createInterstitialAdmob();
+        } else mInterstitialAdAdmob = null;
 
         addVideoView();
         AdView mAdview = findViewById(R.id.adView);
@@ -455,6 +457,16 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
+    private void startExecuteService() {
+        VideoReactCamExecute videoProfile = new VideoReactCamExecute(videoFile, cameraCahePath,
+                startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("package_video_react",videoProfile);
+        Intent intent = new Intent(this, ExecuteService.class);
+        intent.putExtras(bundle);
+        intent.putExtra("bundle_video_react_time", (long)((endTime - startTime + videoDuration)/2.5));
+        startService(intent);
+    }
     public void showInterstitialAd(){
         if (mInterstitialAdAdmob != null) {
             mInterstitialAdAdmob.show(this);
@@ -465,11 +477,13 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
                 @Override
                 public void onAdDismissedFullScreenContent() {
+                    startExecuteService();
                     createInterstitialAdmob();
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    startExecuteService();
                 }
 
                 @Override
@@ -480,6 +494,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 public void onAdShowedFullScreenContent() {
                 }
             });
+        } else {
+            startExecuteService();
         }
     }
 
@@ -488,7 +504,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         @Override
         public void run() {
             seekbar.setProgress(mediaPlayer.getCurrentPosition());
-            mSeekbarUpdateHandler.postDelayed(this, 50);
+            mSeekbarUpdateHandler.postDelayed(this, 100);
         }
     };
 
@@ -498,14 +514,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         builder.setCancelable(true);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                VideoReactCamExecute videoProfile = new VideoReactCamExecute(videoFile, cameraCahePath,
-                        startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("package_video_react",videoProfile);
-                Intent intent = new Intent(ReactCamActivity.this, ExecuteService.class);
-                intent.putExtras(bundle);
-                intent.putExtra("bundle_video_react_time", (long)((endTime - startTime + videoDuration)/2.5));
-                startService(intent);
                 showInterstitialAd();
                 finish();
             }

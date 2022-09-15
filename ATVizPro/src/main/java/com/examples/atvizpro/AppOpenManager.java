@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.examples.atvizpro.ui.VideoEditorView;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -35,6 +36,11 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
     private boolean isFirstTime = true;
     public static boolean isPickFromGallery = false;
 
+    private IAppOpenAdListener mCallBack;
+    public void setCallBack(IAppOpenAdListener callBack) {
+        mCallBack = callBack;
+    }
+
     /** Constructor */
     public AppOpenManager(App myApplication) {
         this.myApplication = myApplication;
@@ -42,10 +48,6 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
         this.myApplication.registerActivityLifecycleCallbacks(this);
 
         ProcessLifecycleOwner.get().getLifecycle().addObserver((this));
-    }
-
-    public static Activity getCurrentActivity() {
-        return currentActivity;
     }
 
     /** LifecycleObserver methods */
@@ -75,11 +77,15 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
                             // Set the reference to null so isAdAvailable() returns false.
                             AppOpenManager.this.appOpenAd = null;
                             isShowingAd = false;
+                            if (mCallBack != null) mCallBack.onDismiss();
                             fetchAd();
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(AdError adError) {}
+                        public void onAdFailedToShowFullScreenContent(AdError adError) {
+                            System.out.println("thanhlv onAdFailedToShowFullScreenContent ");
+                            if (mCallBack != null) mCallBack.onLoadFail();
+                        }
 
                         @Override
                         public void onAdShowedFullScreenContent() {
@@ -126,11 +132,15 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
                                             // Set the reference to null so isAdAvailable() returns false.
                                             AppOpenManager.this.appOpenAd = null;
                                             isShowingAd = false;
+
+                                            if (mCallBack != null) mCallBack.onDismiss();
                                             fetchAd();
                                         }
 
                                         @Override
-                                        public void onAdFailedToShowFullScreenContent(AdError adError) {}
+                                        public void onAdFailedToShowFullScreenContent(AdError adError) {
+                                            if (mCallBack != null) mCallBack.onLoadFail();
+                                        }
 
                                         @Override
                                         public void onAdShowedFullScreenContent() {
@@ -154,6 +164,7 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
                     @Override
                     public void onAdFailedToLoad(LoadAdError loadAdError) {
                         // Handle the error.
+                        if (mCallBack != null) mCallBack.onLoadFail();
                     }
 
                 };

@@ -25,15 +25,15 @@
     <string name="prepare_video">Prepare video...</string>
     <string name="trimmed_done">video trim completed！</string>
 
-    <string name="facebook_app_id">636414803521202</string>
-    <string name="fb_login_protocol_scheme">fb636414803521202</string>
 
     <!--RemoveAds settings-->
     <string name="setting_remove_ads">setting_remove_ads</string>
 
     <!--Video settings-->
     <string name="setting_first_time_record">setting_first_time_record</string>
-    <string name="setting_first_time_livestream">setting_first_time_livestream</string>
+    <string name="setting_first_time_livestream_youtube">setting_first_time_livestream</string>
+    <string name="setting_first_time_livestream_facebook">setting_first_time_livestream</string>
+    <string name="setting_first_time_livestream_twitch">setting_first_time_livestream</string>
     <string name="setting_video_bitrate">setting_video_bitrate</string>
     <string name="setting_video_resolution">setting_video_resolution</string>
     <string name="setting_video_fps">setting_video_fps</string>
@@ -150,6 +150,9 @@
     <string name="faq">FAQ</string>
     <string name="before_starting_your_screen_recording_make_sure_your_phone_is_not_in_slient_mode_and_the_volume_is_on_some_apps_do_not_allow_the_sound_to_be_recorded_and_it_is_a_limitation_we_cannot_bypass">Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.</string>
     <string name="sound_is_not_working">Sound is not working</string>
-    <string name="get_rtmp_address_and_streamkey"><u>Get RTMP Address and StreamKey?</u></string>
+    <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/StreamKey?</u></string>
+    <string name="edit">Edit</string>
+    <string name="livestreaming">Livestreaming...</string>
+    <string name="projects">Projects</string>
 
 </resources>

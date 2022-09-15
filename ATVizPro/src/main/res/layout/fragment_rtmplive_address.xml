@@ -118,10 +118,10 @@
     <TextView
         android:id="@+id/tv_tutorial"
         style="@style/Title_Box_White"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textFontWeight="400"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:text="@string/get_rtmp_address_and_streamkey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

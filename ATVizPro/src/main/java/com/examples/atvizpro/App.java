@@ -36,7 +36,11 @@ public class App extends Application {
     }
 
 
-    public AppOpenManager appOpenManager;
+    public static AppOpenManager appOpenManager;
+
+//    public static AppOpenManager getAppOpen() {
+//        return appOpenManager;
+//    }
 
     @Override
     public void onCreate() {

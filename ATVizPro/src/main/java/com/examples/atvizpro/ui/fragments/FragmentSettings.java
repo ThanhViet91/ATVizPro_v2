@@ -56,7 +56,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
-//        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
@@ -121,6 +121,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             System.out.println("thanhlv how_to_record_your_screen");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment())
+                    .addToBackStack("")
+                    .commit();
+        }
+
+        if (code.equals(getString(R.string.how_to_livestream))) {
+            System.out.println("thanhlv how_to_livestream");
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment())
                     .addToBackStack("")
                     .commit();
         }

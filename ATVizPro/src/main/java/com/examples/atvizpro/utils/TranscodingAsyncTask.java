@@ -68,14 +68,13 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         try {
             System.out.println("thanhlv commandStr ====== " + commandStr);
             vk.run(GeneralUtils.utilConvertToComplex(commandStr), workFolder, App.getAppContext());
-
-
         } catch (CommandValidationException e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);
             commandValidationFailedFlag = true;
-
+            return 0;
         } catch (Throwable e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);
+            return 0;
         }
         finally {
             if (wakeLock.isHeld())
@@ -85,7 +84,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
             }
         }
         Log.i(Prefs.TAG, "doInBackground finished");
-        return Integer.valueOf(0);
+        return 0;
     }
 
     protected void onProgressUpdate(Integer... progress) {

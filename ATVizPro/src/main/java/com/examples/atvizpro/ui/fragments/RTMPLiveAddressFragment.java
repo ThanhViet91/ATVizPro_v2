@@ -1,5 +1,8 @@
 package com.examples.atvizpro.ui.fragments;
 
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
+import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_DISCONNECTED;
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
@@ -68,6 +71,11 @@ public class RTMPLiveAddressFragment extends Fragment {
         }
     }
 
+    private int type;
+    public void setSocialType(int type) {
+        this.type = type;
+    }
+
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -88,8 +96,8 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvPasteStreamKey = view.findViewById(R.id.tv_paste_stream_key);
         tvTutorial = view.findViewById(R.id.tv_tutorial);
 
-        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
-        edtStreamKey.setText("test");
+//        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
+//        edtStreamKey.setText("test");
 
 
         imgBack.setOnClickListener(new View.OnClickListener() {
@@ -160,10 +168,16 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
-                        .addToBackStack("")
-                        .commit();
+                Fragment fragment = null;
+                if (type == SOCIAL_TYPE_YOUTUBE) fragment = new YoutubeLiveStreamingFragment();
+                if (type == SOCIAL_TYPE_FACEBOOK) fragment = new FacebookLiveStreamingFragment();
+                if (type == SOCIAL_TYPE_TWITCH) fragment = new TwitchLiveStreamingFragment();
+                if (fragment != null) {
+                    mFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout_fragment, fragment)
+                            .addToBackStack("")
+                            .commit();
+                }
             }
         });
     }

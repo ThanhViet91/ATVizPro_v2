@@ -2,18 +2,12 @@ package com.examples.atvizpro.controllers.settings;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 
-import com.examples.atvizpro.Constants;
-import com.examples.atvizpro.Core;
 import com.examples.atvizpro.R;
-import com.examples.atvizpro.ui.utils.MyUtils;
 
 public class SettingManager2 {
 
@@ -32,17 +26,45 @@ public class SettingManager2 {
         return preferences.getBoolean(key, true);
     }
 
-    public static void setFirstTimeLiveStream(Context context, boolean value) {
+    public static void setFirstTimeLiveStreamYoutube(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_youtube);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(key, value);
         editor.apply();
     }
 
-    public static boolean getFirstTimeLiveStream(Context context) {
+    public static boolean getFirstTimeLiveStreamYoutube(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_youtube);
+        return preferences.getBoolean(key, true);
+    }
+
+    public static void setFirstTimeLiveStreamTwitch(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_twitch);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getFirstTimeLiveStreamTwitch(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_twitch);
+        return preferences.getBoolean(key, true);
+    }
+
+    public static void setFirstTimeLiveStreamFacebook(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_facebook);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getFirstTimeLiveStreamFacebook(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream_facebook);
         return preferences.getBoolean(key, true);
     }
 

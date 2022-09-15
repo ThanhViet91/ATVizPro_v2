@@ -22,11 +22,15 @@ import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class LiveStreamingFragment extends Fragment {
 
     ImageView imgBack, imgFacebook, imgYoutube, imgTwitch;
 
-    private static final String ACTION_SCREEN_LIVESTREAM = "action_livestream";
+    public static final int SOCIAL_TYPE_YOUTUBE = 1;
+    public static final int SOCIAL_TYPE_FACEBOOK = 2;
+    public static final int SOCIAL_TYPE_TWITCH = 3;
     private MainActivity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
@@ -63,35 +67,19 @@ public class LiveStreamingFragment extends Fragment {
         imgYoutube.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isFirstTimeReach(ACTION_SCREEN_LIVESTREAM)) {
-                    mFragmentManager.beginTransaction()
-                            .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
-                            .addToBackStack("")
-                            .commit();
-                    return;
-                }
-                mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new RTMPLiveAddressFragment())
-                        .addToBackStack("")
-                        .commit();
+                handleSocialLive(SOCIAL_TYPE_YOUTUBE);
             }
         });
         imgFacebook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new FacebookLiveStreamingFragment())
-                        .addToBackStack("")
-                        .commit();
+                handleSocialLive(SOCIAL_TYPE_FACEBOOK);
             }
         });
         imgTwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new TwitchLiveStreamingFragment())
-                        .addToBackStack("")
-                        .commit();
+                handleSocialLive(SOCIAL_TYPE_TWITCH);
             }
         });
 
@@ -100,17 +88,38 @@ public class LiveStreamingFragment extends Fragment {
     }
 
 
-    private boolean isFirstTimeReach(String type) {
-
-        if (type.equals(ACTION_SCREEN_LIVESTREAM))
-            if (SettingManager2.getFirstTimeLiveStream(getContext())) {
-                showTutorialScreenLiveStream();
-                return true;
-            }
+    private void handleSocialLive(int type) {
+        if (isFirstTimeReach(type)) {
+            showTutorialScreenLiveStream(type);
+            return;
+        }
+        RTMPLiveAddressFragment fragment = new RTMPLiveAddressFragment();
+        fragment.setSocialType(type);
+        mFragmentManager.beginTransaction()
+                .replace(R.id.frame_layout_fragment, fragment)
+                .addToBackStack("")
+                .commit();
+    }
+    private boolean isFirstTimeReach(int type) {
+        if (type == SOCIAL_TYPE_YOUTUBE)
+            return SettingManager2.getFirstTimeLiveStreamYoutube(requireContext());
+        if (type == SOCIAL_TYPE_FACEBOOK)
+            return SettingManager2.getFirstTimeLiveStreamFacebook(requireContext());
+        if (type == SOCIAL_TYPE_TWITCH)
+            return SettingManager2.getFirstTimeLiveStreamTwitch(requireContext());
         return false;
     }
 
-    private void showTutorialScreenLiveStream() {
+    private void showTutorialScreenLiveStream(int type) {
+        Fragment fragment = null;
+        if (type == SOCIAL_TYPE_YOUTUBE) fragment = new YoutubeLiveStreamingFragment();
+        if (type == SOCIAL_TYPE_FACEBOOK) fragment = new FacebookLiveStreamingFragment();
+        if (type == SOCIAL_TYPE_TWITCH) fragment = new TwitchLiveStreamingFragment();
+        if (fragment != null)
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
+                    .addToBackStack("")
+                    .commit();
     }
 
 

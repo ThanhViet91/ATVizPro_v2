@@ -67,7 +67,13 @@ import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -103,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
     public int mMode = MyUtils.MODE_RECORDING;
 
     private Intent mScreenCaptureIntent = null;
-
 
     private int mScreenCaptureResultCode = MyUtils.RESULT_CODE_FAILED;
 
@@ -185,25 +190,10 @@ public class MainActivity extends AppCompatActivity {
 
     private AdView mAdView;
 
-    @SuppressLint("WrongConstant")
-    public void setFullscreen(Activity activity) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            activity.getWindow().getAttributes().layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            activity.getWindow().setDecorFitsSystemWindows(false);
-            activity.getWindow().getInsetsController().hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-//                hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-            activity.getWindow().getInsetsController().setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pulsator.stop();
     }
 
     @Override
@@ -221,6 +211,8 @@ public class MainActivity extends AppCompatActivity {
 
         SettingManager2.setRemoveAds(getApplicationContext(), false);
         connectGooglePlayBilling();
+
+        if (!hasPermission()) requestPermissions();
 
         Intent intent = getIntent();
         if (intent != null)
@@ -363,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean initialAds = false;
     protected void onResume() {
         super.onResume();
+        pulsator.start();
         billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
                 (billingResult, list) -> {
@@ -380,8 +373,10 @@ public class MainActivity extends AppCompatActivity {
             if (!SettingManager2.getRemoveAds(getApplicationContext())) {
                 System.out.println("thanhlv createBannerAdmob onresum");
                 AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                createInterstitialAdmob();
             } else {
                 mAdView.setVisibility(View.GONE);
+                mInterstitialAdAdmob = null;
             }
         }
 
@@ -412,13 +407,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ImageView mImgRec;
-
+    PulsatorLayout pulsator;
     private void initViews() {
 
         mAdView = findViewById(R.id.adView);
 
         // initialise pulsator layout
-        PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
+        pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
         //initData()
@@ -431,7 +426,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout btn_set_resolution = findViewById(R.id.set_video_resolution);
         LinearLayout bnt_set_bitrate = findViewById(R.id.set_bitrate);
         LinearLayout btn_set_fps = findViewById(R.id.set_frame_rate);
-
 
         btn_setting.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -525,10 +519,6 @@ public class MainActivity extends AppCompatActivity {
         btn_live.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-//                if (isFirstTimeReach(ACTION_SCREEN_LIVESTREAM)) {
-//                    return;
-//                }
                 getSupportFragmentManager()
                         .beginTransaction()
                         .add(R.id.frame_layout_fragment, new LiveStreamingFragment(), "")
@@ -549,11 +539,12 @@ public class MainActivity extends AppCompatActivity {
         btn_projects.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new ProjectsFragment(), "")
-                        .addToBackStack("")
-                        .commit();
+                showInterstitialAd(0);
+//                getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .add(R.id.frame_layout_fragment, new ProjectsFragment(), "")
+//                        .addToBackStack("")
+//                        .commit();
             }
         });
 
@@ -618,13 +609,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClickMyRecordings() {
-                showMyRecordings(requestVideoFor);
+                showInterstitialAd(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
     }
 
     private void showMyRecordings(int from_code) {
-
         Bundle bundle = new Bundle();
         bundle.putInt("key_from_code", from_code);
         getSupportFragmentManager()
@@ -640,6 +630,64 @@ public class MainActivity extends AppCompatActivity {
 //            intent.setAction(Intent.ACTION_GET_CONTENT);
 //            intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
+    }
+
+
+
+    InterstitialAd mInterstitialAdAdmob = null;
+
+    public void createInterstitialAdmob() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAdAdmob = interstitialAd;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        mInterstitialAdAdmob = null;
+                        createInterstitialAdmob();
+                    }
+                });
+    }
+
+    public void showInterstitialAd(int from_code){
+        if (mInterstitialAdAdmob != null) {
+            mInterstitialAdAdmob.show(this);
+            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdClicked() {
+                }
+
+                @Override
+                public void onAdDismissedFullScreenContent() {
+
+                    showMyRecordings(from_code);
+                    createInterstitialAdmob();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    showMyRecordings(from_code);
+
+                }
+
+                @Override
+                public void onAdImpression() {
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                }
+            });
+        } else {
+            showMyRecordings(from_code);
+        }
     }
 
     private void requestPermissions() {
@@ -804,8 +852,10 @@ public class MainActivity extends AppCompatActivity {
             startService(controller);
         }
 
+
         if (mMode == MyUtils.MODE_RECORDING)
-            finish();
+//            finish();
+        onPause();
     }
 
     /**

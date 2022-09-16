@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.examples.atvizpro.OptiUtils;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.BasicAdapter;
 import com.examples.atvizpro.adapter.StickerAdapter;
@@ -93,7 +94,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         listPos.add("CenterBottom");
         listPos.add("CenterRight");
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_position);
         BasicAdapter basicAdapter = new BasicAdapter(getContext(), listPos, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recyclerView.setAdapter(basicAdapter);
@@ -135,14 +136,14 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
         for (int i = 1; i < 20; i ++){
             listSticker.add(new PhotoModel(resourceID[i-1]));
-            copyResourceToFile("sticker_"+i+".png", resourceID[i-1]);
+//            copyResourceToFile("sticker_"+i+".png", resourceID[i-1]);
+            new OptiUtils().copyFileToInternalStorage(resourceID[i-1], "sticker_"+i, requireContext());
         }
         return listSticker;
     }
 
     public void copyResourceToFile(String resourceName, int id) {
 
-        Bitmap bm = BitmapFactory.decodeResource( getResources(), R.drawable.sticker_19);
 
         String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
 
@@ -153,7 +154,10 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        Bitmap bm = BitmapFactory.decodeResource( getResources(), R.drawable.sticker_1);
         bm.compress(Bitmap.CompressFormat.PNG, 100, outStream);
+        bm.recycle();
         try {
             if (outStream != null) {
                 outStream.flush();

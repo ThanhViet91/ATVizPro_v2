@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.BasicAdapter;
-import com.examples.atvizpro.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -83,7 +82,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         listPos.add("1.75x");
         listPos.add("2.0x");
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_position);
         BasicAdapter basicAdapter = new BasicAdapter(getContext(), listPos, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recyclerView.setAdapter(basicAdapter);
@@ -93,22 +92,22 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
 
     private void processingAddText() {
 
-        new VideoUtil().addText(getActivity(), video_path, "startTime", "endTime", "", "", new VideoUtil.ITranscoding() {
-            @Override
-            public void onStartTranscoding(String outPath) {
-                buildDialog("compression...");
-            }
-
-            @Override
-            public void onFinishTranscoding(String code) {
-                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
-            }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-
-            }
-        });
+//        new VideoUtil().addText(getActivity(), video_path, "startTime", "endTime", "", "", new VideoUtil.ITranscoding() {
+//            @Override
+//            public void onStartTranscoding(String outPath) {
+//                buildDialog("compression...");
+//            }
+//
+//            @Override
+//            public void onFinishTranscoding(String code) {
+//                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+//            }
+//
+//            @Override
+//            public void onUpdateProgressTranscoding(int progress) {
+//
+//            }
+//        });
 
     }
 

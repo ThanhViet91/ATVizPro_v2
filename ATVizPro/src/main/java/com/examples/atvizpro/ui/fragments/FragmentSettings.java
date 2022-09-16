@@ -3,7 +3,6 @@ package com.examples.atvizpro.ui.fragments;
 import static com.examples.atvizpro.ui.utils.MyUtils.dirSize;
 import static com.examples.atvizpro.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.examples.atvizpro.ui.utils.MyUtils.getBaseStorageDirectory;
-import static com.examples.atvizpro.ui.utils.MyUtils.getCacheSize;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -23,15 +22,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
-import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.adapter.SettingsAdapter;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
-import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
 import com.examples.atvizpro.ui.activities.MainActivity;
-import com.examples.atvizpro.ui.services.ExecuteService;
 import com.examples.atvizpro.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
 
@@ -39,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
@@ -55,7 +49,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         View mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
-        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_recorder_settings));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_live));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
 //        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
@@ -71,7 +65,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view_position);
         SettingsAdapter adapter = new SettingsAdapter(getContext(), settingsItems);
         adapter.setListener(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());

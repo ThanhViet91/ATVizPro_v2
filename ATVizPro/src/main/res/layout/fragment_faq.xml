@@ -39,7 +39,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:layout_marginBottom="100dp"
-            android:id="@+id/recycler_view"
+            android:id="@+id/recycler_view_position"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

@@ -45,7 +45,7 @@
         android:layout_marginTop="42dp"
         android:layout_marginEnd="16dp"
         android:padding="8dp"
-        android:text="@string/next"
+        android:text="@string/save"
         android:textFontWeight="600"
         android:textSize="18sp"
         tools:targetApi="p" />
@@ -80,7 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:layout_above="@id/recycler_view">
+        android:layout_above="@id/recycler_view_position">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -134,7 +134,7 @@
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/recycler_view_position"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/adView"

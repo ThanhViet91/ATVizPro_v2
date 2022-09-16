@@ -26,7 +26,7 @@
         android:id="@+id/sbrvVideoTrim"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="80dp"
         style="@style/Base.Sephiroth.Widget.RangeSeekBar"/>
 
     <LinearLayout

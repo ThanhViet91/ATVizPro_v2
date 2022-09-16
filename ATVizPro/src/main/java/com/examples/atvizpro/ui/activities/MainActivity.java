@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
@@ -50,6 +51,7 @@ import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atvizpro.AppOpenManager;
 import com.examples.atvizpro.Core;
+import com.examples.atvizpro.OptiUtils;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.fragments.DialogBitrate;
@@ -67,6 +69,7 @@ import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
+import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -78,6 +81,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -104,7 +108,8 @@ public class MainActivity extends AppCompatActivity {
     private static String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
     };
     public int mMode = MyUtils.MODE_RECORDING;
 
@@ -217,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
-
     }
 
     private void connectGooglePlayBilling() {
@@ -848,9 +852,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if (mMode == MyUtils.MODE_RECORDING)
+//        if (mMode == MyUtils.MODE_RECORDING)
 //            finish();
-        onPause();
     }
 
     /**
@@ -873,6 +876,7 @@ public class MainActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, mPermission[0]) == granted
                 && ContextCompat.checkSelfPermission(this, mPermission[1]) == granted
                 && ContextCompat.checkSelfPermission(this, mPermission[2]) == granted
+                && ContextCompat.checkSelfPermission(this, mPermission[3]) == granted
                 && Settings.canDrawOverlays(this)
                 && mScreenCaptureIntent != null
                 && mScreenCaptureResultCode != MyUtils.RESULT_CODE_FAILED;

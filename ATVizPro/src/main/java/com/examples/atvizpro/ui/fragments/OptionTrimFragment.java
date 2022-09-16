@@ -125,7 +125,7 @@ public class OptionTrimFragment extends DialogFragmentBase {
             @Override
             public void onFinishTranscoding(String code) {
                 dismiss();
-                callback.onFinishProcess();
+                callback.onFinishProcess(code);
             }
 
             @Override

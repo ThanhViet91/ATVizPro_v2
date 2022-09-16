@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,15 +20,24 @@ import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.VideoOptionAdapter;
 import com.examples.atvizpro.ui.VideoEditorView;
 import com.examples.atvizpro.ui.VideoStreamListener;
+import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
 import com.examples.atvizpro.ui.fragments.IOptionFragmentListener;
 import com.examples.atvizpro.ui.fragments.OptionAddImageFragment;
 import com.examples.atvizpro.ui.fragments.OptionAddTextFragment;
 import com.examples.atvizpro.ui.fragments.OptionChangeSpeedFragment;
 import com.examples.atvizpro.ui.fragments.OptionTrimFragment;
+import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
+import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,23 +91,6 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         super.onConfigurationChanged(newConfig);
     }
 
-    String cacheAudioFilePath;
-
-    @SuppressLint("SimpleDateFormat")
-    public String getTimeStamp() {
-        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    }
-
-
-
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(this, "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
-    }
-
 
     private void showOptionFragment(String opt) {
         Bundle bundle = new Bundle();
@@ -106,17 +99,13 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         bundle.putString("video_path", pathOriginalVideo);
         switch (opt) {
             case "Trim":
-
                 OptionTrimFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
-
                 break;
             case "Text":
-
-                OptionAddTextFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
+                OptionAddTextFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
 
             case "Speed":
-
                 OptionChangeSpeedFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
                 break;
 
@@ -124,6 +113,8 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
                 OptionAddImageFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
                 break;
+            default:
+                MyUtils.showSnackBarNotification(videoEditorView, "This fun is coming soon!!", Snackbar.LENGTH_SHORT);
         }
 
     }
@@ -141,13 +132,39 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
     @Override
     public void onClickNext() {
-
+        //pressSave
+        try {
+            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Toast.makeText(this, "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+        finish();
     }
-    @Override
-    public void onFinishProcess() {
 
+    void copyFile(File src, File dst) throws IOException {
+        FileChannel inChannel = new FileInputStream(src).getChannel();
+        FileChannel outChannel = new FileOutputStream(dst).getChannel();
+        try {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+        } finally {
+            if (inChannel != null)
+                inChannel.close();
+            if (outChannel != null)
+                outChannel.close();
+        }
+    }
+
+    String cacheOutputPath = "";
+
+    @Override
+    public void onFinishProcess(String outPath) {
+        cacheOutputPath = outPath;
         animationView.pauseAnimation();
         animationView.setVisibility(View.GONE);
+        videoEditorView.onPressSave();
+        videoEditorView.initVideoByURI(Uri.parse(outPath));
+
     }
 
 

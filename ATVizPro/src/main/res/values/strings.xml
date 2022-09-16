@@ -154,5 +154,6 @@
     <string name="edit">Edit</string>
     <string name="livestreaming">Livestreaming...</string>
     <string name="projects">Projects</string>
+    <string name="save">Save</string>
 
 </resources>

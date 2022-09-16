@@ -25,7 +25,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     private boolean commandValidationFailedFlag = false;
     Context context;
     String commandStr;
-    String outputPath;
+    String outputPath="";
     VideoUtil.ITranscoding mCallback = null;
 
     public TranscodingAsyncTask (Context act, String command, String outPath, VideoUtil.ITranscoding callback) {

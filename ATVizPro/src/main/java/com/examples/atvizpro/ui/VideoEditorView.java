@@ -80,7 +80,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
     private ValueAnimator mRedProgressAnimator;
     private Handler mAnimationHandler = new Handler();
 
-    private TextView btn_cancel, btn_done, number_countdown;
+    private TextView btn_cancel, btn_save, number_countdown;
     private LinearLayout layoutCountdown;
 
     private ArrayList<String> videoOptions = new ArrayList<>();
@@ -117,7 +117,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
         btn_cancel = findViewById(R.id.tv_btn_cancel);
-        btn_done = findViewById(R.id.tv_btn_done);
+        btn_save = findViewById(R.id.tv_btn_done);
         mVideoView = findViewById(R.id.video_loader);
         MediaController mediaController = new MediaController(getContext());
         mVideoView.setMediaController(mediaController);
@@ -127,12 +127,12 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
         mAdview = findViewById(R.id.adView);
 
         videoOptions.add("Trim");
-        videoOptions.add("Music");
+        videoOptions.add("Rotate");
         videoOptions.add("Speed");
         videoOptions.add("Text");
         videoOptions.add("Image");
         videoOptions.add("Merge");
-        rcVideoOptions = findViewById(R.id.recycler_view);
+        rcVideoOptions = findViewById(R.id.recycler_view_position);
         mAdapter = new VideoOptionAdapter(context, videoOptions, this);
         rcVideoOptions.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
@@ -145,6 +145,10 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
         mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
         mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
         setUpListeners();
+    }
+
+    public void onPressSave() {
+        btn_save.setVisibility(VISIBLE);
     }
 
     public void showOrHideAdBanner(){
@@ -193,9 +197,10 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
         mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
         mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
         mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
-        mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
+        mRangeSeekBarView.setMinShootTime(mDuration);
         mRangeSeekBarView.setNotifyWhileDragging(true);
         mRangeSeekBarView.setOnRangeSeekBarChangeListener(mOnRangeSeekBarChangeListener);
+        mSeekBarLayout.removeView(mRangeSeekBarView);
         mSeekBarLayout.addView(mRangeSeekBarView);
         if (mThumbsTotalCount - MAX_COUNT_RANGE > 0) {
             mAverageMsPx = (mDuration - MAX_SHOOT_DURATION) / (float) (mThumbsTotalCount - MAX_COUNT_RANGE);
@@ -212,6 +217,7 @@ public class VideoEditorView extends FrameLayout implements IVideoTrimmerView, V
     }
 
     private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {
+        mVideoThumbAdapter.resetBitmap();
         VideoTrimmerUtil.shootVideoThumbInBackground(context, videoUri, totalThumbsCount, startPosition, endPosition,
                 new SingleCallback<Bitmap, Integer>() {
                     @Override

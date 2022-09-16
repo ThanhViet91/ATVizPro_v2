@@ -6,5 +6,5 @@ package com.examples.atvizpro.ui.fragments;
 public interface IOptionFragmentListener {
     void onClickClose();
     void onClickDone();
-    void onFinishProcess();
+    void onFinishProcess(String outPath);
 }

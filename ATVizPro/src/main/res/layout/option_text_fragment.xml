@@ -10,37 +10,61 @@
         android:id="@+id/iv_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:src="@drawable/ic_baseline_close_24px"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_baseline_close_24px" />
 
     <ImageView
         android:id="@+id/iv_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:padding="12dp"
         android:src="@drawable/ic_baseline_done_24px"
         android:layout_alignParentEnd="true"/>
 
     <EditText
-        android:layout_centerHorizontal="true"
-        android:hint="Enter text"
-        android:paddingLeft="10dp"
         android:id="@+id/edt_input"
-        android:background="@drawable/custom_edt"
-        android:layout_marginTop="60dp"
         android:layout_width="300dp"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/custom_edt"
+        android:hint="Enter text"
+        android:paddingLeft="10dp" />
+
+
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="10dp"
+        android:layout_below="@id/edt_input"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_text"/>
+        <SeekBar
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="8dp"
+            android:id="@+id/seekbar_size"
+            android:progress="30"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="16dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
-        android:id="@+id/recycler_view"
+        android:id="@+id/recycler_view_position"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/edt_input"
-        android:layout_marginBottom="20dp" />
+        android:layout_below="@id/line1"
+        android:layout_marginBottom="16dp" />
 
 
 </RelativeLayout>

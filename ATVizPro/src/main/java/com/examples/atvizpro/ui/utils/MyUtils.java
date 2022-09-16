@@ -128,6 +128,16 @@ public class MyUtils {
         return directory.getAbsolutePath();
     }
 
+    @SuppressLint("ObsoleteSdkInt")
+    public static String getPhotoDirectory(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
+            return context.getExternalFilesDir(Environment.DIRECTORY_DCIM) + "/Recorder";
+        }
+        else
+            return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/Recorder";
+
+    }
+
     @NonNull
     public static String getCacheDirectory() {
         File directory = new File(StorageUtil.getCacheDir().toString());

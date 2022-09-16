@@ -1,6 +1,7 @@
 package com.examples.atvizpro.ui.fragments;
 
-import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,16 +32,22 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = ProjectsFragment.class.getSimpleName();
 
-    public static OptionAddTextFragment newInstance(Bundle args) {
-        OptionAddTextFragment dialogSelectVideoSource = new OptionAddTextFragment();
+    public static OptionAddTextFragment newInstance(IOptionFragmentListener callback, Bundle args) {
+
+        OptionAddTextFragment dialogSelectVideoSource = new OptionAddTextFragment(callback);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public ISelectVideoSourceListener callback = null;
+    public IOptionFragmentListener mCallback = null;
 
     public OptionAddTextFragment() {
 
     }
+
+    public OptionAddTextFragment(IOptionFragmentListener mCallback) {
+        this.mCallback = mCallback;
+    }
+
     @Override
     public int getLayout() {
         return R.layout.option_text_fragment;
@@ -53,6 +61,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
 
     String video_path;
     EditText inputText;
+    SeekBar seekBarOfSize;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -76,37 +85,70 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
             }
         });
 
+        seekBarOfSize = view.findViewById(R.id.seekbar_size);
+        seekBarOfSize.setMax(100);
+        seekBarOfSize.setProgress(sizeOfText);
+        seekBarOfSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                System.out.println("thanhlv seekBarOfSize.setOnSeekBarChangeListener " + i);
+                sizeOfText = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 
         ArrayList<String> listPos = new ArrayList<>();
         listPos.add("TopLeft");
         listPos.add("TopRight");
         listPos.add("Center");
+        listPos.add("CenterTop");
+        listPos.add("CenterBottom");
         listPos.add("BottomLeft");
         listPos.add("BottomRight");
-        listPos.add("CenterLeft");
-        listPos.add("CenterBottom");
-        listPos.add("CenterRight");
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_position);
         BasicAdapter basicAdapter = new BasicAdapter(getContext(), listPos, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recyclerView.setAdapter(basicAdapter);
         recyclerView.setLayoutManager(linearLayoutManager);
 
     }
+    String[] position = {
+            "15:15", // top left
+            "(W-w)/2:15", //top right
+            "(W-w)/2:(H-h)/2", //center
+            "(W-w)/2:15", // top center
+            "(W-w)/2:H-h-15", // bottom center
+            "15:H-h-15", // bottom left
+            "W-w-15:H-h-15" // bottom right
+    };
+    String posSelected = position[0];
+
+    int sizeOfText = 20;
 
     private void processingAddText() {
-
+        dismiss();
+        mCallback.onClickDone();
         if (inputText.getText().toString().equals("")) return;
-        new VideoUtil().addText(getActivity(), video_path, inputText.getText().toString(), "endTime", "", "x=(w-text_w)/2:y=(h-text_h)/2", new VideoUtil.ITranscoding() {
+        new VideoUtil().addText(getActivity(), video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
-                buildDialog("compression...");
             }
 
             @Override
             public void onFinishTranscoding(String code) {
-                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+                if (!code.equals(""))
+                mCallback.onFinishProcess(code);
             }
 
             @Override
@@ -116,16 +158,6 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         });
 
     }
-
-    private ProgressDialog mProgressDialog;
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getContext(), "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
-    }
-
 
     @Override
     public void updateUI() {
@@ -153,6 +185,12 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
 
     @Override
     public void onClickBasicItem(String text) {
-
+        if (text.equals("TopLeft")) posSelected = position[0];
+        if (text.equals("TopRight")) posSelected = position[1];
+        if (text.equals("Center")) posSelected = position[2];
+        if (text.equals("CenterTop")) posSelected = position[3];
+        if (text.equals("CenterBottom")) posSelected = position[4];
+        if (text.equals("BottomLeft")) posSelected = position[5];
+        if (text.equals("BottomRight")) posSelected = position[6];
     }
 }

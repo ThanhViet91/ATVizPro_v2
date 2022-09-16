@@ -52,14 +52,14 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
             case "Trim":
                 holder.img.setImageResource(R.drawable.video_trimming_24);
                 break;
-            case "Music":
-                holder.img.setImageResource(R.drawable.music_video_24);
+            case "Rotate":
+                holder.img.setImageResource(R.drawable.ic_rotate);
                 break;
             case "Speed":
-                holder.img.setImageResource(R.drawable.speed_skating_24);
+                holder.img.setImageResource(R.drawable.ic_speed);
                 break;
             case "Text":
-                holder.img.setImageResource(R.drawable.text_width_24);
+                holder.img.setImageResource(R.drawable.ic_text);
                 break;
             case "Image":
                 holder.img.setImageResource(R.drawable.sticker_24);

@@ -2,7 +2,6 @@ package com.examples.atvizpro.ui.activities;
 
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -12,25 +11,18 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
-import com.examples.atvizpro.adapter.VideoOptionAdapter;
 import com.examples.atvizpro.ui.VideoEditorView;
 import com.examples.atvizpro.ui.VideoStreamListener;
-import com.examples.atvizpro.ui.fragments.DialogFragmentBase;
 import com.examples.atvizpro.ui.fragments.IOptionFragmentListener;
 import com.examples.atvizpro.ui.fragments.OptionAddImageFragment;
 import com.examples.atvizpro.ui.fragments.OptionAddTextFragment;
 import com.examples.atvizpro.ui.fragments.OptionChangeSpeedFragment;
 import com.examples.atvizpro.ui.fragments.OptionTrimFragment;
 import com.examples.atvizpro.ui.utils.MyUtils;
-import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.VideoUtil;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -38,9 +30,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 public class VideoEditorActivity extends AppCompatActivity implements IOptionFragmentListener,
         VideoStreamListener, VideoEditorView.VideoEditorListener {
@@ -106,12 +95,11 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                 break;
 
             case "Speed":
-                OptionChangeSpeedFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
+                OptionChangeSpeedFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
 
             case "Image":
-
-                OptionAddImageFragment.newInstance(bundle).show(getSupportFragmentManager(), "");
+                OptionAddImageFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
             default:
                 MyUtils.showSnackBarNotification(videoEditorView, "This fun is coming soon!!", Snackbar.LENGTH_SHORT);

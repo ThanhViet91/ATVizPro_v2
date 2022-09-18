@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.examples.atvizpro.OptiUtils;
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.BasicAdapter;
 import com.examples.atvizpro.adapter.StickerAdapter;
@@ -40,14 +39,16 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = ProjectsFragment.class.getSimpleName();
 
-    public static OptionAddImageFragment newInstance(Bundle args) {
-        OptionAddImageFragment dialogSelectVideoSource = new OptionAddImageFragment();
+    public IOptionFragmentListener mCallback = null;
+
+    public static OptionAddImageFragment newInstance(IOptionFragmentListener callback, Bundle args) {
+        OptionAddImageFragment dialogSelectVideoSource = new OptionAddImageFragment(callback);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public ISelectVideoSourceListener callback = null;
 
-    public OptionAddImageFragment() {
+    public OptionAddImageFragment(IOptionFragmentListener callback) {
+        mCallback = callback;
     }
     @Override
     public int getLayout() {
@@ -60,7 +61,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    String video_path;
+    String video_path, image_path;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -88,11 +89,10 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         listPos.add("TopLeft");
         listPos.add("TopRight");
         listPos.add("Center");
+        listPos.add("CenterTop");
+        listPos.add("CenterBottom");
         listPos.add("BottomLeft");
         listPos.add("BottomRight");
-        listPos.add("CenterLeft");
-        listPos.add("CenterBottom");
-        listPos.add("CenterRight");
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_position);
         BasicAdapter basicAdapter = new BasicAdapter(getContext(), listPos, this);
@@ -103,6 +103,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
         RecyclerView recyclerView2 = view.findViewById(R.id.recycler_view_image);
         StickerAdapter stickerAdapter = new StickerAdapter(getContext(), getListSticker(), this);
+        image_path = listStickerPath.get(0);
         LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         recyclerView2.setAdapter(stickerAdapter);
         recyclerView2.setLayoutManager(linearLayoutManager2);
@@ -117,45 +118,43 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
                         R.drawable.sticker_6,
                         R.drawable.sticker_7,
                         R.drawable.sticker_8,
-                        R.drawable.sticker_9,
-                        R.drawable.sticker_10,
-                        R.drawable.sticker_11,
                         R.drawable.sticker_12,
-                        R.drawable.sticker_13,
-                        R.drawable.sticker_14,
-                        R.drawable.sticker_15,
-                        R.drawable.sticker_16,
-                        R.drawable.sticker_17,
-                        R.drawable.sticker_18,
-                        R.drawable.sticker_19,
+//                        R.drawable.sticker_15,
+//                        R.drawable.sticker_16,
+//                        R.drawable.sticker_17,
+//                        R.drawable.sticker_18,
+//                        R.drawable.sticker_19,
     };
     private List<PhotoModel> getListSticker() {
 
         List<PhotoModel> listSticker;
         listSticker = new ArrayList<>();
 
-        for (int i = 1; i < 20; i ++){
+        listStickerPath.clear();
+        for (int i = 1; i < 10; i ++){
             listSticker.add(new PhotoModel(resourceID[i-1]));
-//            copyResourceToFile("sticker_"+i+".png", resourceID[i-1]);
-            new OptiUtils().copyFileToInternalStorage(resourceID[i-1], "sticker_"+i, requireContext());
+            copyResourceToFile("sticker_"+i+".png", resourceID[i-1]);
+//            new OptiUtils().copyFileToInternalStorage(resourceID[i-1], "sticker_"+i, requireContext());
         }
         return listSticker;
     }
 
+    ArrayList<String> listStickerPath = new ArrayList<>();
     public void copyResourceToFile(String resourceName, int id) {
 
-
-        String extStorageDirectory = Environment.getExternalStorageDirectory().toString();
+        String extStorageDirectory = App.getAppContext().getExternalFilesDir(null).toString();
 
         File file = new File(extStorageDirectory, resourceName);
         FileOutputStream outStream = null;
         try {
             outStream = new FileOutputStream(file);
+            listStickerPath.add(file.getAbsolutePath());
+            System.out.println("thanhlv copyResourceToFile "+file.getAbsolutePath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        Bitmap bm = BitmapFactory.decodeResource( getResources(), R.drawable.sticker_1);
+        Bitmap bm = BitmapFactory.decodeResource( getResources(), id);
         bm.compress(Bitmap.CompressFormat.PNG, 100, outStream);
         bm.recycle();
         try {
@@ -173,18 +172,31 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     }
 
+    String[] position = {
+            "15:15", // top left
+            "(W-w)/2:15", //top right
+            "(W-w)/2:(H-h)/2", //center
+            "(W-w)/2:15", // top center
+            "(W-w)/2:H-h-15", // bottom center
+            "15:H-h-15", // bottom left
+            "W-w-15:H-h-15" // bottom right
+    };
+    String posSelected = position[0];
 
     private void processingAddImage() {
 
-        new VideoUtil().addImage(getActivity(), video_path, "/sdcard/thanh.png", "x=10:y=10",  new VideoUtil.ITranscoding() {
+        dismiss();
+        mCallback.onClickDone();
+        new VideoUtil().addImage(getActivity(), video_path, image_path, posSelected,  new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
-                buildDialog("compression...");
+
             }
 
             @Override
             public void onFinishTranscoding(String code) {
-                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+                if (!code.equals(""))
+                    mCallback.onFinishProcess(code);
             }
 
             @Override
@@ -231,11 +243,18 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     @Override
     public void onClickBasicItem(String text) {
+        if (text.equals("TopLeft")) posSelected = position[0];
+        if (text.equals("TopRight")) posSelected = position[1];
+        if (text.equals("Center")) posSelected = position[2];
+        if (text.equals("CenterTop")) posSelected = position[3];
+        if (text.equals("CenterBottom")) posSelected = position[4];
+        if (text.equals("BottomLeft")) posSelected = position[5];
+        if (text.equals("BottomRight")) posSelected = position[6];
 
     }
 
     @Override
-    public void onClickStickerItem(String text) {
-
+    public void onClickStickerItem(int pos) {
+        image_path = listStickerPath.get(pos);
     }
 }

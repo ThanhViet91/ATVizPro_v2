@@ -2,6 +2,7 @@ package com.examples.atvizpro.model;
 
 public class PhotoModel {
     private int resourceId;
+    private String path;
 
     public PhotoModel(int resourceId) {
         this.resourceId = resourceId;
@@ -13,5 +14,13 @@ public class PhotoModel {
 
     public void setResourceId(int resourceId) {
         this.resourceId = resourceId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

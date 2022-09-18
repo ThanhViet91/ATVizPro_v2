@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.BasicAdapter;
+import com.examples.atvizpro.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,14 +29,17 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = ProjectsFragment.class.getSimpleName();
 
-    public static OptionChangeSpeedFragment newInstance(Bundle args) {
-        OptionChangeSpeedFragment dialogSelectVideoSource = new OptionChangeSpeedFragment();
+    public IOptionFragmentListener mCallback = null;
+
+    public static OptionChangeSpeedFragment newInstance(IOptionFragmentListener callback, Bundle args) {
+        OptionChangeSpeedFragment dialogSelectVideoSource = new OptionChangeSpeedFragment(callback);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
     public ISelectVideoSourceListener callback = null;
 
-    public OptionChangeSpeedFragment() {
+    public OptionChangeSpeedFragment(IOptionFragmentListener callback) {
+        mCallback = callback;
     }
     @Override
     public int getLayout() {
@@ -90,25 +94,28 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
 
     }
 
+    String speed_selected = "1.0";
+
     private void processingAddText() {
+        dismiss();
+        mCallback.onClickDone();
+        new VideoUtil().changeSpeed(getActivity(), video_path, speed_selected,  new VideoUtil.ITranscoding() {
+            @Override
+            public void onStartTranscoding(String outPath) {
 
-//        new VideoUtil().addText(getActivity(), video_path, "startTime", "endTime", "", "", new VideoUtil.ITranscoding() {
-//            @Override
-//            public void onStartTranscoding(String outPath) {
-//                buildDialog("compression...");
-//            }
-//
-//            @Override
-//            public void onFinishTranscoding(String code) {
-//                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
-//            }
-//
-//            @Override
-//            public void onUpdateProgressTranscoding(int progress) {
-//
-//            }
-//        });
+            }
 
+            @Override
+            public void onFinishTranscoding(String code) {
+                if (!code.equals(""))
+                    mCallback.onFinishProcess(code);
+            }
+
+            @Override
+            public void onUpdateProgressTranscoding(int progress) {
+
+            }
+        });
     }
 
     private ProgressDialog mProgressDialog;
@@ -148,5 +155,6 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
     @Override
     public void onClickBasicItem(String text) {
 
+        speed_selected = text.substring(0, text.length()-1);
     }
 }

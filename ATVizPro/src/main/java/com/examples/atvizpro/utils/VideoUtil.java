@@ -15,11 +15,9 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.examples.atvizpro.App;
-import com.examples.atvizpro.AppOpenManager;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.ui.utils.MyUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -112,7 +110,7 @@ public class VideoUtil {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                String cmd = "ffmpeg -i " + originalVideoPath + " -i " + overlayImagePath.getAbsolutePath() + " -filter_complex [0:v][1:v]overlay=" + position+ " -c:a copy " + outputVideoPath;
+                String cmd = "ffmpeg -i " + originalVideoPath + " -i " + overlayImagePath.getAbsolutePath() + " -filter_complex [0:v][1:v]overlay=" + position+ " -preset ultrafast " + outputVideoPath;
                 new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
             }
         }, 500);
@@ -159,20 +157,31 @@ public class VideoUtil {
         }
     }
 
-    public void changeSpeed(Activity act, String originalVideoPath, String text, String color, String size, String position, ITranscoding callback) {
-        outputVideoPath = generateFileOutput();
+    public void changeSpeed(Activity act, String originalVideoPath, String speed, ITranscoding callback) {
+//        outputVideoPath = generateFileOutput();
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheChangeSpeed_" + getTimeStamp() + ".mp4";
+
         String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
-        String cmd = "ffmpeg -i " + originalVideoPath + " -vf \"drawtext=fontfile= " + fontPath + ": text=\'" + text + "\': fontcolor=" + color
-                + ": fontsize=" + size + ": " + position + " -c:v libx264 -c:a copy -movflags +faststart" + outputVideoPath;
+        String cmd = "ffmpeg -i " + originalVideoPath + " -filter_complex [0:v]setpts=" + convertSpeed(speed) + "*PTS[v];[0:a]atempo="+ speed +"[a] -map [v] -map [a] " + outputVideoPath;
 
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
     }
 
-    public void addImage(Activity act, String originalVideoPath, String imagePath, String position, ITranscoding callback) {
-        outputVideoPath = generateFileOutput();
+    @SuppressLint("DefaultLocale")
+    private String convertSpeed(String speed) {
+        float ss = Float.parseFloat(speed);
+        String ff = String.format("%.2f", 1f/ss);
+        return ff.replace(",", ".");
+    }
 
-        String cmd = "ffmpeg -i " + originalVideoPath + " -i " + imagePath + " -filter_complex " + position + " -c:a copy " + outputVideoPath;
+    public void addImage(Activity act, String originalVideoPath, String imagePath, String position, ITranscoding callback) {
+//        outputVideoPath = generateFileOutput();
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheAddImage_" + getTimeStamp() + ".mp4";
+
+        /*[1:v]scale=100:-1[overlay];[0:v][overlay]overlay="*/
+        String cmd = "ffmpeg -i " + originalVideoPath + " -i " + imagePath + " -filter_complex [0:v][1:v]overlay=" + position+ " -preset ultrafast " + outputVideoPath;
+
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
     }

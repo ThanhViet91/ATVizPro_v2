@@ -23,7 +23,7 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoVie
     private List<PhotoModel> list;
 
     public interface StickerAdapterListener {
-        void onClickStickerItem(String text);
+        void onClickStickerItem(int pos);
     }
 
     private StickerAdapterListener listener;
@@ -58,7 +58,7 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoVie
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View view) {
-                listener.onClickStickerItem(list.get(position)+"");
+                listener.onClickStickerItem(position);
                 posSelected = position;
                 notifyDataSetChanged();
             }

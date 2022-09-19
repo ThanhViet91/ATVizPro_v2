@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +24,12 @@ import com.examples.atvizpro.ui.fragments.OptionChangeSpeedFragment;
 import com.examples.atvizpro.ui.fragments.OptionTrimFragment;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.VideoUtil;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -35,7 +42,6 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         VideoStreamListener, VideoEditorView.VideoEditorListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
-    private ProgressDialog mProgressDialog;
     private VideoEditorView videoEditorView;
     private String pathOriginalVideo = "";
 
@@ -54,6 +60,8 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         videoEditorView.setVideoEditorListener(this);
         animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
+
+        createInterstitialAdmob();
     }
 
     @Override
@@ -126,8 +134,67 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Toast.makeText(this, "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
-        finish();
+        showInterstitialAd();
+    }
+
+
+    InterstitialAd mInterstitialAdAdmob = null;
+
+    public void createInterstitialAdmob() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        // The mInterstitialAd reference will be null until
+                        // an ad is loaded.
+                        mInterstitialAdAdmob = interstitialAd;
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        // Handle the error
+                        mInterstitialAdAdmob = null;
+                        createInterstitialAdmob();
+                    }
+                });
+    }
+
+    public void showInterstitialAd(){
+        if (mInterstitialAdAdmob != null) {
+            mInterstitialAdAdmob.show(this);
+            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdClicked() {
+                }
+
+                @Override
+                public void onAdDismissedFullScreenContent() {
+
+                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    createInterstitialAdmob();
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    finish();
+
+                }
+
+                @Override
+                public void onAdImpression() {
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                }
+            });
+        } else {
+            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     void copyFile(File src, File dst) throws IOException {

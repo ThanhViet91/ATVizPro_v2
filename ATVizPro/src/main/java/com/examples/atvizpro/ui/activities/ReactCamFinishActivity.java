@@ -3,10 +3,15 @@ package com.examples.atvizpro.ui.activities;
 import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.examples.atvizpro.R;
@@ -179,17 +185,60 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         }
 
         if (v == findViewById(R.id.img_btn_share)) {
-            Uri fileUri = Uri.parse(videoFile);
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.setType("video/*");
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(shareIntent, "Share video..."));
+            ContentValues content = new ContentValues(4);
+            content.put(MediaStore.Video.VideoColumns.DATE_ADDED,
+                    System.currentTimeMillis() / 1000);
+            content.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+            content.put(MediaStore.Video.Media.DATA, videoFile);
+
+            ContentResolver resolver = getApplicationContext().getContentResolver();
+            Uri fileUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, content);
+
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("video/*");
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Hey this is the video subject");
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, "Hey this is the video text");
+            sharingIntent.putExtra(Intent.EXTRA_STREAM,fileUri);
+            startActivity(Intent.createChooser(sharingIntent,"Share Video"));
+
+////            Uri fileUri = Uri.parse(videoFile);
+//            Intent shareIntent = new Intent();
+//            shareIntent.setAction(Intent.ACTION_SEND);
+//            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+//            shareIntent.setType("video/*");
+//            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            startActivity(Intent.createChooser(shareIntent, "Share video..."));
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            finish();
+            if (isSaved) {
+                finish();
+                return;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Save Video")
+                    .setMessage("Do you want to save this video?")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @SuppressLint("NotifyDataSetChanged")
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue with delete operation
+                            try {
+                                copyFile(new File(videoFile), new File(VideoUtil.generateFileOutput()));
+                                Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            finish();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
         }
     }
 

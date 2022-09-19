@@ -29,7 +29,7 @@ import java.util.Random;
 public class ExecuteService extends Service {
 
 
-    private static final int NOTIFICATION_ID = 9;
+    private static int NOTIFICATION_ID = 9;
     String originalVideoPath, cameraCachePath;
     long startTime, endTime, duration = 10000;
     int posX, posY, camSize;
@@ -43,7 +43,11 @@ public class ExecuteService extends Service {
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         duration = intent.getLongExtra("bundle_video_react_time", 0);
+        NOTIFICATION_ID = (int) duration;
+
+        createNotification();
         System.out.println("thanhlv onStartCommand .......... " + duration);
         if (duration < 10000) duration = 10000;
 
@@ -162,7 +166,7 @@ public class ExecuteService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        createNotification();
+//        createNotification();
     }
 
     Notification.Builder notificationBuilder = null;

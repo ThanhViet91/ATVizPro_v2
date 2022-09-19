@@ -103,6 +103,13 @@
             tools:ignore="LockedOrientationActivity">
         </activity>
 
+        <activity android:name=".ui.activities.ProjectsActivity" android:configChanges="keyboardHidden|orientation|screenSize"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:screenOrientation="portrait"
+            android:label="TrimBeforeReactCam"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
+
 
         <activity
             android:name=".ui.activities.SplashActivity"

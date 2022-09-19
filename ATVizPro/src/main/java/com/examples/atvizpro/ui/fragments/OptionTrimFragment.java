@@ -29,7 +29,7 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
-    private static final String TAG = ProjectsFragment.class.getSimpleName();
+    private static final String TAG = OptionTrimFragment.class.getSimpleName();
 
     public static OptionTrimFragment newInstance(IOptionFragmentListener callback, Bundle args) {
         OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback);

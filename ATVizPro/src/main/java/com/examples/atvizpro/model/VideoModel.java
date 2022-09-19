@@ -7,16 +7,26 @@ public class VideoModel {
     private long size;
     private long created;
     private String thumb;
+    private String duration;
 
     public VideoModel() {
     }
 
-    public VideoModel(int id, String name, long size, long created, String thumb) {
+    public VideoModel(int id, String name, long size, long created, String thumb, String duration) {
         this.id = id;
         this.name = name;
         this.size = size;
         this.created = created;
         this.thumb = thumb;
+        this.duration = duration;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
     public String getName() {

@@ -41,12 +41,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     ArrayList<SettingsItem> settingsItems = new ArrayList<>();
     private FragmentManager mFragmentManager;
 
+    View mViewRoot;
+
     @SuppressLint("DefaultLocale")
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
+        mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_live));
@@ -88,6 +90,13 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mFragmentManager = getParentFragmentManager();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        AdView mAdView = mViewRoot.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override

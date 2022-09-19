@@ -10,20 +10,27 @@ import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIF
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_REQUEST_START;
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_REQUEST_STOP;
 import static com.examples.atvizpro.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
+import static com.examples.atvizpro.ui.utils.MyUtils.hideSoftInput;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,6 +49,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class RTMPLiveAddressFragment extends Fragment {
 
@@ -95,15 +104,17 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvPasteRTMPAddress = view.findViewById(R.id.tv_paste_rtmp_address);
         tvPasteStreamKey = view.findViewById(R.id.tv_paste_stream_key);
         tvTutorial = view.findViewById(R.id.tv_tutorial);
+        tvStartLiveStream.setAlpha(0.5f);
 
 //        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
 //        edtStreamKey.setText("test");
 
-
         imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftInput(requireActivity());
                 mFragmentManager.popBackStack();
+
             }
         });
         tvStartLiveStream.setOnClickListener(new View.OnClickListener() {
@@ -129,13 +140,11 @@ public class RTMPLiveAddressFragment extends Fragment {
                         mParentActivity.notifyUpdateStreamProfile();
                     } else
                         mParentActivity.shouldStartControllerService();
-
                     tvStartLiveStream.setEnabled(false);
                     edtRTMPAddress.setEnabled(false);
                     edtStreamKey.setEnabled(false);
 
                     MyUtils.showSnackBarNotification(view, "Stream connected!", Snackbar.LENGTH_LONG);
-
                 }
             }
         });
@@ -145,9 +154,11 @@ public class RTMPLiveAddressFragment extends Fragment {
                 ClipboardManager clipboard = (ClipboardManager) mApplication.getSystemService(Context.CLIPBOARD_SERVICE);
                 try {
                     CharSequence textToPaste = clipboard.getPrimaryClip().getItemAt(0).getText();
-                    edtStreamKey.setText(textToPaste);
+                    if (!textToPaste.equals("")) {
+                        edtStreamKey.setText(textToPaste);
+                        edtStreamKey.setSelection(textToPaste.length());
+                    }
                 } catch (Exception e) {
-                    return;
                 }
             }
         });
@@ -157,11 +168,12 @@ public class RTMPLiveAddressFragment extends Fragment {
                 ClipboardManager clipboard = (ClipboardManager) mApplication.getSystemService(Context.CLIPBOARD_SERVICE);
                 try {
                     CharSequence textToPaste = clipboard.getPrimaryClip().getItemAt(0).getText();
-                    edtRTMPAddress.setText(textToPaste);
+                    if (!textToPaste.equals("")) {
+                        edtRTMPAddress.setText(textToPaste);
+                        edtRTMPAddress.setSelection(textToPaste.length());
+                    }
                 } catch (Exception e) {
-                    return;
                 }
-
             }
         });
 
@@ -180,7 +192,66 @@ public class RTMPLiveAddressFragment extends Fragment {
                 }
             }
         });
+
+        edtRTMPAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() == 0) {
+                    tvPasteRTMPAddress.setVisibility(View.VISIBLE);
+                } else {
+                    tvPasteRTMPAddress.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        edtStreamKey.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (charSequence.length() == 0) {
+                    tvPasteStreamKey.setVisibility(View.VISIBLE);
+                } else {
+                    tvPasteStreamKey.setVisibility(View.GONE);
+                }
+                if (MyUtils.isValidStreamUrlFormat(edtRTMPAddress.getText().toString()+charSequence)) {
+                    tvStartLiveStream.setAlpha(1f);
+                    tvStartLiveStream.setClickable(true);
+                } else {
+                    tvStartLiveStream.setAlpha(0.5f);
+                    tvStartLiveStream.setClickable(false);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        LinearLayout rootView = view.findViewById(R.id.root_container);
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideSoftInput(requireActivity());
+            }
+        });
     }
+
+
+    String rtmpURL = "";
 
     private void registerSyncServiceReceiver() {
         mStreamReceiver = new StreamingReceiver();

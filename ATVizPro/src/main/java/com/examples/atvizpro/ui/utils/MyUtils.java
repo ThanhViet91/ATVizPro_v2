@@ -13,13 +13,18 @@ import android.os.StatFs;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.examples.atvizpro.controllers.settings.VideoSetting;
@@ -362,5 +367,32 @@ public class MyUtils {
                 || Build.MANUFACTURER.contains("Genymotion")
                 || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
                 || "google_sdk".equals(Build.PRODUCT);
+    }
+
+
+    public static void hideSoftInput(@NonNull final Activity activity) {
+        hideSoftInput(activity.getWindow());
+    }
+    public static void hideSoftInput(@NonNull final Window window) {
+        View view = window.getCurrentFocus();
+        if (view == null) {
+            View decorView = window.getDecorView();
+            View focusView = decorView.findViewWithTag("keyboardTagView");
+            if (focusView == null) {
+                view = new EditText(window.getContext());
+                view.setTag("keyboardTagView");
+                ((ViewGroup) decorView).addView(view, 0, 0);
+            } else {
+                view = focusView;
+            }
+            view.requestFocus();
+        }
+        hideSoftInput(view);
+    }
+    public static void hideSoftInput(@NonNull final View view) {
+        InputMethodManager imm =
+                (InputMethodManager) App.getAppContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm == null) return;
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

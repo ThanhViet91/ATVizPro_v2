@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
+    android:id="@+id/root_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -20,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="Livestreaming" />
+            android:text="@string/livestreaming_title" />
 
         <ImageView
             android:id="@+id/img_back_rtmp"
@@ -33,8 +34,8 @@
 
 
     <TextView
-        android:layout_marginLeft="20dp"
-        android:text="RTMP address"
+        android:layout_marginStart="20dp"
+        android:text="@string/rtmp_address"
         android:textStyle="bold"
         android:layout_marginTop="20dp"
         android:textColor="@color/white"
@@ -47,16 +48,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <EditText
-            android:hint="rtmp://"
-            android:paddingLeft="10dp"
+            android:hint="@string/rtmp"
+            android:paddingStart="10dp"
             android:id="@+id/edt_rtmp_address"
             android:background="@drawable/custom_edt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_paste_rtmp_address"
-            android:layout_marginRight="7dp"
-            android:text="Paste"
+            android:layout_marginEnd="10dp"
+            android:text="@string/paste"
             android:padding="5dp"
             android:textStyle="bold"
             android:layout_gravity="right|center"
@@ -65,8 +66,8 @@
             android:layout_height="wrap_content"/>
     </FrameLayout>
     <TextView
-        android:layout_marginLeft="20dp"
-        android:text="Steam key"
+        android:layout_marginStart="20dp"
+        android:text="Stream key"
         android:textStyle="bold"
         android:layout_marginTop="20dp"
         android:textColor="@color/white"
@@ -79,15 +80,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <EditText
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             android:id="@+id/edt_stream_key"
             android:background="@drawable/custom_edt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_paste_stream_key"
-            android:layout_marginRight="7dp"
-            android:text="Paste"
+            android:layout_marginEnd="10dp"
+            android:text="@string/paste"
             android:padding="5dp"
             android:textStyle="bold"
             android:layout_gravity="right|center"
@@ -99,7 +100,7 @@
     <TextView
         android:layout_marginTop="8dp"
         android:text="@string/enter_key"
-        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
@@ -108,7 +109,7 @@
         android:textColor="@color/white"
         android:gravity="center"
         android:textStyle="bold"
-        android:textSize="18dp"
+        android:textSize="18sp"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
         android:text="@string/start_livestreming"
@@ -118,11 +119,12 @@
     <TextView
         android:id="@+id/tv_tutorial"
         style="@style/Title_Box_White"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:textFontWeight="400"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:text="@string/get_rtmp_address_and_streamkey"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        tools:targetApi="p" />
 </LinearLayout>

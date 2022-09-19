@@ -26,7 +26,7 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
 
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
-    private static final String TAG = ProjectsFragment.class.getSimpleName();
+    private static final String TAG = DialogSelectVideoSource.class.getSimpleName();
 
     public static DialogSelectVideoSource newInstance(ISelectVideoSourceListener callBack, Bundle args) {
         DialogSelectVideoSource dialogSelectVideoSource = new DialogSelectVideoSource(callBack);

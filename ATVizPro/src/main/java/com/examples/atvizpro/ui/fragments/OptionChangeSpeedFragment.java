@@ -27,7 +27,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
 
     public static final String ARG_PARAM1 = "param1";
     public static final String ARG_PARAM2 = "param2";
-    private static final String TAG = ProjectsFragment.class.getSimpleName();
+    private static final String TAG = OptionChangeSpeedFragment.class.getSimpleName();
 
     public IOptionFragmentListener mCallback = null;
 

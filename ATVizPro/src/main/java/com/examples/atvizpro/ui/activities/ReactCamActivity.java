@@ -119,37 +119,25 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     MediaPlayer mediaPlayer;
-    String videoFile="";
+    String videoFile = "";
     int videoDuration = 0;
 
-    SurfaceHolder surfaceholder;
     private void addVideoView() {
         videoView = findViewById(R.id.video_main1);
         videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
         if (!videoFile.equals(""))
-                    videoView.setVideoPath(videoFile);
-
+            videoView.setVideoPath(videoFile);
 //        videoView.setMediaController(new MediaController(this));
-                videoView.requestFocus();
-                videoView.start();
-//        videoView.start();
-//        videoView.setBackgroundColor(Color.WHITE);
-//        videoView.animate().alpha(1);
-//        videoView.seekTo(1);
-//        videoView.setZOrderOnTop(true);
+        videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(final MediaPlayer mp) {
-//                videoView.setBackgroundColor(Color.TRANSPARENT);
                 videoDuration = mp.getDuration();
-//                System.out.println("thanhlv addVideoView duration===  "+ videoDuration);
                 seekbar.setMax(videoDuration);
-
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
                 mediaPlayer = mp;
                 mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
-
                 seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -168,18 +156,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     }
                 });
                 initCamView();
-//                mp.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-//                    @Override
-//                    public boolean onInfo(MediaPlayer mp, int what, int extra) {
-////                        Log.d(TAG, "onInfo, what = " + what);
-//                        if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START) {
-//                            // video started; hide the placeholder.
-////                            surfaceholder.set
-//                            return true;
-//                        }
-//                        return false;
-//                    }
-//                });
             }
         });
     }
@@ -260,14 +236,15 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             public void run() {
                 System.out.println("thanhlv updateCamview gggg");
 
-                float newY = (mCameraLayout.getY() -yTopOld)*scale + yTop;
-                float newX = (mCameraLayout.getX() -xLeftOld)*scale + xLeft;
+                float newY = (mCameraLayout.getY() - yTopOld) * scale + yTop;
+                float newX = (mCameraLayout.getX() - xLeftOld) * scale + xLeft;
 
                 mCameraLayout.setX(newX);
                 mCameraLayout.setY(newY);
             }
         });
     }
+
     private void checkHasChangeVideoCamView() {
         hasChangeViewPos = false;
         if (screenVideo == null) {
@@ -278,22 +255,23 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         screenVideo.post(new Runnable() {
             @Override
             public void run() {
-                    if (oldScreenWidth != screenVideo.getWidth()
-                            || oldScreenHeight != screenVideo.getHeight()) {
-                        hasChangeViewPos = true;
-                        videoPrepared(mediaPlayer);
-                        updateCamView(Math.min(screenVideo.getWidth()*1f/oldScreenWidth, screenVideo.getHeight()*1f/oldScreenHeight));
-                    }
+                if (oldScreenWidth != screenVideo.getWidth()
+                        || oldScreenHeight != screenVideo.getHeight()) {
+                    hasChangeViewPos = true;
+                    videoPrepared(mediaPlayer);
+                    updateCamView(Math.min(screenVideo.getWidth() * 1f / oldScreenWidth, screenVideo.getHeight() * 1f / oldScreenHeight));
+                }
             }
         });
     }
+
     private void initCamView() {
         root = findViewById(R.id.root_container);
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
         cameraView = new SurfaceView(this);
         rtmpCamera = new RtmpLiveStream(cameraView);
-        if(cameraView.getParent() != null) {
-            ((ViewGroup)cameraView.getParent()).removeView(cameraView); // <- fix
+        if (cameraView.getParent() != null) {
+            ((ViewGroup) cameraView.getParent()).removeView(cameraView); // <- fix
         }
 
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
@@ -302,8 +280,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 6; i >= 0; i--) {
             camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
+            if (camViewSize[i] >= 300) camSize = i;
         }
         camWidth = camViewSize[camSize];  // ~240px
         camHeight = camWidth * 4 / 3f;
@@ -461,13 +440,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         VideoReactCamExecute videoProfile = new VideoReactCamExecute(videoFile, cameraCahePath,
                 startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("package_video_react",videoProfile);
+        bundle.putSerializable("package_video_react", videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
         intent.putExtras(bundle);
-        intent.putExtra("bundle_video_react_time", (long)((endTime - startTime + videoDuration)/2.5));
+        intent.putExtra("bundle_video_react_time", (long) ((endTimeRealCam - startTimeRealCam + videoDuration) / 2.5));
         startService(intent);
     }
-    public void showInterstitialAd(){
+
+    public void showInterstitialAd() {
         if (mInterstitialAdAdmob != null) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -508,7 +488,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
-    public void showDialogConfirmExecute(){
+    public void showDialogConfirmExecute() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirmation").setMessage(getString(R.string.confirm_execute_react_cam));
         builder.setCancelable(true);
@@ -521,9 +501,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         AlertDialog alert = builder.create();
         alert.show();
     }
+
     private void getEndReactCam() {
         mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
         endTime = mediaPlayer.getCurrentPosition();
+        endTimeRealCam = System.currentTimeMillis();
         videoView.stopPlayback();
         hasCamVideo = true;
         mCameraLayout.setVisibility(View.GONE);
@@ -531,10 +513,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     long startTime, endTime = 0;
+    long startTimeRealCam, endTimeRealCam = 0;
     int posX, posY;
 
     private void getStartReactCam() {
         startTime = mediaPlayer.getCurrentPosition();
+        startTimeRealCam = System.currentTimeMillis();
         videoView.start();
         posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
         posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);

@@ -6,12 +6,9 @@ import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
@@ -19,9 +16,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -51,7 +45,6 @@ import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atvizpro.AppOpenManager;
 import com.examples.atvizpro.Core;
-import com.examples.atvizpro.OptiUtils;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.fragments.DialogBitrate;
@@ -63,13 +56,11 @@ import com.examples.atvizpro.ui.fragments.FragmentFAQ;
 import com.examples.atvizpro.ui.fragments.FragmentSettings;
 import com.examples.atvizpro.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
-import com.examples.atvizpro.ui.fragments.ProjectsFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
-import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -81,7 +72,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -614,15 +604,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMyRecordings(int from_code) {
-//        Intent intent = new Intent(this, SplashActivity.class);
-//        startActivity(intent);
-        Bundle bundle = new Bundle();
-        bundle.putInt("key_from_code", from_code);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.frame_layout_fragment, ProjectsFragment.newInstance(bundle), "")
-                .addToBackStack("")
-                .commit();
+        Intent intent = new Intent(this, ProjectsActivity.class);
+        intent.putExtra("key_from_code", from_code);
+        startActivity(intent);
+//        Bundle bundle = new Bundle();
+//        bundle.putInt("key_from_code", from_code);
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .add(R.id.frame_layout_fragment, ProjectsActivity.newInstance(bundle), "")
+//                .addToBackStack("")
+//                .commitAllowingStateLoss();
     }
 
     public void showDialogPickFromGallery(int from_code) {

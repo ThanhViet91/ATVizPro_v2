@@ -5,12 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -62,14 +65,18 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         return new ViewHolder(view);
     }
 
+
+
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
         holder.itemView.setAlpha(1);
         if (video != null) {
+            holder.duration.setText(video.getDuration());
             Glide.with(context)
                     .load(video.getThumb())
-                    .transform(new CenterCrop(), new RoundedCorners(25))
+//                    .transform(new CenterInside(), new RoundedCorners(25))
                     .into(holder.img);
             holder.name.setText(video.getName());
         }
@@ -93,6 +100,15 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                                 if (new File(list.get(position).getThumb()).delete()) {
                                     list.remove(list.get(position));
                                     notifyDataSetChanged();
+                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(context, "Error!! Can't delete this video!", Toast.LENGTH_SHORT).show();
+                                    new Handler().postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            holder.itemView.setAlpha(1);
+                                        }
+                                    }, 500);
                                 }
                             }
                         })
@@ -127,11 +143,13 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView img;
         private TextView name;
+        private TextView duration;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.img_item_video_thumb);
             name = itemView.findViewById(R.id.tv_video_name);
+            duration = itemView.findViewById(R.id.tv_video_duration);
         }
     }
 }

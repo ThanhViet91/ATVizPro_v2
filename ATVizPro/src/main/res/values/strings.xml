@@ -154,5 +154,9 @@
     <string name="livestreaming">Livestreaming...</string>
     <string name="projects">Projects</string>
     <string name="save">Save</string>
+    <string name="rtmp">rtmp://</string>
+    <string name="rtmp_address">RTMP address</string>
+    <string name="livestreaming_title">Livestreaming</string>
+    <string name="camera_view_can_zoom_and_move">Camera view can zoom and move!!</string>
 
 </resources>

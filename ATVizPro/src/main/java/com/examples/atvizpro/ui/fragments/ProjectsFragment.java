@@ -86,6 +86,7 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
         // Inflate the layout for this fragment
         setHasOptionsMenu(true);
         mViewRoot = inflater.inflate(R.layout.fragment_video_projects, container, false);
+
         return mViewRoot;
     }
 

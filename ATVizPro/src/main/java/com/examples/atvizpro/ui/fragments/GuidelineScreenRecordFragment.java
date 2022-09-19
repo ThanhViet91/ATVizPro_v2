@@ -124,9 +124,6 @@ public class GuidelineScreenRecordFragment extends Fragment {
         imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (mFragmentManager != null) {
-//                    mFragmentManager.popBackStack();
-//                } else
                     mParentActivity.onBackPressed();
             }
         });

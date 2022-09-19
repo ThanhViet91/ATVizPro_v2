@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,20 +18,17 @@
         android:textColor="@color/white"
         android:textFontWeight="700"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:targetApi="p" />
 
     <LinearLayout
         android:id="@+id/box_settings"
         android:layout_width="wrap_content"
         android:layout_height="62dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:orientation="horizontal"
         android:weightSum="4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_app">
+        android:layout_below="@id/title_app">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -221,18 +219,16 @@
         android:textColor="@color/white"
         android:textFontWeight="600"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/box_settings" />
+        android:layout_below="@id/box_settings"
+        tools:targetApi="p" />
 
     <pl.bclogic.pulsator4droid.library.PulsatorLayout
         android:id="@+id/pulsator"
         android:layout_width="220dp"
         android:layout_height="220dp"
-        app:layout_constraintBottom_toTopOf="@id/img_live"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_direction"
+        android:layout_below="@id/title_direction"
+        android:layout_above="@id/fl_live"
+        android:layout_centerInParent="true"
         app:pulse_color="#FFFFFF"
         app:pulse_count="4"
         app:pulse_duration="3000"
@@ -249,74 +245,68 @@
             android:src="@drawable/img_btn_record_home" />
     </pl.bclogic.pulsator4droid.library.PulsatorLayout>
 
-    <ImageView
-        android:id="@+id/img_live"
-        android:layout_width="wrap_content"
-        android:layout_height="90dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="18dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/bg_livestream_home"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pulsator" />
 
-    <TextView
+    <FrameLayout
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/item_func_row1"
+        android:id="@+id/fl_live"
+        android:layout_marginBottom="8dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:fontFamily="@font/roboto_regular"
-        android:text="@string/livestreaming"
-        android:textColor="@color/white"
-        android:textFontWeight="500"
-        android:textSize="26sp"
-        app:layout_constraintBottom_toBottomOf="@id/img_live"
-        app:layout_constraintEnd_toEndOf="@id/img_live"
-        app:layout_constraintStart_toStartOf="@id/img_live"
-        app:layout_constraintTop_toTopOf="@id/img_live"
-        tools:targetApi="p" />
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/img_live"
+            android:layout_width="wrap_content"
+            android:layout_height="92dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="18dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/bg_livestream_home"/>
+
+        <TextView
+            android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:fontFamily="@font/roboto_regular"
+            android:text="@string/livestreaming"
+            android:textColor="@color/white"
+            android:textFontWeight="500"
+            android:textSize="26sp"
+            tools:targetApi="p" />
+
+    </FrameLayout>
+
 
     <LinearLayout
         android:id="@+id/item_func_row1"
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="100dp"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginEnd="18dp"
         android:orientation="horizontal"
         android:weightSum="3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/img_live">
+        android:layout_above="@id/item_func_row2"
+        android:layout_centerHorizontal="true">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/bg_item_react_cam"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_item_small_home"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/bg_item_small_home"/>
 
             <LinearLayout
                 android:id="@+id/ln_react_cam"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/bg_item_react_cam"
-                app:layout_constraintEnd_toEndOf="@id/bg_item_react_cam"
-                app:layout_constraintStart_toStartOf="@id/bg_item_react_cam"
-                app:layout_constraintTop_toTopOf="@id/bg_item_react_cam">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="40dp"
@@ -337,35 +327,26 @@
                     tools:targetApi="p" />
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/bg_item_video_editor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_item_small_home"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/bg_item_small_home" />
 
             <LinearLayout
                 android:id="@+id/ln_btn_video_editor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/bg_item_video_editor"
-                app:layout_constraintEnd_toEndOf="@id/bg_item_video_editor"
-                app:layout_constraintStart_toStartOf="@id/bg_item_video_editor"
-                app:layout_constraintTop_toTopOf="@id/bg_item_video_editor">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="50dp"
@@ -387,19 +368,18 @@
             </LinearLayout>
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:gravity="center">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/bg_item_commentary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:src="@drawable/bg_item_small_home"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -408,14 +388,10 @@
 
             <LinearLayout
                 android:id="@+id/ln_btn_commentary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/bg_item_commentary"
-                app:layout_constraintEnd_toEndOf="@id/bg_item_commentary"
-                app:layout_constraintStart_toStartOf="@id/bg_item_commentary"
-                app:layout_constraintTop_toTopOf="@id/bg_item_commentary">
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="20dp"
@@ -436,51 +412,41 @@
                     tools:targetApi="p" />
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
     </LinearLayout>
 
     <LinearLayout
+        android:layout_centerHorizontal="true"
         android:id="@+id/item_func_row2"
-        android:layout_width="wrap_content"
+        android:layout_width="400dp"
         android:layout_height="110dp"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginEnd="18dp"
         android:weightSum="2"
-        app:layout_constraintBottom_toTopOf="@id/adView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_func_row1">
+        android:layout_above="@id/adView">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
             android:layout_marginEnd="2dp"
-            android:layout_weight="1"
-            android:layout_gravity="end">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/bg_item_projects"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_item_lager_home"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/bg_item_lager_home"/>
 
             <LinearLayout
                 android:id="@+id/ln_btn_projects"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/bg_item_projects"
-                app:layout_constraintEnd_toEndOf="@id/bg_item_projects"
-                app:layout_constraintStart_toStartOf="@id/bg_item_projects"
-                app:layout_constraintTop_toTopOf="@id/bg_item_projects">
+                android:layout_gravity="center"
+                android:orientation="vertical">
 
                 <ImageView
                     android:layout_width="60dp"
@@ -501,35 +467,27 @@
                     tools:targetApi="p" />
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="6dp"
-            android:layout_weight="1"
-            android:layout_gravity="start">
+            android:layout_weight="1">
 
             <ImageView
                 android:id="@+id/bg_item_faq"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/bg_item_lager_home"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/bg_item_lager_home" />
 
             <LinearLayout
                 android:id="@+id/ln_btn_faq"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@id/bg_item_faq"
-                app:layout_constraintEnd_toEndOf="@id/bg_item_faq"
-                app:layout_constraintStart_toStartOf="@id/bg_item_faq"
-                app:layout_constraintTop_toTopOf="@id/bg_item_faq">
+                android:layout_gravity="center">
 
                 <ImageView
                     android:id="@+id/img_btn_faq"
@@ -551,7 +509,7 @@
                     tools:targetApi="p" />
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -562,10 +520,7 @@
         android:layout_centerHorizontal="true"
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
-        app:layout_constraintBottom_toTopOf="@id/bottom_line"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/item_func_row2" />
+        android:layout_above="@id/bottom_line"/>
 
 
     <View
@@ -573,13 +528,11 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_alignParentBottom="true"/>
 
 
     <FrameLayout
         android:id="@+id/frame_layout_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

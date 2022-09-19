@@ -28,8 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:background="@drawable/ic_recorder_settings"
-                android:backgroundTint="#ff9248" />
+                android:background="@drawable/ic_recorder_settings"/>
         </LinearLayout>
 
         <TextView

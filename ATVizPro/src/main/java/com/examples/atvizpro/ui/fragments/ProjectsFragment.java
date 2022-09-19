@@ -103,6 +103,9 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
         } else {
             tv_nodata.setVisibility(View.GONE);
         }
+
+        AdView mAdView = mViewRoot.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     private void initViews() {
@@ -139,8 +142,6 @@ public class ProjectsFragment extends Fragment implements VideoProjectsAdapter.V
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-        AdView mAdView = mViewRoot.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
 
     }
 

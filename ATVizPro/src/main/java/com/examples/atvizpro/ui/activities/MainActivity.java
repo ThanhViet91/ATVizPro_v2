@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
         hideStatusBar(this);
 
         billingClient = BillingClient.newBuilder(this)
@@ -614,6 +614,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMyRecordings(int from_code) {
+//        Intent intent = new Intent(this, SplashActivity.class);
+//        startActivity(intent);
         Bundle bundle = new Bundle();
         bundle.putInt("key_from_code", from_code);
         getSupportFragmentManager()

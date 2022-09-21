@@ -44,7 +44,7 @@
     </style>
 
     <style name="Title_Box_White" parent="White_Text">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
     </style>
 
@@ -55,7 +55,7 @@
     </style>
 
     <style name="Body_List_Item_White" parent="White_Text">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
     </style>
 

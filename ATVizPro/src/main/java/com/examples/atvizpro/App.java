@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 public class App extends Application {
 
-    public static final String CHANNEL_ID = "channel_service_id";
+    public static final String CHANNEL_ID = "com.examples.atvizpro";
     private static Application context;
 
 

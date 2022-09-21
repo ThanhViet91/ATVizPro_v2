@@ -81,6 +81,7 @@ public class RTMPLiveAddressFragment extends Fragment {
     }
 
     private int type;
+
     public void setSocialType(int type) {
         this.type = type;
     }
@@ -91,7 +92,6 @@ public class RTMPLiveAddressFragment extends Fragment {
         View mViewRoot = inflater.inflate(R.layout.fragment_rtmplive_address, container, false);
         return mViewRoot;
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -120,33 +120,33 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvStartLiveStream.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                hideSoftInput(requireActivity());
                 mParentActivity.mMode = MyUtils.MODE_STREAMING;
-                mUrl = edtRTMPAddress.getText().toString() + edtStreamKey.getText().toString();
-                if (!MyUtils.isValidStreamUrlFormat(mUrl)) {
-                    MyUtils.showSnackBarNotification(view, "Wrong stream url format (ex: rtmp://127.192.123.1/live/stream)", Snackbar.LENGTH_LONG);
-                    edtRTMPAddress.requestFocus();
-                } else {
-                    if (isMyServiceRunning(getContext(), RecordingService.class)) {
-                        MyUtils.showSnackBarNotification(view, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
-                        return;
-                    }
-                    mParentActivity.mMode = MyUtils.MODE_STREAMING;
-                    StreamProfile mStreamProfile = new StreamProfile("", mUrl, "");
-                    mParentActivity.setStreamProfile(mStreamProfile);
-
-                    if (isMyServiceRunning(getContext(), ControllerService.class)) {
-                        MyUtils.showSnackBarNotification(view, "Streaming service is running!", Snackbar.LENGTH_LONG);
-                        mParentActivity.notifyUpdateStreamProfile();
-                    } else
-                        mParentActivity.shouldStartControllerService();
-                    tvStartLiveStream.setEnabled(false);
-                    edtRTMPAddress.setEnabled(false);
-                    edtStreamKey.setEnabled(false);
-
-                    MyUtils.showSnackBarNotification(view, "Stream connected!", Snackbar.LENGTH_LONG);
+                mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
+//                if (!MyUtils.isValidStreamUrlFormat(mUrl)) {
+//                    MyUtils.showSnackBarNotification(view, "Wrong stream url format (ex: rtmp://127.192.123.1/live/stream)", Snackbar.LENGTH_LONG);
+//                    edtRTMPAddress.requestFocus();
+//                } else {
+                if (isMyServiceRunning(requireContext(), RecordingService.class)) {
+                    MyUtils.showSnackBarNotification(view, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
+                    return;
                 }
+                mParentActivity.mMode = MyUtils.MODE_STREAMING;
+                StreamProfile mStreamProfile = new StreamProfile("", mUrl, "");
+                mParentActivity.setStreamProfile(mStreamProfile);
+
+                if (isMyServiceRunning(requireContext(), ControllerService.class)) {
+                    MyUtils.showSnackBarNotification(view, "Streaming service is running!", Snackbar.LENGTH_LONG);
+                    mParentActivity.notifyUpdateStreamProfile();
+                } else
+                    mParentActivity.shouldStartControllerService();
+                tvStartLiveStream.setEnabled(false);
+                edtRTMPAddress.setEnabled(false);
+                edtStreamKey.setEnabled(false);
+
+                MyUtils.showSnackBarNotification(view, "Stream connected!", Snackbar.LENGTH_LONG);
             }
+//            }
         });
         tvPasteStreamKey.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +180,7 @@ public class RTMPLiveAddressFragment extends Fragment {
         tvTutorial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftInput(requireActivity());
                 Fragment fragment = null;
                 if (type == SOCIAL_TYPE_YOUTUBE) fragment = new YoutubeLiveStreamingFragment();
                 if (type == SOCIAL_TYPE_FACEBOOK) fragment = new FacebookLiveStreamingFragment();
@@ -206,6 +207,13 @@ public class RTMPLiveAddressFragment extends Fragment {
                 } else {
                     tvPasteRTMPAddress.setVisibility(View.GONE);
                 }
+                if (MyUtils.isValidStreamUrlFormat(fixRTMPAddress(charSequence.toString()) + edtStreamKey.getText().toString())) {
+                    tvStartLiveStream.setAlpha(1f);
+                    tvStartLiveStream.setClickable(true);
+                } else {
+                    tvStartLiveStream.setAlpha(0.5f);
+                    tvStartLiveStream.setClickable(false);
+                }
             }
 
             @Override
@@ -213,6 +221,7 @@ public class RTMPLiveAddressFragment extends Fragment {
 
             }
         });
+
         edtStreamKey.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -226,7 +235,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                 } else {
                     tvPasteStreamKey.setVisibility(View.GONE);
                 }
-                if (MyUtils.isValidStreamUrlFormat(edtRTMPAddress.getText().toString()+charSequence)) {
+                if (MyUtils.isValidStreamUrlFormat(fixRTMPAddress(edtRTMPAddress.getText().toString()) + charSequence)) {
                     tvStartLiveStream.setAlpha(1f);
                     tvStartLiveStream.setClickable(true);
                 } else {
@@ -250,8 +259,10 @@ public class RTMPLiveAddressFragment extends Fragment {
         });
     }
 
-
-    String rtmpURL = "";
+    public String fixRTMPAddress(String rtmp) {
+        if (!rtmp.endsWith("/")) return rtmp + "/";
+        return rtmp;
+    }
 
     private void registerSyncServiceReceiver() {
         mStreamReceiver = new StreamingReceiver();

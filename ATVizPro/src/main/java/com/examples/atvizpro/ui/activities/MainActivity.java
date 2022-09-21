@@ -4,9 +4,12 @@ import static com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity
 import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
+import static com.examples.atvizpro.ui.utils.MyUtils.tryToExtractVideoInfoFile;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
@@ -19,10 +22,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -57,10 +62,13 @@ import com.examples.atvizpro.ui.fragments.FragmentSettings;
 import com.examples.atvizpro.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
+import com.examples.atvizpro.ui.services.ExecuteService;
+import com.examples.atvizpro.ui.services.recording.RecordingService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
+import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -72,6 +80,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -505,6 +515,8 @@ public class MainActivity extends AppCompatActivity {
         react_cam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (checkServiceBusy()) return;
+
                 showDialogPickVideo(REQUEST_VIDEO_FOR_REACT_CAM);
             }
         });
@@ -545,6 +557,23 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private boolean checkServiceBusy() {
+        boolean bb = false;
+        if (isMyServiceRunning(this, ExecuteService.class)) {
+            bb = true;
+            new AlertDialog.Builder(this)
+                    .setTitle("Please wait!")
+                    .setMessage("Your previous video in processing, please check in status bar!")
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();
+        }
+        return bb;
     }
 
     private boolean isFirstTimeReach(String type) {
@@ -658,7 +687,6 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onAdDismissedFullScreenContent() {
-
                     showMyRecordings(from_code);
                     createInterstitialAdmob();
                 }
@@ -666,7 +694,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onAdFailedToShowFullScreenContent(AdError adError) {
                     showMyRecordings(from_code);
-
                 }
 
                 @Override
@@ -843,7 +870,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(controller);
         }
-
 
 //        if (mMode == MyUtils.MODE_RECORDING)
 //            finish();

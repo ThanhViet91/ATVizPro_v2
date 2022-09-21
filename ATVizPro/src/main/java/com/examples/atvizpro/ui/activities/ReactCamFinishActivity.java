@@ -9,8 +9,10 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
@@ -170,44 +172,47 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         super.onPause();
     }
 
+    String finalVideoSaved = "";
+    public void saveVideo(String videoFile){
+        if (!isSaved) {
+            try {
+                finalVideoSaved = VideoUtil.generateFileOutput();
+                copyFile(new File(videoFile), new File(finalVideoSaved));
+                isSaved = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                isSaved = false;
+            }
+        }
+    }
+
     public void onClick(View v) {
         if (v == findViewById(R.id.img_btn_save)) {
-            if (!isSaved) {
-                try {
-                    copyFile(new File(videoFile), new File(VideoUtil.generateFileOutput()));
-                    isSaved = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    isSaved = false;
-                }
-            }
+            saveVideo(videoFile);
             Toast.makeText(this, "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
         }
 
         if (v == findViewById(R.id.img_btn_share)) {
-            ContentValues content = new ContentValues(4);
-            content.put(MediaStore.Video.VideoColumns.DATE_ADDED,
-                    System.currentTimeMillis() / 1000);
-            content.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
-            content.put(MediaStore.Video.Media.DATA, videoFile);
+            saveVideo(videoFile);
+//            Uri urii = Uri.parse("content://com.examples.atvizpro" + videoFile);
+            MediaScannerConnection.scanFile(this, new String[] { finalVideoSaved },
+                    null, new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                            Intent shareIntent = new Intent(
+                                    android.content.Intent.ACTION_SEND);
+                            shareIntent.setType("video/*");
+                            shareIntent.putExtra(
+                                    android.content.Intent.EXTRA_SUBJECT, "Hey this is the video subject");
+                            shareIntent.putExtra(
+                                    android.content.Intent.EXTRA_TITLE, "Hey this is the video text");
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                            shareIntent
+//                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
+                            startActivity(Intent.createChooser(shareIntent,"aaa"));
 
-            ContentResolver resolver = getApplicationContext().getContentResolver();
-            Uri fileUri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, content);
-
-            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-            sharingIntent.setType("video/*");
-            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, "Hey this is the video subject");
-            sharingIntent.putExtra(Intent.EXTRA_TEXT, "Hey this is the video text");
-            sharingIntent.putExtra(Intent.EXTRA_STREAM,fileUri);
-            startActivity(Intent.createChooser(sharingIntent,"Share Video"));
-
-////            Uri fileUri = Uri.parse(videoFile);
-//            Intent shareIntent = new Intent();
-//            shareIntent.setAction(Intent.ACTION_SEND);
-//            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-//            shareIntent.setType("video/*");
-//            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//            startActivity(Intent.createChooser(shareIntent, "Share video..."));
+                        }
+                    });
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
@@ -219,15 +224,10 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
                     .setTitle("Save Video")
                     .setMessage("Do you want to save this video?")
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @SuppressLint("NotifyDataSetChanged")
                         public void onClick(DialogInterface dialog, int which) {
                             // Continue with delete operation
-                            try {
-                                copyFile(new File(videoFile), new File(VideoUtil.generateFileOutput()));
-                                Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            saveVideo(videoFile);
+                            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     })

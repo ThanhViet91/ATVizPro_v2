@@ -16,6 +16,9 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
+import android.widget.RemoteViews;
+
+import androidx.annotation.RequiresApi;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.model.VideoReactCamExecute;
@@ -117,9 +120,6 @@ public class ExecuteService extends Service {
     private String finalVideoCachePath = "";
     public void executeFFmpegReactCam(String overlayVideoPath) {
 
-
-
-
         new VideoUtil().reactCamera(originalVideoPath, overlayVideoPath, startTime, endTime, camSize,
                 posX, posY, false, false, new VideoUtil.ITranscoding() {
                     @Override
@@ -133,7 +133,6 @@ public class ExecuteService extends Service {
                             notificationBuilder.setProgress(0, 0, false);
                             notificationBuilder.setContentText("In progress: 100%");
                             finalVideoCachePath = code;
-
                             updatePendingIntent(finalVideoCachePath);
                             startForeground(NOTIFICATION_ID, notification);
 
@@ -172,11 +171,14 @@ public class ExecuteService extends Service {
     Notification.Builder notificationBuilder = null;
     Notification notification;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void createNotification() {
 
         Intent intent = new Intent(this, MainActivity.class);
         @SuppressLint("UnspecifiedImmutableFlag")
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
 
         //Set notification information
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -185,8 +187,11 @@ public class ExecuteService extends Service {
             notificationBuilder = new Notification.Builder(getApplicationContext());
         notificationBuilder
                 .setOngoing(true)
+                .setCustomContentView(notificationLayoutExpanded)
                 .setVibrate(new long[]{0L})
                 .setContentTitle("AT Screen Recorder")
+//                .setContentTitle("ATVizPro is running in background")
+                .setPriority(Notification.PRIORITY_MIN)
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
                 .setContentIntent(pendingIntent)
@@ -203,10 +208,8 @@ public class ExecuteService extends Service {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true);
-                stopSelf();
-            } else {
-                stopSelf();
             }
+            stopSelf();
         } catch (Exception e) {
             e.printStackTrace();
         }

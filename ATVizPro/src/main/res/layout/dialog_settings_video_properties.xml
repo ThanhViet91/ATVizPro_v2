@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="64dp"
         android:background="@drawable/bg_border_header_settings">
 
         <ImageView
@@ -18,7 +18,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="12dp"
-            android:padding="8dp"
+            android:padding="10dp"
             android:src="@drawable/ic_back_header_24" />
 
         <TextView
@@ -32,7 +32,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rc_item"
-        android:paddingTop="10dp"
+        android:paddingTop="6dp"
         android:background="@drawable/bg_home"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

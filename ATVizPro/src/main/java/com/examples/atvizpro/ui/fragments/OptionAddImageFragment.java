@@ -174,7 +174,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     String[] position = {
             "15:15", // top left
-            "(W-w)/2:15", //top right
+            "W-w-15:15", //top right
             "(W-w)/2:(H-h)/2", //center
             "(W-w)/2:15", // top center
             "(W-w)/2:H-h-15", // bottom center

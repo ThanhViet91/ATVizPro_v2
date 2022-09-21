@@ -35,6 +35,8 @@
         android:roundIcon="@drawable/ic_app"
         android:theme="@style/AppTheme">
 
+<!--        <provider android:name=".MyProvider" android:authorities="com.examples.atvizpro" android:exported="true" />-->
+
 
         <activity android:name=".SimpleExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateAlwaysHidden"

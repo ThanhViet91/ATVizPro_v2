@@ -98,13 +98,12 @@ public class TwitchLiveStreamingFragment extends Fragment {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 i = position;
-                if (i == getListPhoto().size() - 1)
-                    if (!SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
+                if (i == getListPhoto().size() - 1){
+                    if (!SettingManager2.getFirstTimeLiveStreamYoutube(requireContext()))
                         btnContinue.setText(getString(R.string.done_));
-                    } else {
-                        btnContinue.setText(getString(R.string.continue_));
-                    }
-
+                } else {
+                    btnContinue.setText(getString(R.string.continue_));
+                }
             }
         });
         btnContinue.setOnClickListener(new View.OnClickListener() {

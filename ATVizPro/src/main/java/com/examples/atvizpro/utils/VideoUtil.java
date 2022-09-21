@@ -33,7 +33,7 @@ public class VideoUtil {
 
     @SuppressLint("SimpleDateFormat")
     public String getTimeStamp() {
-        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        return new SimpleDateFormat("MMdd_HHmmss").format(new Date());
     }
 
     String outputVideoPath;
@@ -89,7 +89,7 @@ public class VideoUtil {
     public void commentaryAudio(Activity act, String originalVideoPath, String audioPath, ITranscoding callback) {
 //        outputVideoPath = generateFileOutput();
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheCommentaryAudio_" + getTimeStamp() + ".mp4";
-        String cmd = "ffmpeg -i " + originalVideoPath + " -i " + audioPath + " -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a " + outputVideoPath;
+        String cmd = "ffmpeg -i " + originalVideoPath + " -i " + audioPath + " -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a -preset ultrafast " + outputVideoPath;
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
 
@@ -99,7 +99,7 @@ public class VideoUtil {
     public void trimVideo(Activity act, String originalVideoPath, long startTime, long endTime, ITranscoding callback) {
 //        outputVideoPath = generateFileOutput();
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheTrimVideo_" + getTimeStamp() + ".mp4";
-        String cmd = "ffmpeg -ss " + parseSecond2Ms(startTime) + " -i " + originalVideoPath + " -to " + parseSecond2Ms(endTime) + " -c:v copy -c:a copy " + outputVideoPath;
+        String cmd = "ffmpeg -ss " + parseSecond2Ms(startTime) + " -i " + originalVideoPath + " -to " + parseSecond2Ms(endTime) + " -c:v copy -c:a copy -preset ultrafast " + outputVideoPath;
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
     }
@@ -162,7 +162,7 @@ public class VideoUtil {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheChangeSpeed_" + getTimeStamp() + ".mp4";
 
         String fontPath = new File(String.valueOf(R.font.roboto_bold)).getAbsolutePath();
-        String cmd = "ffmpeg -i " + originalVideoPath + " -filter_complex [0:v]setpts=" + convertSpeed(speed) + "*PTS[v];[0:a]atempo="+ speed +"[a] -map [v] -map [a] " + outputVideoPath;
+        String cmd = "ffmpeg -i " + originalVideoPath + " -filter_complex [0:v]setpts=" + convertSpeed(speed) + "*PTS[v];[0:a]atempo="+ speed +"[a] -map [v] -map [a] -preset ultrafast " + outputVideoPath;
 
 
         new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
@@ -188,50 +188,32 @@ public class VideoUtil {
 
 
     public void flipHorizontal(String originalVideoPath, ITranscoding callback) {
-        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_flip_" + getTimeStamp() + ".mp4";
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_hflip_" + getTimeStamp() + ".mp4";
 
-        String cmd = "ffmpeg -i " + originalVideoPath + " -vf hflip " + outputVideoPath;
+        String cmd = "ffmpeg -i " + originalVideoPath + " -vf hflip -preset ultrafast " + outputVideoPath;
 
         new TranscodingAsyncTask(context, cmd, outputVideoPath, callback).execute();
     }
 
+    public void flipVertical(String originalVideoPath, ITranscoding callback) {
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_vflip_" + getTimeStamp() + ".mp4";
+
+        String cmd = "ffmpeg -i " + originalVideoPath + " -vf vflip -preset ultrafast " + outputVideoPath;
+
+        new TranscodingAsyncTask(context, cmd, outputVideoPath, callback).execute();
+    }
+
+    public void rotate(String originalVideoPath, int angle, ITranscoding callback) {
+        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_rotate_" + getTimeStamp() + ".mp4";
+
+        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf transpose=1 -preset ultrafast " + outputVideoPath;
+
+        new TranscodingAsyncTask(context, cmd, outputVideoPath, callback).execute();
+    }
 
     public String parseSecond2Ms(long second) {
         String ms = "";
         return ms + second / 1000 + "." + second % 1000;
-    }
-
-
-    public void copyAssets(Context context) {
-        AssetManager assetManager = context.getAssets();
-        String[] files = null;
-        try {
-            files = assetManager.list("");
-        } catch (IOException e) {
-            Log.e("tag", "Failed to get asset file list.", e);
-        }
-        for (String filename : files) {
-            InputStream in = null;
-            OutputStream out = null;
-            try {
-                in = assetManager.open(filename);
-
-//                String outDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Recordings";
-                String outDir = MyUtils.getBaseStorageDirectory();
-
-                File outFile = new File(outDir, filename);
-
-                out = new FileOutputStream(outFile);
-                copyFile(in, out);
-                in.close();
-                in = null;
-                out.flush();
-                out.close();
-                out = null;
-            } catch (IOException e) {
-                Log.e("tag", "Failed to copy asset file: " + filename, e);
-            }
-        }
     }
 
     private void copyFile(InputStream in, OutputStream out) throws IOException {

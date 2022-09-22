@@ -4,6 +4,7 @@ import static com.examples.atvizpro.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -24,6 +25,8 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ShareCompat;
+import androidx.core.content.FileProvider;
 
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.controllers.settings.SettingManager2;
@@ -37,6 +40,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 public class ReactCamFinishActivity extends AppCompatActivity implements View.OnClickListener {
@@ -193,26 +197,33 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         }
 
         if (v == findViewById(R.id.img_btn_share)) {
-            saveVideo(videoFile);
-//            Uri urii = Uri.parse("content://com.examples.atvizpro" + videoFile);
-            MediaScannerConnection.scanFile(this, new String[] { finalVideoSaved },
-                    null, new MediaScannerConnection.OnScanCompletedListener() {
-                        public void onScanCompleted(String path, Uri uri) {
-                            Intent shareIntent = new Intent(
-                                    android.content.Intent.ACTION_SEND);
-                            shareIntent.setType("video/*");
-                            shareIntent.putExtra(
-                                    android.content.Intent.EXTRA_SUBJECT, "Hey this is the video subject");
-                            shareIntent.putExtra(
-                                    android.content.Intent.EXTRA_TITLE, "Hey this is the video text");
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                            shareIntent
-//                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
-                            startActivity(Intent.createChooser(shareIntent,"aaa"));
+            File file = new File(videoFile);
+            Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atvizpro.provider", file);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Share of $fileName");
+            intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(intent, "Share File"));
 
-                        }
-                    });
+//            MediaScannerConnection.scanFile(this, new String[]{file.getPath()}, new String[]{file.getName()}
+//                    , new MediaScannerConnection.OnScanCompletedListener() {
+//                        public void onScanCompleted(String path, Uri uri) {
+//                            Intent shareIntent = new Intent(
+//                                    android.content.Intent.ACTION_SEND);
+//                            shareIntent.setType("video/*");
+//                            shareIntent.putExtra(
+//                                    android.content.Intent.EXTRA_SUBJECT, "Hey this is the video subject");
+//                            shareIntent.putExtra(
+//                                    android.content.Intent.EXTRA_TITLE, "Hey this is the video text");
+//                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+//                            shareIntent
+////                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
+//                            startActivity(Intent.createChooser(shareIntent,"aaa"));
+//
+//                        }
+//                    });
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {

@@ -11,6 +11,7 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,7 +31,11 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -133,7 +138,25 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
                 });
     }
 
+    private void copyFile(File src, File dst) throws IOException {
+        FileChannel inChannel = new FileInputStream(src).getChannel();
+        FileChannel outChannel = new FileOutputStream(dst).getChannel();
+        try {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+        } finally {
+            if (inChannel != null)
+                inChannel.close();
+            if (outChannel != null)
+                outChannel.close();
+        }
+    }
+
     public void showInterstitialAd(){
+        try {
+            copyFile(new File(videoPath), new File(VideoUtil.generateFileOutput()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (mInterstitialAdAdmob != null) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -143,14 +166,15 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
 
                 @Override
                 public void onAdDismissedFullScreenContent() {
-                    Intent intent = new Intent(CommentaryActivity.this, ReactCamFinishActivity.class);
-                    intent.putExtra(KEY_PATH_VIDEO, videoPath);
-                    startActivity(intent);
+                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    finish();
                     createInterstitialAdmob();
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(AdError adError) {
+                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
 
                 @Override
@@ -162,9 +186,8 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
                 }
             });
         } else {
-            Intent intent = new Intent(CommentaryActivity.this, ReactCamFinishActivity.class);
-            intent.putExtra(KEY_PATH_VIDEO, videoPath);
-            startActivity(intent);
+            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -199,7 +222,6 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
     @Override
     public void onClickNext() {
         doExecuteCommentary();
-
     }
 
     @Override

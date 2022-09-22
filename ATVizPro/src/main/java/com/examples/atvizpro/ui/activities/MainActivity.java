@@ -4,10 +4,8 @@ import static com.examples.atvizpro.ui.activities.CompressBeforeReactCamActivity
 import static com.examples.atvizpro.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
 import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atvizpro.ui.utils.MyUtils.isMyServiceRunning;
-import static com.examples.atvizpro.ui.utils.MyUtils.tryToExtractVideoInfoFile;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,12 +60,10 @@ import com.examples.atvizpro.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
 import com.examples.atvizpro.ui.services.ExecuteService;
-import com.examples.atvizpro.ui.services.recording.RecordingService;
 import com.examples.atvizpro.ui.services.streaming.StreamingService;
 import com.examples.atvizpro.ui.utils.MyUtils;
 import com.examples.atvizpro.utils.AdUtil;
 import com.examples.atvizpro.utils.PathUtil;
-import com.examples.atvizpro.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -81,7 +76,6 @@ import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -211,10 +205,9 @@ public class MainActivity extends AppCompatActivity {
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
                 .build();
-
         initViews();
 
-        SettingManager2.setRemoveAds(getApplicationContext(), false);
+//        SettingManager2.setRemoveAds(getApplicationContext(), false);
         connectGooglePlayBilling();
 
         if (!hasPermission()) requestPermissions();
@@ -222,6 +215,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
+
+//        File tesst = new File(MyUtils.getBaseStorageDirectory2(), MyUtils.createFileName(".mp4"));
+
     }
 
     private void connectGooglePlayBilling() {
@@ -355,6 +351,42 @@ public class MainActivity extends AppCompatActivity {
         billingClient.consumeAsync(consumeParams, listener);
     }
 
+/*
+    public void delete(ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri) {
+
+        ContentResolver contentResolver = getContentResolver();
+
+        try {
+
+            //delete object using resolver
+            contentResolver.delete(uri, null, null);
+
+        } catch (SecurityException e) {
+
+            PendingIntent pendingIntent = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+                ArrayList<Uri> collection = new ArrayList<>();
+                collection.add(uri);
+                pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
+
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+                //if exception is recoverable then again send delete request using intent
+                if (e instanceof RecoverableSecurityException) {
+                    RecoverableSecurityException exception = (RecoverableSecurityException) e;
+                    pendingIntent = exception.getUserAction().getActionIntent();
+                }
+            }
+
+            if (pendingIntent != null) {
+                IntentSender sender = pendingIntent.getIntentSender();
+                IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+                launcher.launch(request);
+            }
+        }
+    }*/
 
     public static boolean initialAds = false;
     protected void onResume() {
@@ -372,7 +404,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
         );
+        checkShowAd();
+    }
 
+    public void checkShowAd() {
         if (initialAds) {
             if (!SettingManager2.getRemoveAds(getApplicationContext())) {
                 System.out.println("thanhlv createBannerAdmob onresum");
@@ -383,8 +418,6 @@ public class MainActivity extends AppCompatActivity {
                 mInterstitialAdAdmob = null;
             }
         }
-
-
     }
 
     private void handleIncomingRequest(Intent intent) {

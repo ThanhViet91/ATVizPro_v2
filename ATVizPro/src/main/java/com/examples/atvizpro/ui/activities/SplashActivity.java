@@ -1,5 +1,7 @@
 package com.examples.atvizpro.ui.activities;
 
+import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +14,7 @@ import com.examples.atvizpro.App;
 import com.examples.atvizpro.AppOpenManager;
 import com.examples.atvizpro.IAppOpenAdListener;
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
@@ -21,15 +24,27 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
-
+        hideStatusBar(this);
         // initialise pulsator layout
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
-        App.appOpenManager.setCallBack(this);
+        if (SettingManager2.getRemoveAds(App.getAppContext())) {
+            System.out.println("thanhlv Ad was removed");
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    pulsator.stop();
+                    finish();
+                }
+            }, 5000);
+        } else {
+            App.appOpenManager.setCallBack(this);
+        }
     }
 
     boolean isActive = false;

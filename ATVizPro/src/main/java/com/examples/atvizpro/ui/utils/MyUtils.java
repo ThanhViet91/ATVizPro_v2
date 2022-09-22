@@ -1,5 +1,7 @@
 package com.examples.atvizpro.ui.utils;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -133,14 +135,13 @@ public class MyUtils {
         return directory.getAbsolutePath();
     }
 
-    @SuppressLint("ObsoleteSdkInt")
-    public static String getPhotoDirectory(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD_MR1) {
-            return context.getExternalFilesDir(Environment.DIRECTORY_DCIM) + "/Recorder";
-        }
-        else
-            return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).toString() + "/Recorder";
-
+    @NonNull
+    public static String getBaseStorageDirectory2() {
+        File directory = new File(Environment.getExternalStorageDirectory() + "/Recorder222");
+        getApplicationContext().getExternalFilesDir("Thanhthanh123");
+        if (!directory.exists())
+            directory.mkdirs();
+        return directory.getAbsolutePath();
     }
 
     @NonNull

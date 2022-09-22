@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.VideoEditorView;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
@@ -53,6 +54,10 @@ public class AppOpenManager implements LifecycleObserver, Application.ActivityLi
     /** LifecycleObserver methods */
     @OnLifecycleEvent(ON_START)
     public void onStart() {
+        if (SettingManager2.getRemoveAds(App.getAppContext())) {
+            System.out.println("thanhlv Ad was removed");
+            return;
+        }
         if (isPickFromGallery){
             isPickFromGallery = false;
             return;

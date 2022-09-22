@@ -37,6 +37,15 @@
 
 <!--        <provider android:name=".MyProvider" android:authorities="com.examples.atvizpro" android:exported="true" />-->
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path" />
+        </provider>
 
         <activity android:name=".SimpleExample" android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
                   android:windowSoftInputMode="stateAlwaysHidden"

@@ -187,11 +187,10 @@ public class ExecuteService extends Service {
             notificationBuilder = new Notification.Builder(getApplicationContext());
         notificationBuilder
                 .setOngoing(true)
-                .setCustomContentView(notificationLayoutExpanded)
+//                .setCustomBigContentView(notificationLayoutExpanded)
                 .setVibrate(new long[]{0L})
                 .setContentTitle("AT Screen Recorder")
-//                .setContentTitle("ATVizPro is running in background")
-                .setPriority(Notification.PRIORITY_MIN)
+//                .setPriority(Notification.PRIORITY_MIN)
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
                 .setContentIntent(pendingIntent)

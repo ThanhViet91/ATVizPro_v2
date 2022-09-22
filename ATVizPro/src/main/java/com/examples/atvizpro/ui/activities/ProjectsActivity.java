@@ -7,13 +7,25 @@ import static com.examples.atvizpro.ui.utils.MyUtils.hideStatusBar;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -51,6 +63,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
         }
+
+
     }
 
     @Override
@@ -173,5 +187,51 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteFile(SecurityException e, Uri uri, ContentResolver contentResolver) {
+        delete(e, loginResultHandler, uri, contentResolver);
+    }
+
+    private ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+        // handle intent result here
+        if (result.getResultCode() == RESULT_OK) {
+            Toast.makeText(this, "The video is deleted!", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            //...
+//            Toast.makeText(this, "Error!! Can't delete this video!", Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    boolean isDeleleteNomal;
+    public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
+
+
+            PendingIntent pendingIntent = null;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+
+                ArrayList<Uri> collection = new ArrayList<>();
+                collection.add(uri);
+                pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
+
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+                //if exception is recoverable then again send delete request using intent
+                if (e instanceof RecoverableSecurityException) {
+                    RecoverableSecurityException exception = (RecoverableSecurityException) e;
+                    pendingIntent = exception.getUserAction().getActionIntent();
+                }
+            }
+
+            if (pendingIntent != null) {
+                IntentSender sender = pendingIntent.getIntentSender();
+                IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+                launcher.launch(request);
+            }
+
+
     }
 }

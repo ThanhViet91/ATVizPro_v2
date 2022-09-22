@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
@@ -78,7 +79,8 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         btn_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getParentFragmentManager().popBackStack();
+                ((MainActivity) requireActivity()).checkShowAd();
+                requireActivity().onBackPressed();
             }
         });
 

@@ -1,13 +1,19 @@
 package com.examples.atvizpro.adapter;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentSender;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,10 +32,13 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.examples.atvizpro.App;
 import com.examples.atvizpro.R;
 import com.examples.atvizpro.model.VideoModel;
+import com.examples.atvizpro.ui.utils.MyUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,6 +49,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
 
     public interface VideoProjectsListener {
         void onSelected(String path);
+        void onDeleteFile(SecurityException e, Uri uri, ContentResolver contentResolver);
     }
 
     private VideoProjectsListener listener;
@@ -65,9 +77,6 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         return new ViewHolder(view);
     }
 
-
-
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
@@ -76,7 +85,6 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             holder.duration.setText(video.getDuration());
             Glide.with(context)
                     .load(video.getThumb())
-//                    .transform(new CenterInside(), new RoundedCorners(25))
                     .into(holder.img);
             holder.name.setText(video.getName());
         }
@@ -97,19 +105,23 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                             @SuppressLint("NotifyDataSetChanged")
                             public void onClick(DialogInterface dialog, int which) {
                                 // Continue with delete operation
-                                if (new File(list.get(position).getThumb()).delete()) {
-                                    list.remove(list.get(position));
-                                    notifyDataSetChanged();
-                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(context, "Error!! Can't delete this video!", Toast.LENGTH_SHORT).show();
-                                    new Handler().postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            holder.itemView.setAlpha(1);
-                                        }
-                                    }, 500);
-                                }
+                                File file = new File(list.get(position).getThumb());
+                                MediaScannerConnection.scanFile(context, new String[]{file.getPath()}, new String[]{file.getName()},
+                                        new MediaScannerConnection.OnScanCompletedListener() {
+                                            @Override
+                                            public void onScanCompleted(String s, Uri uri) {
+                                                ContentResolver contentResolver = context.getContentResolver();
+                                                try {
+                                                    //delete object using resolver
+                                                    contentResolver.delete(uri, null, null);
+                                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
+                                                } catch (SecurityException e) {
+                                                    listener.onDeleteFile(e, uri, contentResolver);
+                                                }
+                                            }
+                                        });
+                                list.remove(list.get(position));
+                                notifyDataSetChanged();
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -131,6 +143,8 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         });
 
     }
+
+
 
     @Override
     public int getItemCount() {

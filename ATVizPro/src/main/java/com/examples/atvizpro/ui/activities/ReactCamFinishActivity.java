@@ -110,7 +110,7 @@ public class ReactCamFinishActivity extends AppCompatActivity implements View.On
         }
         videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
-        videoView.start();
+        videoView.seekTo(1);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(final MediaPlayer mp) {

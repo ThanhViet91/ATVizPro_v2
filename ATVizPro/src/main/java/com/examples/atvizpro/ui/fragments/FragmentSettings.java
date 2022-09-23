@@ -65,11 +65,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         return mViewRoot;
     }
 
+    SettingsAdapter adapter;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = view.findViewById(R.id.recycler_view_position);
-        SettingsAdapter adapter = new SettingsAdapter(getContext(), settingsItems);
+        adapter = new SettingsAdapter(getContext(), settingsItems);
         adapter.setListener(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setAdapter(adapter);
@@ -94,11 +95,13 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         mFragmentManager = getParentFragmentManager();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
         super.onResume();
         AdView mAdView = mViewRoot.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);
+        if (adapter != null) adapter.notifyDataSetChanged();
     }
 
     @Override

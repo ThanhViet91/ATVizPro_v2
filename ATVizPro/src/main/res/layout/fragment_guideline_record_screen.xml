@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/bg_home">
 
 
     <RelativeLayout
+        android:layout_centerHorizontal="true"
         android:id="@+id/header"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        android:gravity="center"
+        android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_marginTop="20dp">
 
@@ -20,6 +20,7 @@
         <TextView
             style="@style/Title_Box_White"
             android:id="@+id/title"
+            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:gravity="center"
@@ -33,6 +34,7 @@
             android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
+            android:layout_alignParentEnd="true"
             android:layout_toEndOf="@id/title"
             android:gravity="center"
             android:text="@string/skip"
@@ -40,7 +42,9 @@
 
     </RelativeLayout>
     <TextView
+        android:layout_below="@id/header"
         android:id="@+id/tv_decs"
+        android:layout_centerHorizontal="true"
         style="@style/Text_Description_White_15_400"
         android:textSize="22sp"
         android:gravity="center"
@@ -53,24 +57,28 @@
         android:layout_height="wrap_content"
         tools:targetApi="p" />
     <FrameLayout
-        android:layout_marginTop="20dp"
+        android:id="@+id/images"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tv_decs"
+        android:layout_above="@id/btn_continue_"
+        android:layout_marginTop="10dp"
         android:orientation="vertical"
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp">
+        android:layout_height="match_parent">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager_img_facebook"
-            android:paddingEnd="40dp"
-            android:paddingStart="40dp"
+            android:paddingEnd="36dp"
+            android:paddingStart="36dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="40dp"/>
+            android:paddingBottom="30dp"/>
 
         <me.relex.circleindicator.CircleIndicator3
             android:id="@+id/circle_indicator_facebook"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
+            android:layout_marginTop="10dp"
             android:layout_gravity="bottom|center"
             app:ci_drawable_unselected="@drawable/un_select_img"
             app:ci_drawable="@drawable/select_img"
@@ -80,7 +88,9 @@
 
     </FrameLayout>
     <TextView
-        android:id="@+id/btn_continue_facebook_livestreaming"
+        android:layout_above="@id/adView"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/btn_continue_"
         android:layout_marginTop="10dp"
         android:text="@string/continue_"
         android:textColor="#FF694C"
@@ -89,7 +99,25 @@
         android:textSize="20dp"
         android:textStyle="bold"
         android:background="@drawable/custom_btn"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-</LinearLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:visibility="gone"
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_line"
+        android:layout_centerHorizontal="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+
+    <View
+        android:id="@+id/bottom_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="48dp"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

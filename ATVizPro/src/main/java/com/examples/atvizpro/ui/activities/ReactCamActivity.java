@@ -554,7 +554,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         rtmpCamera = null;
     }
 
-    private int camSize = 3;
+    private int camSize = 6;
 
     @Override
     public void zoomOut() {

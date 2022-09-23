@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.ui.VideoEditorView;
 import com.examples.atvizpro.ui.VideoStreamListener;
 import com.examples.atvizpro.ui.fragments.IOptionFragmentListener;
@@ -61,13 +62,13 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
 
-        createInterstitialAdmob();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         videoEditorView.showOrHideAdBanner();
+        createInterstitialAdmob();
     }
 
     @Override
@@ -141,6 +142,10 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     InterstitialAd mInterstitialAdAdmob = null;
 
     public void createInterstitialAdmob() {
+        if (SettingManager2.getRemoveAds(this)) {
+            mInterstitialAdAdmob = null;
+            return;
+        }
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
                 new InterstitialAdLoadCallback() {

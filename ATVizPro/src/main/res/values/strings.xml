@@ -31,9 +31,10 @@
 
     <!--Video settings-->
     <string name="setting_first_time_record">setting_first_time_record</string>
-    <string name="setting_first_time_livestream_youtube">setting_first_time_livestream</string>
-    <string name="setting_first_time_livestream_facebook">setting_first_time_livestream</string>
-    <string name="setting_first_time_livestream_twitch">setting_first_time_livestream</string>
+    <string name="setting_first_time_livestream">setting_first_time_livestream</string>
+    <string name="setting_first_time_livestream_youtube">setting_first_time_livestream_youtube</string>
+    <string name="setting_first_time_livestream_facebook">setting_first_time_livestream_facebook</string>
+    <string name="setting_first_time_livestream_twitch">setting_first_time_livestream_twitch</string>
     <string name="setting_video_bitrate">setting_video_bitrate</string>
     <string name="setting_video_resolution">setting_video_resolution</string>
     <string name="setting_video_fps">setting_video_fps</string>

@@ -16,11 +16,18 @@ import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.FAQAdapter;
 import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class FragmentFAQ extends Fragment {
 
@@ -80,6 +87,5 @@ public class FragmentFAQ extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
-
 
 }

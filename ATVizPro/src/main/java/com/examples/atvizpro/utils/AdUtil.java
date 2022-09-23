@@ -73,32 +73,4 @@ public class AdUtil {
         return a < 70;
     }
 
-
-
-    public static InterstitialAd mInterstitialAd;
-    public static InterstitialAd createInterstitialAdmob(Context context) {
-
-
-        AdRequest adRequest = new AdRequest.Builder().build();
-
-        InterstitialAd.load(context,"ca-app-pub-3940256099942544/1033173712", adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAd =  interstitialAd;
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        mInterstitialAd = null;
-                        createInterstitialAdmob(context);
-                    }
-                });
-
-
-        return mInterstitialAd;
-    }
 }

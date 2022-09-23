@@ -1,7 +1,6 @@
 package com.examples.atvizpro.ui.fragments;
 
 import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
-import static com.examples.atvizpro.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -69,7 +68,7 @@ public class FacebookLiveStreamingFragment extends Fragment {
 
         viewPager2 = view.findViewById(R.id.view_pager_img_facebook);
         circleIndicator3 = view.findViewById(R.id.circle_indicator_facebook);
-        btnContinue = view.findViewById(R.id.btn_continue_facebook_livestreaming);
+        btnContinue = view.findViewById(R.id.btn_continue_);
         imgBack = view.findViewById(R.id.img_back_fb_slider);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());

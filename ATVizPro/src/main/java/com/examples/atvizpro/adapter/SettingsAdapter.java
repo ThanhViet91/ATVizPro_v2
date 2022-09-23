@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atvizpro.R;
+import com.examples.atvizpro.controllers.settings.SettingManager2;
 import com.examples.atvizpro.model.FAQItem;
 import com.examples.atvizpro.model.SettingsItem;
 
@@ -49,11 +50,19 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         SettingsItem item = mFAQs.get(position);
+        if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
+            if (SettingManager2.getRemoveAds(mContext)) {
+                holder.itemView.setAlpha(0.5f);
+            } else holder.itemView.setAlpha(1f);
+        }
         holder.content_settings.setText(item.getContent());
         holder.ava_settings.setBackgroundResource(item.getResourceId());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
+                    if (SettingManager2.getRemoveAds(mContext)) return;
+                }
                 if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
             }
         });

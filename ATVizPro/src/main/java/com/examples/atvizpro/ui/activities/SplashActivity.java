@@ -26,6 +26,8 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         hideStatusBar(this);
+
+        isActive = true;
         // initialise pulsator layout
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
@@ -51,7 +53,6 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     @Override
     protected void onStart() {
         super.onStart();
-        isActive = true;
     }
 
     @Override
@@ -64,6 +65,7 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     public void onLoadFail() {
         if (isActive) {
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             pulsator.stop();
             finish();
@@ -74,6 +76,7 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     public void onDismiss() {
         if (isActive) {
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             pulsator.stop();
             finish();

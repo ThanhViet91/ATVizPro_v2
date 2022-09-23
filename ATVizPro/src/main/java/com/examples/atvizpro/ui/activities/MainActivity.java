@@ -56,6 +56,7 @@ import com.examples.atvizpro.ui.fragments.DialogSelectVideoSource;
 import com.examples.atvizpro.ui.fragments.DialogVideoResolution;
 import com.examples.atvizpro.ui.fragments.FragmentFAQ;
 import com.examples.atvizpro.ui.fragments.FragmentSettings;
+import com.examples.atvizpro.ui.fragments.GuidelineLiveStreamFragment;
 import com.examples.atvizpro.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atvizpro.ui.fragments.LiveStreamingFragment;
 import com.examples.atvizpro.ui.services.ControllerService;
@@ -75,7 +76,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
-    private static final String ACTION_SCREEN_RECORD = "action_record";
+    public static final int REQUEST_SHOW_FAQ = 102;
+    public static final int REQUEST_SHOW_PROJECTS_DEFAULT = 105;
+    private static final String THE_FIRST_TIME_SCREEN_RECORD = "action_first_record";
+    private static final String THE_FIRST_TIME_LIVESTREAM = "action_first_livestream";
     public static boolean active = false;
     private static final boolean DEBUG = MyUtils.DEBUG;
     private static final int PERMISSION_REQUEST_CODE = 3004;
@@ -320,13 +323,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                         if (!SettingManager2.getRemoveAds(getApplicationContext())) {
 
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
-                                        AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-                                    }
-                                });
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
+                                    AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                                }
+                            });
 
                         }
                     }
@@ -351,43 +354,6 @@ public class MainActivity extends AppCompatActivity {
         billingClient.consumeAsync(consumeParams, listener);
     }
 
-/*
-    public void delete(ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri) {
-
-        ContentResolver contentResolver = getContentResolver();
-
-        try {
-
-            //delete object using resolver
-            contentResolver.delete(uri, null, null);
-
-        } catch (SecurityException e) {
-
-            PendingIntent pendingIntent = null;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
-                ArrayList<Uri> collection = new ArrayList<>();
-                collection.add(uri);
-                pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
-
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-                //if exception is recoverable then again send delete request using intent
-                if (e instanceof RecoverableSecurityException) {
-                    RecoverableSecurityException exception = (RecoverableSecurityException) e;
-                    pendingIntent = exception.getUserAction().getActionIntent();
-                }
-            }
-
-            if (pendingIntent != null) {
-                IntentSender sender = pendingIntent.getIntentSender();
-                IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
-                launcher.launch(request);
-            }
-        }
-    }*/
-
     public static boolean initialAds = false;
     protected void onResume() {
         super.onResume();
@@ -409,28 +375,20 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkShowAd() {
         if (initialAds) {
-            if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                System.out.println("thanhlv createBannerAdmob onresum");
-                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-                createInterstitialAdmob();
-            } else {
-                mAdView.setVisibility(View.GONE);
-                mInterstitialAdAdmob = null;
-            }
+            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+            createInterstitialAdmob();
         }
     }
 
     private void handleIncomingRequest(Intent intent) {
         if (intent.getAction() != null) {
-            System.out.println("thanhlv Main intent === action : "+ intent.getAction());
+            System.out.println("thanhlv Main intent === action : " + intent.getAction());
             switch (intent.getAction()) {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
                     break;
 
                 case "from_notification":
-//                    Intent intent1 = new Intent(this, ExecuteService.class);
-//                    stopService(intent1);
                     break;
             }
         }
@@ -446,7 +404,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mImgRec;
     PulsatorLayout pulsator;
     private void initViews() {
-
         mAdView = findViewById(R.id.adView);
 
         // initialise pulsator layout
@@ -455,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
 
         //initData()
         generateVideoSettings();
-        updateUI();
+        updateVideoSettings();
 
         //
         mImgRec = findViewById(R.id.img_record);
@@ -482,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
                 new DialogVideoResolution(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-                        updateUI();
+                        updateVideoSettings();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
@@ -494,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
                 new DialogBitrate(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-                        updateUI();
+                        updateVideoSettings();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
@@ -506,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
                 new DialogFrameRate(new DialogFragmentBase.IVideoSettingListener() {
                     @Override
                     public void onClick() {
-                        updateUI();
+                        updateVideoSettings();
                     }
                 }).show(getSupportFragmentManager(), "");
             }
@@ -516,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
         mImgRec.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFirstTimeReach(ACTION_SCREEN_RECORD)) return;
+                if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
                 if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
                     MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_INDEFINITE);
                     return;
@@ -536,11 +493,7 @@ public class MainActivity extends AppCompatActivity {
         lnFAQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new FragmentFAQ(), "")
-                        .addToBackStack("")
-                        .commit();
+                showFAQFragment();
             }
         });
 
@@ -558,11 +511,8 @@ public class MainActivity extends AppCompatActivity {
         btn_live.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new LiveStreamingFragment(), "")
-                        .addToBackStack("")
-                        .commit();
+                if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
+                showLiveStreamFragment();
             }
         });
 
@@ -578,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
         btn_projects.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInterstitialAd(0);
+                showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT);
             }
         });
 
@@ -590,6 +540,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void showLiveStreamFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, new LiveStreamingFragment(), "")
+                .addToBackStack("")
+                .commit();
+    }
+
+    public void showFAQFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, new FragmentFAQ(), "")
+                .addToBackStack("")
+                .commit();
     }
 
     private boolean checkServiceBusy() {
@@ -610,12 +576,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isFirstTimeReach(String type) {
-        if (type.equals(ACTION_SCREEN_RECORD))
-        if (SettingManager2.getFirstTimeRecord(this)) {
-            showTutorialScreenRecord();
-            SettingManager2.setFirstTimeRecord(this, false);
-            return true;
-        }
+        if (type.equals(THE_FIRST_TIME_SCREEN_RECORD))
+            if (SettingManager2.getFirstTimeRecord(this)) {
+                showTutorialScreenRecord();
+                SettingManager2.setFirstTimeRecord(this, false);
+                return true;
+            }
+
+        if (type.equals(THE_FIRST_TIME_LIVESTREAM))
+            if (SettingManager2.getFirstTimeLiveStream(this)) {
+                showTutorialLiveStream();
+                SettingManager2.setFirstTimeLiveStream(this, false);
+                return true;
+            }
 
         return false;
     }
@@ -628,7 +601,15 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void updateUI() {
+    private void showTutorialLiveStream() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment())
+                .addToBackStack("")
+                .commit();
+    }
+
+    private void updateVideoSettings() {
 
         TextView tv_resolution = findViewById(R.id.tv_video_resolution);
         TextView tv_bitrate = findViewById(R.id.tv_bitrate);
@@ -669,13 +650,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ProjectsActivity.class);
         intent.putExtra("key_from_code", from_code);
         startActivity(intent);
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("key_from_code", from_code);
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.frame_layout_fragment, ProjectsActivity.newInstance(bundle), "")
-//                .addToBackStack("")
-//                .commitAllowingStateLoss();
     }
 
     public void showDialogPickFromGallery(int from_code) {
@@ -687,10 +661,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     InterstitialAd mInterstitialAdAdmob = null;
 
     public void createInterstitialAdmob() {
+        if (SettingManager2.getRemoveAds(this)) {
+            mInterstitialAdAdmob = null;
+            return;
+        }
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
                 new InterstitialAdLoadCallback() {
@@ -710,7 +687,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void showInterstitialAd(int from_code){
+    public void showInterstitialAd(int from_code) {
         if (mInterstitialAdAdmob != null) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -746,6 +723,8 @@ public class MainActivity extends AppCompatActivity {
 
         // PERMISSION DRAW OVER
         if (!Settings.canDrawOverlays(this)) {
+
+            System.out.println("thanhlv Draw over other app permission not available 1111111");
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
@@ -835,7 +814,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
         if (requestCode == REQUEST_VIDEO_FOR_VIDEO_EDIT && resultCode == RESULT_OK) {
             System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY");
             final Uri selectedUri = data.getData();
@@ -857,11 +835,11 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
         if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
 
             //Check if the permission is granted or not.
             if (resultCode != RESULT_OK) { //Permission is not available
+                System.out.println("thanhlv Draw over other app permission not available");
                 MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);
             }
         } else if (requestCode == PERMISSION_RECORD_DISPLAY) {

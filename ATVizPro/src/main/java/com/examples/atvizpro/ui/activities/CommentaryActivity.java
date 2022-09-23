@@ -151,12 +151,15 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
         }
     }
 
-    public void showInterstitialAd(){
-        try {
-            copyFile(new File(videoPath), new File(VideoUtil.generateFileOutput()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void showResultActivity(String videoPath){
+        Intent intent = new Intent(this, ReactCamFinishActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, videoPath);
+        System.out.println("thanhlv showResultActivity after execute "+videoPath);
+        startActivity(intent);
+    }
+    public void showInterstitialAd(String videoPath){
+
+
         if (mInterstitialAdAdmob != null) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -166,14 +169,14 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
 
                 @Override
                 public void onAdDismissedFullScreenContent() {
-                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    showResultActivity(videoPath);
                     finish();
                     createInterstitialAdmob();
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(AdError adError) {
-                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                    showResultActivity(videoPath);
                     finish();
                 }
 
@@ -186,30 +189,26 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
                 }
             });
         } else {
-            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+            showResultActivity(videoPath);
             finish();
         }
     }
 
 
-    String videoPath;
     private void doExecuteCommentary() {
         if (!pathOriginalVideo.equals("") && !cacheAudioFilePath.equals("")) {
             new VideoUtil().commentaryAudio(this, pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
                 @Override
                 public void onStartTranscoding(String outPath) {
-//                    buildDialog("compression...");
                     animationView.setVisibility(View.VISIBLE);
                     animationView.playAnimation();
                 }
 
                 @Override
                 public void onFinishTranscoding(String code) {
-//                    if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
                     animationView.pauseAnimation();
                     animationView.setVisibility(View.GONE);
-                    videoPath = code;
-                    showInterstitialAd();
+                    showInterstitialAd(code);
                 }
 
                 @Override

@@ -26,6 +26,20 @@ public class SettingManager2 {
         return preferences.getBoolean(key, true);
     }
 
+    public static void setFirstTimeLiveStream(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean getFirstTimeLiveStream(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_first_time_livestream);
+        return preferences.getBoolean(key, true);
+    }
+
     public static void setFirstTimeLiveStreamYoutube(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_first_time_livestream_youtube);

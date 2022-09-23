@@ -199,7 +199,7 @@ public class RecordingService extends BaseService {
 
                         showResultActivity(outputFile);
                     }
-                }, 1500);
+                }, 1000);
                 // you should not wait here
             }
         }

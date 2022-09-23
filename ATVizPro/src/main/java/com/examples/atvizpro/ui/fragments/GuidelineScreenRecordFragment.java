@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,12 +22,13 @@ import com.examples.atvizpro.R;
 import com.examples.atvizpro.adapter.PhotoAdapter;
 import com.examples.atvizpro.model.PhotoModel;
 import com.examples.atvizpro.ui.activities.MainActivity;
+import com.examples.atvizpro.utils.AdUtil;
+import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -69,7 +69,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
 
         viewPager2 = view.findViewById(R.id.view_pager_img_facebook);
         circleIndicator3 = view. findViewById(R.id.circle_indicator_facebook);
-        btnContinue =  view.findViewById(R.id.btn_continue_facebook_livestreaming);
+        btnContinue =  view.findViewById(R.id.btn_continue_);
         imgBack =  view.findViewById(R.id.img_back_fb_slider);
         tvDecs =  view.findViewById(R.id.tv_decs);
 
@@ -127,7 +127,15 @@ public class GuidelineScreenRecordFragment extends Fragment {
                     mParentActivity.onBackPressed();
             }
         });
+        AdView mAdView = view.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(getContext(), mAdView);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        AdView mAdview = mViewRoot.findViewById(R.id.adView);
+        AdUtil.createBannerAdmob(requireContext(), mAdview);
     }
 
     private void setDecs(int i) {

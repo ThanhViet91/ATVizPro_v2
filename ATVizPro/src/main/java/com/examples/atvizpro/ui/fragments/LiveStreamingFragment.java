@@ -117,7 +117,7 @@ public class LiveStreamingFragment extends Fragment {
         if (type == SOCIAL_TYPE_TWITCH) fragment = new TwitchLiveStreamingFragment();
         if (fragment != null)
             mFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout_fragment, new YoutubeLiveStreamingFragment())
+                    .replace(R.id.frame_layout_fragment, fragment)
                     .addToBackStack("")
                     .commit();
     }

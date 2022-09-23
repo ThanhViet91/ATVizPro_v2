@@ -1,5 +1,6 @@
 package com.examples.atvizpro.ui.activities;
 
+import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
 import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atvizpro.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
@@ -181,6 +182,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             case REQUEST_VIDEO_FOR_COMMENTARY:
                 intent = new Intent(this, CommentaryActivity.class);
                 break;
+            case REQUEST_SHOW_PROJECTS_DEFAULT:
             default:
                 intent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
                 intent.setDataAndType(Uri.parse(path), "video/*");

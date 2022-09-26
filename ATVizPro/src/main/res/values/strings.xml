@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ATVizPro</string>
+    <string name="app_name">AT Zecord</string>
     <string name="email">infoboy.ftu.edu@gmail.com</string>
     <string name="full_app_name">ATVizPro</string>
     <string name="welcome_demo">Demo shows how easy it is for every application to run FFMpeg commands.</string>
@@ -159,5 +159,7 @@
     <string name="rtmp_address">RTMP address</string>
     <string name="livestreaming_title">Livestreaming</string>
     <string name="camera_view_can_zoom_and_move">Camera view can zoom and move!!</string>
+    <string name="step_1">Step 1:....</string>
+    <string name="todo">TODO</string>
 
 </resources>

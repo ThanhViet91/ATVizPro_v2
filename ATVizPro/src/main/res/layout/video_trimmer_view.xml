@@ -21,13 +21,13 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/video_frames_recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_gravity="bottom" />
 
             <ImageView
                 android:id="@+id/positionIcon"
                 android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="30dp"
                 android:contentDescription="@null"
@@ -47,7 +47,7 @@
                 <LinearLayout
                     android:id="@+id/seekBarLayout"
                     android:layout_width="0dp"
-                    android:layout_height="60dp"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
                     android:gravity="bottom"
@@ -76,7 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/black">
-            <com.examples.atvizpro.ui.ZVideoView
+            <com.examples.atscreenrecord.ui.ZVideoView
                 android:id="@+id/video_loader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.examples.atvizpro"
+    package="com.examples.atscreenrecord"
       android:installLocation="internalOnly"
       android:versionCode="101"
       android:versionName="1.0.1">
@@ -35,7 +35,7 @@
         android:roundIcon="@drawable/ic_app"
         android:theme="@style/AppTheme">
 
-<!--        <provider android:name=".MyProvider" android:authorities="com.examples.atvizpro" android:exported="true" />-->
+<!--        <provider android:name=".MyProvider" android:authorities="com.examples.atscreenrecord" android:exported="true" />-->
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -125,7 +125,6 @@
         <activity
             android:name=".ui.activities.SplashActivity"
             android:noHistory="true"
-            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -135,8 +134,6 @@
         </activity>
         <activity android:name=".ui.activities.MainActivity"
             android:exported="true"
-            android:alwaysRetainTaskState="true"
-            android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
@@ -145,6 +142,10 @@
 <!--                <category android:name="android.intent.category.LAUNCHER" />-->
 <!--            </intent-filter>-->
         </activity>
+
+
+<!--        android:alwaysRetainTaskState="true"-->
+<!--        android:launchMode="singleTask"-->
 
 <!--        <activity-->
 <!--            android:name="ui.activities.SyncActivity"-->
@@ -186,7 +187,7 @@
             android:exported="false" />
         <service android:name=".ui.services.streaming.StreamingControllerService" />
         <service android:name=".ui.services.streaming.StreamingService" />
-        <service android:name=".ui.services.sync.SyncService" />
+<!--        <service android:name=".ui.services.sync.SyncService" />-->
 
         <service
             android:foregroundServiceType="mediaProjection|location|camera|microphone"

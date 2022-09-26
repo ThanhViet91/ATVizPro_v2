@@ -21,6 +21,8 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.serenegiant:common:0.0.3@aar'
+
+        classpath 'com.google.gms:google-services:4.3.13'
         ////
     }
 }
@@ -29,5 +31,6 @@ allprojects {
     repositories {
         jcenter()
         google()
+        mavenCentral()  // Maven Central repository
     }
 }

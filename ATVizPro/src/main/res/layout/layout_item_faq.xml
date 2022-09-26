@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/tv_question"
-            style="@style/Title_Box_White"
+            style="@style/Title_Box_Black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -55,7 +55,7 @@
     <TextView
         android:visibility="gone"
         android:id="@+id/tv_answer"
-        style="@style/Body_List_Item_White_16_400"
+        style="@style/Body_List_Item_Black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

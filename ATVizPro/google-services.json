@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "707895026332",
+    "project_id": "atscreenrecord",
+    "storage_bucket": "atscreenrecord.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707895026332:android:723f794b4d848a877b0359",
+        "android_client_info": {
+          "package_name": "com.examples.atscreenrecord"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "707895026332-38p9n9qdchm8m6fe9buhfa70nmnlocqr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9tc0yadI4lOvoa2JzgATTl7IJC5mwRbY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "707895026332-38p9n9qdchm8m6fe9buhfa70nmnlocqr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

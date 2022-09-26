@@ -1,47 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
-    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:background="@drawable/bg_home">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_home"
+    android:clickable="true"
+    tools:ignore="KeyboardInaccessibleWidget">
 
-    <TextView
-        android:id="@+id/tv_btn_cancel_projects"
-        style="@style/Title_Box_White"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
-        android:padding="6dp"
-        android:text="@string/cancel"
-        android:textFontWeight="600"
-        android:textSize="18sp"
-        tools:targetApi="p" />
+        android:layout_marginTop="@dimen/header_top_margin">
 
-    <TextView
-        style="@style/Title_Box_White"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
-        android:text="@string/my_recordings"
-        android:textFontWeight="700"
-        android:textSize="24sp"
-        tools:targetApi="p" />
+        <TextView
+            android:id="@+id/tv_btn_cancel_projects"
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="@dimen/normal_margin"
+            android:padding="@dimen/medium_padding"
+            android:text="@string/cancel"
+            android:textSize="18sp" />
+
+        <TextView
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="2dp"
+            android:text="@string/my_recordings"
+            android:textFontWeight="700"
+            android:textSize="24sp"
+            tools:targetApi="p" />
+
+    </RelativeLayout>
+
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/adView"
-        android:paddingStart="10dp"
-        android:layout_marginTop="100dp"
-        android:layout_marginBottom="6dp"
-        android:paddingEnd="10dp">
+        android:layout_below="@id/header"
+        android:layout_marginTop="@dimen/medium_margin"
+        android:layout_marginBottom="@dimen/medium_margin"
+        android:paddingStart="@dimen/normal_padding"
+        android:paddingEnd="@dimen/normal_padding">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_videos"
@@ -55,26 +62,30 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
-        android:text="@string/no_video"
-        android:textColor="@color/white"
-        android:visibility="gone"
         android:id="@+id/tvEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"
+        android:text="@string/no_video"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
-    <com.google.android.gms.ads.AdView
-        android:visibility="gone"
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_line"
         android:layout_centerHorizontal="true"
+        android:visibility="gone"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
-        android:layout_marginBottom="48dp"
-        android:layout_alignParentBottom="true"/>
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
+    <View
+        android:id="@+id/bottom_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/adview_margin" />
 
 
 </RelativeLayout>

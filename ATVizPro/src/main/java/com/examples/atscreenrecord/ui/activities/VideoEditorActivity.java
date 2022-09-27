@@ -2,7 +2,6 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
-import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.VideoEditorView;
-import com.examples.atscreenrecord.ui.VideoStreamListener;
+import com.examples.atscreenrecord.ui.IVideoStreamView;
 import com.examples.atscreenrecord.ui.fragments.IOptionFragmentListener;
 import com.examples.atscreenrecord.ui.fragments.OptionAddImageFragment;
 import com.examples.atscreenrecord.ui.fragments.OptionAddTextFragment;
@@ -40,7 +39,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class VideoEditorActivity extends AppCompatActivity implements IOptionFragmentListener,
-        VideoStreamListener, VideoEditorView.VideoEditorListener {
+        IVideoStreamView, VideoEditorView.VideoEditorListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private VideoEditorView videoEditorView;
@@ -51,7 +50,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.video_editor_layout);
+        setContentView(R.layout.activity_video_editor);
         hideStatusBar(this);
         videoEditorView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();

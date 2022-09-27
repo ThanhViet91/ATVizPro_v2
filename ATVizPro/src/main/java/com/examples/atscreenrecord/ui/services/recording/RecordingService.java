@@ -7,9 +7,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -21,31 +18,19 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.Size;
 import android.view.Display;
-import android.widget.Toast;
 
-import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.encoder.MediaAudioEncoder;
 import com.examples.atscreenrecord.controllers.encoder.MediaEncoder;
 import com.examples.atscreenrecord.controllers.encoder.MediaMuxerWrapper;
-import com.examples.atscreenrecord.controllers.encoder.MediaScreenEncoder;
 import com.examples.atscreenrecord.controllers.encoder.MediaScreenEncoderHard;
-import com.examples.atscreenrecord.controllers.encoder.RenderUtil.CustomDecorator;
-import com.examples.atscreenrecord.controllers.settings.SettingManager;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord.controllers.settings.VideoSetting;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting2;
-import com.examples.atscreenrecord.data.database.VideoDatabase;
-import com.examples.atscreenrecord.data.entities.Video;
-import com.examples.atscreenrecord.ui.activities.MainActivity;
-import com.examples.atscreenrecord.ui.activities.ReactCamFinishActivity;
+import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord.ui.services.BaseService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecordingService extends BaseService {
     private final IBinder mIBinder = new RecordingBinder();
@@ -207,7 +192,7 @@ public class RecordingService extends BaseService {
     }
 
     public void showResultActivity(String finalVideoCachePath) {
-        Intent intent = new Intent(this, ReactCamFinishActivity.class);
+        Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent.putExtra("from_screen_recorder", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -1,7 +1,6 @@
 package com.examples.atscreenrecord.ui.fragments;
 
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,7 +15,6 @@ import androidx.annotation.Nullable;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.utils.VideoUtil;
-//import com.github.guilhe.views.SeekBarRangedView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -126,11 +124,6 @@ public class OptionTrimFragment extends DialogFragmentBase {
             public void onFinishTranscoding(String code) {
                 dismiss();
                 callback.onFinishProcess(code);
-            }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-
             }
         });
 

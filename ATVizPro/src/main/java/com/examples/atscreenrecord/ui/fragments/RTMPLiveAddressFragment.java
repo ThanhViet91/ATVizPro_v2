@@ -13,7 +13,6 @@ import static com.examples.atscreenrecord.ui.services.streaming.StreamingService
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideSoftInput;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -26,8 +25,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,8 +46,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class RTMPLiveAddressFragment extends Fragment {
 
@@ -182,9 +177,9 @@ public class RTMPLiveAddressFragment extends Fragment {
             public void onClick(View v) {
                 hideSoftInput(requireActivity());
                 Fragment fragment = null;
-                if (type == SOCIAL_TYPE_YOUTUBE) fragment = new YoutubeLiveStreamingFragment();
-                if (type == SOCIAL_TYPE_FACEBOOK) fragment = new FacebookLiveStreamingFragment();
-                if (type == SOCIAL_TYPE_TWITCH) fragment = new TwitchLiveStreamingFragment();
+                if (type == SOCIAL_TYPE_YOUTUBE) fragment = new GuidelineYoutubeLiveStreamingFragment();
+                if (type == SOCIAL_TYPE_FACEBOOK) fragment = new GuidelineFacebookLiveStreamingFragment();
+                if (type == SOCIAL_TYPE_TWITCH) fragment = new GuidelineTwitchLiveStreamingFragment();
                 if (fragment != null) {
                     mFragmentManager.beginTransaction()
                             .replace(R.id.frame_layout_fragment, fragment)

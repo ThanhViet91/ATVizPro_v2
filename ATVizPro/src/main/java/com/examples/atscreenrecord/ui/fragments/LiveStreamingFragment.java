@@ -22,8 +22,6 @@ import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
-
 public class LiveStreamingFragment extends Fragment {
 
     ImageView imgBack, imgFacebook, imgYoutube, imgTwitch;
@@ -112,9 +110,9 @@ public class LiveStreamingFragment extends Fragment {
 
     private void showTutorialScreenLiveStream(int type) {
         Fragment fragment = null;
-        if (type == SOCIAL_TYPE_YOUTUBE) fragment = new YoutubeLiveStreamingFragment();
-        if (type == SOCIAL_TYPE_FACEBOOK) fragment = new FacebookLiveStreamingFragment();
-        if (type == SOCIAL_TYPE_TWITCH) fragment = new TwitchLiveStreamingFragment();
+        if (type == SOCIAL_TYPE_YOUTUBE) fragment = new GuidelineYoutubeLiveStreamingFragment();
+        if (type == SOCIAL_TYPE_FACEBOOK) fragment = new GuidelineFacebookLiveStreamingFragment();
+        if (type == SOCIAL_TYPE_TWITCH) fragment = new GuidelineTwitchLiveStreamingFragment();
         if (fragment != null)
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, fragment)

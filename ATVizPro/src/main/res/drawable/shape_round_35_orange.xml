@@ -3,6 +3,6 @@
     android:shape="rectangle">
     <solid android:color="@color/orange_check_radio" />
     <corners
-        android:topLeftRadius="35dp"
-        android:topRightRadius="35dp"/>
+        android:topLeftRadius="32dp"
+        android:topRightRadius="32dp"/>
 </shape>

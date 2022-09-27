@@ -76,7 +76,7 @@
             app:ci_drawable="@drawable/select_img"
             app:ci_drawable_unselected="@drawable/un_select_img"
             app:ci_height="8dp"
-            app:ci_width="8dp"/>
+            app:ci_width="8dp" />
 
     </FrameLayout>
 
@@ -96,8 +96,7 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <com.google.android.gms.ads.AdView
-        xmlns:ads="http://schemas.android.com/apk/res-auto"
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

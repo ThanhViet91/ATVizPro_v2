@@ -94,12 +94,12 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
 
             switch (getArguments().getInt(ARG_PARAM1)) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
-                    ava.setImageResource(R.drawable.ic_react_cam);
+                    ava.setImageResource(R.drawable.ic_react_cam_svg_large);
                     title.setText(R.string.react_cam);
                     des.setText(R.string.react_to_videos_from_camera_roll);
                     break;
                 case REQUEST_VIDEO_FOR_VIDEO_EDIT:
-                    ava.setImageResource(R.drawable.ic_video_editor);
+                    ava.setImageResource(R.drawable.ic_video_editor_svg_large);
                     title.setText(R.string.video_editor);
                     des.setText(R.string.edit_video_from_my_recordings_or_camera_roll);
                     break;

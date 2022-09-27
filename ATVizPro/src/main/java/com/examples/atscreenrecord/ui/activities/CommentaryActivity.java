@@ -11,7 +11,6 @@ import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,8 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord.ui.VideoStreamListener;
-import com.examples.atscreenrecord.ui.VideoStreamView2;
+import com.examples.atscreenrecord.ui.IVideoStreamView;
+import com.examples.atscreenrecord.ui.VideoCommentaryView;
 import com.examples.atscreenrecord.utils.StorageUtil;
 import com.examples.atscreenrecord.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
@@ -39,18 +38,18 @@ import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CommentaryActivity extends AppCompatActivity implements VideoStreamListener {
+public class CommentaryActivity extends AppCompatActivity implements IVideoStreamView {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
-    private VideoStreamView2 videoStreamView;
+    private VideoCommentaryView videoStreamView;
     private String pathOriginalVideo = "";
     private LottieAnimationView animationView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.commentary_layout);
+        setContentView(R.layout.activity_video_commentary);
         hideStatusBar(this);
         videoStreamView = findViewById(R.id.trimmer_view);
         Bundle bd = getIntent().getExtras();
@@ -156,7 +155,7 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
     }
 
     public void showResultActivity(String videoPath){
-        Intent intent = new Intent(this, ReactCamFinishActivity.class);
+        Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);
         System.out.println("thanhlv showResultActivity after execute "+videoPath);
         startActivity(intent);
@@ -214,11 +213,6 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
                     animationView.setVisibility(View.GONE);
                     showInterstitialAd(code);
                 }
-
-                @Override
-                public void onUpdateProgressTranscoding(int progress) {
-
-                }
             });
         }
     }
@@ -246,7 +240,6 @@ public class CommentaryActivity extends AppCompatActivity implements VideoStream
 
     @Override
     public void onCancel() {
-        videoStreamView.onDestroy();
         finish();
     }
 

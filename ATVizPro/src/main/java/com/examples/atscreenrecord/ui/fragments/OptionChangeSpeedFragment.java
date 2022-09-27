@@ -110,11 +110,6 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
                 if (!code.equals(""))
                     mCallback.onFinishProcess(code);
             }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-
-            }
         });
     }
 

@@ -36,11 +36,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord.model.VideoModel;
+import com.examples.atscreenrecord.ui.utils.DialogHelper;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -64,9 +66,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_video_projects);
         hideStatusBar(this);
-
         if (getIntent() != null) from_code = getIntent().getIntExtra("key_from_code", 0);
-
         initViews();
     }
 
@@ -137,7 +137,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         tv_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 modeSelect++;
                 handleSelectButton();
             }
@@ -153,7 +152,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         btn_rename.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                handleRenameButton();
+                handleRenameButton();
             }
         });
 
@@ -175,6 +174,31 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         recyclerView.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
+    }
+
+
+        public void renameFile(final String videoPath, final String newName) throws Exception {
+        if (MyUtils.isValidFilenameSynctax(newName))
+            throw new Exception("A filename cannot contain any of the following charactor: \\/\":*<>| is not n");
+
+        File file = new File(videoPath);
+
+        final File fileWithNewName = new File(file.getParent(), newName);
+        if (fileWithNewName.exists()) {
+            throw new IOException("This filename is exists. Please choose another name");
+        }
+
+        // Rename file (or directory)
+        boolean success = file.renameTo(fileWithNewName);
+
+        if (!success) {
+            // File was not successfully renamed
+            throw new Exception("Cannot rename this video. This video file might not available.");
+        }
+    }
+    private void handleRenameButton() {
+
+        DialogHelper.getInstance().showRenameDialog(this, getVideoListSelected().get(0).getName());
     }
 
     private void handleDeleteButton() {
@@ -345,7 +369,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     @Override
     public void onSelected(String path) {
-        if (from_code != 0) {
+        if (mAdapter.getSelectable()) {
             checkNumberSelected();
             return;
         }
@@ -371,35 +395,21 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         startActivity(intent);
     }
 
-    @Override
-    public void onDeleteFile(SecurityException e, Uri uri, ContentResolver contentResolver) {
-        delete(e, loginResultHandler, uri, contentResolver);
-    }
-
     private ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
         // handle intent result here
         if (result.getResultCode() == RESULT_OK) {
             Toast.makeText(this, "The video is deleted! "+result.getData(), Toast.LENGTH_SHORT).show();
-        } /*else {
-            Toast.makeText(this, "Error!! Can't delete this video! " + result.getResultCode(), Toast.LENGTH_SHORT).show();
-        }*/
+        }
     });
 
-    boolean isDeleleteNomal;
-
     public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
-
-
         PendingIntent pendingIntent = null;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
             ArrayList<Uri> collection = new ArrayList<>();
             collection.add(uri);
             pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
             //if exception is recoverable then again send delete request using intent
             if (e instanceof RecoverableSecurityException) {
                 RecoverableSecurityException exception = (RecoverableSecurityException) e;
@@ -412,7 +422,5 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
             launcher.launch(request);
         }
-
-
     }
 }

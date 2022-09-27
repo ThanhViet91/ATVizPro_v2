@@ -6,8 +6,9 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.multidex.BuildConfig;
+
 import com.examples.atscreenrecord.App;
-import com.examples.atscreenrecord.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;

@@ -14,14 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.ui.VideoTrimListener;
-import com.examples.atscreenrecord.ui.VideoTrimmerView;
+import com.examples.atscreenrecord.ui.VideoBeforeReactView;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 public class CompressBeforeReactCamActivity extends AppCompatActivity implements VideoTrimListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
-    private VideoTrimmerView trimmerView;
+    private VideoBeforeReactView trimmerView;
     private String pathOriginalVideo = "";
 
     @Override
@@ -95,10 +95,6 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
                     nextToReactCam();
                 }
 
-                @Override
-                public void onUpdateProgressTranscoding(int progress) {
-
-                }
             });
         }
     }
@@ -109,10 +105,6 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
         intent.putExtra(KEY_PATH_VIDEO, pathOriginalVideo);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    public void onFinishTrim(String in) {
     }
 
     @Override

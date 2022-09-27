@@ -199,10 +199,6 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
                     mCallback.onFinishProcess(code);
             }
 
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-
-            }
         });
 
     }

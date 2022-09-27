@@ -1,7 +1,6 @@
 package com.examples.atscreenrecord.ui.fragments;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -149,11 +148,6 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
             public void onFinishTranscoding(String code) {
                 if (!code.equals(""))
                 mCallback.onFinishProcess(code);
-            }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-
             }
         });
 

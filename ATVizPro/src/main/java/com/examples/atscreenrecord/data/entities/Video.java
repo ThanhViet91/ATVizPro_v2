@@ -11,13 +11,10 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.examples.atscreenrecord.controllers.settings.VideoSetting;
-import com.examples.atscreenrecord.ui.utils.GoogleDriveFileHolder;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 @Entity(tableName = "videos")
 public class Video implements Parcelable {
@@ -116,14 +113,6 @@ public class Video implements Parcelable {
             return new Video[size];
         }
     };
-
-    public static ArrayList<Video> createTempVideoFromGoogleDriveData(List<GoogleDriveFileHolder> files) {
-        ArrayList<Video> videos = new ArrayList<>();
-        for(GoogleDriveFileHolder file: files){
-            videos.add(new Video(file.getName(), 0, 0, 0, 0,0, file.getSize(), "", file.getModifiedTime().getValue(), file.getId(), file.getThumbnailLink()));
-        }
-        return videos;
-    }
 
     private long getCurrentTime() {
         Calendar cal = Calendar.getInstance();

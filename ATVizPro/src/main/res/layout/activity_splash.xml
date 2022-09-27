@@ -24,6 +24,7 @@
             android:textSize="28sp"/>
 
         <pl.bclogic.pulsator4droid.library.PulsatorLayout
+            android:layout_marginTop="30dp"
             android:id="@+id/pulsator"
             android:layout_width="300dp"
             android:layout_height="300dp"
@@ -38,10 +39,9 @@
 
             <ImageView
                 android:id="@+id/img_record"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_centerInParent="true"
-                android:padding="40dp"
                 android:src="@drawable/img_btn_record_home" />
         </pl.bclogic.pulsator4droid.library.PulsatorLayout>
     </LinearLayout>

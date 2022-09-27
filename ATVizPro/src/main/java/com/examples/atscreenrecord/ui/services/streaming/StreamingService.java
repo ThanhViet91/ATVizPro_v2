@@ -1,15 +1,11 @@
 package com.examples.atscreenrecord.ui.services.streaming;
 
-import static com.examples.atscreenrecord.ui.utils.UIThreadUtil.runOnUiThread;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
-import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
@@ -20,16 +16,14 @@ import android.util.Size;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.pedro.encoder.video.GetVideoData;
-import com.takusemba.rtmppublisher.Publisher;
-import com.takusemba.rtmppublisher.PublisherListener;
-import com.takusemba.rtmppublisher.helper.StreamProfile;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.encoder.RenderUtil.CustomDecorator;
 import com.examples.atscreenrecord.ui.services.BaseService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
+import com.takusemba.rtmppublisher.Publisher;
+import com.takusemba.rtmppublisher.PublisherListener;
+import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class StreamingService extends BaseService implements PublisherListener {

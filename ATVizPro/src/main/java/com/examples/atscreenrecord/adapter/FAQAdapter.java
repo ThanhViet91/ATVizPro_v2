@@ -38,13 +38,15 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.ViewHolder>{
         FAQItem item = mFAQs.get(position);
         holder.tv_question.setText(item.getQuestion());
         if (item.getShown()) {
-            holder.rl_head_faq.setBackgroundResource(R.drawable.shape_round_white_60);
+            holder.rl_head_faq.setBackgroundResource(R.drawable.shape_round_white_30);
+            holder.itemView.setBackgroundResource(R.drawable.shape_round_white_30);
             holder.ic_down.setVisibility(View.GONE);
             holder.ic_up.setVisibility(View.VISIBLE);
             holder.tv_answer.setVisibility(View.VISIBLE);
             holder.tv_answer.setText(item.getAnswer());
         } else {
             holder.rl_head_faq.setBackgroundResource(R.drawable.shape_round_transparent);
+            holder.itemView.setBackgroundResource(R.drawable.shape_round_white_60);
             holder.ic_down.setVisibility(View.VISIBLE);
             holder.ic_up.setVisibility(View.GONE);
             holder.tv_answer.setVisibility(View.GONE);

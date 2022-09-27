@@ -7,8 +7,8 @@ import android.os.Build;
 
 public class NotificationHelper {
     public static final String CHANNEL_ID = "com.examples.atscreenrecord";
-    public static final String CHANNEL_NAME = "Zecorder Service";
-    private static final String CHANNEL_DESCRTIPTION = "Zecorder_Channel_Description";
+    public static final String CHANNEL_NAME = "Recorder Service";
+    private static final String CHANNEL_DESCRTIPTION = "Recorder_Channel_Description";
 
     private static final NotificationHelper ourInstance = new NotificationHelper();
 

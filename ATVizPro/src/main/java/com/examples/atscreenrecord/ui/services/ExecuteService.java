@@ -6,15 +6,12 @@ import static com.examples.atscreenrecord.utils.TranscodingAsyncTask.ERROR_CODE;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 
@@ -23,7 +20,7 @@ import androidx.annotation.RequiresApi;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoReactCamExecute;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
-import com.examples.atscreenrecord.ui.activities.ReactCamFinishActivity;
+import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import java.util.Random;
@@ -110,10 +107,6 @@ public class ExecuteService extends Service {
                 if (!code.equals(ERROR_CODE))
                     executeFFmpegReactCam(code);
             }
-
-            @Override
-            public void onUpdateProgressTranscoding(int progress) {
-            }
         });
     }
 
@@ -138,16 +131,12 @@ public class ExecuteService extends Service {
 
                         }
                     }
-
-                    @Override
-                    public void onUpdateProgressTranscoding(int progress) {
-                    }
                 });
     }
 
     private void updatePendingIntent(String finalVideoCachePath) {
 
-        Intent intent = new Intent(this, ReactCamFinishActivity.class);
+        Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent.putExtra("from_notification", true);
         System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);

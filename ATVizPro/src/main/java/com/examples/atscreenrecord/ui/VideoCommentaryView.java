@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,7 +23,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -31,12 +31,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.adapter.VideoOptionAdapter;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
-
-import java.util.ArrayList;
 
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -48,16 +45,16 @@ import iknow.android.utils.thread.UiThreadExecutor;
  * Email： who_know_me@163.com
  * Describe:
  */
-public class VideoEditorView extends FrameLayout implements IVideoCustomView, VideoOptionAdapter.VideoOptionListener {
+public class VideoCommentaryView extends FrameLayout implements IVideoCustomView {
 
-    private static final String TAG = VideoEditorView.class.getSimpleName();
+    private static final String TAG = VideoCommentaryView.class.getSimpleName();
 
     private int mMaxWidth = VIDEO_FRAMES_WIDTH;
     private Context mContext;
     private RelativeLayout mLinearVideo;
     private VideoView mVideoView;
     private ImageView mPlayView;
-    private RecyclerView mVideoThumbRecyclerView, rcVideoOptions;
+    private RecyclerView mVideoThumbRecyclerView;
     private RangeSeekBarView mRangeSeekBarView;
     private LinearLayout mSeekBarLayout;
     private ImageView mRedProgressIcon;
@@ -65,7 +62,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private float mAverageMsPx;//每毫秒所占的px
     private float averagePxMs;//每px所占用的ms毫秒
     private Uri mSourceUri;
-    private IVideoStreamView IVideoStreamView;
+    private IVideoStreamView mOnTrimVideoListener;
     private int mDuration = 0;
     private VideoTrimmerAdapter mVideoThumbAdapter;
     private boolean isFromRestore = false;
@@ -81,106 +78,39 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private ValueAnimator mRedProgressAnimator;
     private Handler mAnimationHandler = new Handler();
 
-    private TextView btn_cancel, btn_save, number_countdown;
+    private TextView btn_cancel, btn_done, number_countdown;
     private LinearLayout layoutCountdown;
-
-    private ArrayList<String> videoOptions = new ArrayList<>();
-    private VideoOptionAdapter mAdapter;
-
     private AdView mAdview;
-    private MediaPlayer mediaPlayer;
 
-    public interface VideoEditorListener {
-        void onClickVideoOption(String opt);
-    }
-
-    private VideoEditorListener videoEditorListener;
-
-    public void setVideoEditorListener(VideoEditorListener videoEditorListener){
-        this.videoEditorListener = videoEditorListener;
-    }
-
-    public VideoEditorView(Context context, AttributeSet attrs) {
+    public VideoCommentaryView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public VideoEditorView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public VideoCommentaryView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
-
     private void init(Context context) {
         this.mContext = context;
-        LayoutInflater.from(context).inflate(R.layout.video_editor_view, this, true);
+        LayoutInflater.from(context).inflate(R.layout.video_commentary_view, this, true);
 
         mLinearVideo = findViewById(R.id.screenVideo);
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
         btn_cancel = findViewById(R.id.tv_btn_cancel);
-        btn_save = findViewById(R.id.tv_btn_done);
+        btn_done = findViewById(R.id.tv_btn_done);
         mVideoView = findViewById(R.id.video_loader);
-        MediaController mediaController = new MediaController(getContext());
-        mVideoView.setMediaController(mediaController);
+        mPlayView = findViewById(R.id.toggle_record);
         mSeekBarLayout = findViewById(R.id.seekBarLayout);
         mRedProgressIcon = findViewById(R.id.positionIcon);
-
         mAdview = findViewById(R.id.adView);
-
-        videoOptions.add("Trim");
-        videoOptions.add("Rotate");
-        videoOptions.add("Speed");
-        videoOptions.add("Text");
-        videoOptions.add("Image");
-        videoOptions.add("Merge");
-        rcVideoOptions = findViewById(R.id.recycler_view_position);
-        mAdapter = new VideoOptionAdapter(context, videoOptions, this);
-        rcVideoOptions.setAdapter(mAdapter);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
-        rcVideoOptions.setLayoutManager(linearLayoutManager);
-
-
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
         mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
         mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
         mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
         setUpListeners();
-    }
-
-    public void onPressSave() {
-        btn_save.setVisibility(VISIBLE);
-    }
-
-    public void showOrHideAdBanner(){
-        AdUtil.createBannerAdmob(mContext, mAdview);
-        mAdview.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    hasChangeVideoView();
-                }
-            }
-        });
-    }
-    private void hasChangeVideoView() {
-        if (mLinearVideo == null) return;
-        int screenWidth = mLinearVideo.getWidth();
-        int screenHeight = mLinearVideo.getHeight();
-        mLinearVideo.post(new Runnable() {
-            @Override
-            public void run() {
-                if (screenWidth != mLinearVideo.getWidth()
-                        || screenHeight != mLinearVideo.getHeight()) {
-                    updateVideoView(mediaPlayer);
-                }
-            }
-        });
-    }
-
-    public long getVideoDuration() {
-        return mVideoView.getDuration();
     }
 
     private void initRangeSeekBarView() {
@@ -198,10 +128,10 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
         mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
         mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
+//        mRangeSeekBarView.setMinShootTime(VideoTrimmerUtil.MIN_SHOOT_DURATION);
         mRangeSeekBarView.setMinShootTime(mDuration);
         mRangeSeekBarView.setNotifyWhileDragging(true);
         mRangeSeekBarView.setOnRangeSeekBarChangeListener(mOnRangeSeekBarChangeListener);
-        mSeekBarLayout.removeView(mRangeSeekBarView);
         mSeekBarLayout.addView(mRangeSeekBarView);
         if (mThumbsTotalCount - MAX_COUNT_RANGE > 0) {
             mAverageMsPx = (mDuration - MAX_SHOOT_DURATION) / (float) (mThumbsTotalCount - MAX_COUNT_RANGE);
@@ -236,9 +166,36 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
 
     private void onCancelClicked() {
-        if (IVideoStreamView != null)
-            IVideoStreamView.onCancel();
+        mOnTrimVideoListener.onCancel();
     }
+
+    public void showOrHideAdBanner(){
+        AdUtil.createBannerAdmob(mContext, mAdview);
+        mAdview.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (mediaPlayer != null) {
+                    hasChangeVideoView();
+                }
+            }
+        });
+    }
+    private void hasChangeVideoView() {
+        if (mLinearVideo == null) return;
+        int screenWidth = mLinearVideo.getWidth();
+        int screenHeight = mLinearVideo.getHeight();
+        mLinearVideo.post(new Runnable() {
+            @Override
+            public void run() {
+                if (screenWidth != mLinearVideo.getWidth()
+                        || screenHeight != mLinearVideo.getHeight()) {
+                    updateVideoView(mediaPlayer);
+                }
+            }
+        });
+    }
+
     private void updateVideoView(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = mVideoView.getLayoutParams();
         int videoWidth = mp.getVideoWidth();
@@ -269,6 +226,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         }
         mVideoView.setLayoutParams(lpVideo);
     }
+
     private void videoPrepared(MediaPlayer mp) {
         updateVideoView(mp);
         mDuration = mVideoView.getDuration();
@@ -284,24 +242,84 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
     private void videoCompleted() {
         seekTo(mLeftProgressPos);
+        setToggleViewIcon(0);
     }
 
     private void onVideoReset() {
         mVideoView.pause();
+        setToggleViewIcon(0);
+    }
+
+    private boolean completed = false;
+//    private boolean hasCancel = false;
+
+    private CountDownTimer countDownTimer = new CountDownTimer(2900, 1000) {
+        public void onTick(long millisUntilFinished) {
+//            if (hasCancel) return;
+            layoutCountdown.setVisibility(VISIBLE);
+            number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
+        }
+
+        public void onFinish() {
+//            if (hasCancel) return;
+            layoutCountdown.setVisibility(GONE);
+            mRedProgressBarPos = mVideoView.getCurrentPosition();
+            mVideoView.start();
+            mOnTrimVideoListener.onStartRecord();
+            setToggleViewIcon(1);
+            playingRedProgressAnimation();
+        }
+    };
+    private void handlerPlayVideoOrPause() {
+        mRedProgressBarPos = mVideoView.getCurrentPosition();
+        if (mVideoView.isPlaying()) {
+            mVideoView.pause();
+            pauseRedProgressAnimation();
+            completedCommentary();
+        } else if (!completed) {
+            countDownTimer.start();
+            completed = true;
+//            hasCancel = false;
+        } else {
+            //TODO completed commentary and show delete
+
+//            layoutCountdown.setVisibility(GONE);
+            System.out.println("thanhlv delelelet");
+            seekTo(0);
+            setToggleViewIcon(0);
+            completed = false;
+//            hasCancel = true;
+            mOnTrimVideoListener.onDeleteRecord();
+            mRedProgressIcon.setVisibility(GONE);
+            btn_done.setVisibility(GONE);
+        }
+    }
+
+    private void completedCommentary() {
+        mOnTrimVideoListener.onStopRecord();
+        completed = true;
+        setToggleViewIcon(2);
+        btn_done.setVisibility(VISIBLE);
     }
 
     public void onVideoPause() {
         if (mVideoView.isPlaying()) {
             seekTo(mLeftProgressPos);//复位
             mVideoView.pause();
+            if (completed) {
+                setToggleViewIcon(2);
+                mOnTrimVideoListener.onStopRecord();
+            } else
+                setToggleViewIcon(0);
             mRedProgressIcon.setVisibility(GONE);
         }
     }
 
-    public void setOnEditVideoListener(IVideoStreamView onStreamVideoListener) {
-        IVideoStreamView = onStreamVideoListener;
+    public void setOnTrimVideoListener(IVideoStreamView onStreamVideoListener) {
+        mOnTrimVideoListener = onStreamVideoListener;
     }
 
+    MediaPlayer mediaPlayer;
     private void setUpListeners() {
         findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnClickListener() {
             @Override
@@ -331,11 +349,16 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
                 videoCompleted();
             }
         });
+        mPlayView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handlerPlayVideoOrPause();
+            }
+        });
     }
 
     private void onDoneClicked() {
-        if (IVideoStreamView != null)
-        IVideoStreamView.onClickNext();
+        mOnTrimVideoListener.onClickNext();
     }
 
 
@@ -352,6 +375,9 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         isFromRestore = fromRestore;
     }
 
+    private void setToggleViewIcon(int status) {
+        mPlayView.setImageResource(status == 0 ? R.drawable.ic_start_recording : (status == 1 ? R.drawable.stop_recording_commentary : R.drawable.toggle_delete));
+    }
 
     private final RangeSeekBarView.OnRangeSeekBarChangeListener mOnRangeSeekBarChangeListener = new RangeSeekBarView.OnRangeSeekBarChangeListener() {
         @Override
@@ -414,6 +440,8 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
                 mRedProgressBarPos = mLeftProgressPos;
                 if (mVideoView.isPlaying()) {
                     mVideoView.pause();
+//          setPlayPauseViewIcon(false);
+                    setToggleViewIcon(0);
                 }
                 mRedProgressIcon.setVisibility(GONE);
                 seekTo(mLeftProgressPos);
@@ -496,12 +524,5 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     public void onDestroy() {
         BackgroundExecutor.cancelAll("", true);
         UiThreadExecutor.cancelAll("");
-    }
-
-    //callback click video options
-    @Override
-    public void onClickItem(String text) {
-        if (videoEditorListener != null)
-            videoEditorListener.onClickVideoOption(text);
     }
 }

@@ -1,47 +1,21 @@
 package com.examples.atscreenrecord.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.app.RecoverableSecurityException;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.IntentSender;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.IntentSenderRequest;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.CenterInside;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
-import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoModel;
-import com.examples.atscreenrecord.ui.utils.MyUtils;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
@@ -54,8 +28,6 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
 
     public interface VideoProjectsListener {
         void onSelected(String path);
-
-        void onDeleteFile(SecurityException e, Uri uri, ContentResolver contentResolver);
     }
 
     private VideoProjectsListener listener;
@@ -85,6 +57,10 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     public void setSelectable(boolean selectable) {
         this.selectable = selectable;
         notifyDataSetChanged();
+    }
+
+    public boolean getSelectable() {
+        return this.selectable;
     }
 
     @NonNull

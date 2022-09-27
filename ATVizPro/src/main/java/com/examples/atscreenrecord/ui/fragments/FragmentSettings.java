@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
@@ -49,7 +48,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mViewRoot = inflater.inflate(R.layout.fragment_setting, container, false);
+        mViewRoot = inflater.inflate(R.layout.fragment_settings_home, container, false);
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_live));

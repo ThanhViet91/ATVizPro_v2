@@ -7,6 +7,7 @@
     <dimen name="adview_margin">10dp</dimen>
     <dimen name="small_margin">6dp</dimen>
     <dimen name="lager_margin">24dp</dimen>
+    <dimen name="huge_margin">40dp</dimen>
     <dimen name="header_top_margin">30dp</dimen>
     <dimen name="medium_margin">12dp</dimen>
     <dimen name="normal_margin">16dp</dimen>
@@ -20,6 +21,7 @@
 
     <dimen name="small_icon">12dp</dimen>
     <dimen name="lager_icon">36dp</dimen>
+    <dimen name="huge_icon">48dp</dimen>
     <dimen name="normal_icon">24dp</dimen>
 
 </resources>

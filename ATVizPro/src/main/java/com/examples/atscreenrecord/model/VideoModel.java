@@ -4,21 +4,23 @@ package com.examples.atscreenrecord.model;
 public class VideoModel {
     private int id;
     private String name;
-    private long size;
-    private long created;
     private String thumb;
     private String duration;
+    private boolean selected;
 
     public VideoModel() {
     }
 
-    public VideoModel(int id, String name, long size, long created, String thumb, String duration) {
+    public VideoModel(int id, String name, String thumb, String duration) {
         this.id = id;
         this.name = name;
-        this.size = size;
-        this.created = created;
         this.thumb = thumb;
         this.duration = duration;
+        this.selected = false;
+    }
+
+    public String getCompare() {
+        return name + thumb + duration;
     }
 
     public String getDuration() {
@@ -37,22 +39,6 @@ public class VideoModel {
         this.name = name;
     }
 
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public long getCreated() {
-        return created;
-    }
-
-    public void setCreated(long created) {
-        this.created = created;
-    }
-
     public String getThumb() {
         return thumb;
     }
@@ -67,5 +53,13 @@ public class VideoModel {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

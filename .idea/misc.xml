@@ -33,6 +33,7 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_purcharse.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_text.xml" value="0.2035" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_transparent.xml" value="0.2455" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_white_60.xml" value="0.205" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_white_camera_roll.xml" value="0.172" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/activity_main2.xml" value="0.3625" />
@@ -56,7 +57,7 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_setting.xml" value="0.3625" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_twitch_live_streaming.xml" value="0.3625" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_video_manager.xml" value="0.3625" />
-        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_video_projects.xml" value="0.25" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_video_projects.xml" value="0.33" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/fragment_youtube_live_streaming.xml" value="0.3625" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/item_photo.xml" value="0.3625" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/item_settings_with_checked.xml" value="0.3625" />

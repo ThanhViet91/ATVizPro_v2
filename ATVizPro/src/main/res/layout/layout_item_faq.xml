@@ -7,7 +7,7 @@
     android:layout_marginStart="15dp"
     android:layout_marginEnd="15dp"
     android:layout_marginBottom="15dp"
-    android:background="@drawable/shape_round_gray">
+    android:background="@drawable/shape_round_white_60">
 
     <RelativeLayout
         android:id="@+id/rl_head_faq"
@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/tv_question"
-            style="@style/Title_Box_Black"
+            style="@style/Title_Box_White"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -55,7 +55,7 @@
     <TextView
         android:visibility="gone"
         android:id="@+id/tv_answer"
-        style="@style/Body_List_Item_Black"
+        style="@style/Body_List_Item_White_16_400"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"

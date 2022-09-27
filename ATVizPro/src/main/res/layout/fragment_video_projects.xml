@@ -10,11 +10,12 @@
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="42dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="@dimen/header_top_margin">
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/tv_btn_cancel_projects"
             style="@style/Title_Box_White"
             android:layout_width="wrap_content"
@@ -26,16 +27,44 @@
             android:text="@string/cancel"
             android:textSize="18sp" />
 
+        <ImageView
+            android:id="@+id/img_btn_back_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/medium_margin"
+            android:contentDescription="@string/todo"
+            android:padding="@dimen/normal_padding"
+            android:src="@drawable/ic_back_header_24" />
+
         <TextView
             style="@style/Title_Box_White"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="2dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
             android:text="@string/my_recordings"
             android:textFontWeight="700"
             android:textSize="24sp"
             tools:targetApi="p" />
+
+        <TextView
+            android:id="@+id/tv_btn_select"
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:autoSizeTextType="uniform"
+            android:gravity="end|center"
+            android:maxLines="1"
+            android:padding="@dimen/medium_padding"
+            android:text="@string/select"
+            android:textSize="17sp" />
 
     </RelativeLayout>
 
@@ -44,9 +73,10 @@
         android:id="@+id/swipeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/option"
         android:layout_below="@id/header"
         android:layout_marginTop="@dimen/medium_margin"
-        android:layout_marginBottom="@dimen/medium_margin"
+        android:layout_marginBottom="@dimen/small_margin"
         android:paddingStart="@dimen/normal_padding"
         android:paddingEnd="@dimen/normal_padding">
 
@@ -69,6 +99,50 @@
         android:text="@string/no_video"
         android:textColor="@color/white"
         android:visibility="gone" />
+
+    <RelativeLayout
+        android:id="@+id/option"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_above="@id/adView">
+
+        <TextView
+            android:id="@+id/tv_selected"
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="@dimen/normal_margin"
+            android:padding="@dimen/medium_padding"
+            android:text="@string/_1_item_selected"
+            android:textFontWeight="500"
+            android:textSize="16sp"
+            tools:targetApi="p" />
+
+        <ImageView
+            android:id="@+id/img_btn_delete"
+            android:layout_width="@dimen/lager_icon"
+            android:layout_height="@dimen/lager_icon"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/lager_margin"
+            android:contentDescription="@string/todo"
+            android:padding="@dimen/small_padding"
+            android:src="@drawable/ic_delete" />
+
+        <ImageView
+            android:id="@+id/img_btn_rename"
+            android:layout_width="@dimen/lager_icon"
+            android:layout_height="@dimen/lager_icon"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/huge_margin"
+            android:layout_toStartOf="@id/img_btn_delete"
+            android:contentDescription="@string/todo"
+            android:padding="@dimen/small_padding"
+            android:src="@drawable/ic_rename" />
+
+    </RelativeLayout>
 
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adView"

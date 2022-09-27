@@ -54,7 +54,7 @@
         <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>
 
-    <style name="Body_List_Item_White" parent="White_Text">
+    <style name="Body_List_Item_White_18_600" parent="White_Text">
         <item name="android:textSize">18sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
     </style>
@@ -64,7 +64,7 @@
         <item name="android:textFontWeight" tools:ignore="NewApi">500</item>
     </style>
 
-    <style name="Body_List_Item_Black" parent="Black_Text">
+    <style name="Body_List_Item_Black_16_400" parent="Black_Text">
         <item name="android:textSize">16sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>

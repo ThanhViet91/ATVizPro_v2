@@ -20,6 +20,12 @@
     <string name="recording">RECORD</string>
     <string name="back">Back</string>
     <string name="cancel">Cancel</string>
+    <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="deselect_all">Deselect all</string>
+    <string name="unselect">Unselect</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
     <string name="choose">Choose</string>
     <string name="finish">Finish</string>
     <string name="prepare_video">Prepare video...</string>
@@ -161,5 +167,6 @@
     <string name="camera_view_can_zoom_and_move">Camera view can zoom and move!!</string>
     <string name="step_1">Step 1:....</string>
     <string name="todo">TODO</string>
+    <string name="_1_item_selected">1 item selected</string>
 
 </resources>

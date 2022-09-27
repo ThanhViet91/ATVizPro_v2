@@ -17,6 +17,8 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,8 +49,12 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     private Context context;
     private List<VideoModel> list;
 
+    private boolean selectable = false;
+
+
     public interface VideoProjectsListener {
         void onSelected(String path);
+
         void onDeleteFile(SecurityException e, Uri uri, ContentResolver contentResolver);
     }
 
@@ -69,6 +75,17 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         this.list = listNew;
         notifyDataSetChanged();
     }
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<VideoModel> listNew) {
+        this.list = listNew;
+        notifyDataSetChanged();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setSelectable(boolean selectable) {
+        this.selectable = selectable;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -80,7 +97,12 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
-        holder.itemView.setAlpha(1);
+        if (selectable) {
+            holder.checkBox.setVisibility(View.VISIBLE);
+            holder.checkBox.setChecked(video.isSelected());
+        } else {
+            holder.checkBox.setVisibility(View.GONE);
+        }
         if (video != null) {
             holder.duration.setText(video.getDuration());
             Glide.with(context)
@@ -91,59 +113,69 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (selectable) {
+                    holder.checkBox.setChecked(!holder.checkBox.isChecked());
+                    list.get(position).setSelected(holder.checkBox.isChecked());
+                }
                 listener.onSelected(list.get(position).getThumb());
             }
         });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+
+        holder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View view) {
-                holder.itemView.setAlpha(0.5f);
-                new AlertDialog.Builder(context)
-                        .setTitle("Delete Video")
-                        .setMessage("Are you sure you want to delete this video?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            @SuppressLint("NotifyDataSetChanged")
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Continue with delete operation
-                                File file = new File(list.get(position).getThumb());
-                                MediaScannerConnection.scanFile(context, new String[]{file.getPath()}, new String[]{file.getName()},
-                                        new MediaScannerConnection.OnScanCompletedListener() {
-                                            @Override
-                                            public void onScanCompleted(String s, Uri uri) {
-                                                ContentResolver contentResolver = context.getContentResolver();
-                                                try {
-                                                    //delete object using resolver
-                                                    contentResolver.delete(uri, null, null);
-                                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
-                                                } catch (SecurityException e) {
-                                                    listener.onDeleteFile(e, uri, contentResolver);
-                                                }
-                                            }
-                                        });
-                                list.remove(list.get(position));
-                                notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                holder.itemView.setAlpha(1);
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show()
-                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                            @Override
-                            public void onCancel(DialogInterface dialogInterface) {
-                                holder.itemView.setAlpha(1);
-                            }
-                        });
-                return false;
+            public void onClick(View view) {
+                list.get(position).setSelected(holder.checkBox.isChecked());
+                listener.onSelected(list.get(position).getThumb());
             }
         });
 
-    }
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                new AlertDialog.Builder(context)
+//                        .setTitle("Delete Video")
+//                        .setMessage("Are you sure you want to delete this video?")
+//                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//                            @SuppressLint("NotifyDataSetChanged")
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                // Continue with delete operation
+//                                File file = new File(list.get(position).getThumb());
+//                                MediaScannerConnection.scanFile(context, new String[]{file.getPath()}, new String[]{file.getName()},
+//                                        new MediaScannerConnection.OnScanCompletedListener() {
+//                                            @Override
+//                                            public void onScanCompleted(String s, Uri uri) {
+//                                                ContentResolver contentResolver = context.getContentResolver();
+//                                                try {
+//                                                    //delete object using resolver
+//                                                    contentResolver.delete(uri, null, null);
+//                                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
+//                                                } catch (SecurityException e) {
+//                                                    listener.onDeleteFile(e, uri, contentResolver);
+//                                                }
+//                                            }
+//                                        });
+//                                list.remove(list.get(position));
+//                                notifyDataSetChanged();
+//                            }
+//                        })
+//                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                            }
+//                        })
+//                        .setIcon(android.R.drawable.ic_dialog_alert)
+//                        .show()
+//                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                            @Override
+//                            public void onCancel(DialogInterface dialogInterface) {
+//                            }
+//                        });
+//                return false;
+//            }
+//        });
 
+    }
 
 
     @Override
@@ -158,9 +190,11 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         private ImageView img;
         private TextView name;
         private TextView duration;
+        private CheckBox checkBox;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            checkBox = itemView.findViewById(R.id.checkbox);
             img = itemView.findViewById(R.id.img_item_video_thumb);
             name = itemView.findViewById(R.id.tv_video_name);
             duration = itemView.findViewById(R.id.tv_video_duration);

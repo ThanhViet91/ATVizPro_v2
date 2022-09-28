@@ -130,6 +130,4 @@ public class LiveStreamingFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
-
-
 }

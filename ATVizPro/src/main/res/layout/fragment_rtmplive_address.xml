@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:clickable="true"
     android:id="@+id/root_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/custom_background"
+    android:clickable="true"
     android:orientation="vertical"
-    android:background="@drawable/custom_background">
+    tools:ignore="KeyboardInaccessibleWidget">
 
     <RelativeLayout
         android:id="@+id/header"
@@ -29,102 +29,145 @@
             android:layout_height="40dp"
             android:layout_marginStart="16dp"
             android:paddingStart="10dp"
-            android:src="@drawable/ic_back_header_24" />
+            android:src="@drawable/ic_back_header_24"
+            tools:ignore="RtlSymmetry"
+            android:contentDescription="@string/todo" />
     </RelativeLayout>
 
 
     <TextView
-        android:layout_marginStart="20dp"
-        android:text="@string/rtmp_address"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/white"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/rtmp_address"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
     <FrameLayout
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="20dp">
+
         <EditText
+            android:id="@+id/edt_rtmp_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_edt"
             android:hint="@string/rtmp"
             android:paddingStart="10dp"
-            android:id="@+id/edt_rtmp_address"
-            android:background="@drawable/custom_edt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            tools:ignore="RtlSymmetry"
+            android:importantForAutofill="no"
+            android:inputType="none" />
+
         <TextView
             android:id="@+id/tv_paste_rtmp_address"
-            android:layout_marginEnd="10dp"
-            android:text="@string/paste"
-            android:padding="5dp"
-            android:textStyle="bold"
-            android:layout_gravity="right|center"
-            android:textColor="@color/black"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:text="@string/paste"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            tools:ignore="RtlHardcoded" />
+
+        <ImageView
+            android:id="@+id/img_clear_rtmp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="right|center"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:padding="@dimen/medium_padding"
+            android:src="@drawable/ic_close_24"
+            android:visibility="gone"
+            tools:ignore="RtlHardcoded"
+            android:contentDescription="@string/todo" />
     </FrameLayout>
+
     <TextView
-        android:layout_marginStart="20dp"
-        android:text="Stream key"
-        android:textStyle="bold"
-        android:layout_marginTop="20dp"
-        android:textColor="@color/white"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/stream_key"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
     <FrameLayout
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="20dp">
+
         <EditText
-            android:paddingStart="10dp"
             android:id="@+id/edt_stream_key"
-            android:background="@drawable/custom_edt"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_edt"
+            android:paddingStart="10dp"
+            tools:ignore="RtlSymmetry"
+            android:importantForAutofill="no"
+            android:inputType="none" />
+
         <TextView
             android:id="@+id/tv_paste_stream_key"
-            android:layout_marginEnd="10dp"
-            android:text="@string/paste"
-            android:padding="5dp"
-            android:textStyle="bold"
-            android:layout_gravity="right|center"
-            android:gravity="center"
-            android:textColor="@color/black"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center"
+            android:layout_marginEnd="10dp"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/paste"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            tools:ignore="RtlHardcoded" />
+
+        <ImageView
+            android:id="@+id/img_clear_stream_key"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="right|center"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:padding="@dimen/medium_padding"
+            android:src="@drawable/ic_close_24"
+            android:visibility="gone"
+            tools:ignore="RtlHardcoded"
+            android:contentDescription="@string/todo" />
     </FrameLayout>
+
     <TextView
-        android:layout_marginTop="8dp"
-        android:text="@string/enter_key"
-        android:layout_marginStart="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/enter_key" />
+
     <TextView
         android:id="@+id/tv_start_livestreaming"
-        android:background="@drawable/custom_background_tv_startlivestreaming"
-        android:textColor="@color/white"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="18sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"
+        android:background="@drawable/custom_background_tv_startlivestreaming"
+        android:gravity="center"
         android:text="@string/start_livestreming"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_tutorial"
         style="@style/Title_Box_White"
-        android:textSize="15sp"
-        android:textFontWeight="400"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:text="@string/get_rtmp_address_and_streamkey"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:textFontWeight="400"
+        android:textSize="15sp"
         tools:targetApi="p" />
 </LinearLayout>

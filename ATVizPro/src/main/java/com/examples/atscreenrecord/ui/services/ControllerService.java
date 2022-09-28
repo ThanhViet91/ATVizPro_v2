@@ -1,5 +1,9 @@
 package com.examples.atscreenrecord.ui.services;
 
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -34,7 +38,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.utils.CustomOnScaleDetector;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 import com.examples.atscreenrecord.R;
@@ -86,6 +92,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         String action = intent.getAction();
         if(action!=null) {
             handleIncomeAction(intent);
+            updateUI();
             if(DEBUG) Log.i(TAG, "return START_REDELIVER_INTENT" + action);
 
             return START_NOT_STICKY;
@@ -94,12 +101,27 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private void updateUI() {
+        if (mMode == MyUtils.MODE_STREAMING) {
+            int type = SettingManager2.getLiveStreamType(this);
+            if (type == SOCIAL_TYPE_YOUTUBE) mImgRec.setBackgroundResource(R.drawable.ic_youtube);
+            if (type == SOCIAL_TYPE_FACEBOOK) mImgRec.setBackgroundResource(R.drawable.ic_facebook);
+            if (type == SOCIAL_TYPE_TWITCH) mImgRec.setBackgroundResource(R.drawable.ic_twitch);
+        } else {
+            mImgRec.setBackgroundResource(R.drawable.icon_app);
+        }
+    }
+
     private void handleIncomeAction(Intent intent) {
         String action = intent.getAction();
         if(TextUtils.isEmpty(action))
             return;
 
         switch (action){
+            case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
+                onClickStop();
+                onClickClose();
+                break;
             case MyUtils.ACTION_INIT_CONTROLLER:
                 mMode = intent.getIntExtra(MyUtils.KEY_CONTROLlER_MODE, MyUtils.MODE_RECORDING);
                 mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
@@ -451,6 +473,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         toggleView(mImgStop, View.GONE);
         toggleNavigationButton(View.GONE);
 
+
         mImgCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -522,9 +545,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                             mService.startPerformService();
 
                             if(mMode == MyUtils.MODE_RECORDING)
-                                MyUtils.toast(getApplicationContext(), "Recording Started", Toast.LENGTH_SHORT);
-//                            else
-//                                MyUtils.toast(getApplicationContext(), "Streaming Started", Toast.LENGTH_SHORT);
+                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
+                            else
+                                MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
                         }
                     }.start();
 
@@ -541,25 +564,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toggleNavigationButton(View.GONE);
+                onClickStop();
 
-                if(mRecordingServiceBound){
-                    //Todo: stop and save recording
-                    mRecordingStarted = false;
-
-                    mService.stopPerformService();
-
-                    if(mMode==MyUtils.MODE_RECORDING){
-//                        ((RecordingService)mService).insertVideoToGallery();
-                        MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
-                        return;
-                    }
-
-                }
-                else{
-                    mRecordingStarted = true;
-                    MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
-                }
             }
         });
 
@@ -579,23 +585,20 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRecordingStarted){
-                    mImgStop.performClick();
-                }
+                onClickClose();
 
-                stopService();
 
-                if(!DEBUG)
-                if(!MainActivity.active) {
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    if (mMode == MyUtils.MODE_RECORDING) {
-                        intent.setAction(MyUtils.ACTION_OPEN_VIDEO_MANAGER_ACTIVITY);
-                    } else {
-                        intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
-                    }
-                    startActivity(intent);
-                }
+//                if(!DEBUG)
+//                if(!MainActivity.active) {
+//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    if (mMode == MyUtils.MODE_RECORDING) {
+//                        intent.setAction(MyUtils.ACTION_OPEN_VIDEO_MANAGER_ACTIVITY);
+//                    } else {
+//                        intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
+//                    }
+//                    startActivity(intent);
+//                }
             }
         });
 
@@ -670,6 +673,39 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         });
     }
 
+    private void onClickStop() {
+        toggleNavigationButton(View.GONE);
+        if(mRecordingServiceBound){
+            //Todo: stop and save recording
+            mRecordingStarted = false;
+
+            mService.stopPerformService();
+
+            if(mMode==MyUtils.MODE_RECORDING){
+//                        ((RecordingService)mService).insertVideoToGallery();
+                MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
+                return;
+            }
+        }
+        else{
+            mRecordingStarted = true;
+            MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
+        }
+    }
+
+    private void onClickClose() {
+        if(mRecordingStarted){
+            mImgStop.performClick();
+        }
+
+        stopService();
+
+        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
+        Intent intent = new Intent(MyUtils.ACTION_DISCONNECT_LIVE_FROM_SERVICE);
+        intent.putExtra("is_disconnect_live", true);
+        sendBroadcast(intent);
+    }
+
     private void stopService() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -722,20 +758,22 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             if(mMode == MyUtils.MODE_STREAMING) {
                 binder = (StreamingBinder) service;
                 mService = ((StreamingBinder) binder).getService();
+
+                MyUtils.toast(getApplicationContext(), "Livestream service connected", Toast.LENGTH_SHORT);
             }
             else{
                 binder = (RecordingBinder)service;
                 mService = ((RecordingBinder) binder).getService();
+
+                MyUtils.toast(getApplicationContext(), "Recording service connected", Toast.LENGTH_SHORT);
             }
             mRecordingServiceBound = true;
-
-            MyUtils.toast(getApplicationContext(), "Streaming service connected", Toast.LENGTH_SHORT);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mRecordingServiceBound = false;
-            MyUtils.toast(getApplicationContext(), "Streaming service disconnected", Toast.LENGTH_SHORT);
+            MyUtils.toast(getApplicationContext(), "Service disconnected "+name.toString(), Toast.LENGTH_SHORT);
         }
     };
 
@@ -771,7 +809,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //            else{
 //                mImgResume.setVisibility(View.GONE);
 //            }
-            mViewRoot.setPadding(32,48, 32, 48);
+            mViewRoot.setPadding(32,32, 32, 32);
         }
     }
 

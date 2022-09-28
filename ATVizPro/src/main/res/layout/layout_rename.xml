@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,7 +11,7 @@
         android:id="@+id/tvRename"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rename"
+        android:text="@string/rename"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent"
@@ -43,7 +44,8 @@
                 android:inputType="text"
                 android:maxLength="200"
                 android:ems="15"
-                />
+                android:autofillHints="Name"
+                tools:ignore="LabelFor" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -63,7 +65,7 @@
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="OK"
+        android:text="@string/ok"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         android:layout_marginTop="16dp"
@@ -73,7 +75,7 @@
         style="@style/Base.Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toStartOf="@id/rename_btn_ok"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />

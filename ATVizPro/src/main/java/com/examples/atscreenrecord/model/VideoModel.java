@@ -1,26 +1,22 @@
 package com.examples.atscreenrecord.model;
 
-
 public class VideoModel {
     private int id;
     private String name;
-    private String thumb;
+    private String path;
     private String duration;
     private boolean selected;
 
-    public VideoModel() {
-    }
-
-    public VideoModel(int id, String name, String thumb, String duration) {
+    public VideoModel(int id, String name, String path, String duration) {
         this.id = id;
         this.name = name;
-        this.thumb = thumb;
+        this.path = path;
         this.duration = duration;
         this.selected = false;
     }
 
     public String getCompare() {
-        return name + thumb + duration;
+        return name + path + duration;
     }
 
     public String getDuration() {
@@ -39,12 +35,12 @@ public class VideoModel {
         this.name = name;
     }
 
-    public String getThumb() {
-        return thumb;
+    public String getPath() {
+        return path;
     }
 
-    public void setThumb(String thumb) {
-        this.thumb = thumb;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public int getId() {

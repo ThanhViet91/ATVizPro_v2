@@ -14,7 +14,7 @@
             android:id="@+id/imgRec"
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
-            android:src="@drawable/icon_app"
+            android:background="@drawable/icon_app"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -2,13 +2,18 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
+import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
@@ -20,17 +25,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
@@ -38,9 +43,7 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
@@ -60,6 +63,7 @@ import com.examples.atscreenrecord.ui.fragments.FragmentSettings;
 import com.examples.atscreenrecord.ui.fragments.GuidelineLiveStreamFragment;
 import com.examples.atscreenrecord.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment;
+import com.examples.atscreenrecord.ui.fragments.RTMPLiveAddressFragment;
 import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
@@ -76,45 +80,38 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
-
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.function.ToDoubleBiFunction;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getSimpleName();
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
-    public static final int REQUEST_SHOW_FAQ = 102;
     public static final int REQUEST_SHOW_PROJECTS_DEFAULT = 105;
     private static final String THE_FIRST_TIME_SCREEN_RECORD = "action_first_record";
     private static final String THE_FIRST_TIME_LIVESTREAM = "action_first_livestream";
     public static boolean active = false;
-    private static final boolean DEBUG = MyUtils.DEBUG;
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
-
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
 
     public void showProductRemoveAds() {
         handlerProductList(mProductDetailsList);
     }
 
-    private static String[] mPermission = new String[]{
+    private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
     public int mMode = MyUtils.MODE_RECORDING;
-
     private Intent mScreenCaptureIntent = null;
-
     private int mScreenCaptureResultCode = MyUtils.RESULT_CODE_FAILED;
-
     private StreamProfile mStreamProfile;
 
     @Override
@@ -132,15 +129,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        System.out.println("thanhlv getIntentttttt ==== " + intent.getAction());
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         active = true;
+        registerSyncServiceReceiver();
+
+    }
+    private void registerSyncServiceReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_SERVICE);
+        registerReceiver(mMessageReceiver, intentFilter);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         active = false;
+        unregisterReceiver(mMessageReceiver);
     }
 
     void handlePurchase(Purchase purchase) {
@@ -154,14 +165,11 @@ public class MainActivity extends AppCompatActivity {
                         AcknowledgePurchaseParams.newBuilder()
                                 .setPurchaseToken(purchase.getPurchaseToken())
                                 .build();
-                billingClient.acknowledgePurchase(acknowledgePurchaseParams, new AcknowledgePurchaseResponseListener() {
-                    @Override
-                    public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
-                        if (billingResult.getResponseCode() == 0) {
-                            if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
-                                SettingManager2.setRemoveAds(getApplicationContext(), true);
-                                initialAds = false;
-                            }
+                billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
+                    if (billingResult.getResponseCode() == 0) {
+                        if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
+                            SettingManager2.setRemoveAds(getApplicationContext(), true);
+                            initialAds = false;
                         }
                     }
                 });
@@ -170,23 +178,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private PurchasesUpdatedListener purchasesUpdatedListener = new PurchasesUpdatedListener() {
-        @Override
-        public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> purchases) {
-            // To be implemented in a later section.
+    private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
+        // To be implemented in a later section.
 
-            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                    && purchases != null) {
-                for (Purchase purchase : purchases) {
-                    handlePurchase(purchase);
-                }
-            } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-                // Handle an error caused by a user cancelling the purchase flow.
-            } else {
-                // Handle any other error codes.
+        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
+                && purchases != null) {
+            for (Purchase purchase : purchases) {
+                handlePurchase(purchase);
             }
-
+        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
+            // Handle an error caused by a user cancelling the purchase flow.
+            //TODO
+        } else {
+            //TODO
         }
+
     };
 
     private BillingClient billingClient;
@@ -204,32 +210,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
-
         billingClient = BillingClient.newBuilder(this)
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
                 .build();
-
 //        SettingManager2.setRemoveAds(this, false);
         initViews();
-
-        System.out.println("thanhlv desity =============== " + App.getAppContext().getResources().getDisplayMetrics().scaledDensity);
         connectGooglePlayBilling();
-
         if (!hasPermission()) requestPermissions();
-
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
-
-//        File tesst = new File(MyUtils.getBaseStorageDirectory2(), MyUtils.createFileName(".mp4"));
-
     }
 
     private void connectGooglePlayBilling() {
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     // The BillingClient is ready. You can query purchases here.
                     showProducts();
@@ -237,12 +234,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //check show ad banner when connectGGBill fail
                     if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                System.out.println("thanhlv createBannerAdmob connectGooglePlayBilling ");
-                                AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-                            }
+                        runOnUiThread(() -> {
+                            System.out.println("thanhlv createBannerAdmob connectGooglePlayBilling ");
+                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
                         });
                     }
                 }
@@ -272,13 +266,10 @@ public class MainActivity extends AppCompatActivity {
 
         billingClient.queryProductDetailsAsync(
                 queryProductDetailsParams,
-                new ProductDetailsResponseListener() {
-                    public void onProductDetailsResponse(BillingResult billingResult,
-                                                         List<ProductDetails> productDetailsList) {
-                        // check billingResult
-                        // process returned productDetailsList
-                        mProductDetailsList = productDetailsList;
-                    }
+                (billingResult, productDetailsList) -> {
+                    // check billingResult
+                    // process returned productDetailsList
+                    mProductDetailsList = productDetailsList;
                 }
         );
 
@@ -287,16 +278,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void handlerProductList(List<ProductDetails> productDetailsList) {
         if (productDetailsList == null || productDetailsList.size() == 0) return;
-        ImmutableList productDetailsParamsList =
-                ImmutableList.of(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                                // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-                                .setProductDetails(productDetailsList.get(0))
-                                // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
-                                // for a list of offers that are available to the user
+        ImmutableList productDetailsParamsList;
+        productDetailsParamsList = ImmutableList.of(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                        // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
+                        .setProductDetails(productDetailsList.get(0))
+                        // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
+                        // for a list of offers that are available to the user
 //                                                .setOfferToken(productDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken())
-                                .build()
-                );
+                        .build()
+        );
 
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(productDetailsParamsList)
@@ -311,12 +302,11 @@ public class MainActivity extends AppCompatActivity {
                 QueryPurchaseHistoryParams.newBuilder()
                         .setProductType(BillingClient.ProductType.INAPP)
                         .build(),
-                new PurchaseHistoryResponseListener() {
-                    public void onPurchaseHistoryResponse(
-                            BillingResult billingResult, List purchasesHistoryList) {
-                        // check billingResult
-                        // process returned purchase history list, e.g. display purchase history
+                (billingResult, purchasesHistoryList) -> {
+                    // check billingResult
+                    // process returned purchase history list, e.g. display purchase history
 
+                    if (purchasesHistoryList != null) {
                         for (Object purchase : purchasesHistoryList) {
                             if (purchase.toString().contains(getString(R.string.product_id_remove_ads))) {
                                 SettingManager2.setRemoveAds(getApplicationContext(), true);
@@ -324,17 +314,13 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
-                        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                    }
+                    if (!SettingManager2.getRemoveAds(getApplicationContext())) {
+                        runOnUiThread(() -> {
+                            System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
+                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                        });
 
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
-                                    AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-                                }
-                            });
-
-                        }
                     }
                 }
         );
@@ -360,7 +346,9 @@ public class MainActivity extends AppCompatActivity {
     public static boolean initialAds = false;
     protected void onResume() {
         super.onResume();
+        System.out.println("thanhlv onResume mainnnnnnnnn");
         pulsator.start();
+        updateService();
         billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
                 (billingResult, list) -> {
@@ -376,6 +364,21 @@ public class MainActivity extends AppCompatActivity {
         checkShowAd();
     }
 
+    public void updateService() {
+        int type = SettingManager2.getLiveStreamType(this);
+        if (type != 0) {
+            liveStreaming.setText(getString(R.string.disconnect_livestream));
+            imgLiveType.setVisibility(View.VISIBLE);
+            if (type == SOCIAL_TYPE_YOUTUBE) imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
+            if (type == SOCIAL_TYPE_FACEBOOK) imgLiveType.setBackgroundResource(R.drawable.ic_facebook);
+            if (type == SOCIAL_TYPE_TWITCH) imgLiveType.setBackgroundResource(R.drawable.ic_twitch);
+        } else {
+            imgLiveType.setVisibility(View.GONE);
+            liveStreaming.setText(getString(R.string.livestreaming));
+        }
+    }
+
+
     public void checkShowAd() {
         if (initialAds) {
             AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
@@ -390,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
                     break;
-
                 case "from_notification":
                     break;
             }
@@ -404,145 +406,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ImageView mImgRec;
-    PulsatorLayout pulsator;
+    private ImageView mImgRec, imgLiveType;
+    private PulsatorLayout pulsator;
+    private TextView liveStreaming;
+
     private void initViews() {
         mAdView = findViewById(R.id.adView);
-
-        // initialise pulsator layout
-        pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
+        pulsator = findViewById(R.id.pulsator);
+        liveStreaming = findViewById(R.id.tv_live_streaming);
+        imgLiveType = findViewById(R.id.img_live_type);
         pulsator.start();
-
-        //initData()
         generateVideoSettings();
         updateVideoSettings();
-
-        //
         mImgRec = findViewById(R.id.img_record);
         ImageView btn_setting = findViewById(R.id.img_settings);
         LinearLayout btn_set_resolution = findViewById(R.id.set_video_resolution);
         LinearLayout bnt_set_bitrate = findViewById(R.id.set_bitrate);
         LinearLayout btn_set_fps = findViewById(R.id.set_frame_rate);
-
-        btn_setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new FragmentSettings(), "")
-                        .addToBackStack("")
-                        .commit();
-
+        btn_setting.setOnClickListener(view -> getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frame_layout_fragment, new FragmentSettings(), "")
+                .addToBackStack("")
+                .commit());
+        btn_set_resolution.setOnClickListener(view -> new DialogVideoResolution(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
+        bnt_set_bitrate.setOnClickListener(view -> new DialogBitrate(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
+        btn_set_fps.setOnClickListener(view -> new DialogFrameRate(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
+        mImgRec.setOnClickListener(view -> {
+            if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
+            if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+                MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_LONG);
+                return;
             }
-        });
-
-        btn_set_resolution.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DialogVideoResolution(new DialogFragmentBase.IVideoSettingListener() {
-                    @Override
-                    public void onClick() {
-                        updateVideoSettings();
-                    }
-                }).show(getSupportFragmentManager(), "");
+            if (isMyServiceRunning(getApplicationContext(), ControllerService.class)) {
+                MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
+                return;
             }
+            mMode = MyUtils.MODE_RECORDING;
+            shouldStartControllerService();
         });
-
-        bnt_set_bitrate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DialogBitrate(new DialogFragmentBase.IVideoSettingListener() {
-                    @Override
-                    public void onClick() {
-                        updateVideoSettings();
-                    }
-                }).show(getSupportFragmentManager(), "");
-            }
-        });
-
-        btn_set_fps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DialogFrameRate(new DialogFragmentBase.IVideoSettingListener() {
-                    @Override
-                    public void onClick() {
-                        updateVideoSettings();
-                    }
-                }).show(getSupportFragmentManager(), "");
-            }
-        });
-
-
-        mImgRec.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
-                if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                    MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_INDEFINITE);
-                    return;
-                }
-                if (isMyServiceRunning(getApplicationContext(), ControllerService.class)) {
-                    MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
-                    return;
-                }
-                mMode = MyUtils.MODE_RECORDING;
-
-                shouldStartControllerService();
-
-            }
-        });
-
         LinearLayout lnFAQ = findViewById(R.id.ln_btn_faq);
-        lnFAQ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showFAQFragment();
-            }
-        });
-
+        lnFAQ.setOnClickListener(view -> showFAQFragment());
         LinearLayout react_cam = findViewById(R.id.ln_react_cam);
-        react_cam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (checkServiceBusy()) return;
-
-                showDialogPickVideo(REQUEST_VIDEO_FOR_REACT_CAM);
-            }
+        react_cam.setOnClickListener(view -> {
+            if (checkServiceBusy()) return;
+            showDialogPickVideo(REQUEST_VIDEO_FOR_REACT_CAM);
         });
-
         ImageView btn_live = findViewById(R.id.img_live);
-        btn_live.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
-                showLiveStreamFragment();
+        btn_live.setOnClickListener(view -> {
+            if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
+            if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+                sendDisconnectToService();
+                return;
             }
+            showLiveStreamFragment();
         });
-
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
-        btn_commentary.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY);
-            }
-        });
-
+        btn_commentary.setOnClickListener(view -> showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY));
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
-        btn_projects.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT);
-            }
-        });
-
+        btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT));
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
-        btn_editor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT);
-            }
-        });
-
+        btn_editor.setOnClickListener(view -> showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT));
     }
 
     private void showLiveStreamFragment() {
@@ -568,10 +491,7 @@ public class MainActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Please wait!")
                     .setMessage("Your previous video in processing, please check in status bar!")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    })
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {})
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
         }
@@ -658,8 +578,6 @@ public class MainActivity extends AppCompatActivity {
     public void showDialogPickFromGallery(int from_code) {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI); // todo: this thing might need some work :/, eg open from google drive, stuff like that
         intent.setTypeAndNormalize("video/*");
-//            intent.setAction(Intent.ACTION_GET_CONTENT);
-//            intent.addCategory(Intent.CATEGORY_OPENABLE);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
     }
 
@@ -687,9 +605,6 @@ public class MainActivity extends AppCompatActivity {
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         // Handle the error
                         mInterstitialAdAdmob = null;
-//                        loadAgain++;
-//                        if (loadAgain < 2)
-//                            createInterstitialAdmob();
                     }
                 });
     }
@@ -709,7 +624,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                     showMyRecordings(from_code);
                 }
 
@@ -730,8 +645,6 @@ public class MainActivity extends AppCompatActivity {
 
         // PERMISSION DRAW OVER
         if (!Settings.canDrawOverlays(this)) {
-
-            System.out.println("thanhlv Draw over other app permission not available 1111111");
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
@@ -766,8 +679,6 @@ public class MainActivity extends AppCompatActivity {
             startControllerService();
         } else {
             requestPermissions();
-//            if(!hasCaptureIntent())
-//                requestScreenCaptureIntent();
         }
     }
 
@@ -780,10 +691,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         AppOpenManager.isPickFromGallery = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
-            assert data != null;
-
-            final Uri selectedUri = data.getData();
-
+            final Uri selectedUri = data != null ? data.getData() : null;
             if (selectedUri != null) {
                 String pathVideo = "";
                 try {
@@ -796,13 +704,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, CompressBeforeReactCamActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
-            } else {
-//                Toast.makeText(MainActivity.this, "R.string.toast_cannot_retrieve_selected_video", Toast.LENGTH_SHORT).show();
             }
         }
 
         if (requestCode == REQUEST_VIDEO_FOR_COMMENTARY && resultCode == RESULT_OK) {
-            final Uri selectedUri = data.getData();
+            final Uri selectedUri = data != null ? data.getData() : null;
 
             if (selectedUri != null) {
                 String pathVideo = "";
@@ -812,7 +718,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY === " + pathVideo);
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);
                 Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
@@ -822,8 +727,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (requestCode == REQUEST_VIDEO_FOR_VIDEO_EDIT && resultCode == RESULT_OK) {
-            System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY");
-            final Uri selectedUri = data.getData();
+            final Uri selectedUri = data != null ? data.getData() : null;
 
             if (selectedUri != null) {
                 String pathVideo = "";
@@ -833,7 +737,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                System.out.println("thanhlv REQUEST_VIDEO_FOR_COMMENTARY === " + pathVideo);
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);
                 Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
@@ -846,7 +749,6 @@ public class MainActivity extends AppCompatActivity {
 
             //Check if the permission is granted or not.
             if (resultCode != RESULT_OK) { //Permission is not available
-                System.out.println("thanhlv Draw over other app permission not available");
                 MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);
             }
         } else if (requestCode == PERMISSION_RECORD_DISPLAY) {
@@ -855,13 +757,25 @@ public class MainActivity extends AppCompatActivity {
                 mScreenCaptureIntent = null;
             } else {
                 mScreenCaptureIntent = data;
-                mScreenCaptureIntent.putExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, resultCode);
+                if (mScreenCaptureIntent != null) {
+                    mScreenCaptureIntent.putExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, resultCode);
+                }
                 mScreenCaptureResultCode = resultCode;
 
                 shouldStartControllerService();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public void sendDisconnectToService(){
+        Intent controller = new Intent(MainActivity.this, ControllerService.class);
+        controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(controller);
+        } else {
+            startService(controller);
         }
     }
 
@@ -881,35 +795,35 @@ public class MainActivity extends AppCompatActivity {
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
             controller.putExtras(bundle);
         }
-
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(controller);
         } else {
             startService(controller);
         }
 
-//        if (mMode == MyUtils.MODE_RECORDING)
-//            finish();
+        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
+        if (all_frags.size() == 0) {
+        } else {
+            for (Fragment frag : all_frags) {
+                getSupportFragmentManager().beginTransaction().remove(frag).commit();
+            }
+        }
+        updateService();
+//        finish();
     }
 
     /**
      * Check if this device has a camera
      */
+    @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
     private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
+        // this device has a camera
+        // no camera on this device
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     public boolean hasPermission() {
         int granted = PackageManager.PERMISSION_GRANTED;
-
         return ContextCompat.checkSelfPermission(this, mPermission[0]) == granted
                 && ContextCompat.checkSelfPermission(this, mPermission[1]) == granted
                 && ContextCompat.checkSelfPermission(this, mPermission[2]) == granted
@@ -921,13 +835,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void setStreamProfile(StreamProfile streamProfile) {
         this.mStreamProfile = streamProfile;
-
     }
 
     public void notifyUpdateStreamProfile() {
         if (mMode == MyUtils.MODE_STREAMING) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
             controller.setAction(MyUtils.ACTION_UPDATE_STREAM_PROFILE);
             Bundle bundle = new Bundle();
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
@@ -937,5 +849,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            boolean disconnect_live = intent.getBooleanExtra("is_disconnect_live", false);
+            if (disconnect_live) updateService();
+        }
+    };
 }
 

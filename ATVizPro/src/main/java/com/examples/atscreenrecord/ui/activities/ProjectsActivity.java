@@ -5,12 +5,10 @@ import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VID
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
-
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.media.MediaMetadataRetriever;
@@ -23,7 +21,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -32,7 +29,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord.model.VideoModel;
@@ -40,26 +36,19 @@ import com.examples.atscreenrecord.ui.utils.DialogHelper;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class ProjectsActivity extends AppCompatActivity implements VideoProjectsAdapter.VideoProjectsListener {
     // TODO: Rename parameter arguments, choose names that match
-
-    private static final String TAG = ProjectsActivity.class.getSimpleName();
-    private RecyclerView recyclerView;
-    private TextView btn_cancel, tv_nodata, tv_select, tv_selected;
-    private ImageView btn_back, btn_rename, btn_delete;
+    private TextView tv_cancel, tv_noData, tv_select, tv_selected;
+    private ImageView btn_back;
+    private ImageView btn_rename;
     private VideoProjectsAdapter mAdapter;
-    private final String VIDEO_PATH_KEY = "video-file-path";
-    private ArrayList<VideoModel> videoList = new ArrayList<VideoModel>();
-    private ArrayList<VideoModel> videoList_temp = new ArrayList<VideoModel>();
-    private ArrayList<VideoModel> videoList_selected = new ArrayList<VideoModel>();
+    private final ArrayList<VideoModel> videoList = new ArrayList<>();
+    private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int from_code = 0;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,10 +63,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     public void onResume() {
         super.onResume();
         reloadData();
-        if (videoList == null || videoList.size() == 0) {
-            toggleView(tv_nodata, View.VISIBLE);
+        if (videoList.size() == 0) {
+            toggleView(tv_noData, View.VISIBLE);
         } else {
-            toggleView(tv_nodata, View.GONE);
+            toggleView(tv_noData, View.GONE);
         }
         AdView mAdView = findViewById(R.id.adView);
         AdUtil.createBannerAdmob(this, mAdView);
@@ -90,164 +79,96 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private void initViews() {
-        recyclerView = (RecyclerView) findViewById(R.id.list_videos);
-        btn_cancel = findViewById(R.id.tv_btn_cancel_projects);
+        RecyclerView recyclerView = findViewById(R.id.list_videos);
+        tv_cancel = findViewById(R.id.tv_btn_cancel_projects);
+        tv_noData = findViewById(R.id.tvEmpty);
         tv_select = findViewById(R.id.tv_btn_select);
         btn_back = findViewById(R.id.img_btn_back_header);
-        btn_delete = findViewById(R.id.img_btn_delete);
+        ImageView btn_delete = findViewById(R.id.img_btn_delete);
         btn_rename = findViewById(R.id.img_btn_rename);
         tv_selected = findViewById(R.id.tv_selected);
-
         toggleView(findViewById(R.id.option), View.GONE);
-        tv_select.setText("Select");
-
+        tv_select.setText(getString(R.string.select));
         if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
-            toggleView(btn_cancel, View.GONE);
+            toggleView(tv_cancel, View.GONE);
             toggleView(btn_back, View.VISIBLE);
         } else {
-            toggleView(btn_cancel, View.VISIBLE);
+            toggleView(tv_cancel, View.VISIBLE);
             toggleView(btn_back, View.GONE);
             toggleView(tv_select, View.GONE);
         }
-
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
-                    for (VideoModel video : videoList) video.setSelected(false);
-                    mAdapter.setSelectable(false);
-                    toggleView(btn_back, View.VISIBLE);
-                    toggleView(btn_cancel, View.GONE);
-                    modeSelect = 0;
-                    tv_select.setText(getString(R.string.select));
-                    toggleView(findViewById(R.id.option), View.GONE);
-                } else {
-                    onBackPressed();
-                }
-            }
-        });
-
-        btn_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        tv_cancel.setOnClickListener(view -> {
+            if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+                for (VideoModel video : videoList) video.setSelected(false);
+                mAdapter.setSelectable(false);
+                toggleView(btn_back, View.VISIBLE);
+                toggleView(tv_cancel, View.GONE);
+                modeSelect = 0;
+                tv_select.setText(getString(R.string.select));
+                toggleView(findViewById(R.id.option), View.GONE);
+            } else
                 onBackPressed();
-            }
         });
-
-        tv_select.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                modeSelect++;
-                handleSelectButton();
-            }
+        btn_back.setOnClickListener(view -> onBackPressed());
+        tv_select.setOnClickListener(view -> {
+            modeSelect++;
+            handleSelectButton();
         });
-
-        btn_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleDeleteButton();
-            }
+        btn_delete.setOnClickListener(view -> handleDeleteButton());
+        btn_rename.setOnClickListener(view -> handleRenameButton(getVideoListSelected().get(0)));
+        final SwipeRefreshLayout srl = findViewById(R.id.swipeLayout);
+        srl.setOnRefreshListener(() -> {
+            reloadData();
+            srl.setRefreshing(false);
         });
-
-        btn_rename.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleRenameButton();
-            }
-        });
-
-        final SwipeRefreshLayout srl = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
-        srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                reloadData();
-                srl.setRefreshing(false);
-            }
-        });
-
         readData();
-        mAdapter = new VideoProjectsAdapter(
-                this, videoList);
+        mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
-        // Set the mAdapter on the {@link ListView}
-        // so the list can be populated in the user interface
         recyclerView.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
     }
 
-
-        public void renameFile(final String videoPath, final String newName) throws Exception {
-        if (MyUtils.isValidFilenameSynctax(newName))
-            throw new Exception("A filename cannot contain any of the following charactor: \\/\":*<>| is not n");
-
-        File file = new File(videoPath);
-
-        final File fileWithNewName = new File(file.getParent(), newName);
-        if (fileWithNewName.exists()) {
-            throw new IOException("This filename is exists. Please choose another name");
-        }
-
-        // Rename file (or directory)
-        boolean success = file.renameTo(fileWithNewName);
-
-        if (!success) {
-            // File was not successfully renamed
-            throw new Exception("Cannot rename this video. This video file might not available.");
-        }
-    }
-    private void handleRenameButton() {
-
-        DialogHelper.getInstance().showRenameDialog(this, getVideoListSelected().get(0).getName());
+    private void handleRenameButton(VideoModel oldVideo) {
+        DialogHelper.getInstance(new DialogHelper.IDialogHelper() {
+            @Override
+            public void onClickOK(String result) {
+                for (VideoModel videoModel : videoList)
+                    if (videoModel.equals(oldVideo)) {
+                        videoModel.setName(result);
+//                        videoModel.setPath(result);
+                        mAdapter.updateData(videoList);
+                        break;
+                    }
+            }
+            @Override
+            public void onClickCancel(String result) {}
+        }).showRenameDialog(this, oldVideo);
     }
 
     private void handleDeleteButton() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Video")
                 .setMessage("Are you sure you want to delete video?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @SuppressLint("NotifyDataSetChanged")
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Continue with delete operation
-                        deleteVideos(getVideoListSelected());
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                    }
-                })
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .show()
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialogInterface) {
-                    }
-                });
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(getVideoListSelected()))
+                .show();
     }
 
     public void deleteVideos(ArrayList<VideoModel> listSelected) {
         for (VideoModel video : listSelected) {
-            File file = new File(video.getThumb());
+            File file = new File(video.getPath());
             MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                        @Override
-                        public void onScanCompleted(String s, Uri uri) {
-                            ContentResolver contentResolver = getApplicationContext().getContentResolver();
-                            try {
-                                //delete object using resolver
-                                contentResolver.delete(uri, null, null);
-                                videoList.remove(video);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mAdapter.updateData(videoList);
-                                    }
-                                });
-                                Toast.makeText(getApplicationContext(), "The video is deleted!", Toast.LENGTH_SHORT).show();
-                            } catch (SecurityException e) {
-                                delete(e, loginResultHandler, uri, contentResolver);
-                            }
+                    (s, uri) -> {
+                        ContentResolver contentResolver = getApplicationContext().getContentResolver();
+                        try {
+                            //delete object using resolver
+                            contentResolver.delete(uri, null, null);
+                            videoList.remove(video);
+                            runOnUiThread(() -> mAdapter.updateData(videoList));
+                            Toast.makeText(getApplicationContext(), "The video is deleted!", Toast.LENGTH_SHORT).show();
+                        } catch (SecurityException e) {
+                            delete(e, loginResultHandler, uri, contentResolver);
                         }
                     });
         }
@@ -260,54 +181,50 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         return list;
     }
 
-    int modeSelect = 0;
+    private int modeSelect = 0;
     private void handleSelectButton() {
         toggleView(btn_back, View.GONE);
-        toggleView(btn_cancel, View.VISIBLE);
-        toggleView(findViewById(R.id.option), View.VISIBLE);
+        toggleView(tv_cancel, View.VISIBLE);
         if (modeSelect == 1) {
             tv_select.setText(getString(R.string.select_all));
             mAdapter.setSelectable(true);
-            checkNumberSelected();
         }
         if (modeSelect == 2) {
             for (VideoModel video : videoList) video.setSelected(true);
             mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.deselect_all));
-            checkNumberSelected();
-
         }
         if (modeSelect == 3) {
             for (VideoModel video : videoList) video.setSelected(false);
             mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.select_all));
             modeSelect = 1;
-            checkNumberSelected();
         }
+        checkNumberSelected();
     }
 
+    @SuppressLint("DefaultLocale")
     private void checkNumberSelected() {
         if (getVideoListSelected().size() == 0) {
-            toggleView(tv_selected, View.GONE);
-            toggleView(btn_rename, View.GONE);
-            toggleView(btn_delete, View.GONE);
+            toggleView(findViewById(R.id.option), View.GONE);
             return;
         }
-        toggleView(tv_selected, View.VISIBLE);
-        toggleView(btn_delete, View.VISIBLE);
+        toggleView(findViewById(R.id.option), View.VISIBLE);
+        toggleView(tv_cancel, View.VISIBLE);
+        toggleView(btn_back, View.GONE);
         if (getVideoListSelected().size() == 1) {
             toggleView(btn_rename, View.VISIBLE);
         } else {
-            if (getVideoListSelected().size() == videoList.size()) {
-                modeSelect = 2;
-                tv_select.setText(getString(R.string.deselect_all));
-            } else {
-                modeSelect = 1;
-                tv_select.setText(getString(R.string.select_all));
-            }
             toggleView(btn_rename, View.GONE);
         }
-        tv_selected.setText(getVideoListSelected().size() + " item selected");
+        if (getVideoListSelected().size() == videoList.size()) {
+            modeSelect = 2;
+            tv_select.setText(getString(R.string.deselect_all));
+        } else {
+            modeSelect = 1;
+            tv_select.setText(getString(R.string.select_all));
+        }
+        tv_selected.setText(String.format("%d item selected", getVideoListSelected().size()));
     }
 
     private void reloadData() {
@@ -316,13 +233,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         videoList.clear();
         readData();
         processingData();
-        mAdapter.reloadData(videoList);
+        mAdapter.updateData(videoList);
     }
 
     private void processingData() {
-        for (VideoModel videoOld: videoList_temp) {
+        for (VideoModel videoOld : videoList_temp) {
             for (VideoModel videoNew : videoList) {
-                if (videoOld.getCompare().equals(videoNew.getCompare())){
+                if (videoOld.getCompare().equals(videoNew.getCompare())) {
                     videoNew.setSelected(videoOld.isSelected());
                     break;
                 }
@@ -341,7 +258,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 listFilesForFolder(fileEntry);
             } else {
                 if (fileEntry.getName().contains(".mp4"))
-                    videoList.add(0, new VideoModel(i, fileEntry.getName().replace(".mp4", ""), fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath())));
+                    videoList.add(0, new VideoModel(i, fileEntry.getName().replace(".mp4", ""),
+                            fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath())));
                 i++;
             }
         }
@@ -351,7 +269,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(this, Uri.parse(path));
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-
         retriever.release();
         long timeInMs = Long.parseLong(time);
         return parseLongToTime(timeInMs);
@@ -362,18 +279,25 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         long second = (durationInMillis / 1000) % 60;
         long minute = (durationInMillis / (1000 * 60)) % 60;
         long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
-
         if (hour == 0) return String.format("%02d:%02d", minute, second);
         return String.format("%02d:%02d:%02d", hour, minute, second);
     }
 
     @Override
     public void onSelected(String path) {
+        if (path.equals("longClick")) {
+            if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+                mAdapter.setSelectable(true);
+            } else {
+                return;
+            }
+        }
         if (mAdapter.getSelectable()) {
             checkNumberSelected();
             return;
         }
         Bundle bundle = new Bundle();
+        String VIDEO_PATH_KEY = "video-file-path";
         bundle.putString(VIDEO_PATH_KEY, path);
         Intent intent;
         switch (from_code) {
@@ -395,10 +319,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         startActivity(intent);
     }
 
-    private ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+    private final ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
         // handle intent result here
         if (result.getResultCode() == RESULT_OK) {
-            Toast.makeText(this, "The video is deleted! "+result.getData(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The video is deleted! " + result.getData(), Toast.LENGTH_SHORT).show();
         }
     });
 
@@ -408,7 +332,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             ArrayList<Uri> collection = new ArrayList<>();
             collection.add(uri);
             pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
-
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             //if exception is recoverable then again send delete request using intent
             if (e instanceof RecoverableSecurityException) {
@@ -416,7 +339,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 pendingIntent = exception.getUserAction().getActionIntent();
             }
         }
-
         if (pendingIntent != null) {
             IntentSender sender = pendingIntent.getIntentSender();
             IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();

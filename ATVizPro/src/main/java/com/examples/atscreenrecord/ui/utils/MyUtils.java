@@ -60,6 +60,8 @@ public class MyUtils {
     public static final String DRIVE_MASTER_FOLDER = "Zecorder";
     public static final String STREAM_PROFILE = "Stream_Profile";
     public static final String ACTION_NOTIFY_FROM_STREAM_SERVICE = "ACTION_NOTIFY_FROM_STREAM_SERVICE";
+    public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
+    public static final String ACTION_DISCONNECT_LIVE_FROM_HOME = "ACTION_DISCONNECT_LIVE_FROM_HOME";
     public static final String KEY_CAMERA_AVAILABLE = "KEY_CAMERA_AVAILABLE";
     public static final String KEY_CONTROLlER_MODE = "KEY_CONTROLLER_MODE";
     public static final String ACTION_INIT_CONTROLLER = "ACTION INIT CONTROLLER";

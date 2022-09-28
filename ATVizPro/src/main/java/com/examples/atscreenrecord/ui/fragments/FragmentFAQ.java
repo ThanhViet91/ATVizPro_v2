@@ -11,23 +11,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.FAQAdapter;
 import com.examples.atscreenrecord.model.FAQItem;
 import com.examples.atscreenrecord.utils.AdUtil;
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class FragmentFAQ extends Fragment {
 
@@ -39,7 +29,7 @@ public class FragmentFAQ extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View mViewRoot = inflater.inflate(R.layout.fragment_faq, container, false);
-        mFAQs.add(new FAQItem("Sound is not working", "Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. " +
+        mFAQs.add(new FAQItem("Sound is not working", "Before starting your screen recording,make sure your phone is not in silent mode and the volume is on. " +
                 "Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.", false));
         mFAQs.add(new FAQItem("How do I turn on the microphone?", "Make sure you long press (or 3D touch it available) the record button, " +
                 "so a menu will appear to turn on the microphone.", false));
@@ -48,7 +38,7 @@ public class FragmentFAQ extends Fragment {
         mFAQs.add(new FAQItem("My Video is saved to camera roll and I want to save it on the app", "Just make sure you long press (or 3D touch if available) " +
                 "the record button on the control center. Then, select Record it! as the destination app.", false));
         mFAQs.add(new FAQItem("Error while recording or recording won’t stop", "Somethings the recording engine gets stuck due to a memory bug on some IOS devices." +
-                " Try restarting you divice and close all other apps.", false));
+                " Try restarting you device and close all other apps.", false));
         mFAQs.add(new FAQItem("My record button is greyed out", "Make sure Screen Recording is Not Restricted with Parental Control: " +
                 "Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. " +
                 "Then scroll and look if Screen Recorder is restricted. If so, turn it off.", false));
@@ -67,12 +57,7 @@ public class FragmentFAQ extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
-        btn_back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getParentFragmentManager().popBackStack();
-            }
-        });
+        btn_back.setOnClickListener(view1 -> requireActivity().onBackPressed());
 
         AdView mAdView = view.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);

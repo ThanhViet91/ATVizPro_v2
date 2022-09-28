@@ -44,6 +44,13 @@
     <string name="setting_video_bitrate">setting_video_bitrate</string>
     <string name="setting_video_resolution">setting_video_resolution</string>
     <string name="setting_video_fps">setting_video_fps</string>
+    <string name="setting_rtmp_youtube">setting_rtmp_youtube</string>
+    <string name="setting_rtmp_facebook">setting_rtmp_facebook</string>
+    <string name="setting_rtmp_twitch">setting_rtmp_twitch</string>
+    <string name="setting_stream_key_youtube">setting_stream_key_youtube</string>
+    <string name="setting_stream_key_facebook">setting_stream_key_facebook</string>
+    <string name="setting_stream_key_twitch">setting_stream_key_twitch</string>
+    <string name="setting_livestream_type">setting_livestream_type</string>
 
     <!--Camera settings-->
     <string name="setting_camera_mode">setting_camera_mode</string>
@@ -85,6 +92,7 @@
     <string name="settings">Settings</string>
     <string name="how_to_record_your_screen">How to record your screen</string>
     <string name="how_to_livestream">How to livestream</string>
+    <string name="share_app_to_friends">Share App to Friends</string>
     <string name="upgrade_to_pro">Upgrade to Pro</string>
     <string name="restore_purchase">Restore Purchase</string>
     <string name="available_storage_2_43gb">Available Storage: </string>
@@ -159,6 +167,7 @@
     <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/StreamKey?</u></string>
     <string name="edit">Edit</string>
     <string name="livestreaming">Livestreaming...</string>
+    <string name="disconnect_livestream">Disconnect live</string>
     <string name="projects">Projects</string>
     <string name="save">Save</string>
     <string name="rtmp">rtmp://</string>
@@ -168,5 +177,7 @@
     <string name="step_1">Step 1:....</string>
     <string name="todo">TODO</string>
     <string name="_1_item_selected">1 item selected</string>
+    <string name="ok">OK</string>
+    <string name="stream_key">Stream key</string>
 
 </resources>

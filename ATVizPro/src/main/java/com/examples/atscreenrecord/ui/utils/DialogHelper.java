@@ -4,42 +4,47 @@ import android.app.Dialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.examples.atscreenrecord.R;
+import com.examples.atscreenrecord.model.VideoModel;
 import com.google.android.material.textfield.TextInputLayout;
+import java.io.File;
+import java.io.IOException;
 
 public class DialogHelper {
 
     private static DialogHelper mInstance = null;
 
-    private DialogHelper() {
-
+    private DialogHelper(IDialogHelper callback) {
+        this.mCallback = callback;
     }
 
-    public static DialogHelper getInstance(){
+    public static DialogHelper getInstance(IDialogHelper callback){
         if (mInstance == null) {
             synchronized (DialogHelper.class) {
-                mInstance = new DialogHelper();
+                mInstance = new DialogHelper(callback);
             }
         }
         return mInstance;
     }
 
+    public interface IDialogHelper {
+        void onClickOK(String result);
+        void onClickCancel(String result);
+    }
 
-    public void showRenameDialog(Context context, String videoName) {
-        if (!videoName.equals("")) {
+    private final IDialogHelper mCallback;
+
+    public void showRenameDialog(Context context, VideoModel oldVideo) {
+
             final Dialog dialog = new Dialog(context);
             dialog.setContentView(R.layout.layout_rename);
             dialog.setTitle("Properties");
-            final TextInputLayout tilEditext = (TextInputLayout) dialog.findViewById(R.id.tilRename);
-
-            final boolean isValid = true;
+            final TextInputLayout tilEdittext = dialog.findViewById(R.id.tilRename);
 
             final EditText editText = dialog.findViewById(R.id.edRename);
-            editText.setText(videoName);
+            editText.setText(oldVideo.getName());
             editText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -52,42 +57,59 @@ public class DialogHelper {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (MyUtils.isValidFilenameSynctax(s.toString())) {
-                        tilEditext.setError("A filename cannot contain any of the following charactor: \\/\":*<>| is not n");
+                        tilEdittext.setError("A filename cannot contain any of the following character: \\/\":*<>| is not n");
                     } else {
-                        tilEditext.setError("");
+                        tilEdittext.setError("");
                     }
                 }
             });
-            Button btnOk = (Button) dialog.findViewById(R.id.rename_btn_ok);
+            Button btnOk = dialog.findViewById(R.id.rename_btn_ok);
             // if button is clicked, close the custom dialog
-            btnOk.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    String newTitle = editText.getText().toString() + ".mp4";
-//                    if (!TextUtils.equals(video.getTitle(), newTitle)) {
-//                        try {
-//                            renameFile(video, newTitle);
-//                            mVideoAdapter.notifyDataSetChanged();
-//                            dialog.dismiss();
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                            tilEditext.setError(e.getMessage());
-//                        }
-//                    } else
-//                        dialog.dismiss();
+            btnOk.setOnClickListener(v -> {
+                String newTitle = editText.getText().toString();
+                if (!oldVideo.getName().equals(newTitle)) {
+                    try {
+                        renameFile(oldVideo.getPath(), newTitle);
+                        mCallback.onClickOK(newTitle);
+                        dialog.dismiss();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        tilEdittext.setError(e.getMessage());
+                    }
+                } else
+                    dialog.dismiss();
 
-                }
             });
 
-            Button btnCancel = (Button) dialog.findViewById(R.id.rename_btn_cancel);
+            Button btnCancel = dialog.findViewById(R.id.rename_btn_cancel);
             // if button is clicked, close the custom dialog
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
+            btnCancel.setOnClickListener(v -> {
+                mCallback.onClickCancel("cancel");
+                dialog.dismiss();
             });
             dialog.show();
+
+    }
+
+
+
+    public void renameFile(final String videoPath, final String newName) throws Exception {
+        if (MyUtils.isValidFilenameSynctax(newName))
+            throw new Exception("A filename cannot contain any of the following character: \\/\":*<>| is not n");
+
+        File file = new File(videoPath);
+
+        final File fileWithNewName = new File(file.getParent(), newName + ".mp4");
+        if (fileWithNewName.exists()) {
+            throw new IOException("This filename is exists. Please choose another name");
+        }
+
+        // Rename file (or directory)
+        boolean success = file.renameTo(fileWithNewName);
+
+        if (!success) {
+            // File was not successfully renamed
+            throw new Exception("Cannot rename this video. This video file might not available.");
         }
     }
 }

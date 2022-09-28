@@ -38,7 +38,7 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
                 @Override
                 public void run() {
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     pulsator.stop();
                     finish();
@@ -65,7 +65,7 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     public void onLoadFail() {
         if (isActive) {
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             pulsator.stop();
             finish();
@@ -76,7 +76,7 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
     public void onDismiss() {
         if (isActive) {
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             pulsator.stop();
             finish();

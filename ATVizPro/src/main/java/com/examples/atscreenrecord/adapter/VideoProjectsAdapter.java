@@ -8,23 +8,18 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoModel;
-
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<VideoModel> list;
-
     private boolean selectable = false;
-
 
     public interface VideoProjectsListener {
         void onSelected(String path);
@@ -41,12 +36,6 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         this.listener = listener;
     }
 
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void reloadData(List<VideoModel> listNew) {
-        this.list = listNew;
-        notifyDataSetChanged();
-    }
     @SuppressLint("NotifyDataSetChanged")
     public void updateData(List<VideoModel> listNew) {
         this.list = listNew;
@@ -70,103 +59,52 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         return new ViewHolder(view);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
         if (selectable) {
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.checkBox.setChecked(video.isSelected());
-        } else {
+        } else
             holder.checkBox.setVisibility(View.GONE);
-        }
-        if (video != null) {
-            holder.duration.setText(video.getDuration());
-            Glide.with(context)
-                    .load(video.getThumb())
-                    .into(holder.img);
-            holder.name.setText(video.getName());
-        }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                if (selectable) {
-                    holder.checkBox.setChecked(!holder.checkBox.isChecked());
-                    list.get(position).setSelected(holder.checkBox.isChecked());
-                }
-                listener.onSelected(list.get(position).getThumb());
-            }
-        });
-
-        holder.checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        holder.duration.setText(video.getDuration());
+        Glide.with(context)
+                .load(video.getPath())
+                .into(holder.img);
+        holder.name.setText(video.getName());
+        holder.itemView.setOnClickListener(view -> {
+            if (selectable) {
+                holder.checkBox.setChecked(!holder.checkBox.isChecked());
                 list.get(position).setSelected(holder.checkBox.isChecked());
-                listener.onSelected(list.get(position).getThumb());
             }
+            listener.onSelected(list.get(position).getPath());
         });
-
-//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                new AlertDialog.Builder(context)
-//                        .setTitle("Delete Video")
-//                        .setMessage("Are you sure you want to delete this video?")
-//                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-//                            @SuppressLint("NotifyDataSetChanged")
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                // Continue with delete operation
-//                                File file = new File(list.get(position).getThumb());
-//                                MediaScannerConnection.scanFile(context, new String[]{file.getPath()}, new String[]{file.getName()},
-//                                        new MediaScannerConnection.OnScanCompletedListener() {
-//                                            @Override
-//                                            public void onScanCompleted(String s, Uri uri) {
-//                                                ContentResolver contentResolver = context.getContentResolver();
-//                                                try {
-//                                                    //delete object using resolver
-//                                                    contentResolver.delete(uri, null, null);
-//                                                    Toast.makeText(context, "The video is deleted!", Toast.LENGTH_SHORT).show();
-//                                                } catch (SecurityException e) {
-//                                                    listener.onDeleteFile(e, uri, contentResolver);
-//                                                }
-//                                            }
-//                                        });
-//                                list.remove(list.get(position));
-//                                notifyDataSetChanged();
-//                            }
-//                        })
-//                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialogInterface, int i) {
-//                            }
-//                        })
-//                        .setIcon(android.R.drawable.ic_dialog_alert)
-//                        .show()
-//                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                            @Override
-//                            public void onCancel(DialogInterface dialogInterface) {
-//                            }
-//                        });
-//                return false;
-//            }
-//        });
-
+        holder.checkBox.setOnClickListener(view -> {
+            list.get(position).setSelected(holder.checkBox.isChecked());
+            listener.onSelected(list.get(position).getPath());
+        });
+        holder.itemView.setOnLongClickListener(view -> {
+            if (!selectable) {
+                list.get(position).setSelected(true);
+                listener.onSelected("longClick");
+            }
+            return false;
+        });
     }
-
 
     @Override
     public int getItemCount() {
-        if (list != null) {
-            return list.size();
-        }
+        if (list != null) return list.size();
         return 0;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView img;
-        private TextView name;
-        private TextView duration;
-        private CheckBox checkBox;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ImageView img;
+        private final TextView name;
+        private final TextView duration;
+        private final CheckBox checkBox;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

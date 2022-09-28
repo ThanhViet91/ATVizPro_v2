@@ -19,6 +19,7 @@ public class RtmpPublisherSSL implements Publisher {
     private int audioBitrate;
     private int videoBitrate;
     private int density;
+    private PublisherListener listener;
 
     RtmpPublisherSSL(
             String url,
@@ -27,7 +28,8 @@ public class RtmpPublisherSSL implements Publisher {
             int audioBitrate,
             int videoBitrate,
             int density,
-            @NonNull MediaProjection mediaProjection) {
+            @NonNull MediaProjection mediaProjection,
+            PublisherListener listener) {
 
         this.url = url;
         this.width = width;
@@ -35,13 +37,13 @@ public class RtmpPublisherSSL implements Publisher {
         this.audioBitrate = audioBitrate;
         this.videoBitrate = videoBitrate;
         this.density = density;
-        this.streamer = new Streamer(mediaProjection);
+        this.streamer = new Streamer(mediaProjection, listener);
+        streamer.open(url, width, height);
     }
 
     @Override
     public void startPublishing() {
         if(DEBUG) Log.i(TAG, "startPublishing: called (clicked)");
-        streamer.open(url, width, height);
         streamer.startStreamingSSL(width, height, audioBitrate, videoBitrate, density);
     }
 
@@ -49,6 +51,13 @@ public class RtmpPublisherSSL implements Publisher {
     public void stopPublishing() {
         if (streamer.isStreaming()) {
             streamer.stopStreaming();
+        }
+    }
+
+    @Override
+    public void closePublishing() {
+        if (streamer.isStreaming()) {
+            streamer.disconnectStreaming();
         }
     }
 

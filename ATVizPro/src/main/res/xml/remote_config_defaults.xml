@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>Configs</key>
+    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream ™","interstitialPercent":100,"frequencyCapping":10,"privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
+  </entry>
+</defaults>

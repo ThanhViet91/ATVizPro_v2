@@ -13,4 +13,26 @@ public class FirebaseUtils {
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
     }
 
+//    private static AppConfigs _instance;
+//    private FirebaseRemoteConfig config;
+//
+//    private AppConfigs(){
+//
+//    }
+//
+//    public FirebaseRemoteConfig getConfig(){
+//        return this.config;
+//    }
+//
+//    public void setConfig(FirebaseRemoteConfig config){
+//        this.config = config;
+//    }
+//
+//    public static AppConfigs getInstance(){
+//        if(_instance==null){
+//            _instance = new AppConfigs();
+//        }
+//        return _instance;
+//    }
+
 }

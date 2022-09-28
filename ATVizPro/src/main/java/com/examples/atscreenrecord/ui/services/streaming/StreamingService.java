@@ -2,9 +2,6 @@ package com.examples.atscreenrecord.ui.services.streaming;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -12,19 +9,14 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.Size;
 import android.view.Display;
 import android.widget.Toast;
 
-import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.controllers.encoder.RenderUtil.CustomDecorator;
 import com.examples.atscreenrecord.ui.services.BaseService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.takusemba.rtmppublisher.Publisher;
 import com.takusemba.rtmppublisher.PublisherListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
-
-import java.util.ArrayList;
 
 public class StreamingService extends BaseService implements PublisherListener {
     private static final boolean DEBUG = MyUtils.DEBUG;    // TODO set false on release
@@ -32,6 +24,7 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     public static final String NOTIFY_MSG_CONNECTION_FAILED = "Stream connection failed";
     public static final String NOTIFY_MSG_CONNECTION_STARTED = "Stream started";
+    public static final String NOTIFY_MSG_CONNECTED = "Stream connected";
     public static final String NOTIFY_MSG_ERROR = "Stream connection error!";
     public static final String NOTIFY_MSG_UPDATED_STREAM_PROFILE = "Updated stream profile";
     public static final String NOTIFY_MSG_CONNECTION_DISCONNECTED = "Connection disconnected!";
@@ -62,6 +55,12 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     @Override
+    public void onConnected() {
+        System.out.println("thanhlv onConnected callback");
+        notifyStreamingCallback(NOTIFY_MSG_CONNECTED);
+    }
+
+    @Override
     public void onStopped() {
         if (DEBUG) Log.i(TAG, "onStopped");
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
@@ -76,10 +75,12 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onFailedToConnect() {
         if (mPublisher != null && mPublisher.isPublishing())
-            mPublisher.stopPublishing();
+//            mPublisher.stopPublishing();
+            mPublisher.closePublishing();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
         if (DEBUG) Log.i(TAG, "onFailedToConnect");
-        MyUtils.toast(getApplicationContext(), "Streaming Connection Failed", Toast.LENGTH_SHORT);
+
+        MyUtils.toast(getApplicationContext(), "Connection failed, please check RTMP address and Stream Key again!", Toast.LENGTH_LONG);
     }
 
     @Override
@@ -99,10 +100,12 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     void notifyStreamingCallback(String notify_msg) {
         if (DEBUG) Log.i(TAG, "sent notify stream " + notify_msg);
-        Intent intent = new Intent();
-        intent.setAction(MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE);
-        intent.putExtra(KEY_NOTIFY_MSG, notify_msg);
-        sendBroadcast(intent);
+//        Intent intent = new Intent();
+//        intent.setAction(MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE);
+//        intent.putExtra(KEY_MESSAGE, notify_msg);
+//        sendBroadcast(intent);
+        MyUtils.sendBroadCastMessageFromService(this, notify_msg);
+
     }
 
     @Override
@@ -171,6 +174,12 @@ public class StreamingService extends BaseService implements PublisherListener {
         return mIBinder;
     }
 
+    @Override
+    public void openPerformService() {
+        System.out.println("thanhlv openPerformService ....");
+        prepareConnection();
+    }
+
 
     @Override
     public void startPerformService() {
@@ -186,26 +195,36 @@ public class StreamingService extends BaseService implements PublisherListener {
         stopStreaming();
     }
 
-    public void startStreaming() {
+    @Override
+    public void closePerformService() {
+        if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
+        notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP + " " + mUrl);
+        closeStreaming();
+    }
+
+    public void prepareConnection() {
         synchronized (sSync) {
             if (mPublisher == null) {
-                if (DEBUG) Log.i(TAG, "startStreaming:");
                 try {
                     mPublisher = new Publisher.Builder()
                             .setUrl(mUrl)
-                            .setSize(1280, 720)
+                            .setSize(720, 1280)
                             .setAudioBitrate(Publisher.Builder.DEFAULT_AUDIO_BITRATE)
                             .setVideoBitrate(Publisher.Builder.DEFAULT_VIDEO_BITRATE)
                             .setDensity(mScreenDensity)
+                            .setListener(this)
                             .setMediaProjection(mMediaProjection)
                             .build();
-                    mPublisher.startPublishing();
-
                 } catch (final Exception e) {
-                    Log.e(TAG, "startStreaming error:", e);
-                    notifyStreamingCallback(NOTIFY_MSG_ERROR);
+                    mPublisher = null;
                 }
-            } else {
+            }
+        }
+    }
+
+    public void startStreaming() {
+        synchronized (sSync) {
+            if (mPublisher != null) {
                 mPublisher.startPublishing();
             }
         }
@@ -220,21 +239,15 @@ public class StreamingService extends BaseService implements PublisherListener {
         }
     }
 
-    private ArrayList<CustomDecorator> createDecorators() {
-        ArrayList<CustomDecorator> list = new ArrayList<>();
-
-        //watermask
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wartermark);
-
-        list.add(new CustomDecorator(bitmap, new Size(240, 240), new Point(0, 0)));
-
-        return list;
-    }
-
     public void stopStreaming() {
         if (mPublisher != null && mPublisher.isPublishing()) {
             mPublisher.stopPublishing();
         }
     }
 
+    public void closeStreaming() {
+        if (mPublisher != null && mPublisher.isPublishing()) {
+            mPublisher.closePublishing();
+        }
+    }
 }

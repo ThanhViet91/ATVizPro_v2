@@ -96,6 +96,10 @@ public class RecordingService extends BaseService {
     }
 
     @Override
+    public void openPerformService() {
+    }
+
+    @Override
     public void startPerformService() {
         Log.i(TAG, "startPerformService: from RecordingService");
         startRecording();
@@ -105,6 +109,11 @@ public class RecordingService extends BaseService {
     public void stopPerformService() {
         VideoSetting2 v = stopRecording();
         mResultVideo = v;
+    }
+
+    @Override
+    public void closePerformService() {
+
     }
 
     public void startRecording() {

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
@@ -25,10 +26,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.examples.atscreenrecord.App;
-import com.examples.atscreenrecord.utils.StorageUtil;
-import com.google.android.material.snackbar.Snackbar;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting;
 import com.examples.atscreenrecord.data.entities.Video;
+import com.examples.atscreenrecord.utils.StorageUtil;
+import com.google.android.material.snackbar.Snackbar;
+import com.serenegiant.utils.UIThreadHelper;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,8 +43,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import kotlin.Suppress;
 
 public class MyUtils {
     public static final boolean DEBUG = true;
@@ -61,6 +61,7 @@ public class MyUtils {
     public static final String STREAM_PROFILE = "Stream_Profile";
     public static final String ACTION_NOTIFY_FROM_STREAM_SERVICE = "ACTION_NOTIFY_FROM_STREAM_SERVICE";
     public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
+    public static final String ACTION_CONNECT_FAILED_FROM_SERVICE = "ACTION_CONNECT_FAILED_FROM_SERVICE";
     public static final String ACTION_DISCONNECT_LIVE_FROM_HOME = "ACTION_DISCONNECT_LIVE_FROM_HOME";
     public static final String KEY_CAMERA_AVAILABLE = "KEY_CAMERA_AVAILABLE";
     public static final String KEY_CONTROLlER_MODE = "KEY_CONTROLLER_MODE";
@@ -70,13 +71,22 @@ public class MyUtils {
     public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/thanh";
     public static final String KEY_STREAM_URL = "rtmp stream";
     public static final String KEY_STREAM_LOG = "Stream log";
+    public static final String KEY_MESSAGE = "KEY_MESSAGE";
     public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
     public static final String ACTION_UPDATE_STREAM_PROFILE = "ACTION_UPDATE_STREAM_PROFILE";
     public static final String ACTION_START_CAPTURE_NOW = "ACTION_START_CAPTURE_NOW";
+    public static final String ACTION_SEND_MESSAGE_FROM_SERVICE = "ACTION_SEND_MESSAGE_FROM_SERVICE";
+    public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 
     private static final String TAG = "chienpm_utils";
     public static final int MODE_STREAMING = 101;
     public static final int MODE_RECORDING = 102;
+
+    public static void sendBroadCastMessageFromService(Context context, String message) {
+        Intent intent = new Intent(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
+        intent.putExtra(KEY_MESSAGE, message);
+        context.sendBroadcast(intent);
+    }
 
     @NonNull
     public static String createFileName(@NonNull String ext) {
@@ -179,7 +189,7 @@ public class MyUtils {
 
 
     public static void toast(Context mContext, String msg, int length) {
-        Toast.makeText(mContext, msg, length).show();
+        UIThreadHelper.runOnUiThread(() -> Toast.makeText(mContext, msg, length).show());
     }
 
     public static boolean isValidFilenameSynctax(String filename) {

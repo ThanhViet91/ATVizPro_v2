@@ -7,11 +7,11 @@ import static com.examples.atscreenrecord.ui.services.streaming.StreamingService
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_ERROR;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_REQUEST_START;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_REQUEST_STOP;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideSoftInput;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.toast;
 
 import android.content.BroadcastReceiver;
 import android.content.ClipboardManager;
@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,14 +42,11 @@ import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.services.recording.RecordingService;
-import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class RTMPLiveAddressFragment extends Fragment {
 
@@ -72,6 +70,18 @@ public class RTMPLiveAddressFragment extends Fragment {
         mFragmentManager = getParentFragmentManager();
         if (mStreamReceiver == null) {
             registerSyncServiceReceiver();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        unRegisterSyncServiceReceiver();
+    }
+
+    private void unRegisterSyncServiceReceiver() {
+        if (mStreamReceiver != null) {
+            mApplication.unregisterReceiver(mStreamReceiver);
         }
     }
 
@@ -300,35 +310,41 @@ public class RTMPLiveAddressFragment extends Fragment {
     private void registerSyncServiceReceiver() {
         mStreamReceiver = new StreamingReceiver();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE);
+        intentFilter.addAction(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
         mApplication.registerReceiver(mStreamReceiver, intentFilter);
     }
 
     //Receiver
     private class StreamingReceiver extends BroadcastReceiver {
-        private boolean isStarted = false;
 
         @Override
         public void onReceive(Context context, Intent intent) {
 
             String action = intent.getAction();
             if (!TextUtils.isEmpty(action) &&
-                    MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE.equals(action)) {
+                    MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
 
-                String notify_msg = intent.getStringExtra(StreamingService.KEY_NOTIFY_MSG);
+                String notify_msg = intent.getStringExtra(KEY_MESSAGE);
                 if (TextUtils.isEmpty(notify_msg))
                     return;
                 switch (notify_msg) {
                     case NOTIFY_MSG_CONNECTION_STARTED:
                         edtRTMPAddress.setEnabled(false);
                         edtStreamKey.setEnabled(false);
-                        isStarted = true;
-                        break;
-
-                    case NOTIFY_MSG_CONNECTION_FAILED:
+                        btnClearRTMP.setEnabled(false);
+                        btnClearStreamKey.setEnabled(false);
+                        tvStartLiveStream.setEnabled(false);
                         break;
 
                     case NOTIFY_MSG_CONNECTION_DISCONNECTED:
+                    case NOTIFY_MSG_CONNECTION_FAILED:
+                        toast(getContext(), "tttttttt", Toast.LENGTH_LONG);
+                        edtRTMPAddress.setEnabled(true);
+                        edtStreamKey.setEnabled(true);
+                        btnClearRTMP.setEnabled(true);
+                        btnClearStreamKey.setEnabled(true);
+                        tvStartLiveStream.setEnabled(true);
+                        edtRTMPAddress.requestFocus();
                         break;
 
                     case NOTIFY_MSG_STREAM_STOPPED:
@@ -336,37 +352,32 @@ public class RTMPLiveAddressFragment extends Fragment {
 
                     case NOTIFY_MSG_ERROR:
                         break;
-                    case NOTIFY_MSG_REQUEST_STOP:
 
-                        edtRTMPAddress.setEnabled(true);
-                        edtStreamKey.setEnabled(true);
-
-                        break;
-                    case NOTIFY_MSG_REQUEST_START:
-
-                        new Thread(new Runnable() {
-                            int i = 0;
-
-                            @Override
-                            public void run() {
-                                while (!isStarted) {
-                                    if (i > 5000) {
-                                        //failed
-//                                        appendLog("Cannot stream to server. Try later..");
-                                        onStop();
-                                        break;
-                                    }
-                                    try {
-                                        i += 1000;
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }).start();
-
-                        break;
+//                    case NOTIFY_MSG_REQUEST_START:
+//
+//                        new Thread(new Runnable() {
+//                            int i = 0;
+//
+//                            @Override
+//                            public void run() {
+//                                while (!isStarted) {
+//                                    if (i > 5000) {
+//                                        //failed
+////                                        appendLog("Cannot stream to server. Try later..");
+//                                        onStop();
+//                                        break;
+//                                    }
+//                                    try {
+//                                        i += 1000;
+//                                        Thread.sleep(1000);
+//                                    } catch (InterruptedException e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                        }).start();
+//
+//                        break;
                     default:
                 }
             }

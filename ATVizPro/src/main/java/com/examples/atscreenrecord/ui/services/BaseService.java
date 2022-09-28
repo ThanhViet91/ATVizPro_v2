@@ -13,6 +13,8 @@ public abstract class BaseService extends Service {
         return null;
     }
 
+    public abstract void openPerformService();
     public abstract void startPerformService();
     public abstract void stopPerformService();
+    public abstract void closePerformService();
 }

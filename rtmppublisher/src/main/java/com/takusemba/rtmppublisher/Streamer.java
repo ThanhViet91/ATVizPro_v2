@@ -24,46 +24,54 @@ class Streamer
     private AudioHandler audioHandler;
 
     private SrsFlvMuxer srsFlvMuxer;
+    private PublisherListener listener = null;
 
-    Streamer(@NonNull MediaProjection mediaProjection) {
+    Streamer(@NonNull MediaProjection mediaProjection, PublisherListener listener) {
         this.videoHandler = new VideoHandler(mediaProjection);
         this.audioHandler = new AudioHandler();
+        this.listener = listener;
     }
 
     void open(String url, int width, int height) {
         if(DEBUG) Log.i(TAG, "open: "+url);
 
+        if (listener != null) listener.onStarted();
         srsFlvMuxer = new SrsFlvMuxer(new ConnectCheckerRtmp() {
             @Override
             public void onConnectionSuccessRtmp() {
+                System.out.println("thanhlv onConnectionSuccessRtmp");
+                if (listener != null) listener.onConnected();
             }
 
             @Override
             public void onConnectionFailedRtmp(@NonNull String reason) {
+                System.out.println("thanhlv onConnectionFailedRtmp");
+                if (listener != null) listener.onFailedToConnect();
             }
 
             @Override
             public void onNewBitrateRtmp(long bitrate) {
+                System.out.println("thanhlv onNewBitrateRtmp");
             }
 
             @Override
             public void onDisconnectRtmp() {
-
+                System.out.println("thanhlv onDisconnectRtmp");
+                if (listener != null) listener.onDisconnected();
             }
 
             @Override
             public void onAuthErrorRtmp() {
-
+                System.out.println("thanhlv onAuthErrorRtmp");
             }
 
             @Override
             public void onAuthSuccessRtmp() {
-
+                System.out.println("thanhlv onAuthSuccessRtmp");
             }
         });
         srsFlvMuxer.setVideoResolution(width, height);
         srsFlvMuxer.start(url);
-
         srsFlvMuxer.setIsStereo(true);
         srsFlvMuxer.setSampleRate(44100);
 
@@ -89,21 +97,26 @@ class Streamer
             audioHandler.setOnAudioEncoderStateListener(this);
             videoHandler.start(width, height, videoBitrate, startStreamingAt, density);
             audioHandler.start(audioBitrate, startStreamingAt);
+
         } else {
             Log.e(TAG, "startStreaming: failed coz muxer is not connected");
+            System.out.println("startStreaming: failed coz muxer is not connected");
         }
     }
 
-    void stopStreaming() {
+    void disconnectStreaming(){
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 srsFlvMuxer.stop();
                 oldTimeStamp = 0L;
             }
-        }, 1000);
+        }, 200);
+    }
+    void stopStreaming() {
         videoHandler.stop();
         audioHandler.stop();
+        if (listener != null) listener.onStopped();
     }
 
     boolean isStreaming() {

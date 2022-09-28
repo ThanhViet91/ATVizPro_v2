@@ -5,6 +5,13 @@ import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.A
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_DISCONNECTED;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_ERROR;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.MESSAGE_DISCONNECT_LIVE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
@@ -21,11 +28,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,7 +55,6 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
-import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.AppOpenManager;
 import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
@@ -63,7 +69,6 @@ import com.examples.atscreenrecord.ui.fragments.FragmentSettings;
 import com.examples.atscreenrecord.ui.fragments.GuidelineLiveStreamFragment;
 import com.examples.atscreenrecord.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment;
-import com.examples.atscreenrecord.ui.fragments.RTMPLiveAddressFragment;
 import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
@@ -80,9 +85,9 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
+
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.function.ToDoubleBiFunction;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
@@ -143,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void registerSyncServiceReceiver() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_SERVICE);
+        intentFilter.addAction(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
         registerReceiver(mMessageReceiver, intentFilter);
     }
 
@@ -453,11 +458,13 @@ public class MainActivity extends AppCompatActivity {
         });
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
-            if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                sendDisconnectToService();
-                return;
+                if (!liveStreaming.getText().toString().equals(getString(R.string.livestreaming))){
+                    sendDisconnectToService();
+                    return;
+                }
             }
+            if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
             showLiveStreamFragment();
         });
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
@@ -801,13 +808,13 @@ public class MainActivity extends AppCompatActivity {
             startService(controller);
         }
 
-        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
-        if (all_frags.size() == 0) {
-        } else {
-            for (Fragment frag : all_frags) {
-                getSupportFragmentManager().beginTransaction().remove(frag).commit();
-            }
-        }
+//        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
+//        if (all_frags.size() == 0) {
+//        } else {
+//            for (Fragment frag : all_frags) {
+//                getSupportFragmentManager().beginTransaction().remove(frag).commit();
+//            }
+//        }
         updateService();
 //        finish();
     }
@@ -853,8 +860,34 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            boolean disconnect_live = intent.getBooleanExtra("is_disconnect_live", false);
-            if (disconnect_live) updateService();
+
+            String action = intent.getAction();
+            if (!TextUtils.isEmpty(action) &&
+                    MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
+
+                String notify_msg = intent.getStringExtra(KEY_MESSAGE);
+                if (TextUtils.isEmpty(notify_msg))
+                    return;
+                System.out.println("thanhlv messsssssssssss "+notify_msg);
+                switch (notify_msg) {
+
+                    case NOTIFY_MSG_CONNECTION_STARTED:
+                    case NOTIFY_MSG_STREAM_STOPPED:
+                        break;
+
+                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
+                    case MESSAGE_DISCONNECT_LIVE:
+                        updateService();
+                        break;
+                    case NOTIFY_MSG_CONNECTION_FAILED:
+                        liveStreaming.setText(getString(R.string.livestreaming));
+                        break;
+
+                    case NOTIFY_MSG_ERROR:
+                        break;
+                    default:
+                }
+            }
         }
     };
 }

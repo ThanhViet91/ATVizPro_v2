@@ -1,6 +1,7 @@
 package com.github.faucamp.simplertmp.io;
 
 import android.util.Log;
+
 import com.github.faucamp.simplertmp.RtmpPublisher;
 import com.github.faucamp.simplertmp.Util;
 import com.github.faucamp.simplertmp.amf.AmfMap;
@@ -17,6 +18,11 @@ import com.github.faucamp.simplertmp.packets.RtmpPacket;
 import com.github.faucamp.simplertmp.packets.UserControl;
 import com.github.faucamp.simplertmp.packets.Video;
 import com.github.faucamp.simplertmp.packets.WindowAckSize;
+
+import net.ossrs.rtmp.BitrateManager;
+import net.ossrs.rtmp.ConnectCheckerRtmp;
+import net.ossrs.rtmp.CreateSSLSocket;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
@@ -29,9 +35,6 @@ import java.net.SocketAddress;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.ossrs.rtmp.BitrateManager;
-import net.ossrs.rtmp.ConnectCheckerRtmp;
-import net.ossrs.rtmp.CreateSSLSocket;
 
 /**
  * Main RTMP connection implementation class
@@ -161,7 +164,7 @@ public class RtmpConnection implements RtmpPublisher {
       if (!tlsEnabled) {
         socket = new Socket();
         SocketAddress socketAddress = new InetSocketAddress(host, port);
-        socket.connect(socketAddress, 10000);
+        socket.connect(socketAddress, 5000);
       } else {
         socket = CreateSSLSocket.createSSlSocket(host, port);
         if (socket == null) throw new IOException("Socket creation failed");

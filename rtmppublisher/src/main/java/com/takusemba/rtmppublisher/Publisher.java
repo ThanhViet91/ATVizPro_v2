@@ -21,6 +21,7 @@ public interface Publisher {
      */
     void stopPublishing();
 
+    void closePublishing();
     /**
      * @return if the Publisher is publishing data.
      */
@@ -157,12 +158,6 @@ public interface Publisher {
          * @return the created RtmpPublisher
          */
         public RtmpPublisherSSL build() {
-//            if (activity == null) {
-//                throw new IllegalStateException("activity should not be null");
-//            }
-//            if (glView == null) {
-//                throw new IllegalStateException("GLSurfaceView should not be null");
-//            }
             if (url == null || url.isEmpty()) {
                 throw new IllegalStateException("url should not be empty or null");
             }
@@ -185,7 +180,7 @@ public interface Publisher {
 //                mode = DEFAULT_MODE;
 //            }
 
-            return new RtmpPublisherSSL(url, width, height, audioBitrate, videoBitrate, density, mediaProjection);
+            return new RtmpPublisherSSL(url, width, height, audioBitrate, videoBitrate, density, mediaProjection, listener);
         }
 
     }

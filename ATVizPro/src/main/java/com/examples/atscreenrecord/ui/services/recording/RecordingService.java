@@ -139,8 +139,8 @@ public class RecordingService extends BaseService {
                     if (true) {
                         // for screen capturing
 
-                        VideoSetting2 videoSetting2 = SettingManager2.getVideoProfile(getApplicationContext());
-                        mCurrentVideoSetting = videoSetting2;
+                        VideoSetting2 videoSetting = SettingManager2.getVideoProfile(getApplicationContext());
+                        mCurrentVideoSetting = videoSetting;
                         new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
                     }
                     if (true) {

@@ -151,8 +151,11 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if(mMode == MyUtils.MODE_STREAMING && mService!=null && mRecordingServiceBound) {
-                    mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
-                    ((StreamingService)mService).updateStreamProfile(mStreamProfile);
+//                    mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
+//                    ((StreamingService)mService).updateStreamProfile(mStreamProfile);
+                    String url = intent.getStringExtra(MyUtils.NEW_URL);
+                    ((StreamingService)mService).updateUrl(url);
+                    ((StreamingService)mService).prepareConnection();
                 }
                 else{
                     Log.e(TAG, "handleIncomeAction: ", new Exception("Update stream profile error") );
@@ -528,19 +531,19 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             @Override
             public void onClick(View v) {
                 toggleNavigationButton(View.GONE);
-
+                clickStart = true;
                 clickStop = false;
                 if(mRecordingServiceBound){
 
                     toggleView(mCountdownLayout, View.VISIBLE);
 
-                    int countdown = (SettingManager.getCountdown(getApplication())+1) * 1000;
+                    int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
 
                     new CountDownTimer(countdown, 1000) {
 
                         public void onTick(long millisUntilFinished) {
                             toggleView(mViewRoot, View.GONE);
-                            mTvCountdown.setText(""+(millisUntilFinished / 1000));
+                            mTvCountdown.setText(""+(millisUntilFinished/1000+1));
                         }
 
                         public void onFinish() {
@@ -679,6 +682,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     boolean clickStop = false;
+    boolean clickStart = false;
     private void onClickStop() {
         toggleNavigationButton(View.GONE);
         clickStop = true;
@@ -690,7 +694,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
             if(mMode==MyUtils.MODE_RECORDING){
 //                        ((RecordingService)mService).insertVideoToGallery();
-                MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
+                if (clickStart) MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
             }
         }
         else{

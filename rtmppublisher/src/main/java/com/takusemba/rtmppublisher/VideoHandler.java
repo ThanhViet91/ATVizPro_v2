@@ -45,7 +45,7 @@ class VideoHandler {
 
                             videoEncoder.start();
                         }
-                    }, 1000);
+                    }, 500);
                 } catch (IOException ioe) {
                     throw new RuntimeException(ioe);
                 }

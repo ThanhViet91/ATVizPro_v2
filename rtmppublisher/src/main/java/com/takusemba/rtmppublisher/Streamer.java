@@ -7,6 +7,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.serenegiant.utils.UIThreadHelper;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 import net.ossrs.rtmp.SrsFlvMuxer;
 
@@ -45,7 +47,7 @@ class Streamer
 
             @Override
             public void onConnectionFailedRtmp(@NonNull String reason) {
-                System.out.println("thanhlv onConnectionFailedRtmp");
+                System.out.println("thanhlv onConnectionFailedRtmp " + reason);
                 if (listener != null) listener.onFailedToConnect();
             }
 
@@ -111,7 +113,7 @@ class Streamer
                 srsFlvMuxer.stop();
                 oldTimeStamp = 0L;
             }
-        }, 200);
+        }, 1000);
     }
     void stopStreaming() {
         videoHandler.stop();

@@ -1,14 +1,17 @@
 package com.examples.atscreenrecord.ui.fragments;
 
+import static com.examples.atscreenrecord.Core.isConnected;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_DISCONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_ERROR;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.MESSAGE_DISCONNECT_LIVE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideSoftInput;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.toast;
@@ -37,6 +40,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.examples.atscreenrecord.App;
+import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
@@ -47,6 +51,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class RTMPLiveAddressFragment extends Fragment {
 
@@ -129,8 +135,15 @@ public class RTMPLiveAddressFragment extends Fragment {
             mParentActivity.setStreamProfile(mStreamProfile);
 
             if (isMyServiceRunning(requireContext(), ControllerService.class)) {
-                MyUtils.showSnackBarNotification(view, "Streaming service is running!", Snackbar.LENGTH_LONG);
-                mParentActivity.notifyUpdateStreamProfile();
+                if (!isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
+                    saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
+                    mParentActivity.sendNewURL(mUrl);
+                    mParentActivity.notifyUpdateStreamProfile();
+                } else {
+                    MyUtils.showSnackBarNotification(view, String.format("Livestream on %s is running!",
+                            parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
+                    return;
+                }
             } else{
                 saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
                 mParentActivity.shouldStartControllerService();
@@ -248,6 +261,12 @@ public class RTMPLiveAddressFragment extends Fragment {
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
     }
 
+    private String parseType(int type) {
+        if (type == 2) return "Facebook";
+        if (type == 3) return "Twitch";
+        return "Youtube";
+    }
+
     private void saveData(String rtmp, String streamkey) {
         if (type == SOCIAL_TYPE_YOUTUBE) {
             SettingManager2.setRTMPYoutube(requireContext(), rtmp);
@@ -284,6 +303,17 @@ public class RTMPLiveAddressFragment extends Fragment {
             btnClearStreamKey.setVisibility(View.VISIBLE);
             tvStartLiveStream.setAlpha(1f);
             tvStartLiveStream.setEnabled(true);
+        }
+        if (isMyServiceRunning(requireContext(), ControllerService.class)) {
+            if (isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
+                edtRTMPAddress.setEnabled(false);
+                edtStreamKey.setEnabled(false);
+                btnClearRTMP.setEnabled(false);
+                btnClearRTMP.setVisibility(View.GONE);
+                btnClearStreamKey.setVisibility(View.GONE);
+                btnClearStreamKey.setEnabled(false);
+                tvStartLiveStream.setEnabled(false);
+            }
         }
     }
     private void checkRestoreData() {
@@ -329,22 +359,29 @@ public class RTMPLiveAddressFragment extends Fragment {
                     return;
                 switch (notify_msg) {
                     case NOTIFY_MSG_CONNECTION_STARTED:
+                    case NOTIFY_MSG_CONNECTED:
+                        isConnected = true;
                         edtRTMPAddress.setEnabled(false);
                         edtStreamKey.setEnabled(false);
                         btnClearRTMP.setEnabled(false);
+                        btnClearRTMP.setVisibility(View.GONE);
+                        btnClearStreamKey.setVisibility(View.GONE);
                         btnClearStreamKey.setEnabled(false);
                         tvStartLiveStream.setEnabled(false);
                         break;
 
-                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
+                    case MESSAGE_DISCONNECT_LIVE:
                     case NOTIFY_MSG_CONNECTION_FAILED:
-                        toast(getContext(), "tttttttt", Toast.LENGTH_LONG);
+                        isConnected = false;
                         edtRTMPAddress.setEnabled(true);
                         edtStreamKey.setEnabled(true);
+                        btnClearRTMP.setVisibility(View.VISIBLE);
+                        btnClearStreamKey.setVisibility(View.VISIBLE);
                         btnClearRTMP.setEnabled(true);
                         btnClearStreamKey.setEnabled(true);
                         tvStartLiveStream.setEnabled(true);
                         edtRTMPAddress.requestFocus();
+                        edtRTMPAddress.setSelection(edtRTMPAddress.getText().length());
                         break;
 
                     case NOTIFY_MSG_STREAM_STOPPED:

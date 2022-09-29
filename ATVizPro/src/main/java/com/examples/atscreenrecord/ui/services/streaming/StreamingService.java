@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
+import com.examples.atscreenrecord.controllers.settings.SettingManager2;
+import com.examples.atscreenrecord.controllers.settings.VideoSetting2;
 import com.examples.atscreenrecord.ui.services.BaseService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.takusemba.rtmppublisher.Publisher;
@@ -58,6 +60,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void onConnected() {
         System.out.println("thanhlv onConnected callback");
         notifyStreamingCallback(NOTIFY_MSG_CONNECTED);
+        MyUtils.toast(getApplicationContext(), "Connection success!", Toast.LENGTH_LONG);
     }
 
     @Override
@@ -69,18 +72,17 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onDisconnected() {
         if (DEBUG) Log.i(TAG, "onDisconnected");
-        notifyStreamingCallback(NOTIFY_MSG_CONNECTION_DISCONNECTED);
+//        notifyStreamingCallback(NOTIFY_MSG_CONNECTION_DISCONNECTED);
     }
 
     @Override
     public void onFailedToConnect() {
         if (mPublisher != null && mPublisher.isPublishing())
-//            mPublisher.stopPublishing();
             mPublisher.closePublishing();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
         if (DEBUG) Log.i(TAG, "onFailedToConnect");
 
-        MyUtils.toast(getApplicationContext(), "Connection failed, please check RTMP address and Stream Key again!", Toast.LENGTH_LONG);
+        MyUtils.toast(getApplicationContext(), "Connection failed, please check stream link again!", Toast.LENGTH_LONG);
     }
 
     @Override
@@ -109,6 +111,12 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        closeStreaming();
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
         mMediaProjectionManager = (MediaProjectionManager) getSystemService(
@@ -133,8 +141,8 @@ public class StreamingService extends BaseService implements PublisherListener {
             width = (int) (width / scale);
             height = (int) (height / scale);
         }
-        //just support landscape
-        if (width > height) {
+        //just support portrait
+        if (width < height) {
             mScreenWidth = width;
             mScreenHeight = height;
         } else {
@@ -202,15 +210,21 @@ public class StreamingService extends BaseService implements PublisherListener {
         closeStreaming();
     }
 
+    public void updateUrl(String url) {
+        mUrl = url;
+    }
     public void prepareConnection() {
         synchronized (sSync) {
             if (mPublisher == null) {
                 try {
+                    VideoSetting2 videoSetting = SettingManager2.getVideoProfile(getApplicationContext());
+
                     mPublisher = new Publisher.Builder()
                             .setUrl(mUrl)
-                            .setSize(720, 1280)
+                            .setSize(videoSetting.getWidth(), videoSetting.getHeight())
+//                            .setSize(mScreenWidth, mScreenHeight)
                             .setAudioBitrate(Publisher.Builder.DEFAULT_AUDIO_BITRATE)
-                            .setVideoBitrate(Publisher.Builder.DEFAULT_VIDEO_BITRATE)
+                            .setVideoBitrate(videoSetting.getBitrate())
                             .setDensity(mScreenDensity)
                             .setListener(this)
                             .setMediaProjection(mMediaProjection)
@@ -219,6 +233,8 @@ public class StreamingService extends BaseService implements PublisherListener {
                     mPublisher = null;
                 }
             }
+            if (mPublisher != null)
+                mPublisher.openPublishing(mUrl);
         }
     }
 
@@ -235,7 +251,8 @@ public class StreamingService extends BaseService implements PublisherListener {
         mStreamProfile = profile;
         if (!mUrl.equals(profile.getStreamUrl())) {
             mUrl = profile.getStreamUrl();
-            notifyStreamingCallback(NOTIFY_MSG_UPDATED_STREAM_PROFILE);
+//            if (mPublisher != null) mPublisher.set
+//            notifyStreamingCallback(NOTIFY_MSG_UPDATED_STREAM_PROFILE);
         }
     }
 
@@ -246,6 +263,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     public void closeStreaming() {
+        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
         if (mPublisher != null && mPublisher.isPublishing()) {
             mPublisher.closePublishing();
         }

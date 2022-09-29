@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         registerSyncServiceReceiver();
 
     }
+
     private void registerSyncServiceReceiver() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
@@ -262,11 +263,44 @@ public class MainActivity extends AppCompatActivity {
         QueryProductDetailsParams queryProductDetailsParams =
                 QueryProductDetailsParams.newBuilder()
                         .setProductList(
-                                ImmutableList.of(QueryProductDetailsParams.Product.newBuilder()
-                                        .setProductId(getString(R.string.product_id_remove_ads))
-                                        .setProductType(BillingClient.ProductType.INAPP)
-                                        .build()
-                                )
+                                ImmutableList.of(
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("at_screen_record_remove_ads_10")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("at_screen_record_remove_ads_20")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_thanh_10")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_thanh_20")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_50")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_40")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_30")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_20")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build(),
+                                        QueryProductDetailsParams.Product.newBuilder()
+                                                .setProductId("remove_ads_10")
+                                                .setProductType(BillingClient.ProductType.INAPP)
+                                                .build()
+                                        )
                         ).build();
 
         billingClient.queryProductDetailsAsync(
@@ -349,6 +383,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static boolean initialAds = false;
+
     protected void onResume() {
         super.onResume();
         System.out.println("thanhlv onResume mainnnnnnnnn");
@@ -374,9 +409,12 @@ public class MainActivity extends AppCompatActivity {
         if (type != 0) {
             liveStreaming.setText(getString(R.string.disconnect_livestream));
             imgLiveType.setVisibility(View.VISIBLE);
-            if (type == SOCIAL_TYPE_YOUTUBE) imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
-            if (type == SOCIAL_TYPE_FACEBOOK) imgLiveType.setBackgroundResource(R.drawable.ic_facebook);
-            if (type == SOCIAL_TYPE_TWITCH) imgLiveType.setBackgroundResource(R.drawable.ic_twitch);
+            if (type == SOCIAL_TYPE_YOUTUBE)
+                imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
+            if (type == SOCIAL_TYPE_FACEBOOK)
+                imgLiveType.setBackgroundResource(R.drawable.ic_facebook);
+            if (type == SOCIAL_TYPE_TWITCH)
+                imgLiveType.setBackgroundResource(R.drawable.ic_twitch);
         } else {
             imgLiveType.setVisibility(View.GONE);
             liveStreaming.setText(getString(R.string.livestreaming));
@@ -459,7 +497,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                if (!liveStreaming.getText().toString().equals(getString(R.string.livestreaming))){
+                if (!liveStreaming.getText().toString().equals(getString(R.string.livestreaming))) {
                     sendDisconnectToService();
                     return;
                 }
@@ -498,7 +536,8 @@ public class MainActivity extends AppCompatActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Please wait!")
                     .setMessage("Your previous video in processing, please check in status bar!")
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {})
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    })
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
         }
@@ -592,6 +631,7 @@ public class MainActivity extends AppCompatActivity {
     InterstitialAd mInterstitialAdAdmob = null;
 
     int loadAgain = 0;
+
     public void createInterstitialAdmob() {
         if (SettingManager2.getRemoveAds(this)) {
             mInterstitialAdAdmob = null;
@@ -776,7 +816,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendDisconnectToService(){
+    public void sendDisconnectToService() {
         Intent controller = new Intent(MainActivity.this, ControllerService.class);
         controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -816,7 +856,6 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }
         updateService();
-//        finish();
     }
 
     /**
@@ -844,10 +883,15 @@ public class MainActivity extends AppCompatActivity {
         this.mStreamProfile = streamProfile;
     }
 
+    String mURL = "";
+    public void sendNewURL(String url) {
+        mURL = url;
+    }
     public void notifyUpdateStreamProfile() {
         if (mMode == MyUtils.MODE_STREAMING) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
             controller.setAction(MyUtils.ACTION_UPDATE_STREAM_PROFILE);
+            controller.putExtra(MyUtils.NEW_URL, mURL);
             Bundle bundle = new Bundle();
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
             controller.putExtras(bundle);
@@ -860,7 +904,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-
             String action = intent.getAction();
             if (!TextUtils.isEmpty(action) &&
                     MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
@@ -868,22 +911,20 @@ public class MainActivity extends AppCompatActivity {
                 String notify_msg = intent.getStringExtra(KEY_MESSAGE);
                 if (TextUtils.isEmpty(notify_msg))
                     return;
-                System.out.println("thanhlv messsssssssssss "+notify_msg);
+                updateService();
+                System.out.println("thanhlv messsssssssssss " + notify_msg);
                 switch (notify_msg) {
 
-                    case NOTIFY_MSG_CONNECTION_STARTED:
-                    case NOTIFY_MSG_STREAM_STOPPED:
-                        break;
-
-                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
-                    case MESSAGE_DISCONNECT_LIVE:
-                        updateService();
-                        break;
+//                    case NOTIFY_MSG_CONNECTION_STARTED:
+//                    case NOTIFY_MSG_STREAM_STOPPED:
+//                        updateService();
+//                        break;
+//                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
+//                    case MESSAGE_DISCONNECT_LIVE:
+//                        updateService();
+//                        break;
                     case NOTIFY_MSG_CONNECTION_FAILED:
                         liveStreaming.setText(getString(R.string.livestreaming));
-                        break;
-
-                    case NOTIFY_MSG_ERROR:
                         break;
                     default:
                 }

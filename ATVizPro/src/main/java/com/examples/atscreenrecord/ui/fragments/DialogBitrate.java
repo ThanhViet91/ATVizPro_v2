@@ -86,14 +86,13 @@ public class DialogBitrate extends DialogFragmentBase {
     private void initChecked() {
 
         mBitrates = new ArrayList<>();
+        mBitrates.add(new VideoProperties("16Mbps", false));
         mBitrates.add(new VideoProperties("12Mbps", false));
+        mBitrates.add(new VideoProperties("10Mbps", false));
         mBitrates.add(new VideoProperties("8Mbps", false));
         mBitrates.add(new VideoProperties("6Mbps", false));
-        mBitrates.add(new VideoProperties("5Mbps", false));
         mBitrates.add(new VideoProperties("4Mbps", false));
-        mBitrates.add(new VideoProperties("3Mbps", false));
         mBitrates.add(new VideoProperties("2Mbps", false));
-        mBitrates.add(new VideoProperties("1Mbps", false));
 
         String bitrate = SettingManager2.getVideoBitrate(requireContext());
         for (VideoProperties selected: mBitrates) {

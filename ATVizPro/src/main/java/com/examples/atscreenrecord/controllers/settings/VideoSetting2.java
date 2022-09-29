@@ -16,6 +16,9 @@ public class VideoSetting2 {
     public static VideoSetting2 VIDEO_PROFILE_FHD = new VideoSetting2(1080, 1920, 30, 4000 * 1024, ORIENTATION_PORTRAIT);
     private String mOutputPath;
 
+    public VideoSetting2() {
+    }
+
     public VideoSetting2(int width, int height, int FPS, int bitrate, int orientation) {
         mWidth = width;
         mHeight = height;
@@ -35,6 +38,14 @@ public class VideoSetting2 {
 
     public int getHeight() {
         return mHeight;
+    }
+
+    public void setWidth(int mWidth) {
+        this.mWidth = mWidth;
+    }
+
+    public void setHeight(int mHeight) {
+        this.mHeight = mHeight;
     }
 
     public int getFPS() {

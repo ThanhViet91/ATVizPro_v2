@@ -70,6 +70,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         AdView mAdView = findViewById(R.id.adView);
         AdUtil.createBannerAdmob(this, mAdView);
+        if (mAdapter != null && mAdapter.getSelectable()) {
+            checkNumberSelected();
+        }
     }
 
     public void toggleView(View view, int type) {

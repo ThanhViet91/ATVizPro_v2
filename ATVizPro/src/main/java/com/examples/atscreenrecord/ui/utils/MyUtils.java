@@ -53,6 +53,7 @@ public class MyUtils {
     public static final String ACTION_OPEN_LIVE_ACTIVITY = "ACTION_OPEN_LIVE_ACTIVITY";
     public static final String ACTION_OPEN_VIDEO_MANAGER_ACTIVITY = "ACTION_OPEN_VIDOE_MANAGER_ACTIVITY";
     public static final String ACTION_UPDATE_SETTING = "ACTION_UPDATE_SETTING";
+    public static final String NEW_URL = "NEW_URL";
     public static final int SELECTED_MODE_EMPTY = 0;
     public static final int SELECTED_MODE_ALL = 1;
     public static final int SELECTED_MODE_MULTIPLE = 2;

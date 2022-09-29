@@ -47,7 +47,7 @@ public class MediaScreenEncoderHard extends MediaVideoEncoderBase {
 		int _fps = videoSetting.getFPS();
 		int _bitrate = videoSetting.getBitrate();
 		fps = (_fps > 0 && _fps <= 30) ? _fps : FRAME_RATE;
-		bitrate = (_bitrate > 0) ? _bitrate * 1024 : calcBitRate(_fps);
+		bitrate = (_bitrate > 0) ? _bitrate : calcBitRate(_fps);
 
 		final HandlerThread thread = new HandlerThread(TAG);
 		thread.start();

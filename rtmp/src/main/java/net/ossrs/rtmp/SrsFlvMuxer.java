@@ -57,15 +57,15 @@ public class SrsFlvMuxer {
   private static final int VIDEO_ALLOC_SIZE = 128 * 1024;
   private static final int AUDIO_ALLOC_SIZE = 4 * 1024;
   private volatile boolean connected = false;
-  private RtmpPublisher publisher, publisher2;
+  private final RtmpPublisher publisher;
   private Thread worker;
-  private SrsFlv flv = new SrsFlv();
+  private final SrsFlv flv = new SrsFlv();
   private boolean needToFindKeyFrame = true;
-  private SrsAllocator mVideoAllocator = new SrsAllocator(VIDEO_ALLOC_SIZE);
-  private SrsAllocator mAudioAllocator = new SrsAllocator(AUDIO_ALLOC_SIZE);
+  private final SrsAllocator mVideoAllocator = new SrsAllocator(VIDEO_ALLOC_SIZE);
+  private final SrsAllocator mAudioAllocator = new SrsAllocator(AUDIO_ALLOC_SIZE);
   private volatile BlockingQueue<SrsFlvFrame> mFlvVideoTagCache = new LinkedBlockingQueue<>(30);
   private volatile BlockingQueue<SrsFlvFrame> mFlvAudioTagCache = new LinkedBlockingQueue<>(30);
-  private ConnectCheckerRtmp connectCheckerRtmp;
+  private final ConnectCheckerRtmp connectCheckerRtmp;
   private int sampleRate = 0;
   private boolean isPpsSpsSend = false;
   private byte profileIop = ProfileIop.BASELINE;
@@ -74,7 +74,7 @@ public class SrsFlvMuxer {
   private boolean doingRetry;
   private int numRetry;
   private int reTries;
-  private Handler handler;
+  private final Handler handler;
   private Runnable runnable;
   private boolean akamaiTs = false;
 
@@ -358,7 +358,7 @@ public class SrsFlvMuxer {
   //     3 = disposable inter frame (H.263 only)
   //     4 = generated key frame (reserved for server use only)
   //     5 = video info/command frame
-  private class SrsCodecVideoAVCFrame {
+  private static class SrsCodecVideoAVCFrame {
     public final static int KeyFrame = 1;
     public final static int InterFrame = 2;
   }
@@ -369,7 +369,7 @@ public class SrsFlvMuxer {
   //     1 = AVC NALU
   //     2 = AVC end of sequence (lower level NALU sequence ender is
   //         not required or supported)
-  private class SrsCodecVideoAVCType {
+  private static class SrsCodecVideoAVCType {
     public final static int SequenceHeader = 0;
     public final static int NALU = 1;
   }
@@ -377,14 +377,14 @@ public class SrsFlvMuxer {
   /**
    * E.4.1 FLV Tag, page 75
    */
-  private class SrsCodecFlvTag {
+  private static class SrsCodecFlvTag {
     // 8 = audio
     public final static int Audio = 8;
     // 9 = video
     public final static int Video = 9;
   }
 
-  private class AudioSampleRate {
+  private static class AudioSampleRate {
     public final static int R11025 = 11025;
     public final static int R12000 = 12000;
     public final static int R16000 = 16000;
@@ -407,7 +407,7 @@ public class SrsFlvMuxer {
   //     5 = On2 VP6 with alpha channel
   //     6 = Screen video version 2
   //     7 = AVC
-  private class SrsCodecVideo {
+  private static class SrsCodecVideo {
     public final static int AVC = 7;
   }
 
@@ -416,7 +416,7 @@ public class SrsFlvMuxer {
    * for AudioSpecificConfig, @see aac-mp4a-format-ISO_IEC_14496-3+2001.pdf, page 33
    * for audioObjectType, @see aac-mp4a-format-ISO_IEC_14496-3+2001.pdf, page 23
    */
-  private class SrsAacObjectType {
+  private static class SrsAacObjectType {
     public final static int AacLC = 2;
   }
 
@@ -424,7 +424,7 @@ public class SrsFlvMuxer {
    * Table 7-1 – NAL unit type codes, syntax element categories, and NAL unit type classes
    * H.264-AVC-ISO_IEC_14496-10-2012.pdf, page 83.
    */
-  private class SrsAvcNaluType {
+  private static class SrsAvcNaluType {
     // Unspecified
     public final static int Reserved = 0;
 
@@ -467,7 +467,7 @@ public class SrsFlvMuxer {
   /**
    * the search result for annexb.
    */
-  private class SrsAnnexbSearch {
+  private static class SrsAnnexbSearch {
     public int nb_start_code = 0;
     public boolean match = false;
   }
@@ -475,7 +475,7 @@ public class SrsFlvMuxer {
   /**
    * the demuxed tag frame.
    */
-  private class SrsFlvFrameBytes {
+  private static class SrsFlvFrameBytes {
     public ByteBuffer data;
     public int size;
   }
@@ -483,7 +483,7 @@ public class SrsFlvMuxer {
   /**
    * the muxed flv frame.
    */
-  private class SrsFlvFrame {
+  private static class SrsFlvFrame {
     // the tag bytes.
     public SrsAllocator.Allocation flvTag;
     // the codec type for audio/aac and video/avc for instance.
@@ -518,13 +518,13 @@ public class SrsFlvMuxer {
   private class SrsRawH264Stream {
     private final static String TAG = "SrsFlvMuxer";
 
-    private SrsAnnexbSearch annexb = new SrsAnnexbSearch();
-    private SrsFlvFrameBytes nalu_header = new SrsFlvFrameBytes();
-    private SrsFlvFrameBytes seq_hdr = new SrsFlvFrameBytes();
-    private SrsFlvFrameBytes sps_hdr = new SrsFlvFrameBytes();
-    private SrsFlvFrameBytes sps_bb = new SrsFlvFrameBytes();
-    private SrsFlvFrameBytes pps_hdr = new SrsFlvFrameBytes();
-    private SrsFlvFrameBytes pps_bb = new SrsFlvFrameBytes();
+    private final SrsAnnexbSearch annexb = new SrsAnnexbSearch();
+    private final SrsFlvFrameBytes nalu_header = new SrsFlvFrameBytes();
+    private final SrsFlvFrameBytes seq_hdr = new SrsFlvFrameBytes();
+    private final SrsFlvFrameBytes sps_hdr = new SrsFlvFrameBytes();
+    private final SrsFlvFrameBytes sps_bb = new SrsFlvFrameBytes();
+    private final SrsFlvFrameBytes pps_hdr = new SrsFlvFrameBytes();
+    private final SrsFlvFrameBytes pps_bb = new SrsFlvFrameBytes();
 
     public boolean isSps(SrsFlvFrameBytes frame) {
       return frame.size >= 1 && (frame.data.get(0) & 0x1f) == SrsAvcNaluType.SPS;

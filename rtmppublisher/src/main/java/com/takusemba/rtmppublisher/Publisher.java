@@ -11,6 +11,7 @@ public interface Publisher {
      */
 //    void switchCamera();
 
+    void openPublishing(String url);
     /**
      * start publishing video and audio data
      */
@@ -39,9 +40,9 @@ public interface Publisher {
         public static final int DEFAULT_WIDTH_LAND = 1280;
         public static final int DEFAULT_HEIGHT_LAND = 720;
 
-        public static final int DEFAULT_AUDIO_BITRATE = 64000;
+        public static final int DEFAULT_AUDIO_BITRATE = 44100;
         public static final int DEFAULT_VIDEO_BITRATE = 4000*1024;
-        public static final int DEFAULT_DENSITY = 300;
+        public static final int DEFAULT_DENSITY = 400;
 //        public static final CameraMode DEFAULT_MODE = CameraMode.BACK;
 
         /**
@@ -184,4 +185,5 @@ public interface Publisher {
         }
 
     }
+
 }

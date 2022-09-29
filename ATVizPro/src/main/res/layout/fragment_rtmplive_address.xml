@@ -58,8 +58,10 @@
             android:background="@drawable/custom_edt"
             android:hint="@string/rtmp"
             android:importantForAutofill="no"
-            android:inputType="none"
-            android:maxLines="1"
+            android:inputType="text"
+            android:scrollHorizontally="true"
+            android:ellipsize="end"
+            android:textColor="@color/black"
             android:paddingStart="10dp"
             tools:ignore="RtlSymmetry" />
 
@@ -110,8 +112,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/custom_edt"
             android:importantForAutofill="no"
-            android:inputType="none"
-            android:maxLines="1"
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:scrollHorizontally="true"
+            android:ellipsize="end"
             android:paddingStart="10dp"
             tools:ignore="RtlSymmetry" />
 

@@ -257,23 +257,27 @@ public class SettingManager2 {
     }
 
     public static VideoSetting2 getVideoProfile(Context context) {
-        VideoSetting2 videoSetting = null;
+        VideoSetting2 videoSetting = new VideoSetting2();
 
         String resolution = getVideoResolution(context);
 
 
         switch (resolution) {
             case "360p (SD)":
-                videoSetting = VideoSetting2.VIDEO_PROFILE_SSD;
+                videoSetting.setWidth(360);
+                videoSetting.setHeight(480);
                 break;
             case "480p (SD)":
-                videoSetting = VideoSetting2.VIDEO_PROFILE_SD;
+                videoSetting.setWidth(480);
+                videoSetting.setHeight(640);
                 break;
             case "1080p (FHD)":
-                videoSetting = VideoSetting2.VIDEO_PROFILE_FHD;
+                videoSetting.setWidth(1080);
+                videoSetting.setHeight(1920);
                 break;
             default:
-                videoSetting = VideoSetting2.VIDEO_PROFILE_HD;
+                videoSetting.setWidth(720);
+                videoSetting.setHeight(1280);
                 break;
         }
 
@@ -286,45 +290,39 @@ public class SettingManager2 {
             case "50fps":
                 videoSetting.setFPS(50);
                 break;
-            case "30fps":
-                videoSetting.setFPS(30);
-                break;
             case "25fps":
                 videoSetting.setFPS(25);
                 break;
             case "24fps":
                 videoSetting.setFPS(24);
                 break;
-
+            default:
+                videoSetting.setFPS(30);
         }
 
         String bitrate = getVideoBitrate(context);
 
         switch (bitrate) {
-            case "12Mbps":
-                videoSetting.setBitrate(12000);
+            case "16Mbps":
+                videoSetting.setBitrate(16000*1024);
                 break;
-            case "8Mbps":
-                videoSetting.setBitrate(8000);
+            case "12Mbps":
+                videoSetting.setBitrate(12000*1024);
+                break;
+            case "10Mbps":
+                videoSetting.setBitrate(10000*1024);
                 break;
             case "6Mbps":
-                videoSetting.setBitrate(6000);
-                break;
-            case "5Mbps":
-                videoSetting.setBitrate(5000);
+                videoSetting.setBitrate(6000*1024);
                 break;
             case "4Mbps":
-                videoSetting.setBitrate(4000);
-                break;
-            case "3Mbps":
-                videoSetting.setBitrate(3000);
+                videoSetting.setBitrate(4000*1024);
                 break;
             case "2Mbps":
-                videoSetting.setBitrate(2000);
+                videoSetting.setBitrate(2000*1024);
                 break;
-            case "1Mbps":
-                videoSetting.setBitrate(1000);
-                break;
+            default:
+                videoSetting.setBitrate(8000*1024);
         }
 
 

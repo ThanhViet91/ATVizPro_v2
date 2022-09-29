@@ -83,18 +83,23 @@ class AudioEncoder implements Encoder {
         if (encoder == null) return;
         int bufferRemaining;
         long timestamp = System.currentTimeMillis() - startedEncodingAt;
-        int inputBufferId = encoder.dequeueInputBuffer(TIMEOUT_USEC);
-        if (inputBufferId >= 0) {
-            ByteBuffer inputBuf = inputBuffers[inputBufferId];
-            inputBuf.clear();
-            bufferRemaining = inputBuf.remaining();
-            if (bufferRemaining < length) {
-                inputBuf.put(data, 0, bufferRemaining);
-            } else {
-                inputBuf.put(data, 0, length);
+        try {
+            int inputBufferId = encoder.dequeueInputBuffer(TIMEOUT_USEC);
+            if (inputBufferId >= 0) {
+                ByteBuffer inputBuf = inputBuffers[inputBufferId];
+                inputBuf.clear();
+                bufferRemaining = inputBuf.remaining();
+                if (bufferRemaining < length) {
+                    inputBuf.put(data, 0, bufferRemaining);
+                } else {
+                    inputBuf.put(data, 0, length);
+                }
+                encoder.queueInputBuffer(inputBufferId, 0, inputBuf.position(), timestamp * 1000, 0);
             }
-            encoder.queueInputBuffer(inputBufferId, 0, inputBuf.position(), timestamp * 1000, 0);
+        } catch (IllegalStateException ignored) {
+
         }
+
     }
 
     /**
@@ -112,21 +117,26 @@ class AudioEncoder implements Encoder {
                 MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
                 // keep running... so use a different thread.
                 while (isEncoding) {
-                    int outputBufferId = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
-                    if (outputBufferId >= 0) {
-                        ByteBuffer encodedData = outputBuffers[outputBufferId];
-                        if (encodedData == null) {
-                            continue;
+                    try {
+                        int outputBufferId = encoder.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);
+                        if (outputBufferId >= 0) {
+                            ByteBuffer encodedData = outputBuffers[outputBufferId];
+                            if (encodedData == null) {
+                                continue;
+                            }
+                            listener.onAudioDataEncoded(encodedData, bufferInfo);
+                            encoder.releaseOutputBuffer(outputBufferId, false);
+                        } else if (outputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                            // format should not be changed
                         }
-                        listener.onAudioDataEncoded(encodedData, bufferInfo);
-                        encoder.releaseOutputBuffer(outputBufferId, false);
-                    } else if (outputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                        // format should not be changed
+                        if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                            //end of stream
+                            break;
+                        }
+                    } catch (IllegalStateException ignored) {
+
                     }
-                    if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                        //end of stream
-                        break;
-                    }
+
                 }
                 release();
             }

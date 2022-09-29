@@ -3,6 +3,7 @@ package com.takusemba.rtmppublisher;
 import static com.takusemba.rtmppublisher.helper.MyUtils.DEBUG;
 
 import android.media.projection.MediaProjection;
+import android.os.Handler;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -22,9 +23,9 @@ public class RtmpPublisherSSL implements Publisher {
     private PublisherListener listener;
 
     RtmpPublisherSSL(
-            String url,
-            int width,
-            int height,
+            final String url,
+            final int width,
+            final int height,
             int audioBitrate,
             int videoBitrate,
             int density,
@@ -38,7 +39,12 @@ public class RtmpPublisherSSL implements Publisher {
         this.videoBitrate = videoBitrate;
         this.density = density;
         this.streamer = new Streamer(mediaProjection, listener);
-        streamer.open(url, width, height);
+
+    }
+
+    @Override
+    public void openPublishing(String url) {
+                streamer.open(url, width, height);
     }
 
     @Override

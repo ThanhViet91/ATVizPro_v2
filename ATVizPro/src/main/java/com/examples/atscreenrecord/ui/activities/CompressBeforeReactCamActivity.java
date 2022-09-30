@@ -13,11 +13,11 @@ import android.os.Handler;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.ui.VideoTrimListener;
+import com.examples.atscreenrecord.ui.ChooseVideoListener;
 import com.examples.atscreenrecord.ui.VideoBeforeReactView;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
-public class CompressBeforeReactCamActivity extends AppCompatActivity implements VideoTrimListener {
+public class CompressBeforeReactCamActivity extends AppCompatActivity implements ChooseVideoListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
@@ -78,7 +78,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
                 if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
                 nextToReactCam();
             }
-        }, 3000);
+        }, 2000);
     }
 
     public void runCompressVideo(){

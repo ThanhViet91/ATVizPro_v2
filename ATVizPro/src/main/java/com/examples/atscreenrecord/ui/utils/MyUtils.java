@@ -49,6 +49,7 @@ public class MyUtils {
 
     public static final int RESULT_CODE_FAILED = -999999;
     public static final String SCREEN_CAPTURE_INTENT_RESULT_CODE = "SCREEN_CAPTURE_INTENT_RESULT_CODE";
+    public static final String ACTION_GO_HOME = "ACTION_GO_HOME";
     public static final String ACTION_OPEN_SETTING_ACTIVITY = "ACTION_OPEN_SETTING_ACTIVITY";
     public static final String ACTION_OPEN_LIVE_ACTIVITY = "ACTION_OPEN_LIVE_ACTIVITY";
     public static final String ACTION_OPEN_VIDEO_MANAGER_ACTIVITY = "ACTION_OPEN_VIDOE_MANAGER_ACTIVITY";
@@ -78,6 +79,9 @@ public class MyUtils {
     public static final String ACTION_UPDATE_TYPE_LIVE = "ACTION_UPDATE_TYPE_LIVE";
     public static final String ACTION_START_CAPTURE_NOW = "ACTION_START_CAPTURE_NOW";
     public static final String ACTION_SEND_MESSAGE_FROM_SERVICE = "ACTION_SEND_MESSAGE_FROM_SERVICE";
+    public static final String ACTION_END_REACT = "ACTION_END_REACT";
+    public static final String ACTION_END_RECORD = "ACTION_END_RECORD";
+    public static final String ACTION_END_COMMENTARY = "ACTION_END_COMMENTARY";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 
     private static final String TAG = "chienpm_utils";

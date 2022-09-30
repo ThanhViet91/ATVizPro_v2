@@ -64,7 +64,7 @@ public class VideoCommentaryView extends FrameLayout implements IVideoCustomView
     private Uri mSourceUri;
     private IVideoStreamView mOnTrimVideoListener;
     private int mDuration = 0;
-    private VideoTrimmerAdapter mVideoThumbAdapter;
+    private VideoThumbAdapter mVideoThumbAdapter;
     private boolean isFromRestore = false;
     //new
     private long mLeftProgressPos, mRightProgressPos;
@@ -107,7 +107,7 @@ public class VideoCommentaryView extends FrameLayout implements IVideoCustomView
         mAdview = findViewById(R.id.adView);
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
-        mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
+        mVideoThumbAdapter = new VideoThumbAdapter(mContext);
         mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
         mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
         setUpListeners();

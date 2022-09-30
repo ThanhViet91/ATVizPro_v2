@@ -203,7 +203,7 @@ public class RecordingService extends BaseService {
     public void showResultActivity(String finalVideoCachePath) {
         Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-        intent.putExtra("from_screen_recorder", true);
+        intent.setAction(MyUtils.ACTION_END_RECORD);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         System.out.println("thanhlv showResultActivity "+finalVideoCachePath);
         startActivity(intent);

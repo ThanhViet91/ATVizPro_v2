@@ -26,22 +26,22 @@ import java.util.List;
  * version: 1.0
  * description:
  */
-public class VideoTrimmerAdapter extends RecyclerView.Adapter {
+public class VideoThumbAdapter extends RecyclerView.Adapter {
   private List<Bitmap> mBitmaps = new ArrayList<>();
   private LayoutInflater mInflater;
   private Context context;
 
-  public VideoTrimmerAdapter(Context context) {
+  public VideoThumbAdapter(Context context) {
     this.context = context;
     this.mInflater = LayoutInflater.from(context);
   }
 
   @NonNull @Override public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-    return new TrimmerViewHolder(mInflater.inflate(R.layout.video_thumb_item_layout, parent, false));
+    return new ThumbViewHolder(mInflater.inflate(R.layout.video_thumb_item_layout, parent, false));
   }
 
   @Override public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-    ((TrimmerViewHolder) holder).thumbImageView.setImageBitmap(mBitmaps.get(position));
+    ((ThumbViewHolder) holder).thumbImageView.setImageBitmap(mBitmaps.get(position));
   }
 
   @Override public int getItemCount() {
@@ -58,10 +58,10 @@ public class VideoTrimmerAdapter extends RecyclerView.Adapter {
     mBitmaps = new ArrayList<>();
     mBitmaps.clear();
   }
-  private final class TrimmerViewHolder extends RecyclerView.ViewHolder {
+  private final class ThumbViewHolder extends RecyclerView.ViewHolder {
     ImageView thumbImageView;
 
-    TrimmerViewHolder(View itemView) {
+    ThumbViewHolder(View itemView) {
       super(itemView);
       thumbImageView = itemView.findViewById(R.id.thumb);
       LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) thumbImageView.getLayoutParams();

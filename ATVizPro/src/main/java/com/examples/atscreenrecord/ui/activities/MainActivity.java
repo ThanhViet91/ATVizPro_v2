@@ -89,6 +89,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import java.net.MulticastSocket;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -140,6 +141,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         System.out.println("thanhlv getIntentttttt ==== " + intent.getAction());
+        if (intent.getAction().equals(MyUtils.ACTION_GO_HOME)) {
+            removeAllFragment();
+        }
     }
 
     @Override
@@ -627,7 +631,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClickMyRecordings() {
-                showInterstitialAd(requestVideoFor);
+//                showInterstitialAd(requestVideoFor);
+                showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
     }
@@ -883,9 +888,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void removeAllFragment() {
-        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
-        for (Fragment frag : all_frags) {
-            getSupportFragmentManager().beginTransaction().remove(frag).commit();
+//        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
+//        for (Fragment frag : all_frags) {
+//            getSupportFragmentManager().beginTransaction().remove(frag).commit();
+//        }
+//        while (getSupportFragmentManager().getFragments().size() > 0)
+//            getSupportFragmentManager().popBackStack();
+        for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
+            getSupportFragmentManager().popBackStack();
         }
     }
 

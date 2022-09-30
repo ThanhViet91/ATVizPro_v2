@@ -3,7 +3,6 @@ package com.examples.atscreenrecord.ui.activities;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -13,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.examples.atscreenrecord.utils.VideoUtil;
 import com.google.android.gms.ads.AdListener;
@@ -36,11 +37,10 @@ import java.nio.channels.FileChannel;
 
 public class ResultVideoFinishActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageView btn_save_video;
-    private ImageView btn_share_video;
     private ImageView btn_back;
     private boolean isSaved = false;
     private AdView mAdView;
+    private TextView title;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,18 +50,45 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
 
         isSaved = false;
 
-        btn_save_video = findViewById(R.id.img_btn_save);
-        btn_share_video = findViewById(R.id.img_btn_share);
+        ImageView btn_save_video = findViewById(R.id.img_btn_save);
+        title = findViewById(R.id.title_result);
+        ImageView btn_share_video = findViewById(R.id.img_btn_share);
+        ImageView btn_go_home = findViewById(R.id.img_btn_home);
         mAdView = findViewById(R.id.adView);
+
+        videoView = findViewById(R.id.video_main);
 
         btn_share_video.setOnClickListener(this);
         btn_save_video.setOnClickListener(this);
 
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
+        btn_go_home.setOnClickListener(this);
+        handleIntent();
         addVideoView();
 
-        System.out.println("thanhlv FinishReact intent === action : "+ getIntent().getAction());
+        System.out.println("thanhlv result intent === action : "+ getIntent().getAction());
+    }
+
+    private void handleIntent() {
+        if (getIntent() != null){
+            videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
+            System.out.println("thanhlv handleIntent hhhhhh "+videoFile);
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_REACT)){
+                Intent intent = new Intent(this, ExecuteService.class);
+                stopService(intent);
+                btn_back.setVisibility(View.GONE);
+                title.setText(getString(R.string.react_cam));
+            }
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_RECORD)){
+                title.setText(getString(R.string.record_screen));
+                btn_back.setVisibility(View.GONE);
+            }
+
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_COMMENTARY)){
+                title.setText(getString(R.string.commentary));
+            }
+        }
     }
 
     @Override
@@ -84,33 +111,19 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
     VideoView videoView;
 
     private void addVideoView() {
-        videoView = findViewById(R.id.video_main);
-        if (getIntent() != null){
-            videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
-            System.out.println("thanhlv addVideoView hhhhhh "+videoFile);
-            if (getIntent().getBooleanExtra("from_notification", false)){
-                Intent intent1 = new Intent(this, ExecuteService.class);
-                stopService(intent1);
-            }
-        }
 
         if (videoFile == null) return;
         if (!videoFile.equals("")){
             videoView.setVideoPath(videoFile);
-
         }
         videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
-        videoView.seekTo(1);
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(final MediaPlayer mp) {
-                mediaPlayer = mp;
-                mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-                videoPrepared(mp);
-            }
+        videoView.seekTo(0);
+        videoView.setOnPreparedListener(mp -> {
+            mediaPlayer = mp;
+            mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+            videoPrepared(mp);
         });
-
     }
 
     private void checkHasChangeVideoCamView() {
@@ -119,36 +132,26 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
         }
         int oldScreenWidth = screenVideo.getWidth();
         int oldScreenHeight = screenVideo.getHeight();
-        screenVideo.post(new Runnable() {
-            @Override
-            public void run() {
-                if (oldScreenWidth != screenVideo.getWidth()
-                        || oldScreenHeight != screenVideo.getHeight()) {
-                    videoPrepared(mediaPlayer);
-                }
+        screenVideo.post(() -> {
+            if (oldScreenWidth != screenVideo.getWidth()
+                    || oldScreenHeight != screenVideo.getHeight()) {
+                videoPrepared(mediaPlayer);
             }
         });
     }
 
-    private int videoWidth, videoHeight;
-    RelativeLayout screenVideo;
-
+    private RelativeLayout screenVideo;
     private void videoPrepared(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = videoView.getLayoutParams();
-        videoWidth = mp.getVideoWidth();
-        videoHeight = mp.getVideoHeight();
+        int videoWidth = mp.getVideoWidth();
+        int videoHeight = mp.getVideoHeight();
         double videoRatio = (double) videoWidth / (double) videoHeight;
-
         screenVideo = findViewById(R.id.screenVideo);
         int screenWidth = screenVideo.getWidth();
         int screenHeight = screenVideo.getHeight();
         double screenRatio = (double) screenWidth / (double) screenHeight;
-
         double diffRatio = videoRatio / screenRatio - 1;
-
-        if (Math.abs(diffRatio) < 0.01) {
-            // very good
-        } else {
+        if (Math.abs(diffRatio) > 0.01) {
             if (diffRatio > 0) {
                 //closed width
                 lpVideo.width = screenWidth;
@@ -181,6 +184,12 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
         }
     }
 
+    private void goHome(){
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(MyUtils.ACTION_GO_HOME);
+        startActivity(intent);
+    }
     public void onClick(View v) {
         if (v == findViewById(R.id.img_btn_save)) {
             saveVideo(videoFile);
@@ -191,12 +200,37 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
             File file = new File(videoFile);
             Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atscreenrecord.provider", file);
             Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Share of $fileName");
+            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
             intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Share File"));
         }
+
+        if (v == findViewById(R.id.img_btn_home)) {
+            if (isSaved) {
+                goHome();
+                finish();
+                return;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Save Video")
+                    .setMessage("Do you want to save this video?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        saveVideo(videoFile);
+                        Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                        goHome();
+                        finish();
+                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+                        goHome();
+                        finish();
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
 
         if (v == findViewById(R.id.img_btn_back_header)) {
             if (isSaved) {
@@ -206,35 +240,21 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
             new AlertDialog.Builder(this)
                     .setTitle("Save Video")
                     .setMessage("Do you want to save this video?")
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Continue with delete operation
-                            saveVideo(videoFile);
-                            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        saveVideo(videoFile);
+                        Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+                        finish();
                     })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            finish();
-                        }
-                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         }
     }
 
     void copyFile(File src, File dst) throws IOException {
-        FileChannel inChannel = new FileInputStream(src).getChannel();
-        FileChannel outChannel = new FileOutputStream(dst).getChannel();
-        try {
+        try (FileChannel inChannel = new FileInputStream(src).getChannel(); FileChannel outChannel = new FileOutputStream(dst).getChannel()) {
             inChannel.transferTo(0, inChannel.size(), outChannel);
-        } finally {
-            if (inChannel != null)
-                inChannel.close();
-            if (outChannel != null)
-                outChannel.close();
         }
     }
 }

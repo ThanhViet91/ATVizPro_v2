@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 
@@ -21,6 +20,7 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoReactCamExecute;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import java.util.Random;
@@ -41,6 +41,7 @@ public class ExecuteService extends Service {
     public int generateProgress(int lastProgress) {
         return Math.min(99, (int)(lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration))));
     }
+    @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -119,6 +120,7 @@ public class ExecuteService extends Service {
                     public void onStartTranscoding(String outputCachePath) {
                     }
 
+                    @RequiresApi(api = Build.VERSION_CODES.S)
                     @Override
                     public void onFinishTranscoding(String code) {
                         if (!code.equals(ERROR_CODE)) {
@@ -134,14 +136,15 @@ public class ExecuteService extends Service {
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void updatePendingIntent(String finalVideoCachePath) {
 
         Intent intent = new Intent(this, ResultVideoFinishActivity.class);
+        intent.setAction(MyUtils.ACTION_END_REACT);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-        intent.putExtra("from_notification", true);
         System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);
-        @SuppressLint("UnspecifiedImmutableFlag")
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
         notificationBuilder.setContentIntent(pendingIntent);
 
     }
@@ -160,14 +163,14 @@ public class ExecuteService extends Service {
     Notification.Builder notificationBuilder = null;
     Notification notification;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @RequiresApi(api = Build.VERSION_CODES.S)
     private void createNotification() {
 
         Intent intent = new Intent(this, MainActivity.class);
-        @SuppressLint("UnspecifiedImmutableFlag")
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
 
-        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
+//        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
 
         //Set notification information
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

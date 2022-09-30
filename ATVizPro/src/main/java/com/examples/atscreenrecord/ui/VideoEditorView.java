@@ -67,7 +67,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private Uri mSourceUri;
     private IVideoStreamView IVideoStreamView;
     private int mDuration = 0;
-    private VideoTrimmerAdapter mVideoThumbAdapter;
+    private VideoThumbAdapter mVideoThumbAdapter;
     private boolean isFromRestore = false;
     //new
     private long mLeftProgressPos, mRightProgressPos;
@@ -142,7 +142,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
         mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
         mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
-        mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
+        mVideoThumbAdapter = new VideoThumbAdapter(mContext);
         mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
         mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
         setUpListeners();

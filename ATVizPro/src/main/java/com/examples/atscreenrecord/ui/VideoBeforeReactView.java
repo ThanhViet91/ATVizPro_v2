@@ -62,9 +62,9 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
   private float mAverageMsPx;
   private float averagePxMs;
   private Uri mSourceUri;
-  private VideoTrimListener mOnTrimVideoListener;
+  private ChooseVideoListener chooseVideoListener;
   private int mDuration = 0;
-  private VideoTrimmerAdapter mVideoThumbAdapter;
+  private VideoThumbAdapter mVideoThumbAdapter;
   private boolean isFromRestore = false;
   //new
   private long mLeftProgressPos, mRightProgressPos;
@@ -100,7 +100,7 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     mAdview = findViewById(R.id.adView);
     mVideoThumbRecyclerView = findViewById(R.id.video_frames_recyclerView);
     mVideoThumbRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
-    mVideoThumbAdapter = new VideoTrimmerAdapter(mContext);
+    mVideoThumbAdapter = new VideoThumbAdapter(mContext);
     mVideoThumbRecyclerView.setAdapter(mVideoThumbAdapter);
     mVideoThumbRecyclerView.addOnScrollListener(mOnScrollListener);
 
@@ -188,7 +188,7 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
   }
 
   private void onCancelClicked() {
-    mOnTrimVideoListener.onCancel();
+    chooseVideoListener.onCancel();
   }
 
   private void updateVideoView(MediaPlayer mp) {
@@ -266,8 +266,8 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     }
   }
 
-  public void setOnTrimVideoListener(VideoTrimListener onTrimVideoListener) {
-    mOnTrimVideoListener = onTrimVideoListener;
+  public void setOnTrimVideoListener(ChooseVideoListener onTrimVideoListener) {
+    chooseVideoListener = onTrimVideoListener;
   }
 
   MediaPlayer mediaPlayer;
@@ -308,8 +308,9 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
       Toast.makeText(mContext, "视频长不足3秒,无法上传", Toast.LENGTH_SHORT).show();
     } else {
       mVideoView.pause();
-      mOnTrimVideoListener.onClickChoose();
+      chooseVideoListener.onClickChoose();
     }
+    pauseRedProgressAnimation();
   }
 
   private void seekTo(long msec) {

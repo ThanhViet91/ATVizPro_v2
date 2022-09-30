@@ -5,11 +5,11 @@ import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -17,11 +17,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -62,18 +61,19 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     VideoView videoView;
 //    private SeekBar seekbar;
 
-    public static RtmpLiveStream rtmpCamera;
+    public RtmpLiveStream rtmpCamera;
 
-    private ImageView toggleReactCam, btnRetake;
+    private ImageView btnRetake;
 
-    private LottieAnimationView animationView;
     private boolean inRecording = false;
     private ProgressBar progressBar;
     ObjectAnimator animationProgressBar;
     private TextView tvDurationCounter, btnNext;
 
     int timeCounter = 0;
-
+    private TextView number_countdown;
+    private LinearLayout layoutCountdown;
+    private ImageView toggleReactCam;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_video_react_cam);
         hideStatusBar(this);
 
-        animationView = findViewById(R.id.animation_view);
+        LottieAnimationView animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
 
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
@@ -92,18 +92,17 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         tvDurationCounter = findViewById(R.id.tv_count_duration);
         toggleReactCam.setOnClickListener(this);
 
-//        seekbar = findViewById(R.id.seekbar);
-//        seekbar.setVisibility(View.GONE);
-
-
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
 
         progressBar = findViewById(R.id.progressBar);
         animationProgressBar = ObjectAnimator.ofInt(progressBar, "progress", 0, 500); // see this max value coming back here, we animate towards that value
-        animationProgressBar.setInterpolator(new DecelerateInterpolator());
+        animationProgressBar.setInterpolator(new LinearInterpolator());
         progressBar.setProgress(0);
         tvDurationCounter.setText("");
+
+        layoutCountdown = findViewById(R.id.ln_countdown);
+        number_countdown = findViewById(R.id.tv_number_countdown);
     }
 
     @Override
@@ -144,22 +143,18 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             videoView.setVideoPath(videoFile);
 //        videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(final MediaPlayer mp) {
-                videoDuration = mp.getDuration();
-                animationProgressBar.setDuration(videoDuration);
-                mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-                videoPrepared(mp);
-                mediaPlayer = mp;
-                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mediaPlayer) {
-                        getEndReactCam();
-                    }
-                });
-                initCamView();
-            }
+        videoView.setOnPreparedListener(mp -> {
+            videoDuration = mp.getDuration();
+            animationProgressBar.setDuration(videoDuration);
+            mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+            videoPrepared(mp);
+            mediaPlayer = mp;
+            videoView.setOnCompletionListener(mediaPlayer -> {
+                System.out.println("thanhlv endTime = mediaPlayer.getCurrentPosition() endvideo " + mediaPlayer.getCurrentPosition());
+                System.out.println("thanhlv endTime = mediaPlayer.getCurrentPosition() duration " + videoDuration);
+                getEndReactCam();
+            });
+            initCamView();
         });
     }
 
@@ -181,9 +176,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         double diffRatio = videoRatio / screenRatio - 1;
 
-        if (Math.abs(diffRatio) < 0.01) {
-            // very good
-        } else {
+        if (Math.abs(diffRatio) > 0.01) {
             if (diffRatio > 0) {
                 //closed width
                 lpVideo.width = screenWidth;
@@ -235,17 +228,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         camWidth = camViewSize[camSize];  // ~240px
         camHeight = camWidth * 4 / 3f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
-        mCameraLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("thanhlv updateCamview gggg");
+        mCameraLayout.post(() -> {
+            System.out.println("thanhlv updateCamview gggg");
 
-                float newY = (mCameraLayout.getY() - yTopOld) * scale + yTop;
-                float newX = (mCameraLayout.getX() - xLeftOld) * scale + xLeft;
+            float newY = (mCameraLayout.getY() - yTopOld) * scale + yTop;
+            float newX = (mCameraLayout.getX() - xLeftOld) * scale + xLeft;
 
-                mCameraLayout.setX(newX);
-                mCameraLayout.setY(newY);
-            }
+            mCameraLayout.setX(newX);
+            mCameraLayout.setY(newY);
         });
     }
 
@@ -256,15 +246,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
         int oldScreenWidth = screenVideo.getWidth();
         int oldScreenHeight = screenVideo.getHeight();
-        screenVideo.post(new Runnable() {
-            @Override
-            public void run() {
-                if (oldScreenWidth != screenVideo.getWidth()
-                        || oldScreenHeight != screenVideo.getHeight()) {
-                    hasChangeViewPos = true;
-                    videoPrepared(mediaPlayer);
-                    updateCamView(Math.min(screenVideo.getWidth() * 1f / oldScreenWidth, screenVideo.getHeight() * 1f / oldScreenHeight));
-                }
+        screenVideo.post(() -> {
+            if (oldScreenWidth != screenVideo.getWidth()
+                    || oldScreenHeight != screenVideo.getHeight()) {
+                hasChangeViewPos = true;
+                videoPrepared(mediaPlayer);
+                updateCamView(Math.min(screenVideo.getWidth() * 1f / oldScreenWidth, screenVideo.getHeight() * 1f / oldScreenHeight));
             }
         });
     }
@@ -282,7 +269,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
         mHolder.addCallback(this);
-        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+//        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         for (int i = 6; i >= 0; i--) {
             camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
@@ -292,12 +279,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         camHeight = camWidth * 4 / 3f;
 
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
-        mCameraLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mCameraLayout.setX(xRight - camWidth);
-                mCameraLayout.setY(yBottom - camHeight);
-            }
+        mCameraLayout.post(() -> {
+            mCameraLayout.setX(xRight - camWidth);
+            mCameraLayout.setY(yBottom - camHeight);
         });
         videoView.seekTo(0);
         root.addView(mCameraLayout);
@@ -306,14 +290,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y;
-            private int pointerId1, pointerId2;
 
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (inRecording) return true;
                 if (event.getPointerCount() > 1) {
-                    pointerId1 = event.getPointerId(0);
-                    pointerId2 = event.getPointerId(1);
+                    int pointerId1 = event.getPointerId(0);
+                    int pointerId2 = event.getPointerId(1);
                     if (event.getX(pointerId1) < 0 || event.getX(pointerId2) < 0
                             || event.getX(pointerId1) > v.getWidth() || event.getX(pointerId2) > v.getWidth()
                             || event.getY(pointerId1) < 0 || event.getY(pointerId2) < 0
@@ -368,6 +352,27 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     String cameraCahePath = "";
     boolean hasCamVideo = false;
 
+
+    private CountDownTimer countDownTimer = new CountDownTimer(2900, 1000) {
+        public void onTick(long millisUntilFinished) {
+            layoutCountdown.setVisibility(View.VISIBLE);
+            number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
+        }
+
+        public void onFinish() {
+            layoutCountdown.setVisibility(View.GONE);
+            toggleReactCam.setEnabled(true);
+            try {
+                getStartReactCam();
+            } catch (IOException e) {
+                e.printStackTrace();
+                rtmpCamera.stopRecord();
+                videoView.stopPlayback();
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
     public void onClick(View v) {
 
 
@@ -375,38 +380,25 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             showDialogConfirm("Retake this video?", "Start over");
         }
 
-//        if (v == findViewById(R.id.tv_next_react_cam)) {
-//            showDialogConfirm("Discard the last clip?", "Discard");
-//        }
+        if (v == findViewById(R.id.tv_next_react_cam)) {
+            showDialogConfirmExecute();
+        }
 
         if (v == findViewById(R.id.img_btn_react_cam)) {
-            inRecording = false;
-            if (hasCamVideo) {
-//                showDialogConfirmExecute();
-                return;
-            }
+            toggleReactCam.setEnabled(false);
+            inRecording = true;
+            if (hasCamVideo) return;
 
             if (!rtmpCamera.isRecording()) {
-                inRecording = true;
                 cameraCahePath = StorageUtil.getCacheDir() + "/CacheCamOverlay_" + getTimeStamp() + ".mp4";
-                try {
-                    if (!rtmpCamera.isStreaming()) {
-                        if (rtmpCamera.prepareAudio() && rtmpCamera.prepareVideo()) {
-                            rtmpCamera.startRecord(cameraCahePath);
-                            getStartReactCam();
-                            Toast.makeText(this, "Recording... ", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "Error preparing stream, This device cant do it", Toast.LENGTH_SHORT).show();
-                        }
+                if (!rtmpCamera.isStreaming()) {
+                    if (rtmpCamera.prepareAudio() && rtmpCamera.prepareVideo()) {
+                        countDownTimer.start();
                     } else {
-                        rtmpCamera.startRecord(cameraCahePath);
-                        getStartReactCam();
-                        Toast.makeText(this, "Recording... ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error preparing stream, This device cant do it", Toast.LENGTH_SHORT).show();
                     }
-                } catch (IOException e) {
-                    rtmpCamera.stopRecord();
-                    videoView.stopPlayback();
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    countDownTimer.start();
                 }
             } else {
                 getEndReactCam();
@@ -416,7 +408,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (v == findViewById(R.id.img_btn_back_header)) {
             if (rtmpCamera.isRecording()) {
                 rtmpCamera.stopRecord();
-                finish();
+                discardVideo();
                 return;
             }
             if (!cameraCahePath.equals("")) {
@@ -428,19 +420,26 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void retakeVideo() {
-        mCameraLayout.setVisibility(View.VISIBLE);
+        rtmpCamera.startPreview(1);
         progressBar.setProgress(0);
+        videoView.seekTo(0);
         tvDurationCounter.setText("");
+        inRecording = false;
         if (!cameraCahePath.equals("")) {
             boolean deleteCamCache = new File(cameraCahePath).delete();
             cameraCahePath = "";
             hasCamVideo = false;
-            addVideoView();
         }
+        btnRetake.setVisibility(View.GONE);
+        btnNext.setVisibility(View.GONE);
+
+        toggleReactCam.setEnabled(true);
     }
 
     public void discardVideo() {
-        boolean deleteCamCache = new File(cameraCahePath).delete();
+        if (!cameraCahePath.equals("")) {
+            boolean deleteCamCache = new File(cameraCahePath).delete();
+        }
         finish();
     }
 
@@ -488,11 +487,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 @Override
                 public void onAdDismissedFullScreenContent() {
                     startExecuteService();
-                    createInterstitialAdmob();
+//                    createInterstitialAdmob();
                 }
 
                 @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                     startExecuteService();
                 }
 
@@ -509,16 +508,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private Handler mCounterUpdateHandler = new Handler();
-    private Runnable mUpdateCounter = new Runnable() {
+    private final Handler mCounterUpdateHandler = new Handler();
+    private final Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    tvDurationCounter.setText(parseTime(timeCounter));
-                }
-            });
+            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter)));
             timeCounter++;
             mCounterUpdateHandler.postDelayed(this, 1000);
         }
@@ -537,9 +531,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(title)
                 .setCancelable(true)
-                .setPositiveButton(action, (dialog, id) -> {
-                        doPositiveButton(action);
-                })
+                .setPositiveButton(action, (dialog, id) -> doPositiveButton(action))
                 .setNegativeButton("Cancel", (dialogInterface, i) -> {
                 })
                 .create().show();
@@ -559,34 +551,35 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirmation").setMessage(getString(R.string.confirm_execute_react_cam));
         builder.setCancelable(true);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                showInterstitialAd();
-                finish();
-            }
+        builder.setPositiveButton("OK", (dialog, id) -> {
+            showInterstitialAd();
+            finish();
         });
         AlertDialog alert = builder.create();
         alert.show();
     }
 
     private void getEndReactCam() {
-        rtmpCamera.stopRecord();
-        endTime = mediaPlayer.getCurrentPosition();
         if (videoView.isPlaying()) videoView.pause();
+        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
+        System.out.println("thanhlv endTime = mediaPlayer.getCurrentPosition() " + endTime);
+        new Handler().postDelayed(() -> {
+            rtmpCamera.stopRecord();
+            rtmpCamera.stopPreview();
+            hasCamVideo = true;
+        }, 100);
         progressBar.clearAnimation();
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
-        hasCamVideo = true;
-        mCameraLayout.setVisibility(View.GONE);
         btnRetake.setVisibility(View.VISIBLE);
         btnNext.setVisibility(View.VISIBLE);
-//        showDialogConfirmExecute();
     }
 
     int startTime, endTime = 0;
     int posX, posY;
 
-    private void getStartReactCam() {
+    private void getStartReactCam() throws IOException {
+        rtmpCamera.startRecord(cameraCahePath);
         videoView.start();
         startTime = 0;
         timeCounter = 0;
@@ -598,12 +591,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-
         System.out.println("thanhlv surfaceCreated");
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
 

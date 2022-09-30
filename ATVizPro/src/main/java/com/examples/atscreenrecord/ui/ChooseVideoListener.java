@@ -6,7 +6,7 @@ package com.examples.atscreenrecord.ui;
  * Email： who_know_me@163.com
  * Describe:
  */
-public interface VideoTrimListener {
+public interface ChooseVideoListener {
     void onClickChoose();
     void onCancel();
 }

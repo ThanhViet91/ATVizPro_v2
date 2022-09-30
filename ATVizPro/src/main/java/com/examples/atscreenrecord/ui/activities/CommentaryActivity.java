@@ -21,6 +21,7 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.IVideoStreamView;
 import com.examples.atscreenrecord.ui.VideoCommentaryView;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.StorageUtil;
 import com.examples.atscreenrecord.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
@@ -157,6 +158,7 @@ public class CommentaryActivity extends AppCompatActivity implements IVideoStrea
     public void showResultActivity(String videoPath){
         Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);
+        intent.setAction(MyUtils.ACTION_END_COMMENTARY);
         System.out.println("thanhlv showResultActivity after execute "+videoPath);
         startActivity(intent);
     }

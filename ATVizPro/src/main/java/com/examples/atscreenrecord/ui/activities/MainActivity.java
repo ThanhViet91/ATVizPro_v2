@@ -1,5 +1,6 @@
 package com.examples.atscreenrecord.ui.activities;
 
+import static com.examples.atscreenrecord.Core.isConnected;
 import static com.examples.atscreenrecord.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
@@ -19,6 +20,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -33,6 +35,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -300,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                                                 .setProductId("remove_ads_10")
                                                 .setProductType(BillingClient.ProductType.INAPP)
                                                 .build()
-                                        )
+                                )
                         ).build();
 
         billingClient.queryProductDetailsAsync(
@@ -405,9 +408,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateService() {
-        int type = SettingManager2.getLiveStreamType(this);
-        if (type != 0) {
-            liveStreaming.setText(getString(R.string.disconnect_livestream));
+        if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+            int type = SettingManager2.getLiveStreamType(this);
+            if (isConnected) {
+                liveStreaming.setText(getString(R.string.disconnect_livestream));
+            } else
+                liveStreaming.setText(getString(R.string.livestreaming));
             imgLiveType.setVisibility(View.VISIBLE);
             if (type == SOCIAL_TYPE_YOUTUBE)
                 imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
@@ -497,8 +503,19 @@ public class MainActivity extends AppCompatActivity {
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                if (!liveStreaming.getText().toString().equals(getString(R.string.livestreaming))) {
-                    sendDisconnectToService();
+                if (isConnected) {
+                    new AlertDialog.Builder(this)
+                            .setTitle("Disconnect livestream!")
+                            .setMessage("Do you want to disconnect livestream?")
+                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                                // Continue with delete operation
+                                sendDisconnectToService();
+                            })
+                            .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
                     return;
                 }
             }
@@ -817,12 +834,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void sendDisconnectToService() {
-        Intent controller = new Intent(MainActivity.this, ControllerService.class);
-        controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(controller);
-        } else {
-            startService(controller);
+        if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+            controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
+    }
+
+    public void updateIconService() {
+        updateService();
+        if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+            controller.setAction(MyUtils.ACTION_UPDATE_TYPE_LIVE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
         }
     }
 
@@ -847,15 +879,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(controller);
         }
-
-//        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
-//        if (all_frags.size() == 0) {
-//        } else {
-//            for (Fragment frag : all_frags) {
-//                getSupportFragmentManager().beginTransaction().remove(frag).commit();
-//            }
-//        }
         updateService();
+    }
+
+    public void removeAllFragment() {
+        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
+        for (Fragment frag : all_frags) {
+            getSupportFragmentManager().beginTransaction().remove(frag).commit();
+        }
     }
 
     /**
@@ -884,9 +915,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     String mURL = "";
+
     public void sendNewURL(String url) {
         mURL = url;
     }
+
     public void notifyUpdateStreamProfile() {
         if (mMode == MyUtils.MODE_STREAMING) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
@@ -924,7 +957,7 @@ public class MainActivity extends AppCompatActivity {
 //                        updateService();
 //                        break;
                     case NOTIFY_MSG_CONNECTION_FAILED:
-                        liveStreaming.setText(getString(R.string.livestreaming));
+//                        liveStreaming.setText(getString(R.string.livestreaming));
                         break;
                     default:
                 }

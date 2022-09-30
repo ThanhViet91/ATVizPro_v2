@@ -2,7 +2,9 @@ package com.takusemba.rtmppublisher;
 
 import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
+import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -107,6 +109,7 @@ class Streamer
     }
 
     void disconnectStreaming(){
+//        Looper.prepare();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -114,6 +117,7 @@ class Streamer
                 oldTimeStamp = 0L;
             }
         }, 1000);
+//        Looper.loop();
     }
     void stopStreaming() {
         videoHandler.stop();

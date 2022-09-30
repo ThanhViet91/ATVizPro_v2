@@ -3,6 +3,7 @@ package com.examples.atscreenrecord.ui.activities;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,11 +17,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -56,14 +60,20 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     private SurfaceHolder mHolder;
     VideoView videoView;
-    private SeekBar seekbar;
+//    private SeekBar seekbar;
 
     public static RtmpLiveStream rtmpCamera;
 
-    private ImageView toggleReactCam;
+    private ImageView toggleReactCam, btnRetake;
 
     private LottieAnimationView animationView;
     private boolean inRecording = false;
+    private ProgressBar progressBar;
+    ObjectAnimator animationProgressBar;
+    private TextView tvDurationCounter, btnNext;
+
+    int timeCounter = 0;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,15 +85,25 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         animationView.setVisibility(View.GONE);
 
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
+        btnRetake = findViewById(R.id.img_btn_discard);
+        btnNext = findViewById(R.id.tv_next_react_cam);
+        btnRetake.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
+        tvDurationCounter = findViewById(R.id.tv_count_duration);
         toggleReactCam.setOnClickListener(this);
 
-        seekbar = findViewById(R.id.seekbar);
+//        seekbar = findViewById(R.id.seekbar);
+//        seekbar.setVisibility(View.GONE);
 
 
         btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
 
-
+        progressBar = findViewById(R.id.progressBar);
+        animationProgressBar = ObjectAnimator.ofInt(progressBar, "progress", 0, 500); // see this max value coming back here, we animate towards that value
+        animationProgressBar.setInterpolator(new DecelerateInterpolator());
+        progressBar.setProgress(0);
+        tvDurationCounter.setText("");
     }
 
     @Override
@@ -128,32 +148,21 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onPrepared(final MediaPlayer mp) {
                 videoDuration = mp.getDuration();
-                seekbar.setMax(videoDuration);
+                animationProgressBar.setDuration(videoDuration);
                 mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
                 videoPrepared(mp);
                 mediaPlayer = mp;
-                mSeekbarUpdateHandler.postDelayed(mUpdateSeekbar, 0);
-                seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
-                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                        if (fromUser)
-                            mediaPlayer.seekTo(progress);
-                    }
-
-                    @Override
-                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                    }
-
-                    @Override
-                    public void onStopTrackingTouch(SeekBar seekBar) {
-
+                    public void onCompletion(MediaPlayer mediaPlayer) {
+                        getEndReactCam();
                     }
                 });
                 initCamView();
             }
         });
     }
+
 
     private int videoWidth, videoHeight, newVideoWidth, newVideoHeight;
     RelativeLayout screenVideo;
@@ -214,7 +223,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     protected void onPause() {
         super.onPause();
         //pause seekbar
-        mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
+        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
     }
 
     RelativeLayout root;
@@ -361,10 +370,19 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     public void onClick(View v) {
 
+
+        if (v == findViewById(R.id.img_btn_discard)) {
+            showDialogConfirm("Retake this video?", "Start over");
+        }
+
+//        if (v == findViewById(R.id.tv_next_react_cam)) {
+//            showDialogConfirm("Discard the last clip?", "Discard");
+//        }
+
         if (v == findViewById(R.id.img_btn_react_cam)) {
             inRecording = false;
             if (hasCamVideo) {
-                showDialogConfirmExecute();
+//                showDialogConfirmExecute();
                 return;
             }
 
@@ -391,22 +409,39 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             } else {
-                rtmpCamera.stopRecord();
                 getEndReactCam();
             }
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            mCameraLayout.setVisibility(View.VISIBLE);
+            if (rtmpCamera.isRecording()) {
+                rtmpCamera.stopRecord();
+                finish();
+                return;
+            }
             if (!cameraCahePath.equals("")) {
-                boolean deleteCamCache = new File(cameraCahePath).delete();
-                cameraCahePath = "";
-                hasCamVideo = false;
-                addVideoView();
+                showDialogConfirm("Discard the last clip?", "Discard");
             } else {
                 finish();
             }
         }
+    }
+
+    public void retakeVideo() {
+        mCameraLayout.setVisibility(View.VISIBLE);
+        progressBar.setProgress(0);
+        tvDurationCounter.setText("");
+        if (!cameraCahePath.equals("")) {
+            boolean deleteCamCache = new File(cameraCahePath).delete();
+            cameraCahePath = "";
+            hasCamVideo = false;
+            addVideoView();
+        }
+    }
+
+    public void discardVideo() {
+        boolean deleteCamCache = new File(cameraCahePath).delete();
+        finish();
     }
 
     InterstitialAd mInterstitialAdAdmob = null;
@@ -438,7 +473,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         bundle.putSerializable("package_video_react", videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
         intent.putExtras(bundle);
-        intent.putExtra("bundle_video_react_time", (long) ((endTimeRealCam - startTimeRealCam + videoDuration) / 2.5));
+        intent.putExtra("bundle_video_react_time", (long) ((endTime + videoDuration) / 2.5));
         startService(intent);
     }
 
@@ -474,14 +509,51 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private Handler mSeekbarUpdateHandler = new Handler();
-    private Runnable mUpdateSeekbar = new Runnable() {
+    private Handler mCounterUpdateHandler = new Handler();
+    private Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            seekbar.setProgress(mediaPlayer.getCurrentPosition());
-            mSeekbarUpdateHandler.postDelayed(this, 100);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    tvDurationCounter.setText(parseTime(timeCounter));
+                }
+            });
+            timeCounter++;
+            mCounterUpdateHandler.postDelayed(this, 1000);
         }
     };
+
+    @SuppressLint("DefaultLocale")
+    private String parseTime(int timeCounter) {
+        int hh = timeCounter / 3600;
+        int mm = timeCounter / 60;
+        int ss = timeCounter % 60;
+        if (hh == 0) return String.format("%02d:%02d", mm, ss);
+        return String.format("%d:%02d:%02d", hh, mm, ss);
+    }
+
+    public void showDialogConfirm(String title, String action) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setCancelable(true)
+                .setPositiveButton(action, (dialog, id) -> {
+                        doPositiveButton(action);
+                })
+                .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                })
+                .create().show();
+    }
+
+    private void doPositiveButton(String action) {
+        if (action.equals("Start over")) {
+            retakeVideo();
+        }
+
+        if (action.equals("Discard")) {
+            discardVideo();
+        }
+    }
 
     public void showDialogConfirmExecute() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -498,23 +570,28 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void getEndReactCam() {
-        mSeekbarUpdateHandler.removeCallbacks(mUpdateSeekbar);
+        rtmpCamera.stopRecord();
         endTime = mediaPlayer.getCurrentPosition();
-        endTimeRealCam = System.currentTimeMillis();
-        videoView.stopPlayback();
+        if (videoView.isPlaying()) videoView.pause();
+        progressBar.clearAnimation();
+        animationProgressBar.cancel();
+        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         hasCamVideo = true;
         mCameraLayout.setVisibility(View.GONE);
-        showDialogConfirmExecute();
+        btnRetake.setVisibility(View.VISIBLE);
+        btnNext.setVisibility(View.VISIBLE);
+//        showDialogConfirmExecute();
     }
 
-    long startTime, endTime = 0;
-    long startTimeRealCam, endTimeRealCam = 0;
+    int startTime, endTime = 0;
     int posX, posY;
 
     private void getStartReactCam() {
-        startTime = mediaPlayer.getCurrentPosition();
-        startTimeRealCam = System.currentTimeMillis();
         videoView.start();
+        startTime = 0;
+        timeCounter = 0;
+        animationProgressBar.start();
+        mCounterUpdateHandler.post(mUpdateCounter);
         posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
         posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);
         hasCamVideo = false;

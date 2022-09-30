@@ -266,9 +266,7 @@
         <ImageView
             android:id="@+id/img_live"
             android:layout_width="wrap_content"
-            android:layout_height="92dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="18dp"
+            android:layout_height="88dp"
             android:adjustViewBounds="true"
             android:src="@drawable/bg_livestream_home" />
 

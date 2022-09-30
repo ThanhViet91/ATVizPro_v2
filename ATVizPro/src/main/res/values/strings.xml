@@ -173,7 +173,7 @@
     <string name="rtmp">rtmp://</string>
     <string name="rtmp_address">RTMP address</string>
     <string name="livestreaming_title">Livestreaming</string>
-    <string name="camera_view_can_zoom_and_move">Camera view can zoom and move!!</string>
+    <string name="camera_site_can_zoom_and_move_before_start">Camera site can zoom and move before start!!</string>
     <string name="step_1">Step 1:....</string>
     <string name="todo">TODO</string>
     <string name="_1_item_selected">1 item selected</string>

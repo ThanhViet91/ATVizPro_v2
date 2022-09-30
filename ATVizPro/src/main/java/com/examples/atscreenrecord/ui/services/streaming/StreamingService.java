@@ -52,7 +52,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     //Implement Publisher listener
     @Override
     public void onStarted() {
-        if (DEBUG) Log.i(TAG, "onStarted");
+        if (DEBUG) Log.i(TAG, "onStarted connect");
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_STARTED);
     }
 
@@ -65,7 +65,7 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onStopped() {
-        if (DEBUG) Log.i(TAG, "onStopped");
+        if (DEBUG) Log.i(TAG, "onStopped live");
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
     }
 

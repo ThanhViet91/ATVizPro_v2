@@ -2,6 +2,8 @@ package com.examples.atscreenrecord.ui.fragments;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +19,14 @@ import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
+import com.examples.atscreenrecord.ui.services.ControllerService;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class LiveStreamingFragment extends Fragment {
 
@@ -56,12 +62,7 @@ public class LiveStreamingFragment extends Fragment {
         imgTwitch = view.findViewById(R.id.img_twitch_livestreaming);
         imgYoutube = view.findViewById(R.id.img_youtube_livestreaming);
 
-        imgBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFragmentManager.popBackStack();
-            }
-        });
+        imgBack.setOnClickListener(v -> mFragmentManager.popBackStack());
         imgYoutube.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,6 +88,8 @@ public class LiveStreamingFragment extends Fragment {
 
 
     private void handleSocialLive(int type) {
+        SettingManager2.setLiveStreamType(requireContext(), type);
+        mParentActivity.updateIconService();
         if (isFirstTimeReach(type)) {
             showTutorialScreenLiveStream(type);
             return;

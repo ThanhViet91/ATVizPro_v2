@@ -39,4 +39,5 @@
     <color name="line_button">#565758</color>
     <color name="black_translucent">#50000000</color>
     <color name="top_bottom">#42BAF8</color>
+    <color name="red100">#FF0000</color>
 </resources>

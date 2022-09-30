@@ -196,25 +196,6 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Share File"));
-
-//            MediaScannerConnection.scanFile(this, new String[]{file.getPath()}, new String[]{file.getName()}
-//                    , new MediaScannerConnection.OnScanCompletedListener() {
-//                        public void onScanCompleted(String path, Uri uri) {
-//                            Intent shareIntent = new Intent(
-//                                    android.content.Intent.ACTION_SEND);
-//                            shareIntent.setType("video/*");
-//                            shareIntent.putExtra(
-//                                    android.content.Intent.EXTRA_SUBJECT, "Hey this is the video subject");
-//                            shareIntent.putExtra(
-//                                    android.content.Intent.EXTRA_TITLE, "Hey this is the video text");
-//                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-//                            shareIntent
-////                                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-//                                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION );
-//                            startActivity(Intent.createChooser(shareIntent,"aaa"));
-//
-//                        }
-//                    });
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {

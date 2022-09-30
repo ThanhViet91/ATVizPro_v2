@@ -203,15 +203,6 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     }
 
-    private ProgressDialog mProgressDialog;
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getContext(), "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
-    }
-
 
     @Override
     public void updateUI() {

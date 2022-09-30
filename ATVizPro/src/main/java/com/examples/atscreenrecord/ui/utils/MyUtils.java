@@ -75,6 +75,7 @@ public class MyUtils {
     public static final String KEY_MESSAGE = "KEY_MESSAGE";
     public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
     public static final String ACTION_UPDATE_STREAM_PROFILE = "ACTION_UPDATE_STREAM_PROFILE";
+    public static final String ACTION_UPDATE_TYPE_LIVE = "ACTION_UPDATE_TYPE_LIVE";
     public static final String ACTION_START_CAPTURE_NOW = "ACTION_START_CAPTURE_NOW";
     public static final String ACTION_SEND_MESSAGE_FROM_SERVICE = "ACTION_SEND_MESSAGE_FROM_SERVICE";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";

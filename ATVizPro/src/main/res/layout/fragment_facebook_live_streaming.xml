@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="Facebook livestreaming" />
+            android:text="@string/facebook_livestreaming" />
 
         <ImageView
             android:id="@+id/tv_btn_skip"

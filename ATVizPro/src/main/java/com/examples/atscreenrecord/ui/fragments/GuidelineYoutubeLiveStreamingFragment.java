@@ -107,6 +107,7 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 i = i + 1;
+                viewPager2.setCurrentItem(i);
                 if (i == getListPhoto().size() - 1)
                     if (!SettingManager2.getFirstTimeLiveStreamYoutube(requireContext())) {
                         btnContinue.setText(getString(R.string.done_));
@@ -124,8 +125,8 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
                         mFragmentManager.popBackStack();
                     }
                     SettingManager2.setFirstTimeLiveStreamYoutube(requireContext(), false);
+                    i = 0;
                 }
-                viewPager2.setCurrentItem(i);
             }
         });
         imgBack.setOnClickListener(new View.OnClickListener() {

@@ -8,7 +8,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="68dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
@@ -36,7 +36,7 @@
             style="@style/Body_List_Item_White_18_600"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
+            android:layout_marginStart="15sp"
             android:text="@string/how_to_record_your_screen" />
 
     </LinearLayout>

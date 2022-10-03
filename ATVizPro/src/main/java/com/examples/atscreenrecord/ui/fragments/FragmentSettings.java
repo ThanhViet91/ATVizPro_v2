@@ -122,7 +122,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv upgrade_to_pro");
             ((MainActivity) requireActivity()).showProductRemoveAds();
-//            SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
+            SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
         }
 
         if (code.equals(getString(R.string.how_to_record_your_screen))) {

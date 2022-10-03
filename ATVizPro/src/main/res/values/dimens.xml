@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="text_margin">16dp</dimen>
-    <dimen name="recording_icon_square">32dp</dimen>
-    <dimen name="recording_button_distance">48dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="adview_margin">10dp</dimen>
-    <dimen name="small_margin">6dp</dimen>
-    <dimen name="lager_margin">24dp</dimen>
-    <dimen name="huge_margin">40dp</dimen>
-    <dimen name="header_top_margin">30dp</dimen>
-    <dimen name="medium_margin">12dp</dimen>
-    <dimen name="normal_margin">16dp</dimen>
+    <dimen name="text_margin">@dimen/_16sdp</dimen>
+    <dimen name="recording_icon_square">@dimen/_32sdp</dimen>
+    <dimen name="recording_button_distance">@dimen/_48sdp</dimen>
+    <dimen name="fab_margin">@dimen/_16sdp</dimen>
+    <dimen name="adview_margin">@dimen/_10sdp</dimen>
+    <dimen name="small_margin">@dimen/_6sdp</dimen>
+    <dimen name="lager_margin">@dimen/_24sdp</dimen>
+    <dimen name="huge_margin">@dimen/_40sdp</dimen>
+    <dimen name="header_top_margin">@dimen/_30sdp</dimen>
+    <dimen name="medium_margin">@dimen/_12sdp</dimen>
+    <dimen name="normal_margin">@dimen/_16sdp</dimen>
+    <dimen name="normal_margin_left">@dimen/_20sdp</dimen>
+    <dimen name="normal_margin_right">@dimen/_20sdp</dimen>
 
 
-    <dimen name="small_padding">2dp</dimen>
-    <dimen name="lager_padding">12dp</dimen>
-    <dimen name="medium_padding">6dp</dimen>
-    <dimen name="normal_padding">8dp</dimen>
 
 
-    <dimen name="small_icon">12dp</dimen>
-    <dimen name="lager_icon">36dp</dimen>
-    <dimen name="huge_icon">48dp</dimen>
-    <dimen name="normal_icon">24dp</dimen>
+    <dimen name="small_padding">@dimen/_2sdp</dimen>
+    <dimen name="lager_padding">@dimen/_12sdp</dimen>
+    <dimen name="medium_padding">@dimen/_6sdp</dimen>
+    <dimen name="normal_padding">@dimen/_8sdp</dimen>
+
+
+    <dimen name="small_icon">@dimen/_12sdp</dimen>
+    <dimen name="lager_icon">@dimen/_36sdp</dimen>
+    <dimen name="huge_icon">@dimen/_48sdp</dimen>
+    <dimen name="normal_icon">@dimen/_24sdp</dimen>
 
 </resources>

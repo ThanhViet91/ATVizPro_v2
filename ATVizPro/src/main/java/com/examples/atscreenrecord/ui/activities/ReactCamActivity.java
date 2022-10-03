@@ -87,6 +87,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
         btnRetake = findViewById(R.id.img_btn_discard);
         btnNext = findViewById(R.id.tv_next_react_cam);
+        btnRetake.setVisibility(View.GONE);
         btnRetake.setOnClickListener(this);
         btnNext.setOnClickListener(this);
         tvDurationCounter = findViewById(R.id.tv_count_duration);

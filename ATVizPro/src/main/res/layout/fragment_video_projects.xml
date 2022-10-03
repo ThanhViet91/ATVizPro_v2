@@ -22,10 +22,9 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginStart="@dimen/normal_margin"
-            android:padding="@dimen/medium_padding"
+            android:padding="8dp"
             android:text="@string/cancel"
-            android:textSize="18sp"
-            android:visibility="gone" />
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/img_btn_back_header"
@@ -34,9 +33,9 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/medium_margin"
-            android:contentDescription="@string/todo"
-            android:padding="@dimen/normal_padding"
-            android:src="@drawable/ic_back_header_24" />
+            android:padding="8dp"
+            android:src="@drawable/ic_back_header_24"
+            tools:ignore="ContentDescription" />
 
         <TextView
             style="@style/Title_Box_White"
@@ -62,7 +61,7 @@
             android:autoSizeTextType="uniform"
             android:gravity="end|center"
             android:maxLines="1"
-            android:padding="@dimen/medium_padding"
+            android:padding="8dp"
             android:text="@string/select"
             android:textSize="17sp"
             tools:ignore="RelativeOverlap"
@@ -116,7 +115,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="@dimen/normal_margin"
-            android:padding="@dimen/medium_padding"
+            android:padding="4dp"
             android:text="@string/_1_item_selected"
             android:textFontWeight="500"
             android:textSize="16sp"
@@ -124,8 +123,8 @@
 
         <ImageView
             android:id="@+id/img_btn_delete"
-            android:layout_width="@dimen/lager_icon"
-            android:layout_height="@dimen/lager_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/lager_margin"
@@ -135,8 +134,8 @@
 
         <ImageView
             android:id="@+id/img_btn_rename"
-            android:layout_width="@dimen/lager_icon"
-            android:layout_height="@dimen/lager_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/huge_margin"
             android:layout_toStartOf="@id/img_btn_delete"

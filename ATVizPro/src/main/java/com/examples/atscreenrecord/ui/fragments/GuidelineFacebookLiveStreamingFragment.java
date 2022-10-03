@@ -108,6 +108,7 @@ public class GuidelineFacebookLiveStreamingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 i = i + 1;
+                viewPager2.setCurrentItem(i);
                 if (i == getListPhoto().size() - 1)
                     if (!SettingManager2.getFirstTimeLiveStreamFacebook(requireContext())) {
                         btnContinue.setText(getString(R.string.done_));
@@ -125,8 +126,8 @@ public class GuidelineFacebookLiveStreamingFragment extends Fragment {
                         mFragmentManager.popBackStack();
                     }
                     SettingManager2.setFirstTimeLiveStreamFacebook(requireContext(), false);
+                    i = 0;
                 }
-                viewPager2.setCurrentItem(i);
             }
         });
         imgBack.setOnClickListener(new View.OnClickListener() {

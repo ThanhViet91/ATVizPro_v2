@@ -48,6 +48,10 @@
         <item name="android:textFontWeight" tools:ignore="NewApi">600</item>
     </style>
 
+    <style name="WhiteCheck">
+        <item name="colorAccent">#99ffffff</item>
+    </style>
+
 
     <style name="Text_Description_White_15_400" parent="White_Text">
         <item name="android:textSize">15sp</item>

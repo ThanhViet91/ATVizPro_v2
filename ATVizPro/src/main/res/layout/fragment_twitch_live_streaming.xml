@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="Twitch livestreaming" />
+            android:text="@string/twitch_livestreaming" />
 
         <ImageView
             android:id="@+id/img_back_tw_slider"

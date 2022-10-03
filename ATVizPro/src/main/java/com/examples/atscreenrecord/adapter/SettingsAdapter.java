@@ -19,7 +19,7 @@ import com.examples.atscreenrecord.model.SettingsItem;
 
 import java.util.ArrayList;
 
-public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHolder> {
+public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
     private ArrayList<SettingsItem> mFAQs;
 
@@ -38,35 +38,68 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHo
     public void setListener(SettingsListener listener) {
         this.listener = listener;
     }
-
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.layout_item_settings, parent, false);
-        return new ViewHolder(view);
+        switch (viewType) {
+            case 1:
+                View view = inflater.inflate(R.layout.layout_item_settings, parent, false);
+                return new ViewHolderNormal(view);
+            case 2:
+                View view2 = inflater.inflate(R.layout.layout_item_settings_up_to_pro, parent, false);
+                return new ViewHolderUptoPro(view2);
+        }
+        return null;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        SettingsItem item = mFAQs.get(position);
-        if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
-            if (SettingManager2.getRemoveAds(mContext)) {
-                holder.itemView.setAlpha(0.5f);
-            } else holder.itemView.setAlpha(1f);
-        }
-        holder.content_settings.setText(item.getContent());
-        holder.ava_settings.setBackgroundResource(item.getResourceId());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
-                    if (SettingManager2.getRemoveAds(mContext)) return;
-                }
-                if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
-            }
-        });
+    public int getItemViewType(int position) {
+        // Just as an example, return 0 or 2 depending on position
+        // Note that unlike in ListView adapters, types don't have to be contiguous
+        if (position == 0) return 2;
+        return 1;
     }
+
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        switch (holder.getItemViewType()) {
+            case 1:
+                ViewHolderNormal viewHolder1 = (ViewHolderNormal)holder;
+                SettingsItem item = mFAQs.get(position);
+                if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
+                    if (SettingManager2.getRemoveAds(mContext)) {
+                        viewHolder1.itemView.setAlpha(0.5f);
+                    } else viewHolder1.itemView.setAlpha(1f);
+                }
+                viewHolder1.content_settings.setText(item.getContent());
+                viewHolder1.ava_settings.setBackgroundResource(item.getResourceId());
+                viewHolder1.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+//                        if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
+//                            if (SettingManager2.getRemoveAds(mContext)) return;
+//                        }
+                        if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
+                    }
+                });
+                break;
+
+            case 2:
+                ViewHolderUptoPro viewHolder2 = (ViewHolderUptoPro)holder;
+                if (SettingManager2.getRemoveAds(mContext))  {
+                    viewHolder2.itemView.setAlpha(0.5f);
+                    return;
+                }
+                viewHolder2.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
+                    }
+                });
+                break;
+        }
+    }
+
 
 
     @Override
@@ -74,14 +107,22 @@ public class SettingsAdapter extends RecyclerView.Adapter<SettingsAdapter.ViewHo
         return mFAQs.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolderNormal extends RecyclerView.ViewHolder {
         public TextView content_settings;
         public ImageView ava_settings;
 
-        public ViewHolder(View itemView) {
+        public ViewHolderNormal(View itemView) {
             super(itemView);
             content_settings = itemView.findViewById(R.id.tv_content_settings);
             ava_settings = itemView.findViewById(R.id.iv_ava_settings);
+
+        }
+    }
+
+    public class ViewHolderUptoPro extends RecyclerView.ViewHolder {
+
+        public ViewHolderUptoPro(View itemView) {
+            super(itemView);
 
         }
     }

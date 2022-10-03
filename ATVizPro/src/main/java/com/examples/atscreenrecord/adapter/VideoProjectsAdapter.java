@@ -2,6 +2,7 @@ package com.examples.atscreenrecord.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             }
             listener.onSelected(list.get(position).getPath());
         });
+//        holder.checkBox.setBackgroundColor(Color.WHITE);
         holder.checkBox.setOnClickListener(view -> {
             list.get(position).setSelected(holder.checkBox.isChecked());
             listener.onSelected(list.get(position).getPath());

@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="React Cam" />
+            android:text="@string/react_cam" />
 
         <ImageView
             android:id="@+id/img_btn_back_header"
@@ -177,7 +177,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/lager_margin"
-            android:padding="@dimen/medium_padding"
+            android:padding="@dimen/small_padding"
             android:src="@drawable/ic_retake" />
 
     </RelativeLayout>

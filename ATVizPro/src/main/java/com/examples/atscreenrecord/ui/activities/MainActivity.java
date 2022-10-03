@@ -18,6 +18,7 @@ import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,6 +33,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -234,6 +236,18 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
+
+//        final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent);
+//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialog.setContentView(R.layout.loading);
+//        dialog.setCancelable(true);
+//        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//            @Override
+//            public void onCancel(DialogInterface dialog) {
+//                //onBackPressed();
+//            }
+//        });
+//        dialog.show();
     }
 
     private void connectGooglePlayBilling() {

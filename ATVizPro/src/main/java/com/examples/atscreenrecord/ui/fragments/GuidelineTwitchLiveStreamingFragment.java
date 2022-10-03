@@ -109,6 +109,7 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 i = i + 1;
+                viewPager2.setCurrentItem(i);
                 if (i == getListPhoto().size() - 1)
                     if (!SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
                         btnContinue.setText(getString(R.string.done_));
@@ -126,8 +127,8 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                         mFragmentManager.popBackStack();
                     }
                     SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
+                    i = 0;
                 }
-                viewPager2.setCurrentItem(i);
             }
         });
         imgBack.setOnClickListener(new View.OnClickListener() {

@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.model.PhotoModel;
@@ -37,7 +36,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
     CircleIndicator3 circleIndicator3;
     PhotoAdapter photoAdapter;
     TextView btnContinue;
-    TextView imgBack;
+    TextView tvSkip;
     int i = 0;
 
     private Activity mParentActivity = null;
@@ -71,7 +70,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
         circleIndicator3 = view. findViewById(R.id.circle_indicator);
         btnContinue =  view.findViewById(R.id.btn_continue_);
-        imgBack =  view.findViewById(R.id.tv_btn_skip);
+        tvSkip =  view.findViewById(R.id.tv_btn_skip);
         tvDecs =  view.findViewById(R.id.tv_decs);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
@@ -100,8 +99,10 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
+                    tvSkip.setText(getString(R.string.done_));
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
+                    tvSkip.setText(getString(R.string.skip));
                 }
                 setDecs(position);
                 i = position;
@@ -113,6 +114,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
+                    tvSkip.setText(getString(R.string.done_));
                 }
                 if (i >= getListPhoto().size()) {
                     mFragmentManager.popBackStack();
@@ -122,7 +124,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 setDecs(i);
             }
         });
-        imgBack.setOnClickListener(new View.OnClickListener() {
+        tvSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                     mParentActivity.onBackPressed();

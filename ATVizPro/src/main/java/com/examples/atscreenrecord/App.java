@@ -22,6 +22,10 @@ import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
 import java.util.Arrays;
 
@@ -38,9 +42,29 @@ public class App extends Application {
 
     public static AppOpenManager appOpenManager;
 
-//    public static AppOpenManager getAppOpen() {
+    //    public static AppOpenManager getAppOpen() {
 //        return appOpenManager;
 //    }
+    private void configs() {
+        FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
+        AppConfigs.getInstance().setConfig(config);
+        FirebaseRemoteConfigSettings settings = new FirebaseRemoteConfigSettings.Builder()
+                //3600
+                .setMinimumFetchIntervalInSeconds(3600)
+                .build();
+        config.setConfigSettingsAsync(settings);
+        config.setDefaultsAsync(R.xml.remote_config_defaults);
+        config.fetchAndActivate()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        initConfigs();
+                    }
+                });
+    }
+
+    private void initConfigs() {
+
+    }
 
     @Override
     public void onCreate() {
@@ -58,6 +82,8 @@ public class App extends Application {
         appOpenManager = new AppOpenManager(this);
 
         createChannelNotification();
+
+        configs();
 
 //        if (Build.VERSION.SDK_INT >= 25) {
 ////            createShortcut();

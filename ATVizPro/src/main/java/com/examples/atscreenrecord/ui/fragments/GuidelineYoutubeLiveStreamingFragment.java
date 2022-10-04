@@ -141,8 +141,8 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
     public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.youtube_slider1));
-        mListPhoto.add(new PhotoModel(R.drawable.youtube_slider2));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_page_yt_1));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_page_yt_2));
         return mListPhoto;
     }
 }

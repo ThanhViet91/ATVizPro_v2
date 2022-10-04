@@ -11,10 +11,13 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.examples.atscreenrecord.App;
+import com.examples.atscreenrecord.AppConfigs;
 import com.examples.atscreenrecord.AppOpenManager;
 import com.examples.atscreenrecord.IAppOpenAdListener;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
+
+import org.json.JSONException;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
@@ -47,6 +50,9 @@ public class SplashActivity extends AppCompatActivity implements IAppOpenAdListe
         } else {
             App.appOpenManager.setCallBack(this);
         }
+
+        SettingManager2.setInterstitialPercent(this, AppConfigs.getInstance().getConfigModel().getInterstitialPercent());
+
     }
 
     boolean isActive = false;

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <defaults>
   <entry>
+    <key>Subscriptions</key>
+    <value>[{"name":"BEST VALUE","keyID":"com.vuquynh.iwidget.removeads","description":"Lifetime","selected":false,"sort":0},{"name":"MOST POPULAR","keyID":"com.vuquynh.iwidget.monthlySub","description":"Month","selected":true,"sort":1},{"name":"Save 80%","keyID":"com.vuquynh.iwidget.yearlySub","description":"Year","selected":false,"sort":2}]</value>
+  </entry>
+  <entry>
     <key>Configs</key>
-    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream ™","interstitialPercent":100,"frequencyCapping":10,"privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
+    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream â„¢","interstitialPercent":100,"frequencyCapping":10,"termsURL":"https://atsoft.io/terms","privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
   </entry>
 </defaults>

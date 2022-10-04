@@ -37,6 +37,7 @@ import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.VideoReactCamExecute;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.utils.CustomOnScaleDetector;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.examples.atscreenrecord.utils.StorageUtil;
 import com.google.android.gms.ads.AdError;
@@ -478,7 +479,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void showInterstitialAd() {
-        if (mInterstitialAdAdmob != null) {
+        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override

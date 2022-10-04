@@ -26,6 +26,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.examples.atscreenrecord.App;
+import com.examples.atscreenrecord.R;
+import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting;
 import com.examples.atscreenrecord.data.entities.Video;
 import com.examples.atscreenrecord.utils.StorageUtil;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,6 +90,11 @@ public class MyUtils {
     private static final String TAG = "chienpm_utils";
     public static final int MODE_STREAMING = 101;
     public static final int MODE_RECORDING = 102;
+
+    public static boolean checkRandomPercentInterstitial(Context context) {
+        return new Random().nextInt(100) < SettingManager2.getInterstitialPercent(context);
+
+    }
 
     public static void sendBroadCastMessageFromService(Context context, String message) {
         Intent intent = new Intent(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);

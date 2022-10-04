@@ -10,7 +10,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_88sdp"
+        android:layout_height="@dimen/_92sdp"
         android:background="@drawable/bg_upgrade_to_pro"/>
 
 

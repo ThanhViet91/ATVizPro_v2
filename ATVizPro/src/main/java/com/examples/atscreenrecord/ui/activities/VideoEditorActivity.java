@@ -170,7 +170,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     }
 
     public void showInterstitialAd(){
-        if (mInterstitialAdAdmob != null) {
+        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override

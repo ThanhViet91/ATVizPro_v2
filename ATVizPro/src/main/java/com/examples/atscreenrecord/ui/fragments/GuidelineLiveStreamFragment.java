@@ -34,7 +34,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
     CircleIndicator3 circleIndicator3;
     PhotoAdapter photoAdapter;
     TextView btnContinue;
-    TextView imgBack;
+    TextView tvSkip;
     int i = 0;
 
     private FragmentManager mFragmentManager;
@@ -66,7 +66,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
         circleIndicator3 = view. findViewById(R.id.circle_indicator);
         btnContinue =  view.findViewById(R.id.btn_continue_);
-        imgBack =  view.findViewById(R.id.tv_btn_skip);
+        tvSkip =  view.findViewById(R.id.tv_btn_skip);
         tvDecs =  view.findViewById(R.id.tv_decs);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
@@ -95,8 +95,10 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
+                    tvSkip.setText(getString(R.string.done_));
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
+                    tvSkip.setText(getString(R.string.skip));
                 }
                 setDecs(position);
                 i = position;
@@ -108,6 +110,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
+                    tvSkip.setText(getString(R.string.done_));
                 }
                 if (i >= getListPhoto().size()) {
                     mFragmentManager.popBackStack();
@@ -117,7 +120,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 setDecs(i);
             }
         });
-        imgBack.setOnClickListener(new View.OnClickListener() {
+        tvSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFragmentManager.popBackStack();
@@ -135,17 +138,17 @@ public class GuidelineLiveStreamFragment extends Fragment {
     }
 
     private void setDecs(int i) {
-        if (i == 0) tvDecs.setText(getString(R.string.guideline_record_step_1));
-        if (i == 1) tvDecs.setText(getString(R.string.guideline_record_step_1));
-        if (i == 2) tvDecs.setText(getString(R.string.guideline_record_step_1));
+        if (i == 0) tvDecs.setText(getString(R.string.guideline_live_step_1));
+        if (i == 1) tvDecs.setText(getString(R.string.guideline_live_step_2));
+        if (i == 2) tvDecs.setText(getString(R.string.guideline_live_step_3));
     }
 
     public List<PhotoModel> getListPhoto(){
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_livestream_1));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_livestream_2));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_livestream_3));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_1));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_step2_howto_live_facebook));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_step3_howto_live));
         return mListPhoto;
     }
 }

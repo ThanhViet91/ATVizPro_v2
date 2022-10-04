@@ -144,8 +144,8 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
     public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.twitch_slider1));
-        mListPhoto.add(new PhotoModel(R.drawable.twitch_slider2));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_page_twitch_1));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_page_twitch_2));
         return mListPhoto;
     }
 }

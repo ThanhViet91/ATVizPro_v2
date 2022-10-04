@@ -165,7 +165,7 @@ public class CommentaryActivity extends AppCompatActivity implements IVideoStrea
     public void showInterstitialAd(String videoPath){
 
 
-        if (mInterstitialAdAdmob != null) {
+        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override

@@ -693,7 +693,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showInterstitialAd(int from_code) {
-        if (mInterstitialAdAdmob != null) {
+        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
                 @Override

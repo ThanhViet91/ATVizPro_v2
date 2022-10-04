@@ -142,7 +142,7 @@ public class GuidelineFacebookLiveStreamingFragment extends Fragment {
     public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.facebook_slider1));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_page_fb_1));
         mListPhoto.add(new PhotoModel(R.drawable.bg_page_fb_2));
         mListPhoto.add(new PhotoModel(R.drawable.bg_page_fb_3));
         return mListPhoto;

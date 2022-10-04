@@ -12,6 +12,20 @@ import com.examples.atscreenrecord.R;
 
 public class SettingManager2 {
 
+    public static void setInterstitialPercent(Context context, int value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_interstitial_percent);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
+    public static int getInterstitialPercent(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_interstitial_percent);
+        return preferences.getInt(key, 100);
+    }
+
     public static void setLiveStreamType(Context context, int value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_livestream_type);

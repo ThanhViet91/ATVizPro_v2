@@ -91,8 +91,6 @@ public class DialogHelper {
 
     }
 
-
-
     public void renameFile(final String videoPath, final String newName) throws Exception {
         if (MyUtils.isValidFilenameSynctax(newName))
             throw new Exception("A filename cannot contain any of the following character: \\/\":*<>| is not n");

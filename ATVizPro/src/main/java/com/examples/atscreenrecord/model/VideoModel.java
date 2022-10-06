@@ -7,6 +7,9 @@ public class VideoModel {
     private String duration;
     private boolean selected;
 
+    public VideoModel() {
+    }
+
     public VideoModel(int id, String name, String path, String duration) {
         this.id = id;
         this.name = name;

@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.media.MediaMetadataRetriever;
@@ -16,9 +17,13 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -29,6 +34,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.examples.atscreenrecord.BuildConfig;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord.model.VideoModel;
@@ -36,6 +43,8 @@ import com.examples.atscreenrecord.ui.utils.DialogHelper;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -49,20 +58,51 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private final ArrayList<VideoModel> videoList = new ArrayList<>();
     private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int from_code = 0;
+    final static int APP_STORAGE_ACCESS_REQUEST_CODE = 501; // Any value
 
+    private RelativeLayout rootView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_video_projects);
+        rootView = findViewById(R.id.root_container);
         hideStatusBar(this);
         if (getIntent() != null) from_code = getIntent().getIntExtra("key_from_code", 0);
-        initViews();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                startActivityForResult(intent, APP_STORAGE_ACCESS_REQUEST_CODE);
+            } else {
+                initViews();
+            }
+        } else {
+            initViews();
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK && requestCode == APP_STORAGE_ACCESS_REQUEST_CODE)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager())
+                {
+                    // Permission granted. Now resume your workflow.
+                    MyUtils.showSnackBarNotification(rootView, "Please grant all permissions to access files.", Snackbar.LENGTH_LONG);
+                }
+            }
+
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         reloadData();
+        System.out.println("thanhlv onResumekkkkkkkkkkkkk");
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
         } else {
@@ -131,18 +171,42 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(gridLayoutManager);
     }
-
+    VideoModel videoModelOld;
     private void handleRenameButton(VideoModel oldVideo) {
+        videoModelOld = new VideoModel();
+        videoModelOld.setPath(oldVideo.getPath());
+        videoModelOld.setId(oldVideo.getId());
+        videoModelOld.setName(oldVideo.getName());
+        videoModelOld.setSelected(oldVideo.isSelected());
+        videoModelOld.setDuration(oldVideo.getDuration());
+        System.out.println("thanhlv rename file " + videoModelOld.getPath() + " /// " + videoModelOld.getName());
+        String oldPath = videoModelOld.getPath();
+        String oldName = videoModelOld.getName();
         DialogHelper.getInstance(new DialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
-                for (VideoModel videoModel : videoList)
-                    if (videoModel.equals(oldVideo)) {
-                        videoModel.setName(result);
-//                        videoModel.setPath(result);
-                        mAdapter.updateData(videoList);
-                        break;
+//                File file = new File(oldVideo.getPath());
+//                MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
+//                        (s, uri)  -> {
+//                            rename(uri, result);
+//                        });
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (VideoModel videoModel : videoList)
+                            if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
+                                System.out.println("thanhlv replace "+videoModelOld.getPath());
+                                videoModel.setPath(oldPath.replace(oldName, result));
+                                videoModel.setName(result);
+                                System.out.println("thanhlv replace "+videoModel.getPath());
+                                mAdapter.updateData(videoList);
+                                break;
+                            }
+                        for (VideoModel videoModel : videoList)
+                            System.out.println("thanhlv lisssss = " + videoModel.getPath());
                     }
+                }, 1000);
+
             }
             @Override
             public void onClickCancel(String result) {}
@@ -346,6 +410,18 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             IntentSender sender = pendingIntent.getIntentSender();
             IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
             launcher.launch(request);
+        }
+    }
+
+    public void rename(Uri uri, String rename) {
+
+        //create content values with new name and update
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, rename);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ContentResolver contentResolver = getApplicationContext().getContentResolver();
+            contentResolver.update(uri, contentValues, null);
         }
     }
 }

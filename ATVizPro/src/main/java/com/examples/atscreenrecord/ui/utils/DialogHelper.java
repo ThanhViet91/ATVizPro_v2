@@ -99,7 +99,7 @@ public class DialogHelper {
 
         File file = new File(videoPath);
 
-        final File fileWithNewName = new File(file.getParent(), newName + ".mp4");
+        final File fileWithNewName = new File(file.getParentFile(), newName + ".mp4");
         if (fileWithNewName.exists()) {
             throw new IOException("This filename is exists. Please choose another name");
         }
@@ -110,6 +110,8 @@ public class DialogHelper {
         if (!success) {
             // File was not successfully renamed
             throw new Exception("Cannot rename this video. This video file might not available.");
+        } else {
+            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
         }
     }
 }

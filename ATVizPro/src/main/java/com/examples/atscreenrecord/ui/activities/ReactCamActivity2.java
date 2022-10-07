@@ -340,6 +340,8 @@ public class ReactCamActivity2 extends AppCompatActivity implements View.OnClick
 
     InterstitialAd mInterstitialAdAdmob = null;
 
+
+
     public void createInterstitialAdmob() {
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
@@ -349,6 +351,7 @@ public class ReactCamActivity2 extends AppCompatActivity implements View.OnClick
                         // The mInterstitialAd reference will be null until
                         // an ad is loaded.
                         mInterstitialAdAdmob = interstitialAd;
+
                     }
 
                     @Override

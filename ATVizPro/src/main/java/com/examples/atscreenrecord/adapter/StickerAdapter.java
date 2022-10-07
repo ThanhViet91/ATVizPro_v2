@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.PhotoModel;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.List;
 
@@ -54,10 +55,10 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoVie
         } else
             holder.itemView.setBackgroundResource(R.drawable.shape_round_bg_video_item);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new OnSingleClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 listener.onClickStickerItem(position);
                 posSelected = position;
                 notifyDataSetChanged();

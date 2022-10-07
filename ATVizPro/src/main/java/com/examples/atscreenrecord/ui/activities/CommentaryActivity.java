@@ -142,19 +142,6 @@ public class CommentaryActivity extends AppCompatActivity implements IVideoStrea
                 });
     }
 
-    private void copyFile(File src, File dst) throws IOException {
-        FileChannel inChannel = new FileInputStream(src).getChannel();
-        FileChannel outChannel = new FileOutputStream(dst).getChannel();
-        try {
-            inChannel.transferTo(0, inChannel.size(), outChannel);
-        } finally {
-            if (inChannel != null)
-                inChannel.close();
-            if (outChannel != null)
-                outChannel.close();
-        }
-    }
-
     public void showResultActivity(String videoPath){
         Intent intent = new Intent(this, ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);
@@ -244,13 +231,4 @@ public class CommentaryActivity extends AppCompatActivity implements IVideoStrea
     public void onCancel() {
         finish();
     }
-
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(this, "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
-    }
-
 }

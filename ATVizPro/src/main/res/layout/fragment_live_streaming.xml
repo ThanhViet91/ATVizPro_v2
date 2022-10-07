@@ -59,17 +59,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
-                android:src="@drawable/bg_facebook160"
+                android:layout_marginEnd="@dimen/normal_padding"
+                android:src="@drawable/bg_facebook_live"
                 tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/img_twitch_livestreaming"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/normal_margin"
+                android:layout_marginStart="@dimen/normal_padding"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
-                android:src="@drawable/bg_twitch"
+                android:src="@drawable/bg_twitch_live"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
 
@@ -90,17 +91,18 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
-                android:src="@drawable/bg_youtube"
+                android:layout_marginEnd="@dimen/normal_padding"
+                android:src="@drawable/bg_youtube_live"
                 tools:ignore="ContentDescription" />
 
             <ImageView
                 android:id="@+id/invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/normal_margin"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
-                android:src="@drawable/bg_youtube"
+                android:layout_marginStart="@dimen/normal_padding"
+                android:src="@drawable/bg_facebook_live"
                 android:visibility="invisible"
 
                 tools:ignore="ContentDescription" />
@@ -116,6 +118,6 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="bottom"
         android:layout_marginBottom="@dimen/normal_margin"
-        ads:adSize="SMART_BANNER"
+        ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 </RelativeLayout>

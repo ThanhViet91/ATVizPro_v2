@@ -17,6 +17,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterInside;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoModel;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -70,9 +71,9 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
                 break;
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 listener.onClickItem(list.get(position));
             }
         });

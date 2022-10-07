@@ -99,6 +99,8 @@ public class MyUtils {
     private static final String TAG = "chienpm_utils";
     public static final int MODE_STREAMING = 101;
     public static final int MODE_RECORDING = 102;
+    public static final int TYPE_REACT_VIDEO = 103;
+    public static final int TYPE_COMMENTARY_VIDEO = 104;
 
     public static boolean checkRandomPercentInterstitial(Context context) {
         return new Random().nextInt(100) < SettingManager2.getInterstitialPercent(context);

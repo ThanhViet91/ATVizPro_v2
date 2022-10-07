@@ -22,6 +22,7 @@ import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
@@ -63,21 +64,21 @@ public class LiveStreamingFragment extends Fragment {
         imgYoutube = view.findViewById(R.id.img_youtube_livestreaming);
 
         imgBack.setOnClickListener(v -> mFragmentManager.popBackStack());
-        imgYoutube.setOnClickListener(new View.OnClickListener() {
+        imgYoutube.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 handleSocialLive(SOCIAL_TYPE_YOUTUBE);
             }
         });
-        imgFacebook.setOnClickListener(new View.OnClickListener() {
+        imgFacebook.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 handleSocialLive(SOCIAL_TYPE_FACEBOOK);
             }
         });
-        imgTwitch.setOnClickListener(new View.OnClickListener() {
+        imgTwitch.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 handleSocialLive(SOCIAL_TYPE_TWITCH);
             }
         });

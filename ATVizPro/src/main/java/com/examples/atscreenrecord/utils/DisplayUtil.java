@@ -17,8 +17,23 @@ public class DisplayUtil {
         return App.getAppContext().getResources().getDisplayMetrics();
     }
 
+    public static void info() {
+
+        float xdpi = getDisplayMetrics().xdpi;
+        float density = getDisplayMetrics().density;
+        int densityDpi = getDisplayMetrics().densityDpi;
+        float scaledDensity = getDisplayMetrics().scaledDensity;
+        int ww = getDisplayMetrics().widthPixels;
+
+        System.out.println("thanhlv inffooooo  == " + xdpi);
+        System.out.println("thanhlv inffooooo  == " + density);
+        System.out.println("thanhlv inffooooo  == " + densityDpi);
+        System.out.println("thanhlv inffooooo  == " + scaledDensity);
+        System.out.println("thanhlv inffooooo  == " + ww);
+    }
     public static float dpToPx(float dp) {
         return dp * getDisplayMetrics().density;
+
     }
 
     public static int dpToPx(int dp) {
@@ -51,6 +66,10 @@ public class DisplayUtil {
 
     public static int getDeviceWidth() {
         return App.getAppContext().getResources().getDisplayMetrics().widthPixels;
+    }
+
+    public static float getDeviceWidthDpi() {
+        return App.getAppContext().getResources().getDisplayMetrics().widthPixels / App.getAppContext().getResources().getDisplayMetrics().density;
     }
 
     public static int getDeviceHeight(){

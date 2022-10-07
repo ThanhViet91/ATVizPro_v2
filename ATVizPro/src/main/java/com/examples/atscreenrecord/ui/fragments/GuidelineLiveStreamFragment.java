@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.PhotoAdapter;
+import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.utils.AdUtil;
 import com.google.android.gms.ads.AdView;
@@ -26,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -35,6 +39,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
     PhotoAdapter photoAdapter;
     TextView btnContinue;
     TextView tvSkip;
+    ImageView btnBack;
     int i = 0;
 
     private FragmentManager mFragmentManager;
@@ -62,11 +67,20 @@ public class GuidelineLiveStreamFragment extends Fragment {
 
         TextView tvTitle = view.findViewById(R.id.title);
         tvTitle.setText(getString(R.string.how_to_livestream));
+        btnBack =  view.findViewById(R.id.img_btn_back_header);
 
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
         circleIndicator3 = view. findViewById(R.id.circle_indicator);
         btnContinue =  view.findViewById(R.id.btn_continue_);
         tvSkip =  view.findViewById(R.id.tv_btn_skip);
+
+        if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+            btnBack.setVisibility(View.GONE);
+            tvSkip.setVisibility(View.VISIBLE);
+        } else {
+            btnBack.setVisibility(View.VISIBLE);
+            tvSkip.setVisibility(View.GONE);
+        }
         tvDecs =  view.findViewById(R.id.tv_decs);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
@@ -95,10 +109,14 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
-                    tvSkip.setText(getString(R.string.done_));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.done_));
+                    }
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
-                    tvSkip.setText(getString(R.string.skip));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.skip));
+                    }
                 }
                 setDecs(position);
                 i = position;
@@ -110,7 +128,9 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
-                    tvSkip.setText(getString(R.string.done_));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.done_));
+                    }
                 }
                 if (i >= getListPhoto().size()) {
                     mFragmentManager.popBackStack();
@@ -121,6 +141,12 @@ public class GuidelineLiveStreamFragment extends Fragment {
             }
         });
         tvSkip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFragmentManager.popBackStack();
+            }
+        });
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mFragmentManager.popBackStack();

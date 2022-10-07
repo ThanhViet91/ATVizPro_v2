@@ -13,11 +13,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.model.VideoReactCamExecute;
+import com.examples.atscreenrecord.model.VideoProfileExecute;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
@@ -81,19 +82,34 @@ public class ExecuteService extends Service {
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            VideoReactCamExecute videoReactCamExecute = (VideoReactCamExecute) bundle.get("package_video_react");
+            VideoProfileExecute videoProfileExecute = (VideoProfileExecute) bundle.get("package_video_profile");
 
-            originalVideoPath = videoReactCamExecute.getOriginalVideoPath();
-            cameraCachePath = videoReactCamExecute.getOverlayVideoPath();
-            startTime = videoReactCamExecute.getStartTime();
-            endTime = videoReactCamExecute.getEndTime();
-            posX = videoReactCamExecute.getPosX();
-            posY = videoReactCamExecute.getPosY();
-            camSize = videoReactCamExecute.getCamSize();
-            flipCamera(cameraCachePath);
+            originalVideoPath = videoProfileExecute.getOriginalVideoPath();
+            cameraCachePath = videoProfileExecute.getOverlayVideoPath();
+            startTime = videoProfileExecute.getStartTime();
+            endTime = videoProfileExecute.getEndTime();
+            posX = videoProfileExecute.getPosX();
+            posY = videoProfileExecute.getPosY();
+            camSize = videoProfileExecute.getCamSize();
+            if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO) flipCamera(cameraCachePath);
+            if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO) commentaryAudio(originalVideoPath, cameraCachePath);
         }
 
         return START_NOT_STICKY;
+    }
+
+    private void commentaryAudio(String videoPath, String audioPath) {
+            new VideoUtil().commentaryAudio(videoPath, audioPath, new VideoUtil.ITranscoding() {
+                @Override
+                public void onStartTranscoding(String outPath) {
+                }
+
+                @Override
+                public void onFinishTranscoding(String code) {
+
+                }
+            });
+
     }
 
     private void flipCamera(String cameraCahePath) {

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.PhotoAdapter;
+import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.utils.AdUtil;
@@ -37,6 +39,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
     PhotoAdapter photoAdapter;
     TextView btnContinue;
     TextView tvSkip;
+    ImageView btnBack;
     int i = 0;
 
     private Activity mParentActivity = null;
@@ -73,6 +76,16 @@ public class GuidelineScreenRecordFragment extends Fragment {
         tvSkip =  view.findViewById(R.id.tv_btn_skip);
         tvDecs =  view.findViewById(R.id.tv_decs);
 
+        btnBack =  view.findViewById(R.id.img_btn_back_header);
+
+        if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+            btnBack.setVisibility(View.GONE);
+            tvSkip.setVisibility(View.VISIBLE);
+        } else {
+            btnBack.setVisibility(View.VISIBLE);
+            tvSkip.setVisibility(View.GONE);
+        }
+
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
         viewPager2.setAdapter(photoAdapter);
         circleIndicator3.setViewPager(viewPager2);
@@ -99,10 +112,14 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
-                    tvSkip.setText(getString(R.string.done_));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.done_));
+                    }
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
-                    tvSkip.setText(getString(R.string.skip));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.skip));
+                    }
                 }
                 setDecs(position);
                 i = position;
@@ -114,7 +131,9 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
-                    tvSkip.setText(getString(R.string.done_));
+                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                        tvSkip.setText(getString(R.string.done_));
+                    }
                 }
                 if (i >= getListPhoto().size()) {
                     mFragmentManager.popBackStack();
@@ -132,6 +151,12 @@ public class GuidelineScreenRecordFragment extends Fragment {
         });
         AdView mAdView = view.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFragmentManager.popBackStack();
+            }
+        });
     }
 
     @Override

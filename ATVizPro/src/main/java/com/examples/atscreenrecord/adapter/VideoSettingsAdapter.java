@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoProperties;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -40,9 +41,9 @@ public class VideoSettingsAdapter extends RecyclerView.Adapter<VideoSettingsAdap
         VideoProperties item = mVideoProperties.get(position);
         holder.radio_check.setChecked(item.getCheck());
         holder.tv_value.setText(item.getValue());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 changeCheckList(position);
             }
         });

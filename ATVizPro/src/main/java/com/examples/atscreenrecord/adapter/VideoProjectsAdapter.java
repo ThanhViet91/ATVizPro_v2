@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoModel;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
+
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
@@ -75,18 +77,21 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                 .load(video.getPath())
                 .into(holder.img);
         holder.name.setText(video.getName());
-        holder.itemView.setOnClickListener(view -> {
+        holder.itemView.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
             if (selectable) {
                 holder.checkBox.setChecked(!holder.checkBox.isChecked());
                 list.get(position).setSelected(holder.checkBox.isChecked());
             }
             listener.onSelected(list.get(position).getPath());
-        });
-//        holder.checkBox.setBackgroundColor(Color.WHITE);
-        holder.checkBox.setOnClickListener(view -> {
+        }});
+        holder.checkBox.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
             list.get(position).setSelected(holder.checkBox.isChecked());
             listener.onSelected(list.get(position).getPath());
-        });
+        }});
         holder.itemView.setOnLongClickListener(view -> {
             if (!selectable) {
                 list.get(position).setSelected(true);

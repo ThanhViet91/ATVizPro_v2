@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -40,6 +41,7 @@ public class BasicAdapter extends RecyclerView.Adapter<BasicAdapter.ViewHolder> 
     }
 
     int posSelected = 0;
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         String item = list.get(position);
@@ -50,10 +52,11 @@ public class BasicAdapter extends RecyclerView.Adapter<BasicAdapter.ViewHolder> 
         } else
             holder.itemView.setBackgroundResource(R.drawable.shape_round_bg_video_item);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new OnSingleClickListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
+
                 listener.onClickBasicItem(list.get(position));
                 posSelected = position;
                 notifyDataSetChanged();

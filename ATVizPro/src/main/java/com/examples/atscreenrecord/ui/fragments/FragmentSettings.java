@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.examples.atscreenrecord.AppConfigs;
+import com.examples.atscreenrecord.BuildConfig;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.SettingsAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
@@ -118,12 +120,21 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onClickItem(String code) {
 
-
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv upgrade_to_pro");
             ((MainActivity) requireActivity()).showProductRemoveAds();
             SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
         }
+
+        if (code.equals(getString(R.string.share_app_to_friends))) {
+            System.out.println("thanhlv share_app_to_friends");
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                    "Hey check out my app at: https://play.google.com/store/apps/details?id=Zzic&hl=vi&gl=US"/* + BuildConfig.APPLICATION_ID*/);
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, "choose one"));
+        }
+
 
         if (code.equals(getString(R.string.how_to_record_your_screen))) {
             System.out.println("thanhlv how_to_record_your_screen");
@@ -145,7 +156,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             System.out.println("thanhlv contact_us");
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
-            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"infoboy.ftu.edu@gmail.com"});
+            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{AppConfigs.getInstance().getConfigModel().getFeedbackEmail()});
             intent.putExtra(Intent.EXTRA_SUBJECT, "Hi ATSoft");
             intent.putExtra(Intent.EXTRA_TEXT   , "Hi ATSoft,\n");
             try {

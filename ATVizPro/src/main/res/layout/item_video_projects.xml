@@ -34,19 +34,19 @@
     </RelativeLayout>
 
     <TextView
-        android:maxLines="2"
-        android:ellipsize="end"
-        style="@style/Body_List_Item_White_16_400"
-        android:textSize="14sp"
-        android:maxWidth="130dp"
-        android:textFontWeight="300"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/img_item_video_thumb"
         android:id="@+id/tv_video_name"
+        style="@style/Body_List_Item_White_16_400"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/img_item_video_thumb"
+        android:layout_centerHorizontal="true"
+        android:ellipsize="end"
         android:gravity="center"
+        android:maxWidth="130dp"
+        android:maxLines="2"
         android:text="Recording_10_20_hg hgg"
+        android:textFontWeight="300"
+        android:textSize="14sp"
         tools:targetApi="p" />
 
     <TextView

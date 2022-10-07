@@ -1,21 +1,29 @@
 package com.examples.atscreenrecord.model;
 
 public class VideoModel {
-    private int id;
     private String name;
     private String path;
     private String duration;
     private boolean selected;
+    private long lastModified;
 
     public VideoModel() {
     }
 
-    public VideoModel(int id, String name, String path, String duration) {
-        this.id = id;
+    public VideoModel(String name, String path, String duration, long lastModified) {
         this.name = name;
         this.path = path;
         this.duration = duration;
         this.selected = false;
+        this.lastModified = lastModified;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
     }
 
     public String getCompare() {
@@ -44,14 +52,6 @@ public class VideoModel {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public boolean isSelected() {

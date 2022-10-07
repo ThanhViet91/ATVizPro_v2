@@ -5,6 +5,7 @@ import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VID
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
+
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
@@ -26,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -42,11 +44,14 @@ import com.examples.atscreenrecord.model.VideoModel;
 import com.examples.atscreenrecord.ui.utils.DialogHelper;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.DisplayUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class ProjectsActivity extends AppCompatActivity implements VideoProjectsAdapter.VideoProjectsListener {
@@ -61,6 +66,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     final static int APP_STORAGE_ACCESS_REQUEST_CODE = 501; // Any value
 
     private RelativeLayout rootView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,14 +88,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == APP_STORAGE_ACCESS_REQUEST_CODE)
-        {
+        if (resultCode == RESULT_OK && requestCode == APP_STORAGE_ACCESS_REQUEST_CODE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (Environment.isExternalStorageManager())
-                {
+                if (Environment.isExternalStorageManager()) {
                     // Permission granted. Now resume your workflow.
                     MyUtils.showSnackBarNotification(rootView, "Please grant all permissions to access files.", Snackbar.LENGTH_LONG);
                 }
@@ -102,7 +105,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     public void onResume() {
         super.onResume();
         reloadData();
-        System.out.println("thanhlv onResumekkkkkkkkkkkkk");
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
         } else {
@@ -140,76 +142,96 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             toggleView(btn_back, View.GONE);
             toggleView(tv_select, View.GONE);
         }
-        tv_cancel.setOnClickListener(view -> {
-            if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
-                for (VideoModel video : videoList) video.setSelected(false);
-                mAdapter.setSelectable(false);
-                toggleView(btn_back, View.VISIBLE);
-                toggleView(tv_cancel, View.GONE);
-                modeSelect = 0;
-                tv_select.setText(getString(R.string.select));
-                toggleView(findViewById(R.id.option), View.GONE);
-            } else
+        tv_cancel.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+                    for (VideoModel video : videoList) video.setSelected(false);
+                    mAdapter.setSelectable(false);
+                    toggleView(btn_back, View.VISIBLE);
+                    toggleView(tv_cancel, View.GONE);
+                    modeSelect = 0;
+                    tv_select.setText(getString(R.string.select));
+                    toggleView(findViewById(R.id.option), View.GONE);
+                } else
+                    onBackPressed();
+            }
+        });
+        btn_back.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
                 onBackPressed();
+            }
         });
-        btn_back.setOnClickListener(view -> onBackPressed());
-        tv_select.setOnClickListener(view -> {
-            modeSelect++;
-            handleSelectButton();
+        tv_select.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                modeSelect++;
+                handleSelectButton();
+            }
         });
-        btn_delete.setOnClickListener(view -> handleDeleteButton());
-        btn_rename.setOnClickListener(view -> handleRenameButton(getVideoListSelected().get(0)));
+        btn_delete.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                handleDeleteButton();
+            }
+        });
+        btn_rename.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                handleRenameButton(getVideoListSelected().get(0));
+            }
+        });
         final SwipeRefreshLayout srl = findViewById(R.id.swipeLayout);
         srl.setOnRefreshListener(() -> {
             reloadData();
             srl.setRefreshing(false);
         });
-        readData();
+//        readData();
         mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
         recyclerView.setAdapter(mAdapter);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
         recyclerView.setLayoutManager(gridLayoutManager);
     }
+
+    private int calculateSpanCount() {
+        DisplayUtil.info();
+        float screenWidth = DisplayUtil.getDeviceWidthDpi();
+        return (int)screenWidth/180 + 1;
+    }
+
     VideoModel videoModelOld;
+
     private void handleRenameButton(VideoModel oldVideo) {
         videoModelOld = new VideoModel();
         videoModelOld.setPath(oldVideo.getPath());
-        videoModelOld.setId(oldVideo.getId());
         videoModelOld.setName(oldVideo.getName());
         videoModelOld.setSelected(oldVideo.isSelected());
         videoModelOld.setDuration(oldVideo.getDuration());
-        System.out.println("thanhlv rename file " + videoModelOld.getPath() + " /// " + videoModelOld.getName());
         String oldPath = videoModelOld.getPath();
         String oldName = videoModelOld.getName();
         DialogHelper.getInstance(new DialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
-//                File file = new File(oldVideo.getPath());
-//                MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-//                        (s, uri)  -> {
-//                            rename(uri, result);
-//                        });
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         for (VideoModel videoModel : videoList)
                             if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
-                                System.out.println("thanhlv replace "+videoModelOld.getPath());
                                 videoModel.setPath(oldPath.replace(oldName, result));
                                 videoModel.setName(result);
-                                System.out.println("thanhlv replace "+videoModel.getPath());
                                 mAdapter.updateData(videoList);
                                 break;
                             }
-                        for (VideoModel videoModel : videoList)
-                            System.out.println("thanhlv lisssss = " + videoModel.getPath());
                     }
-                }, 1000);
+                }, 500);
 
             }
+
             @Override
-            public void onClickCancel(String result) {}
+            public void onClickCancel(String result) {
+            }
         }).showRenameDialog(this, oldVideo);
     }
 
@@ -249,6 +271,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private int modeSelect = 0;
+
     private void handleSelectButton() {
         toggleView(btn_back, View.GONE);
         toggleView(tv_cancel, View.VISIBLE);
@@ -316,18 +339,19 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     private void readData() {
         listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoList.size() > 1) {
+            videoList.sort((t0, t1) -> t0.getLastModified() > t1.getLastModified() ? 1 : -1);
+        }
     }
 
     public void listFilesForFolder(final File folder) {
-        int i = 0;
         for (final File fileEntry : Objects.requireNonNull(folder.listFiles())) {
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
             } else {
                 if (fileEntry.getName().contains(".mp4"))
-                    videoList.add(0, new VideoModel(i, fileEntry.getName().replace(".mp4", ""),
-                            fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath())));
-                i++;
+                    videoList.add(new VideoModel(fileEntry.getName().replace(".mp4", ""),
+                            fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath()), fileEntry.lastModified()));
             }
         }
     }

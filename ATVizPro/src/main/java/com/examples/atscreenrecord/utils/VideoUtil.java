@@ -67,10 +67,10 @@ public class VideoUtil {
     }
 
 
-    public void commentaryAudio(Activity act, String originalVideoPath, String audioPath, ITranscoding callback) {
+    public void commentaryAudio(String originalVideoPath, String audioPath, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheCommentaryAudio_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -i " + originalVideoPath + " -i " + audioPath + " -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a -preset ultrafast " + outputVideoPath;
-        new TranscodingAsyncTask(act, cmd, outputVideoPath, callback).execute();
+        new TranscodingAsyncTask(context, cmd, outputVideoPath, callback).execute();
     }
 
 

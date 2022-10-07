@@ -266,8 +266,8 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     }
   }
 
-  public void setOnTrimVideoListener(ChooseVideoListener onTrimVideoListener) {
-    chooseVideoListener = onTrimVideoListener;
+  public void setOnChooseVideoListener(ChooseVideoListener onChooseVideoListener) {
+    chooseVideoListener = onChooseVideoListener;
   }
 
   MediaPlayer mediaPlayer;

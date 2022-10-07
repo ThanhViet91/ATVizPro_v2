@@ -1,5 +1,6 @@
 package com.examples.atscreenrecord.ui.activities;
 
+import static com.examples.atscreenrecord.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
@@ -51,7 +52,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Objects;
 
 public class ProjectsActivity extends AppCompatActivity implements VideoProjectsAdapter.VideoProjectsListener {
@@ -387,26 +387,26 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             checkNumberSelected();
             return;
         }
-        Bundle bundle = new Bundle();
-        String VIDEO_PATH_KEY = "video-file-path";
-        bundle.putString(VIDEO_PATH_KEY, path);
         Intent intent;
         switch (from_code) {
             case REQUEST_VIDEO_FOR_REACT_CAM:
                 intent = new Intent(this, CompressBeforeReactCamActivity.class);
+                intent.setAction(MyUtils.ACTION_FOR_REACT);
+                intent.putExtra(VIDEO_PATH_KEY, path);
                 break;
             case REQUEST_VIDEO_FOR_VIDEO_EDIT:
                 intent = new Intent(this, VideoEditorActivity.class);
                 break;
             case REQUEST_VIDEO_FOR_COMMENTARY:
-                intent = new Intent(this, CommentaryActivity.class);
+                intent = new Intent(this, CompressBeforeReactCamActivity.class);
+                intent.setAction(MyUtils.ACTION_FOR_COMMENTARY);
+                intent.putExtra(VIDEO_PATH_KEY, path);
                 break;
             case REQUEST_SHOW_PROJECTS_DEFAULT:
             default:
                 intent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
                 intent.setDataAndType(Uri.parse(path), "video/*");
         }
-        intent.putExtras(bundle);
         startActivity(intent);
     }
 

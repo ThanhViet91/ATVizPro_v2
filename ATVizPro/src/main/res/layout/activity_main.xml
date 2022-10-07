@@ -249,7 +249,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_facebook"/>
+            android:src="@drawable/ic_facebook" />
 
     </pl.bclogic.pulsator4droid.library.PulsatorLayout>
 

@@ -105,6 +105,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
+
+        addVideoView();
     }
 
     @Override
@@ -114,7 +116,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             createInterstitialAdmob();
         } else mInterstitialAdAdmob = null;
 
-        addVideoView();
         AdView mAdview = findViewById(R.id.adView);
         AdUtil.createBannerAdmob(this, mAdview);
         mAdview.setAdListener(new AdListener() {
@@ -611,6 +612,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
         rtmpCamera.startPreview(1);
+//        if (hasCamVideo) rtmpCamera.stopPreview();
         System.out.println("thanhlv surfaceChanged");
     }
 

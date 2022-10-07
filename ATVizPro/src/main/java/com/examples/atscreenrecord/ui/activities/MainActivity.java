@@ -6,22 +6,15 @@ import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.A
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_DISCONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_ERROR;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
-import static com.examples.atscreenrecord.ui.utils.MyUtils.MESSAGE_DISCONNECT_LIVE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -33,11 +26,9 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,7 +36,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
@@ -91,7 +81,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-import java.net.MulticastSocket;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -237,17 +226,6 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null)
             handleIncomingRequest(intent);
 
-//        final Dialog dialog = new Dialog(this, android.R.style.Theme_Translucent);
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        dialog.setContentView(R.layout.loading);
-//        dialog.setCancelable(true);
-//        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//            @Override
-//            public void onCancel(DialogInterface dialog) {
-//                //onBackPressed();
-//            }
-//        });
-//        dialog.show();
     }
 
     private void connectGooglePlayBilling() {
@@ -541,7 +519,10 @@ public class MainActivity extends AppCompatActivity {
             showLiveStreamFragment();
         });
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
-        btn_commentary.setOnClickListener(view -> showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY));
+        btn_commentary.setOnClickListener(view -> {
+            if (checkServiceBusy()) return;
+            showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY);
+        });
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
         btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT));
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
@@ -803,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);
-                Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                Intent intent = new Intent(MainActivity.this, CommentaryActivity2.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

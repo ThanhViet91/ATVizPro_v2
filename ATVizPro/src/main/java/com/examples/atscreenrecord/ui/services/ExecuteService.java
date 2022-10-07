@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.view.View;
 
 import androidx.annotation.RequiresApi;
 
@@ -104,9 +103,18 @@ public class ExecuteService extends Service {
                 public void onStartTranscoding(String outPath) {
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.S)
                 @Override
                 public void onFinishTranscoding(String code) {
+                    if (!code.equals(ERROR_CODE)) {
+                        finishExecute = true;
+                        notificationBuilder.setProgress(0, 0, false);
+                        notificationBuilder.setContentText("In progress: 100%");
+                        finalVideoCachePath = code;
+                        updatePendingIntent(finalVideoCachePath);
+                        startForeground(NOTIFICATION_ID, notification);
 
+                    }
                 }
             });
 

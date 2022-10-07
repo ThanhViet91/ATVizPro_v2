@@ -3,21 +3,14 @@ package com.examples.atscreenrecord.ui.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.RecoverableSecurityException;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
-import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -31,10 +24,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord.App;
-import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting;
 import com.examples.atscreenrecord.data.entities.Video;
@@ -51,7 +42,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,6 +91,8 @@ public class MyUtils {
     public static final int MODE_RECORDING = 102;
     public static final int TYPE_REACT_VIDEO = 103;
     public static final int TYPE_COMMENTARY_VIDEO = 104;
+    public static final String ACTION_FOR_REACT = "ACTION_FOR_REACT";
+    public static final String ACTION_FOR_COMMENTARY = "ACTION_FOR_COMMENTARY";
 
     public static boolean checkRandomPercentInterstitial(Context context) {
         return new Random().nextInt(100) < SettingManager2.getInterstitialPercent(context);

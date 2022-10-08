@@ -93,6 +93,8 @@ public class MyUtils {
     public static final int TYPE_COMMENTARY_VIDEO = 104;
     public static final String ACTION_FOR_REACT = "ACTION_FOR_REACT";
     public static final String ACTION_FOR_COMMENTARY = "ACTION_FOR_COMMENTARY";
+    public static final String ACTION_FOR_EDIT = "ACTION_FOR_EDIT";
+    public static final String ACTION_CANCEL_PROCESSING = "ACTION_CANCEL_PROCESSING";
 
     public static boolean checkRandomPercentInterstitial(Context context) {
         return new Random().nextInt(100) < SettingManager2.getInterstitialPercent(context);

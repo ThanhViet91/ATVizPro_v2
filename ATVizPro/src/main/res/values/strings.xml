@@ -189,6 +189,7 @@
     <string name="facebook_livestreaming">Facebook livestreaming</string>
     <string name="twitch_livestreaming">Twitch livestreaming</string>
     <string name="youtube_livestreaming">Youtube livestreaming</string>
+    <string name="enter_text">Enter text</string>
 
 
 </resources>

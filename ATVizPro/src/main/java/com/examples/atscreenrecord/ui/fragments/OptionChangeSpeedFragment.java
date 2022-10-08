@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.BasicAdapter;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,15 +63,15 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         ImageView btn_close = view.findViewById(R.id.iv_close);
         ImageView btn_done = view.findViewById(R.id.iv_done);
 
-        btn_close.setOnClickListener(new View.OnClickListener() {
+        btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 dismiss();
             }
         });
-        btn_done.setOnClickListener(new View.OnClickListener() {
+        btn_done.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 processingAddText();
             }
         });
@@ -99,7 +100,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
     private void processingAddText() {
         dismiss();
         mCallback.onClickDone();
-        new VideoUtil().changeSpeed(getActivity(), video_path, speed_selected,  new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().changeSpeed(getActivity(), video_path, speed_selected,  new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
 

@@ -2,6 +2,7 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
@@ -53,8 +54,10 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         setContentView(R.layout.activity_video_editor);
         hideStatusBar(this);
         videoEditorView = findViewById(R.id.trimmer_view);
-        Bundle bd = getIntent().getExtras();
-        if (bd != null) pathOriginalVideo = bd.getString(VIDEO_PATH_KEY);
+        Intent intent = getIntent();
+        if (intent != null) {
+            pathOriginalVideo = intent.getStringExtra(VIDEO_PATH_KEY);
+        }
         videoEditorView.setOnEditVideoListener(this);
         videoEditorView.initVideoByURI(Uri.parse(pathOriginalVideo));
         videoEditorView.setVideoEditorListener(this);
@@ -229,7 +232,6 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         animationView.setVisibility(View.GONE);
         videoEditorView.onPressSave();
         videoEditorView.initVideoByURI(Uri.parse(outPath));
-
     }
 
 

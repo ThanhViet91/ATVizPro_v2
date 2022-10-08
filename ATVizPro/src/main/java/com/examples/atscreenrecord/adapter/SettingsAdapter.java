@@ -16,6 +16,7 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.FAQItem;
 import com.examples.atscreenrecord.model.SettingsItem;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -73,12 +74,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 }
                 viewHolder1.content_settings.setText(item.getContent());
                 viewHolder1.ava_settings.setBackgroundResource(item.getResourceId());
-                viewHolder1.itemView.setOnClickListener(new View.OnClickListener() {
+                viewHolder1.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
-                    public void onClick(View view) {
-//                        if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
-//                            if (SettingManager2.getRemoveAds(mContext)) return;
-//                        }
+                    public void onSingleClick(View v) {
                         if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
                     }
                 });
@@ -90,9 +88,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     viewHolder2.itemView.setAlpha(0.5f);
                     return;
                 }
-                viewHolder2.itemView.setOnClickListener(new View.OnClickListener() {
+                viewHolder2.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onSingleClick(View v) {
                         if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
                     }
                 });

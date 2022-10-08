@@ -50,10 +50,7 @@ import java.util.Date;
 
 public class CommentaryActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private SurfaceHolder mHolder;
     VideoView videoView;
-//    private SeekBar seekbar;
-
     private ImageView btnRetake;
     private ProgressBar progressBar;
     ObjectAnimator animationProgressBar;
@@ -208,9 +205,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onPause() {
         super.onPause();
-        //pause seekbar
-//        if (!hasAudioFile && !pauseRecord) getEndCommentary();
-
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
     }
 
@@ -337,7 +331,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         bundle.putSerializable("package_video_profile", videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
         intent.putExtras(bundle);
-        intent.putExtra("bundle_video_react_time", (long) ((endTime + videoDuration) / 2.5));
+        intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 2.5));
         startService(intent);
     }
 
@@ -432,6 +426,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             hasAudioFile = true;
         }, 100);
         progressBar.clearAnimation();
+        progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         btnRetake.setVisibility(View.VISIBLE);
@@ -444,7 +439,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         videoView.start();
         timeCounter = 0;
         animationProgressBar.start();
-        progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         mCounterUpdateHandler.post(mUpdateCounter);
         hasAudioFile = false;
         pauseRecord = false;

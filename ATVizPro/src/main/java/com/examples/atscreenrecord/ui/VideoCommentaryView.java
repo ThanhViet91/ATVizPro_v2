@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
 
@@ -321,16 +322,16 @@ public class VideoCommentaryView extends FrameLayout implements IVideoCustomView
 
     MediaPlayer mediaPlayer;
     private void setUpListeners() {
-        findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 onCancelClicked();
             }
         });
 
-        findViewById(R.id.tv_btn_done).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.tv_btn_done).setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 onDoneClicked();
             }
         });
@@ -349,9 +350,9 @@ public class VideoCommentaryView extends FrameLayout implements IVideoCustomView
                 videoCompleted();
             }
         });
-        mPlayView.setOnClickListener(new OnClickListener() {
+        mPlayView.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 handlerPlayVideoOrPause();
             }
         });

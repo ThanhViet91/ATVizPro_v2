@@ -2,6 +2,7 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -36,6 +37,8 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.VideoProfileExecute;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
+import com.examples.atscreenrecord.ui.services.recording.RecordingService;
+import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.CustomOnScaleDetector;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
@@ -260,6 +263,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initCamView() {
+
         root = findViewById(R.id.root_container);
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
         cameraView = new SurfaceView(this);
@@ -473,10 +477,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         VideoProfileExecute videoProfile = new VideoProfileExecute(MyUtils.TYPE_REACT_VIDEO, videoFile, cameraCahePath,
                 startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("package_video_react", videoProfile);
+        bundle.putSerializable("package_video_profile", videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
         intent.putExtras(bundle);
-        intent.putExtra("bundle_video_react_time", (long) ((endTime + videoDuration) / 2.5));
+        intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 2.5));
         startService(intent);
     }
 
@@ -573,6 +577,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             hasCamVideo = true;
         }, 100);
         progressBar.clearAnimation();
+        progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         btnRetake.setVisibility(View.VISIBLE);
@@ -588,7 +593,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         startTime = 0;
         timeCounter = 0;
         animationProgressBar.start();
-        progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         mCounterUpdateHandler.post(mUpdateCounter);
         posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
         posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);
@@ -623,6 +627,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         mHolder = null;
         rtmpCamera = null;
     }
+
 
     private int camSize = 6;
 

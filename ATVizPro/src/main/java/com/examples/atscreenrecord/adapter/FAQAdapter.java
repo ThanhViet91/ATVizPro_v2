@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.FAQItem;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import java.util.ArrayList;
 
@@ -72,9 +73,9 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.ViewHolder>{
             ic_down = itemView.findViewById(R.id.ic_down);
             rl_head_faq = itemView.findViewById(R.id.rl_head_faq);
 
-            rl_head_faq.setOnClickListener(new View.OnClickListener() {
+            rl_head_faq.setOnClickListener(new OnSingleClickListener() {
                 @Override
-                public void onClick(View v) {
+                public void onSingleClick(View v) {
                     if (mFAQs.get(getLayoutPosition()).getShown()) {
                         hideAnswer(getLayoutPosition());
                     } else

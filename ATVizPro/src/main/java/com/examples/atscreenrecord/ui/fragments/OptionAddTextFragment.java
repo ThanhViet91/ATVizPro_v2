@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.BasicAdapter;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +27,6 @@ import java.util.ArrayList;
 
 public class OptionAddTextFragment extends DialogFragmentBase implements BasicAdapter.BasicAdapterListener {
 
-
-    public static final String ARG_PARAM1 = "param1";
-    public static final String ARG_PARAM2 = "param2";
     private static final String TAG = OptionAddTextFragment.class.getSimpleName();
 
     public static OptionAddTextFragment newInstance(IOptionFragmentListener callback, Bundle args) {
@@ -37,6 +35,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
+
     public IOptionFragmentListener mCallback = null;
 
     public OptionAddTextFragment() {
@@ -58,9 +57,8 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    String video_path;
-    EditText inputText;
-    SeekBar seekBarOfSize;
+    private String video_path;
+    private EditText inputText;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -71,20 +69,20 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         ImageView btn_done = view.findViewById(R.id.iv_done);
         inputText = view.findViewById(R.id.edt_input);
 
-        btn_close.setOnClickListener(new View.OnClickListener() {
+        btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 dismiss();
             }
         });
-        btn_done.setOnClickListener(new View.OnClickListener() {
+        btn_done.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 processingAddText();
             }
         });
 
-        seekBarOfSize = view.findViewById(R.id.seekbar_size);
+        SeekBar seekBarOfSize = view.findViewById(R.id.seekbar_size);
         seekBarOfSize.setMax(100);
         seekBarOfSize.setProgress(sizeOfText);
         seekBarOfSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -122,6 +120,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         recyclerView.setLayoutManager(linearLayoutManager);
 
     }
+
     String[] position = {
             "15:15", // top left
             "W-w-15:15", //top right
@@ -139,7 +138,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         dismiss();
         mCallback.onClickDone();
         if (inputText.getText().toString().equals("")) return;
-        new VideoUtil().addText(getActivity(), video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().addText(getActivity(), video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
             }
@@ -147,7 +146,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
             @Override
             public void onFinishTranscoding(String code) {
                 if (!code.equals(""))
-                mCallback.onFinishProcess(code);
+                    mCallback.onFinishProcess(code);
             }
         });
 

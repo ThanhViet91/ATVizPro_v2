@@ -4,7 +4,7 @@ import android.os.SystemClock;
 import android.view.View;
 
 public abstract class OnSingleClickListener implements View.OnClickListener {
-    private static final long MIN_CLICK_INTERVAL = 600;
+    private static final long MIN_CLICK_INTERVAL = 1000;
     private long mLastClickTime;
 
     public abstract void onSingleClick(View v);

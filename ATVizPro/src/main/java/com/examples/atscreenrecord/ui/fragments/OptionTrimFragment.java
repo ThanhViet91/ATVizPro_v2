@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.examples.atscreenrecord.R;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -70,15 +71,15 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
         tvStartTime.setText(secToTime(0));
         tvEndTime.setText(secToTime(videoDuration));
-        btn_close.setOnClickListener(new View.OnClickListener() {
+        btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 dismiss();
             }
         });
-        btn_done.setOnClickListener(new View.OnClickListener() {
+        btn_done.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 processingTrimming();
             }
         });
@@ -115,7 +116,7 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
         callback.onClickDone();
 
-        new VideoUtil().trimVideo(getActivity(), video_path, startTime, endTime, new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().trimVideo(getActivity(), video_path, startTime, endTime, new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
             }

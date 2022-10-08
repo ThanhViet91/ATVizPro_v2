@@ -117,25 +117,22 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
-
+        <activity android:name=".ui.activities.TranslucentActivity"
+            android:theme="@style/Theme.Transparent"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
         <service
             android:name=".ui.services.BaseService"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false"/>
         <service
-            android:name=".ui.services.recording.RecordingControllerService"
-
-            android:foregroundServiceType="mediaProjection|location|camera|microphone"
-            android:enabled="true"
-            android:exported="false" />
-        <service
             android:name=".ui.services.recording.RecordingService"
             android:stopWithTask="true"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false" />
-        <service android:name=".ui.services.streaming.StreamingControllerService" />
         <service android:name=".ui.services.streaming.StreamingService" />
 
         <service

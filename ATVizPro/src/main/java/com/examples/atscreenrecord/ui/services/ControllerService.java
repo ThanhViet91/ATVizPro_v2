@@ -52,6 +52,7 @@ import com.examples.atscreenrecord.ui.utils.CameraPreview;
 import com.examples.atscreenrecord.ui.utils.CustomOnScaleDetector;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.ui.utils.NotificationHelper;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 
@@ -485,9 +486,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         toggleNavigationButton(View.GONE);
 
 
-        mImgCapture.setOnClickListener(new View.OnClickListener() {
+        mImgCapture.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
 //                MyUtils.toast(getApplicationContext(), "Capture clicked", Toast.LENGTH_SHORT);
                 toggleNavigationButton(View.GONE);
                 if (mCameraLayout.getVisibility() == View.GONE) {
@@ -517,9 +518,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //            }
 //        });
 
-        mImgSetting.setOnClickListener(new View.OnClickListener() {
+        mImgSetting.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 MyUtils.toast(getApplicationContext(), "Go home!", Toast.LENGTH_SHORT);
                 toggleNavigationButton(View.GONE);
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -530,9 +531,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
 
-        mImgStart.setOnClickListener(new View.OnClickListener() {
+        mImgStart.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 toggleNavigationButton(View.GONE);
                 clickStart = true;
                 clickStop = false;
@@ -571,9 +572,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
 
-        mImgStop.setOnClickListener(new View.OnClickListener() {
+        mImgStop.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 onClickStop();
 
             }
@@ -592,9 +593,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //            }
 //        });
 
-        mImgClose.setOnClickListener(new View.OnClickListener() {
+        mImgClose.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 onClickClose();
 
 

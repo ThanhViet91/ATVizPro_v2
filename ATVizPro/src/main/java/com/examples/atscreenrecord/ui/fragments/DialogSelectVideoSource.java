@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.examples.atscreenrecord.R;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,25 +55,25 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
         super.onViewCreated(view, savedInstanceState);
 
         ImageView btn_close = view.findViewById(R.id.img_btn_close);
-        btn_close.setOnClickListener(new View.OnClickListener() {
+        btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 dismiss();
             }
         });
         RelativeLayout buttonSelectVideoProjects = view.findViewById(R.id.ln_select_my_recordings);
         RelativeLayout buttonSelectVideoCameraRoll = view.findViewById(R.id.ln_select_video_camera_roll);
-        buttonSelectVideoCameraRoll.setOnClickListener(new View.OnClickListener() {
+        buttonSelectVideoCameraRoll.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 if (callback != null) callback.onClickCameraRoll();
                 dismiss();
             }
         });
 
-        buttonSelectVideoProjects.setOnClickListener(new View.OnClickListener() {
+        buttonSelectVideoProjects.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 if (callback != null) callback.onClickMyRecordings();
                 dismiss();
             }

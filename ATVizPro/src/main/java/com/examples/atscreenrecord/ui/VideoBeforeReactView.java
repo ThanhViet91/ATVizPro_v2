@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
 
@@ -272,14 +273,16 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
 
   MediaPlayer mediaPlayer;
   private void setUpListeners() {
-    findViewById(R.id.cancelBtn).setOnClickListener(new OnClickListener() {
-      @Override public void onClick(View view) {
+    findViewById(R.id.cancelBtn).setOnClickListener(new OnSingleClickListener() {
+      @Override
+      public void onSingleClick(View v) {
         onCancelClicked();
       }
     });
 
-    findViewById(R.id.finishBtn).setOnClickListener(new OnClickListener() {
-      @Override public void onClick(View view) {
+    findViewById(R.id.finishBtn).setOnClickListener(new OnSingleClickListener() {
+      @Override
+      public void onSingleClick(View v) {
         onChooseClicked();
       }
     });
@@ -296,8 +299,9 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
         videoCompleted();
       }
     });
-    mPlayView.setOnClickListener(new OnClickListener() {
-      @Override public void onClick(View v) {
+    mPlayView.setOnClickListener(new OnSingleClickListener() {
+      @Override
+      public void onSingleClick(View v) {
         playVideoOrPause();
       }
     });

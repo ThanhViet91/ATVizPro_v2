@@ -22,6 +22,7 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoSettingsAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.VideoProperties;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,9 +58,9 @@ public class DialogVideoResolution extends DialogFragmentBase{
         TextView title = view.findViewById(R.id.title_box);
         title.setText(getResources().getString(R.string.video_resolution));
 
-        btn_back.setOnClickListener(new View.OnClickListener() {
+        btn_back.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 updateUI();
                 dismiss();
             }

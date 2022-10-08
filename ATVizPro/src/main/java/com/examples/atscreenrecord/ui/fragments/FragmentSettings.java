@@ -30,6 +30,7 @@ import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.SettingsItem;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
@@ -79,9 +80,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         recyclerView.setLayoutManager(linearLayoutManager);
 
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
-        btn_back.setOnClickListener(new View.OnClickListener() {
+        btn_back.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 ((MainActivity) requireActivity()).checkShowAd();
                 requireActivity().onBackPressed();
             }

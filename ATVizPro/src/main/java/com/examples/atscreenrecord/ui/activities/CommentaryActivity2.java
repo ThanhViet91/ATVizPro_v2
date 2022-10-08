@@ -185,7 +185,7 @@ public class CommentaryActivity2 extends AppCompatActivity implements IVideoStre
 
     private void doExecuteCommentary() {
         if (!pathOriginalVideo.equals("") && !cacheAudioFilePath.equals("")) {
-            new VideoUtil().commentaryAudio(pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
+            VideoUtil.getInstance().commentaryAudio(pathOriginalVideo, cacheAudioFilePath, new VideoUtil.ITranscoding() {
                 @Override
                 public void onStartTranscoding(String outPath) {
                     animationView.setVisibility(View.VISIBLE);

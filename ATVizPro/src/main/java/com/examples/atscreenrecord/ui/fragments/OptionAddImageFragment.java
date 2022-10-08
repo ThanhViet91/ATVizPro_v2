@@ -21,6 +21,7 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.BasicAdapter;
 import com.examples.atscreenrecord.adapter.StickerAdapter;
 import com.examples.atscreenrecord.model.PhotoModel;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -71,15 +72,15 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         ImageView btn_close = view.findViewById(R.id.iv_close);
         ImageView btn_done = view.findViewById(R.id.iv_done);
 
-        btn_close.setOnClickListener(new View.OnClickListener() {
+        btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 dismiss();
             }
         });
-        btn_done.setOnClickListener(new View.OnClickListener() {
+        btn_done.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 processingAddImage();
             }
         });
@@ -187,7 +188,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
         dismiss();
         mCallback.onClickDone();
-        new VideoUtil().addImage(getActivity(), video_path, image_path, posSelected,  new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().addImage(getActivity(), video_path, image_path, posSelected,  new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
 

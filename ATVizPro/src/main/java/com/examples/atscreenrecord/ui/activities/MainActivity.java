@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         System.out.println("thanhlv getIntentttttt ==== " + intent.getAction());
-        if (intent.getAction().equals(MyUtils.ACTION_GO_HOME)) {
+        if (intent.getAction() != null && intent.getAction().equals(MyUtils.ACTION_GO_HOME)) {
             removeAllFragment();
         }
     }
@@ -526,7 +526,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
         btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT));
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
-        btn_editor.setOnClickListener(view -> showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT));
+        btn_editor.setOnClickListener(view -> {
+            if (checkServiceBusy()) return;
+            showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT);
+        });
     }
 
     private void showLiveStreamFragment() {
@@ -564,14 +567,12 @@ public class MainActivity extends AppCompatActivity {
         if (type.equals(THE_FIRST_TIME_SCREEN_RECORD))
             if (SettingManager2.getFirstTimeRecord(this)) {
                 showTutorialScreenRecord();
-                SettingManager2.setFirstTimeRecord(this, false);
                 return true;
             }
 
         if (type.equals(THE_FIRST_TIME_LIVESTREAM))
             if (SettingManager2.getFirstTimeLiveStream(this)) {
                 showTutorialLiveStream();
-                SettingManager2.setFirstTimeLiveStream(this, false);
                 return true;
             }
 
@@ -763,10 +764,9 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                Bundle bundle = new Bundle();
-                bundle.putString(VIDEO_PATH_KEY, pathVideo);
                 Intent intent = new Intent(MainActivity.this, CompressBeforeReactCamActivity.class);
-                intent.putExtras(bundle);
+                intent.setAction(MyUtils.ACTION_FOR_REACT);
+                intent.putExtra(VIDEO_PATH_KEY, pathVideo);
                 startActivity(intent);
             }
         }
@@ -784,7 +784,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);
-                Intent intent = new Intent(MainActivity.this, CommentaryActivity2.class);
+                Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }

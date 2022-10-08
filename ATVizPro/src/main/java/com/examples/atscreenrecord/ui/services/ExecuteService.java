@@ -8,18 +8,23 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 
+import com.bumptech.glide.request.target.ThumbnailImageViewTarget;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoProfileExecute;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
+import com.examples.atscreenrecord.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.VideoUtil;
 
@@ -29,6 +34,7 @@ import java.util.Random;
 public class ExecuteService extends Service {
 
 
+    private static final String ACTION_CANCEL = "ACTION_CANCEL";
     private static int NOTIFICATION_ID = 9;
     String originalVideoPath, cameraCachePath;
     long startTime, endTime, duration = 10000;
@@ -37,15 +43,23 @@ public class ExecuteService extends Service {
     private boolean finishExecute = false;
     long countDownInterval = 1000;
     int progress = 0;
-
+    CountDownTimer countDownTimer;
     public int generateProgress(int lastProgress) {
         return Math.min(99, (int)(lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration))));
     }
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.getAction() != null) {
+            if (MyUtils.ACTION_CANCEL_PROCESSING.equals(intent.getAction())) {
+                countDownTimer.cancel();
+                VideoUtil.getInstance().cancelProcess();
+                stopService();
+                return START_NOT_STICKY;
+            }
+        }
 
-        duration = intent.getLongExtra("bundle_video_react_time", 0);
+        duration = intent.getLongExtra("bundle_video_execute_time", 0);
         NOTIFICATION_ID = (int) duration;
 
         createNotification();
@@ -56,7 +70,7 @@ public class ExecuteService extends Service {
             countDownInterval = 1000;
         } else countDownInterval = 2000;
 
-        CountDownTimer countDownTimer = new CountDownTimer(duration, 1000) {
+        countDownTimer = new CountDownTimer(duration, 1000) {
             @Override
             public void onTick(long l) {
                 if (!finishExecute) {
@@ -90,15 +104,23 @@ public class ExecuteService extends Service {
             posX = videoProfileExecute.getPosX();
             posY = videoProfileExecute.getPosY();
             camSize = videoProfileExecute.getCamSize();
-            if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO) flipCamera(cameraCachePath);
-            if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO) commentaryAudio(originalVideoPath, cameraCachePath);
+            if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO)
+            {
+                flipCamera(cameraCachePath);
+                System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO");
+            }
+            if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO)
+            {
+                commentaryAudio(originalVideoPath, cameraCachePath);
+                System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO");
+            }
         }
 
         return START_NOT_STICKY;
     }
 
     private void commentaryAudio(String videoPath, String audioPath) {
-            new VideoUtil().commentaryAudio(videoPath, audioPath, new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().commentaryAudio(videoPath, audioPath, new VideoUtil.ITranscoding() {
                 @Override
                 public void onStartTranscoding(String outPath) {
                 }
@@ -121,7 +143,7 @@ public class ExecuteService extends Service {
     }
 
     private void flipCamera(String cameraCahePath) {
-        new VideoUtil().flipHorizontal(cameraCahePath, new VideoUtil.ITranscoding() {
+        VideoUtil.getInstance().flipHorizontal(cameraCahePath, new VideoUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outputCachePath) {
             }
@@ -137,8 +159,7 @@ public class ExecuteService extends Service {
 
     private String finalVideoCachePath = "";
     public void executeFFmpegReactCam(String overlayVideoPath) {
-
-        new VideoUtil().reactCamera(originalVideoPath, overlayVideoPath, startTime, endTime, camSize,
+        VideoUtil.getInstance().reactCamera(originalVideoPath, overlayVideoPath, startTime, endTime, camSize,
                 posX, posY, false, false, new VideoUtil.ITranscoding() {
                     @Override
                     public void onStartTranscoding(String outputCachePath) {
@@ -190,11 +211,21 @@ public class ExecuteService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.S)
     private void createNotification() {
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, TranslucentActivity.class);
         @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
 
-//        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
+        RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
+//        notificationLayoutExpanded.setTextViewText(R.id.title, "AT Screen Recorder");
+//        notificationLayoutExpanded.setTextViewText(R.id.des, "AT Screen Recorder");
+        notificationLayoutExpanded.setImageViewResource(R.id.ic_app, R.drawable.ic_app);
+
+//        final ComponentName serviceName = new ComponentName(this, ExecuteService.class);
+//
+//        // Previous track
+//        pendingIntent = PendingIntent.getService(this, ACTION_CANCEL, serviceName);
+        notificationLayoutExpanded.setOnClickPendingIntent(R.id.btn_cancel_notification, pendingIntent);
+
 
         //Set notification information
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -203,10 +234,9 @@ public class ExecuteService extends Service {
             notificationBuilder = new Notification.Builder(getApplicationContext());
         notificationBuilder
                 .setOngoing(true)
-//                .setCustomBigContentView(notificationLayoutExpanded)
+                .setCustomBigContentView(notificationLayoutExpanded)
                 .setVibrate(new long[]{0L})
                 .setContentTitle("AT Screen Recorder")
-//                .setPriority(Notification.PRIORITY_MIN)
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
                 .setContentIntent(pendingIntent)

@@ -2,6 +2,7 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
+import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -10,11 +11,16 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.ui.ChooseVideoListener;
 import com.examples.atscreenrecord.ui.VideoBeforeReactView;
+import com.examples.atscreenrecord.ui.services.ControllerService;
+import com.examples.atscreenrecord.ui.services.ExecuteService;
+import com.examples.atscreenrecord.ui.services.recording.RecordingService;
+import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 
 public class CompressBeforeReactCamActivity extends AppCompatActivity implements ChooseVideoListener {
@@ -36,6 +42,8 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.react_cam_prepare_layout);
         hideStatusBar(this);
+
+        turnOffServiceUseCamera();
         prepareVideoView = findViewById(R.id.trimmer_view);
         Intent intent = getIntent();
         if (intent != null) {
@@ -69,6 +77,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     @Override
     public void onClickChoose() {
 //        runCompressVideo();
+        if (checkServiceBusy()) return;
         buildDialog(getResources().getString(R.string.prepare_video)).show();
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -79,7 +88,35 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
             }
         }, 2000);
     }
+    private void turnOffServiceUseCamera() {
+        if (isMyServiceRunning(this, RecordingService.class)) {
+            Intent intent = new Intent(this, RecordingService.class);
+            stopService(intent);
+        }
+        if (isMyServiceRunning(this, StreamingService.class)) {
+            Intent intent = new Intent(this, StreamingService.class);
+            stopService(intent);
+        }
+        if (isMyServiceRunning(this, ControllerService.class)) {
+            Intent intent = new Intent(this, ControllerService.class);
+            stopService(intent);
+        }
+    }
 
+    private boolean checkServiceBusy() {
+        boolean bb = false;
+        if (isMyServiceRunning(this, ExecuteService.class)) {
+            bb = true;
+            new AlertDialog.Builder(this)
+                    .setTitle("Please wait!")
+                    .setMessage("Your previous video in processing, please check in status bar!")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .show();
+        }
+        return bb;
+    }
 
     private void nextToCommentary() {
         Intent intent = new Intent(CompressBeforeReactCamActivity.this, CommentaryActivity.class);

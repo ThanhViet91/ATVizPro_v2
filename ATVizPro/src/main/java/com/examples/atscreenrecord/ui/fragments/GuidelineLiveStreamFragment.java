@@ -22,6 +22,7 @@ import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
@@ -122,9 +123,9 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = position;
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
+        btnContinue.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
@@ -140,20 +141,26 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 setDecs(i);
             }
         });
-        tvSkip.setOnClickListener(new View.OnClickListener() {
+        tvSkip.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 mFragmentManager.popBackStack();
             }
         });
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnBack.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 mFragmentManager.popBackStack();
             }
         });
         AdView mAdView = view.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SettingManager2.setFirstTimeLiveStream(requireContext(), false);
     }
 
     @Override

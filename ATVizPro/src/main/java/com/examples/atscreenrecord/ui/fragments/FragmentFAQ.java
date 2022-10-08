@@ -11,6 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.examples.atscreenrecord.AppConfigs;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.FAQAdapter;
 import com.examples.atscreenrecord.model.FAQItem;
@@ -42,7 +44,7 @@ public class FragmentFAQ extends Fragment {
         mFAQs.add(new FAQItem("My record button is greyed out", "Make sure Screen Recording is Not Restricted with Parental Control: " +
                 "Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. " +
                 "Then scroll and look if Screen Recorder is restricted. If so, turn it off.", false));
-        mFAQs.add(new FAQItem("I still have a question", "Contact us at support@atsoft.io so we can help you.", false));
+        mFAQs.add(new FAQItem("I still have a question", "Contact us at "+ AppConfigs.getInstance().getConfigModel().getFeedbackEmail() +" so we can help you.", false));
 
         return mViewRoot;
     }

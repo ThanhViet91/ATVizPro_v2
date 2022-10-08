@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoOptionAdapter;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdView;
 
@@ -303,16 +304,16 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
 
     private void setUpListeners() {
-        findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.tv_btn_cancel).setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 onCancelClicked();
             }
         });
 
-        findViewById(R.id.tv_btn_done).setOnClickListener(new OnClickListener() {
+        findViewById(R.id.tv_btn_done).setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onSingleClick(View v) {
                 onDoneClicked();
             }
         });

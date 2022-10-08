@@ -25,6 +25,7 @@ import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -105,9 +106,9 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                 }
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
+        btnContinue.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 i = i + 1;
                 viewPager2.setCurrentItem(i);
                 if (i == getListPhoto().size() - 1)
@@ -131,9 +132,9 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                 }
             }
         });
-        imgBack.setOnClickListener(new View.OnClickListener() {
+        imgBack.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 mFragmentManager.popBackStack();
             }
         });

@@ -225,7 +225,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                                 break;
                             }
                     }
-                }, 500);
+                }, 200);
 
             }
 
@@ -340,7 +340,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void readData() {
         listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoList.size() > 1) {
-            videoList.sort((t0, t1) -> t0.getLastModified() > t1.getLastModified() ? 1 : -1);
+            videoList.sort((t0, t1) -> t0.getLastModified() > t1.getLastModified() ? -1 : 0);
         }
     }
 
@@ -350,7 +350,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 listFilesForFolder(fileEntry);
             } else {
                 if (fileEntry.getName().contains(".mp4"))
-                    videoList.add(new VideoModel(fileEntry.getName().replace(".mp4", ""),
+                    videoList.add(0, new VideoModel(fileEntry.getName().replace(".mp4", ""),
                             fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath()), fileEntry.lastModified()));
             }
         }
@@ -387,27 +387,32 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             checkNumberSelected();
             return;
         }
-        Intent intent;
+//        Intent intent;
         switch (from_code) {
             case REQUEST_VIDEO_FOR_REACT_CAM:
-                intent = new Intent(this, CompressBeforeReactCamActivity.class);
+                Intent intent = new Intent(this, CompressBeforeReactCamActivity.class);
                 intent.setAction(MyUtils.ACTION_FOR_REACT);
                 intent.putExtra(VIDEO_PATH_KEY, path);
+                startActivity(intent);
                 break;
             case REQUEST_VIDEO_FOR_VIDEO_EDIT:
-                intent = new Intent(this, VideoEditorActivity.class);
+                Intent intent2 = new Intent(this, VideoEditorActivity.class);
+                intent2.setAction(MyUtils.ACTION_FOR_EDIT);
+                intent2.putExtra(VIDEO_PATH_KEY, path);
+                startActivity(intent2);
                 break;
             case REQUEST_VIDEO_FOR_COMMENTARY:
-                intent = new Intent(this, CompressBeforeReactCamActivity.class);
-                intent.setAction(MyUtils.ACTION_FOR_COMMENTARY);
-                intent.putExtra(VIDEO_PATH_KEY, path);
+                Intent intent3 = new Intent(this, CompressBeforeReactCamActivity.class);
+                intent3.setAction(MyUtils.ACTION_FOR_COMMENTARY);
+                intent3.putExtra(VIDEO_PATH_KEY, path);
+                startActivity(intent3);
                 break;
             case REQUEST_SHOW_PROJECTS_DEFAULT:
             default:
-                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
-                intent.setDataAndType(Uri.parse(path), "video/*");
+                Intent intent4 = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
+                intent4.setDataAndType(Uri.parse(path), "video/*");
+                startActivity(intent4);
         }
-        startActivity(intent);
     }
 
     private final ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {

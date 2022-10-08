@@ -24,6 +24,7 @@ import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +79,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
 
         btnBack =  view.findViewById(R.id.img_btn_back_header);
 
-        if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+        if (SettingManager2.getFirstTimeRecord(requireContext())) {
             btnBack.setVisibility(View.GONE);
             tvSkip.setVisibility(View.VISIBLE);
         } else {
@@ -125,9 +126,9 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 i = position;
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
+        btnContinue.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
@@ -143,20 +144,26 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 setDecs(i);
             }
         });
-        tvSkip.setOnClickListener(new View.OnClickListener() {
+        tvSkip.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                     mParentActivity.onBackPressed();
             }
         });
         AdView mAdView = view.findViewById(R.id.adView);
         AdUtil.createBannerAdmob(getContext(), mAdView);
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnBack.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
-                mFragmentManager.popBackStack();
+            public void onSingleClick(View v) {
+                mParentActivity.onBackPressed();
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        SettingManager2.setFirstTimeRecord(mParentActivity, false);
     }
 
     @Override

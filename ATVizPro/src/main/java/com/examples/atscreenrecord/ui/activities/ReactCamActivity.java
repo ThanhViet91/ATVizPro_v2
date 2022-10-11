@@ -87,6 +87,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
+        TextView tvDes = findViewById(R.id.des);
+        tvDes.setVisibility(View.VISIBLE);
 
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
         btnRetake = findViewById(R.id.img_btn_discard);

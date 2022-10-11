@@ -61,8 +61,25 @@ public class ExecuteService extends Service {
 
         duration = intent.getLongExtra("bundle_video_execute_time", 0);
         NOTIFICATION_ID = (int) duration;
+        Bundle bundle = intent.getExtras();
+        VideoProfileExecute videoProfileExecute = null;
+        if (bundle != null) {
+            videoProfileExecute = (VideoProfileExecute) bundle.get("package_video_profile");
 
-        createNotification();
+            originalVideoPath = videoProfileExecute.getOriginalVideoPath();
+            cameraCachePath = videoProfileExecute.getOverlayVideoPath();
+            startTime = videoProfileExecute.getStartTime();
+            endTime = videoProfileExecute.getEndTime();
+            posX = videoProfileExecute.getPosX();
+            posY = videoProfileExecute.getPosY();
+            camSize = videoProfileExecute.getCamSize();
+
+        }
+        int type = 0;
+        if (videoProfileExecute != null) {
+            type = videoProfileExecute.getType();
+        }
+        createNotification(type);
         System.out.println("thanhlv onStartCommand .......... " + duration);
         if (duration < 10000) duration = 10000;
 
@@ -93,27 +110,16 @@ public class ExecuteService extends Service {
         };
         countDownTimer.start();
 
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            VideoProfileExecute videoProfileExecute = (VideoProfileExecute) bundle.get("package_video_profile");
 
-            originalVideoPath = videoProfileExecute.getOriginalVideoPath();
-            cameraCachePath = videoProfileExecute.getOverlayVideoPath();
-            startTime = videoProfileExecute.getStartTime();
-            endTime = videoProfileExecute.getEndTime();
-            posX = videoProfileExecute.getPosX();
-            posY = videoProfileExecute.getPosY();
-            camSize = videoProfileExecute.getCamSize();
-            if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO)
-            {
-                flipCamera(cameraCachePath);
-                System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO");
-            }
-            if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO)
-            {
-                commentaryAudio(originalVideoPath, cameraCachePath);
-                System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO");
-            }
+        if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO)
+        {
+            flipCamera(cameraCachePath);
+            System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO");
+        }
+        if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO)
+        {
+            commentaryAudio(originalVideoPath, cameraCachePath);
+            System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO");
         }
 
         return START_NOT_STICKY;
@@ -209,21 +215,18 @@ public class ExecuteService extends Service {
     Notification notification;
 
     @RequiresApi(api = Build.VERSION_CODES.S)
-    private void createNotification() {
+    private void createNotification(int type) {
 
         Intent intent = new Intent(this, TranslucentActivity.class);
         @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
 
         RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
-//        notificationLayoutExpanded.setTextViewText(R.id.title, "AT Screen Recorder");
-//        notificationLayoutExpanded.setTextViewText(R.id.des, "AT Screen Recorder");
+
+        if (type == MyUtils.TYPE_REACT_VIDEO) notificationLayoutExpanded.setTextViewText(R.id.des, "React in processing");
+        if (type == MyUtils.TYPE_COMMENTARY_VIDEO) notificationLayoutExpanded.setTextViewText(R.id.des, "Commentary in processing");
         notificationLayoutExpanded.setImageViewResource(R.id.ic_app, R.drawable.ic_app);
 
-//        final ComponentName serviceName = new ComponentName(this, ExecuteService.class);
-//
-//        // Previous track
-//        pendingIntent = PendingIntent.getService(this, ACTION_CANCEL, serviceName);
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.btn_cancel_notification, pendingIntent);
 
 

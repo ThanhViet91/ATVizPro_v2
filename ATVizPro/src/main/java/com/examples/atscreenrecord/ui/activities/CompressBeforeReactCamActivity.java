@@ -42,7 +42,6 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.react_cam_prepare_layout);
         hideStatusBar(this);
-
         turnOffServiceUseCamera();
         prepareVideoView = findViewById(R.id.trimmer_view);
         Intent intent = getIntent();
@@ -50,8 +49,6 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
             pathOriginalVideo = intent.getStringExtra(VIDEO_PATH_KEY);
             actionType = intent.getAction();
         }
-
-        
         prepareVideoView.setOnChooseVideoListener(this);
         prepareVideoView.initVideoByURI(Uri.parse(pathOriginalVideo));
     }

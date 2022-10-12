@@ -80,7 +80,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 		mTrackIndex = -1;
         mMuxerStarted = mIsEOS = false;
 
-        final MediaCodecInfo videoCodecInfo =  chooseVideoEncoder(mime);;//selectVideoCodec(mime);
+        final MediaCodecInfo videoCodecInfo =  chooseVideoEncoder(mime);
 
         if (videoCodecInfo !=null) {
 			if (DEBUG) Log.i(TAG, "selected codec: " + videoCodecInfo.getName());

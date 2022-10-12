@@ -163,12 +163,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 onBackPressed();
             }
         });
-        tv_select.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                modeSelect++;
-                handleSelectButton();
-            }
+        tv_select.setOnClickListener(v -> {
+            modeSelect++;
+            handleSelectButton();
         });
         btn_delete.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -201,8 +198,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         return (int)screenWidth/180 + 1;
     }
 
-    VideoModel videoModelOld;
-
+    private VideoModel videoModelOld;
     private void handleRenameButton(VideoModel oldVideo) {
         videoModelOld = new VideoModel();
         videoModelOld.setPath(oldVideo.getPath());
@@ -244,26 +240,28 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 .show();
     }
 
-    public void deleteVideos(ArrayList<VideoModel> listSelected) {
+    private void deleteVideos(ArrayList<VideoModel> listSelected) {
         for (VideoModel video : listSelected) {
             File file = new File(video.getPath());
-            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-                    (s, uri) -> {
-                        ContentResolver contentResolver = getApplicationContext().getContentResolver();
-                        try {
-                            //delete object using resolver
-                            contentResolver.delete(uri, null, null);
-                            videoList.remove(video);
-                            runOnUiThread(() -> mAdapter.updateData(videoList));
-                            Toast.makeText(getApplicationContext(), "The video is deleted!", Toast.LENGTH_SHORT).show();
-                        } catch (SecurityException e) {
-                            delete(e, loginResultHandler, uri, contentResolver);
-                        }
-                    });
+            if (file.delete()) videoList.remove(video);
+//            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
+//                    (s, uri) -> {
+//                        ContentResolver contentResolver = getApplicationContext().getContentResolver();
+//                        try {
+//                            //delete object using resolver
+//                            contentResolver.delete(uri, null, null);
+//                            videoList.remove(video);
+//                            runOnUiThread(() -> mAdapter.updateData(videoList));
+//                            Toast.makeText(getApplicationContext(), "The video is deleted!", Toast.LENGTH_SHORT).show();
+//                        } catch (SecurityException e) {
+//                            delete(e, loginResultHandler, uri, contentResolver);
+//                        }
+//                    });
         }
+        runOnUiThread(() -> mAdapter.updateData(videoList));
     }
 
-    public ArrayList<VideoModel> getVideoListSelected() {
+    private ArrayList<VideoModel> getVideoListSelected() {
         ArrayList<VideoModel> list = new ArrayList<>();
         for (VideoModel item : videoList)
             if (item.isSelected()) list.add(0, item);
@@ -387,7 +385,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             checkNumberSelected();
             return;
         }
-//        Intent intent;
+
         switch (from_code) {
             case REQUEST_VIDEO_FOR_REACT_CAM:
                 Intent intent = new Intent(this, CompressBeforeReactCamActivity.class);
@@ -443,7 +441,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     public void rename(Uri uri, String rename) {
-
         //create content values with new name and update
         ContentValues contentValues = new ContentValues();
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, rename);

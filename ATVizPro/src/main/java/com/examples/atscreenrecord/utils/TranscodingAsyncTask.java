@@ -33,12 +33,12 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
         commandStr = command;
         outputPath = outPath;
         mCallback = callback;
-        demoVideoFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/videokit/";
-        demoVideoPath = demoVideoFolder + "in.mp4";
+//        demoVideoFolder = Environment.getExternalStorageDirectory().getAbsolutePath() + "/videokit/";
+//        demoVideoPath = demoVideoFolder + "in.mp4";
         workFolder = App.getAppContext().getFilesDir().getAbsolutePath() + "/";
         vkLogPath = workFolder + "vk.log";
-        GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(context, workFolder);
-        GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(context, demoVideoFolder);
+//        GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(context, workFolder);
+//        GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(context, demoVideoFolder);
         int rc = GeneralUtils.isLicenseValid(App.getAppContext(), workFolder);
         System.out.println("thanhlv isLicenseValid ====== " + rc);
     }
@@ -48,20 +48,22 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPreExecute() {
         if (mCallback != null) mCallback.onStartTranscoding(outputPath);
+        System.out.println("thanhlv isLicenseValid ====== onPreExecute");
     }
 
     protected Integer doInBackground(String... paths) {
         Log.i(Prefs.TAG, "doInBackground started...");
+        System.out.println("thanhlv isLicenseValid ======  doInBackground");
 
         // delete previous log
         boolean isDeleted = GeneralUtils.deleteFileUtil(workFolder + "/vk.log");
         Log.i(Prefs.TAG, "vk deleted: " + isDeleted);
 
 
-        PowerManager powerManager = (PowerManager) context.getSystemService(Activity.POWER_SERVICE);
-        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VK_LOCK");
-        Log.d(Prefs.TAG, "Acquire wake lock");
-        wakeLock.acquire();
+//        PowerManager powerManager = (PowerManager) context.getSystemService(Activity.POWER_SERVICE);
+//        PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyWakeLock");
+//        Log.d(Prefs.TAG, "Acquire wake lock");
+//        wakeLock.acquire();
 
 
         LoadJNI vk = new LoadJNI();
@@ -70,19 +72,21 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
             vk.run(GeneralUtils.utilConvertToComplex(commandStr), workFolder, App.getAppContext());
         } catch (CommandValidationException e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);
+            System.out.println("thanhlv isLicenseValid ======  CommandValidationException");
             commandValidationFailedFlag = true;
             return 0;
         } catch (Throwable e) {
             Log.e(Prefs.TAG, "vk run exeption.", e);
+            System.out.println("thanhlv isLicenseValid ======  Throwable");
             return 0;
         }
-        finally {
-            if (wakeLock.isHeld())
-                wakeLock.release();
-            else{
-                Log.i(Prefs.TAG, "Wake lock is already released, doing nothing");
-            }
-        }
+//        finally {
+//            if (wakeLock.isHeld())
+//                wakeLock.release();
+//            else{
+//                Log.i(Prefs.TAG, "Wake lock is already released, doing nothing");
+//            }
+//        }
         Log.i(Prefs.TAG, "doInBackground finished");
         return 0;
     }
@@ -100,6 +104,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 
     @Override
     protected void onPostExecute(Integer result) {
+        System.out.println("thanhlv isLicenseValid ======  onPostExecute");
         Log.i(Prefs.TAG, "onPostExecute");
 
         if (mCallback != null) mCallback.onFinishTranscoding(outputPath);

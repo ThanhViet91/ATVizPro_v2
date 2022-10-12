@@ -133,7 +133,7 @@ public class MediaScreenEncoderHard extends MediaVideoEncoderBase {
 	    	if (DEBUG) Log.i(TAG,"setup VirtualDisplay");
 			intervals = (long)(1000f / fps);
 		    display = mMediaProjection.createVirtualDisplay(
-		    	"Capturing Display",
+		    	"CapturingDisplay",
 		    	mWidth, mHeight, mDensity,
 		    	DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
 		    	mSourceSurface, null, mHandler);

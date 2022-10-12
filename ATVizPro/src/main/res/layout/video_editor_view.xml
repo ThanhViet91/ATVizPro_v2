@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="8dp">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/video_frames_recyclerView"

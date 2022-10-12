@@ -223,11 +223,12 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         }
     }
 
-    String cacheOutputPath = "";
+    private String cacheOutputPath = "";
 
     @Override
     public void onFinishProcess(String outPath) {
         cacheOutputPath = outPath;
+        pathOriginalVideo = outPath;
         animationView.pauseAnimation();
         animationView.setVisibility(View.GONE);
         videoEditorView.onPressSave();

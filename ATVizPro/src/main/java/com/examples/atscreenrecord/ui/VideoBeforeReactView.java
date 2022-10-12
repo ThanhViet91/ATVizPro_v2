@@ -149,7 +149,7 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
       mRightProgressPos = MAX_SHOOT_DURATION;
     }
     mVideoThumbRecyclerView.addItemDecoration(new SpacesItemDecoration(RECYCLER_VIEW_PADDING, mThumbsTotalCount));
-    mRangeSeekBarView = new RangeSeekBarView(mContext, mLeftProgressPos, mRightProgressPos);
+    mRangeSeekBarView = new RangeSeekBarView(mContext, mLeftProgressPos, mRightProgressPos, 0);
     mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
     mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
     mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
@@ -170,6 +170,13 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     mSourceUri = videoURI;
     mVideoView.setVideoURI(videoURI);
     mVideoView.requestFocus();
+//    mVideoView.start();
+//    new Handler().postDelayed(new Runnable() {
+//      @Override
+//      public void run() {
+//        mVideoView.pause();
+//      }
+//    }, 1000);
   }
 
   private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {

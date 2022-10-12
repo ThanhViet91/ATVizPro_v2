@@ -50,6 +50,8 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
             pathOriginalVideo = intent.getStringExtra(VIDEO_PATH_KEY);
             actionType = intent.getAction();
         }
+
+        
         prepareVideoView.setOnChooseVideoListener(this);
         prepareVideoView.initVideoByURI(Uri.parse(pathOriginalVideo));
     }

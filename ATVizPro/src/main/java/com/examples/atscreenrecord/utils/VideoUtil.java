@@ -111,7 +111,7 @@ public class VideoUtil {
                 transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
                 transcodingAsyncTask.execute();
             }
-        }, 500);
+        }, 1000);
     }
 
     private File overlayImagePath;

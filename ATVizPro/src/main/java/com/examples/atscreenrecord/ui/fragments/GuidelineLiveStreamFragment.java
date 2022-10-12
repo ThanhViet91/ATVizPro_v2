@@ -123,9 +123,9 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = position;
             }
         });
-        btnContinue.setOnClickListener(new OnSingleClickListener() {
+        btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View v) {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));

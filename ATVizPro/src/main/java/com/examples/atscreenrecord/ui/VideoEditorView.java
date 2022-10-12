@@ -184,8 +184,8 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         return mVideoView.getDuration();
     }
 
+
     private void initRangeSeekBarView() {
-        if (mRangeSeekBarView != null) return;
         mLeftProgressPos = 0;
         if (mDuration <= MAX_SHOOT_DURATION) {
             mThumbsTotalCount = MAX_COUNT_RANGE;
@@ -194,8 +194,13 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
             mThumbsTotalCount = (int) (mDuration * 1.0f / (MAX_SHOOT_DURATION * 1.0f) * MAX_COUNT_RANGE);
             mRightProgressPos = MAX_SHOOT_DURATION;
         }
+        if (mRangeSeekBarView != null) {
+            mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);
+            return;
+        }
+
         mVideoThumbRecyclerView.addItemDecoration(new SpacesItemDecoration(RECYCLER_VIEW_PADDING, mThumbsTotalCount));
-        mRangeSeekBarView = new RangeSeekBarView(mContext, mLeftProgressPos, mRightProgressPos);
+        mRangeSeekBarView = new RangeSeekBarView(mContext, mLeftProgressPos, mRightProgressPos, 1);
         mRangeSeekBarView.setSelectedMinValue(mLeftProgressPos);
         mRangeSeekBarView.setSelectedMaxValue(mRightProgressPos);
         mRangeSeekBarView.setStartEndTime(mLeftProgressPos, mRightProgressPos);

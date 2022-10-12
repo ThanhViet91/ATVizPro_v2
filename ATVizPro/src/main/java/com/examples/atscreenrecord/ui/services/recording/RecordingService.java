@@ -67,23 +67,23 @@ public class RecordingService extends BaseService {
     private void getScreenSize() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mScreenDensity = metrics.densityDpi;
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
-        if (width > height) {
-            final float scale_x = width / 1920f;
-            final float scale_y = height / 1080f;
-            final float scale = Math.max(scale_x, scale_y);
-            width = (int) (width / scale);
-            height = (int) (height / scale);
-        } else {
-            final float scale_x = width / 1080f;
-            final float scale_y = height / 1920f;
-            final float scale = Math.max(scale_x, scale_y);
-            width = (int) (width / scale);
-            height = (int) (height / scale);
-        }
-        mScreenWidth = width;
-        mScreenHeight = height;
+//        int width = metrics.widthPixels;
+//        int height = metrics.heightPixels;
+//        if (width > height) {
+//            final float scale_x = width / 1920f;
+//            final float scale_y = height / 1080f;
+//            final float scale = Math.max(scale_x, scale_y);
+//            width = (int) (width / scale);
+//            height = (int) (height / scale);
+//        } else {
+//            final float scale_x = width / 1080f;
+//            final float scale_y = height / 1920f;
+//            final float scale = Math.max(scale_x, scale_y);
+//            width = (int) (width / scale);
+//            height = (int) (height / scale);
+//        }
+//        mScreenWidth = width;
+//        mScreenHeight = height;
     }
 
     @Override
@@ -107,8 +107,7 @@ public class RecordingService extends BaseService {
 
     @Override
     public void stopPerformService() {
-        VideoSetting2 v = stopRecording();
-        mResultVideo = v;
+        mResultVideo = stopRecording();
     }
 
     @Override
@@ -136,18 +135,11 @@ public class RecordingService extends BaseService {
                 if (DEBUG) Log.i(TAG, "startStreaming:");
                 try {
                     mMuxer = new MediaMuxerWrapper(this, ".mp4");    // if you record audio only, ".m4a" is also OK.
-                    if (true) {
-                        // for screen capturing
 
-                        VideoSetting2 videoSetting = SettingManager2.getVideoProfile(getApplicationContext());
-                        mCurrentVideoSetting = videoSetting;
-                        new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
-                    }
-                    if (true) {
-                        // for audio capturing
-                        //todo: setting audio setting here
-                        new MediaAudioEncoder(mMuxer, mMediaEncoderListener);
-                    }
+                    mCurrentVideoSetting = SettingManager2.getVideoProfile(getApplicationContext());
+                    new MediaScreenEncoderHard(mMuxer, mMediaEncoderListener, mMediaProjection, mCurrentVideoSetting, mScreenDensity);
+                    new MediaAudioEncoder(mMuxer, mMediaEncoderListener);
+
                     mMuxer.prepare();
                     mMuxer.startRecording();
                 } catch (final IOException e) {
@@ -205,7 +197,7 @@ public class RecordingService extends BaseService {
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent.setAction(MyUtils.ACTION_END_RECORD);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        System.out.println("thanhlv showResultActivity "+finalVideoCachePath);
+        System.out.println("thanhlv showResultActivity " + finalVideoCachePath);
         startActivity(intent);
     }
 

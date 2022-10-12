@@ -83,10 +83,12 @@ public class RangeSeekBarView extends View {
     super(context, attrs, defStyleAttr);
   }
 
-  public RangeSeekBarView(Context context, long absoluteMinValuePrim, long absoluteMaxValuePrim) {
+  private int type = 0;
+  public RangeSeekBarView(Context context, long absoluteMinValuePrim, long absoluteMaxValuePrim, int type) {
     super(context);
     this.absoluteMinValuePrim = absoluteMinValuePrim;
     this.absoluteMaxValuePrim = absoluteMaxValuePrim;
+    this.type = type;
     setFocusable(true);
     setFocusableInTouchMode(true);
     init();
@@ -161,7 +163,7 @@ public class RangeSeekBarView extends View {
 
     drawThumb(normalizedToScreen(normalizedMinValue), false, canvas, true);
     drawThumb(normalizedToScreen(normalizedMaxValue), false, canvas, false);
-    drawVideoTrimTimeText(canvas);
+    if (type != 1) drawVideoTrimTimeText(canvas);
   }
 
   private void drawThumb(float screenCoord, boolean pressed, Canvas canvas, boolean isLeft) {

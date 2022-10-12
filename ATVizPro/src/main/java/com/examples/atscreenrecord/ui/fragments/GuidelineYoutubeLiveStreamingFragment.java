@@ -104,9 +104,9 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
                 }
             }
         });
-        btnContinue.setOnClickListener(new OnSingleClickListener() {
+        btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View v) {
                 i = i + 1;
                 viewPager2.setCurrentItem(i);
                 if (i == getListPhoto().size() - 1)

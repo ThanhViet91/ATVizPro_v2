@@ -37,7 +37,7 @@ class Streamer
     }
 
     void open(String url, int width, int height) {
-        if(DEBUG) Log.i(TAG, "open: "+url);
+        if (DEBUG) Log.i(TAG, "open: " + url);
 
         if (listener != null) listener.onStarted();
         srsFlvMuxer = new SrsFlvMuxer(new ConnectCheckerRtmp() {
@@ -83,11 +83,11 @@ class Streamer
 
     void startStreamingSSL(int width, int height, int audioBitrate, int videoBitrate, int density) {
         int t = 0;
-        while (!srsFlvMuxer.isConnected()){
+        while (!srsFlvMuxer.isConnected()) {
             try {
-                t+=100;
+                t += 100;
                 Thread.sleep(100);
-                if(t>5000)
+                if (t > 5000)
                     break;
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -95,7 +95,7 @@ class Streamer
         }
 
         if (srsFlvMuxer.isConnected()) {
-            if(DEBUG) Log.i(TAG, "start Streaming: connected");
+            if (DEBUG) Log.i(TAG, "start Streaming: connected");
             long startStreamingAt = System.currentTimeMillis();
             videoHandler.setOnVideoEncoderStateListener(this);
             audioHandler.setOnAudioEncoderStateListener(this);
@@ -108,8 +108,7 @@ class Streamer
         }
     }
 
-    void disconnectStreaming(){
-//        Looper.prepare();
+    void disconnectStreaming() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -117,8 +116,8 @@ class Streamer
                 oldTimeStamp = 0L;
             }
         }, 1000);
-//        Looper.loop();
     }
+
     void stopStreaming() {
         videoHandler.stop();
         audioHandler.stop();
@@ -135,22 +134,24 @@ class Streamer
         fixTimeStamp(info);
         srsFlvMuxer.sendAudio(h264Buffer, info);
 
-        System.out.println("thanhlv sendAudio "+info.size);
+        System.out.println("thanhlv sendAudio " + info.size);
     }
 
     @Override
     public void onSpsPps(ByteBuffer sps, ByteBuffer pps) {
         srsFlvMuxer.setSpsPPs(sps, pps);
-        System.out.println("thanhlv onSpsPps "+sps.toString());
+        System.out.println("thanhlv onSpsPps " + sps.toString());
     }
 
     @Override
     public void onVideoDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
         fixTimeStamp(info);
         srsFlvMuxer.sendVideo(h264Buffer, info);
-        System.out.println("thanhlv sendVideo "+info.size);
+        System.out.println("thanhlv sendVideo " + info.size);
     }
+
     long oldTimeStamp = 0L;
+
     protected void fixTimeStamp(MediaCodec.BufferInfo info) {
         if (oldTimeStamp > info.presentationTimeUs) {
             info.presentationTimeUs = oldTimeStamp;

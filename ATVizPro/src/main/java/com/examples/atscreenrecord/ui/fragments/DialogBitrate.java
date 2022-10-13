@@ -6,10 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoSettingsAdapter;
@@ -18,14 +20,12 @@ import com.examples.atscreenrecord.model.VideoProperties;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class DialogBitrate extends DialogFragmentBase {
-    RecyclerView recyclerView;
-    ArrayList<VideoProperties> mBitrates;
-
+    private ArrayList<VideoProperties> mBitrates;
     public IVideoSettingListener callback;
-
     public DialogBitrate(IVideoSettingListener callback) {
         this.callback = callback;
     }
@@ -38,7 +38,6 @@ public class DialogBitrate extends DialogFragmentBase {
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -46,11 +45,9 @@ public class DialogBitrate extends DialogFragmentBase {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
-        recyclerView = view.findViewById(R.id.rc_item);
-
+        RecyclerView recyclerView = view.findViewById(R.id.rc_item);
         TextView title = view.findViewById(R.id.title_box);
         title.setText(getResources().getString(R.string.bitrate));
-
         btn_back.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -58,13 +55,9 @@ public class DialogBitrate extends DialogFragmentBase {
                 dismiss();
             }
         });
-
         initChecked();
-
         VideoSettingsAdapter adapter = new VideoSettingsAdapter(getContext(), mBitrates, 2);
-
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(linearLayoutManager);
     }

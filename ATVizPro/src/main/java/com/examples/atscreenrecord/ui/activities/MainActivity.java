@@ -1,7 +1,7 @@
 package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.Core.isConnected;
-import static com.examples.atscreenrecord.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
+import static com.examples.atscreenrecord.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
@@ -69,6 +69,7 @@ import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.DisplayUtil;
 import com.examples.atscreenrecord.utils.PathUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
@@ -407,7 +408,11 @@ public class MainActivity extends AppCompatActivity {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             int type = SettingManager2.getLiveStreamType(this);
             if (isConnected) {
-                liveStreaming.setText(getString(R.string.disconnect_livestream));
+                if (DisplayUtil.getDeviceWidthDpi() > 500) {
+                    liveStreaming.setText(getString(R.string.disconnect_livestream));
+                } else {
+                    liveStreaming.setText(getString(R.string.disconnect_live__));
+                }
             } else
                 liveStreaming.setText(getString(R.string.livestreaming));
             imgLiveType.setVisibility(View.VISIBLE);
@@ -764,7 +769,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(MainActivity.this, CompressBeforeReactCamActivity.class);
+                Intent intent = new Intent(MainActivity.this, PrepareVideoActivity.class);
                 intent.setAction(MyUtils.ACTION_FOR_REACT);
                 intent.putExtra(VIDEO_PATH_KEY, pathVideo);
                 startActivity(intent);
@@ -962,7 +967,8 @@ public class MainActivity extends AppCompatActivity {
 //                        updateService();
 //                        break;
                     case NOTIFY_MSG_CONNECTION_FAILED:
-//                        liveStreaming.setText(getString(R.string.livestreaming));
+                        liveStreaming.setText(getString(R.string.livestreaming));
+                        sendDisconnectToService();
                         break;
                     default:
                 }

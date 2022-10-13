@@ -42,10 +42,9 @@ class VideoHandler {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-
                             videoEncoder.start();
                         }
-                    }, 500);
+                    }, 1000);
                 } catch (IOException ioe) {
                     throw new RuntimeException(ioe);
                 }

@@ -23,7 +23,7 @@ import com.examples.atscreenrecord.ui.services.recording.RecordingService;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 
-public class CompressBeforeReactCamActivity extends AppCompatActivity implements ChooseVideoListener {
+public class PrepareVideoActivity extends AppCompatActivity implements ChooseVideoListener {
 
     static final String VIDEO_PATH_KEY = "video-file-path";
     private ProgressDialog mProgressDialog;
@@ -34,7 +34,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        System.out.println("thanhlv onStart CompressBeforeReactCamActivity");
+        System.out.println("thanhlv onStart PrepareVideoActivity");
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         prepareVideoView.showOrHideAdBanner();
-        System.out.println("thanhlv CompressBeforeReactCamActivity onResume ");
+        System.out.println("thanhlv PrepareVideoActivity onResume ");
     }
 
     @Override
@@ -118,14 +118,14 @@ public class CompressBeforeReactCamActivity extends AppCompatActivity implements
     }
 
     private void nextToCommentary() {
-        Intent intent = new Intent(CompressBeforeReactCamActivity.this, CommentaryActivity.class);
+        Intent intent = new Intent(PrepareVideoActivity.this, CommentaryActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, pathOriginalVideo);
         startActivity(intent);
         finish();
     }
 
     private void nextToReactCam() {
-        Intent intent = new Intent(CompressBeforeReactCamActivity.this, ReactCamActivity.class);
+        Intent intent = new Intent(PrepareVideoActivity.this, ReactCamActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, pathOriginalVideo);
         startActivity(intent);
         finish();

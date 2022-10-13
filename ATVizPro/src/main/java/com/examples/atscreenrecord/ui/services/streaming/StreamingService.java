@@ -77,8 +77,9 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onFailedToConnect() {
-        if (mPublisher != null && mPublisher.isPublishing())
-            mPublisher.closePublishing();
+//        if (mPublisher != null && mPublisher.isPublishing())
+//            System.out.println("thanhlv ------------- onFailedToConnect");
+//            mPublisher.closePublishing();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
         if (DEBUG) Log.i(TAG, "onFailedToConnect");
 
@@ -113,6 +114,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        System.out.println("thanhlv ------------- onDestroy");
         closeStreaming();
     }
 
@@ -207,6 +209,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void closePerformService() {
         if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
         notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP + " " + mUrl);
+        System.out.println("thanhlv -------------- closePerformService");
         closeStreaming();
     }
 
@@ -224,7 +227,8 @@ public class StreamingService extends BaseService implements PublisherListener {
                             .setSize(videoSetting.getWidth(), videoSetting.getHeight())
 //                            .setSize(mScreenWidth, mScreenHeight)
                             .setAudioBitrate(Publisher.Builder.DEFAULT_AUDIO_BITRATE)
-                            .setVideoBitrate(videoSetting.getBitrate())
+//                            .setVideoBitrate(videoSetting.getBitrate())
+                            .setVideoBitrate(Publisher.Builder.DEFAULT_VIDEO_BITRATE)
                             .setDensity(mScreenDensity)
                             .setListener(this)
                             .setMediaProjection(mMediaProjection)
@@ -265,6 +269,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void closeStreaming() {
         SettingManager2.setLiveStreamType(getApplicationContext(), 0);
         if (mPublisher != null && mPublisher.isPublishing()) {
+            System.out.println("thanhlv ------------- closeStreaming");
             mPublisher.closePublishing();
         }
     }

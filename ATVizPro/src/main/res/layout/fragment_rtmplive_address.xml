@@ -62,6 +62,7 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:paddingStart="10dp"
+            android:paddingEnd="40dp"
             android:scrollHorizontally="true"
             android:textColor="@color/black50"
             tools:ignore="RtlSymmetry" />
@@ -83,7 +84,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="right|center"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="10dp"
             android:contentDescription="@string/todo"
             android:padding="6dp"
             android:src="@drawable/ic_clean_text"
@@ -116,6 +117,7 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:paddingStart="10dp"
+            android:paddingEnd="40dp"
             android:scrollHorizontally="true"
             android:textColor="@color/black50"
             tools:ignore="RtlSymmetry" />
@@ -138,7 +140,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="right|center"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="10dp"
             android:contentDescription="@string/todo"
             android:padding="6dp"
             android:src="@drawable/ic_clean_text"

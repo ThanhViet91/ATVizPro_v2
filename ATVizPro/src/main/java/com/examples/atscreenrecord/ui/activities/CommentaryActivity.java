@@ -11,7 +11,6 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -128,6 +127,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
     private MediaRecorder mediaRecorder;
     private String cacheAudioFilePath;
+
     // this process must be done prior to the start of recording
     private void prepareAudioRecorder() {
         cacheAudioFilePath = StorageUtil.getCacheDir() + "/CacheAudio_" + getTimeStamp() + ".mp3";
@@ -135,7 +135,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mediaRecorder.setAudioEncodingBitRate(16*96000);
+        mediaRecorder.setAudioEncodingBitRate(16 * 96000);
         mediaRecorder.setAudioSamplingRate(96000);
         mediaRecorder.setOutputFile(cacheAudioFilePath);
 
@@ -149,6 +149,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     MediaPlayer mediaPlayer;
     String videoFile = "";
     int videoDuration = 0;
+
     private void addVideoView() {
         videoView = findViewById(R.id.video_main1);
         videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
@@ -162,21 +163,18 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
             videoPrepared(mp);
             mediaPlayer = mp;
-            videoView.setOnCompletionListener(mediaPlayer -> {
-                getEndCommentary();
-            });
+            videoView.setOnCompletionListener(mediaPlayer -> getEndCommentary());
         });
     }
 
 
-    private int videoWidth, videoHeight;
     RelativeLayout screenVideo;
     boolean hasChangeViewPos = false;
 
     private void videoPrepared(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = videoView.getLayoutParams();
-        videoWidth = mp.getVideoWidth();
-        videoHeight = mp.getVideoHeight();
+        int videoWidth = mp.getVideoWidth();
+        int videoHeight = mp.getVideoHeight();
         double videoRatio = (double) videoWidth / (double) videoHeight;
 
         screenVideo = findViewById(R.id.screenVideo);
@@ -229,7 +227,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    private CountDownTimer countDownTimer = new CountDownTimer(2900, 1000) {
+    private final CountDownTimer countDownTimer = new CountDownTimer(2900, 1000) {
+        @SuppressLint("SetTextI18n")
         public void onTick(long millisUntilFinished) {
             layoutCountdown.setVisibility(View.VISIBLE);
             number_countdown.setText("" + (millisUntilFinished / 1000 + 1));
@@ -243,6 +242,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     };
 
     private boolean pauseRecord = true;
+
     public void onClick(View v) {
 
         if (v == findViewById(R.id.img_btn_discard)) {
@@ -265,14 +265,14 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            if (!pauseRecord && !hasAudioFile) {
+            if (!pauseRecord && !hasAudioFile) {    //da bam start nhung chua bam stop
                 mediaRecorder.stop();
                 mediaRecorder.release();
                 mediaRecorder = null;
                 discardVideo();
                 return;
             }
-            if (!cacheAudioFilePath.equals("")) {
+            if (hasAudioFile) {   //da co file audio
                 showDialogConfirm("Discard the last clip?", "Discard");
             } else {
                 finish();
@@ -304,6 +304,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     private InterstitialAd mInterstitialAdAdmob = null;
+
     public void createInterstitialAdmob() {
         AdRequest adRequest = new AdRequest.Builder().build();
         InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
@@ -390,7 +391,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         builder.setTitle(title)
                 .setCancelable(true)
                 .setPositiveButton(action, (dialog, id) -> doPositiveButton(action))
-                .setNegativeButton("Cancel", (dialogInterface, i) -> {})
+                .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                })
                 .create().show();
     }
 

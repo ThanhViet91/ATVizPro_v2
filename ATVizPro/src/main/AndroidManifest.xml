@@ -70,7 +70,7 @@
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.CompressBeforeReactCamActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+        <activity android:name=".ui.activities.PrepareVideoActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
             android:label="TrimBeforeReactCam"

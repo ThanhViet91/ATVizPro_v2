@@ -90,9 +90,6 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
             ImageView ava = view.findViewById(R.id.img_ava_option);
             TextView title = view.findViewById(R.id.tv_title_option);
             TextView des = view.findViewById(R.id.tv_decs_popup);
-
-
-
             switch (getArguments().getInt(ARG_PARAM1)) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
                     ava.setImageResource(R.drawable.ic_react_cam_svg_large);
@@ -110,7 +107,6 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
                     des.setText(R.string.add_commentary_to_video_from_my_recordings_or_camera_roll);
                     break;
             }
-
         }
     }
 

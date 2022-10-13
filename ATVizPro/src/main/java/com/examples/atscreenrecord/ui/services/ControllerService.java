@@ -121,6 +121,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         switch (action) {
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
+                System.out.println("thanhlv ------------- ACTION_DISCONNECT_LIVE_FROM_HOME");
                 onClickClose();
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:

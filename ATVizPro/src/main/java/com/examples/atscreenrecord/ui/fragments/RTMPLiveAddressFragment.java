@@ -119,6 +119,9 @@ public class RTMPLiveAddressFragment extends Fragment {
         TextView tvTutorial = view.findViewById(R.id.tv_tutorial);
         checkRestoreData();
 
+//        edtRTMPAddress.setText("rtmp://live.skysoft.us/live/");
+//        edtStreamKey.setText("test");
+
         imgBack.setOnClickListener(v -> {
             hideSoftInput(requireActivity());
             mFragmentManager.popBackStack();
@@ -410,31 +413,6 @@ public class RTMPLiveAddressFragment extends Fragment {
                     case NOTIFY_MSG_ERROR:
                         break;
 
-//                    case NOTIFY_MSG_REQUEST_START:
-//
-//                        new Thread(new Runnable() {
-//                            int i = 0;
-//
-//                            @Override
-//                            public void run() {
-//                                while (!isStarted) {
-//                                    if (i > 5000) {
-//                                        //failed
-////                                        appendLog("Cannot stream to server. Try later..");
-//                                        onStop();
-//                                        break;
-//                                    }
-//                                    try {
-//                                        i += 1000;
-//                                        Thread.sleep(1000);
-//                                    } catch (InterruptedException e) {
-//                                        e.printStackTrace();
-//                                    }
-//                                }
-//                            }
-//                        }).start();
-//
-//                        break;
                     default:
                 }
             }

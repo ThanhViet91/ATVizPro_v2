@@ -173,6 +173,7 @@
     <string name="edit">Edit</string>
     <string name="livestreaming">Livestream</string>
     <string name="disconnect_livestream">Disconnect livestream</string>
+    <string name="disconnect_live__">Disconnect live..</string>
     <string name="projects">Projects</string>
     <string name="save">Save</string>
     <string name="rtmp">rtmp://</string>

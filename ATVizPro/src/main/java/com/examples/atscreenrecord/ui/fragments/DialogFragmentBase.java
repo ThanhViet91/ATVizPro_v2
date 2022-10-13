@@ -28,7 +28,6 @@ public class DialogFragmentBase extends DialogFragment {
         return R.layout.dialog_settings_empty;
     }
 
-
     public interface ISelectVideoSourceListener {
         void onClick();
         void onClickCameraRoll();
@@ -45,7 +44,6 @@ public class DialogFragmentBase extends DialogFragment {
         Objects.requireNonNull(Objects.requireNonNull(getDialog()).getWindow()).requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().setCanceledOnTouchOutside(false);
         Objects.requireNonNull(getDialog().getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
-
         return requireActivity().getLayoutInflater().inflate(getLayout(), container, false);
     }
 
@@ -71,7 +69,6 @@ public class DialogFragmentBase extends DialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
     }
-
 
     public void updateUI() {
     }

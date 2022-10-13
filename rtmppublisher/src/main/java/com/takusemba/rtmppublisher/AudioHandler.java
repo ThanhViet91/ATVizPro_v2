@@ -40,13 +40,8 @@ class AudioHandler implements AudioRecorder.OnAudioRecorderStateChangedListener 
             @Override
             public void run() {
                 audioEncoder.prepare(bitrate, SAMPLE_RATE, startStreamingAt);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        audioEncoder.start();
-                        audioRecorder.start();
-                    }
-                }, 500);
+                audioEncoder.start();
+                audioRecorder.start();
             }
         });
     }

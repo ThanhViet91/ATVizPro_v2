@@ -1,6 +1,6 @@
 package com.examples.atscreenrecord.ui.activities;
 
-import static com.examples.atscreenrecord.ui.activities.CompressBeforeReactCamActivity.VIDEO_PATH_KEY;
+import static com.examples.atscreenrecord.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
@@ -15,7 +15,6 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -388,7 +387,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
         switch (from_code) {
             case REQUEST_VIDEO_FOR_REACT_CAM:
-                Intent intent = new Intent(this, CompressBeforeReactCamActivity.class);
+                Intent intent = new Intent(this, PrepareVideoActivity.class);
                 intent.setAction(MyUtils.ACTION_FOR_REACT);
                 intent.putExtra(VIDEO_PATH_KEY, path);
                 startActivity(intent);
@@ -400,7 +399,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 startActivity(intent2);
                 break;
             case REQUEST_VIDEO_FOR_COMMENTARY:
-                Intent intent3 = new Intent(this, CompressBeforeReactCamActivity.class);
+                Intent intent3 = new Intent(this, PrepareVideoActivity.class);
                 intent3.setAction(MyUtils.ACTION_FOR_COMMENTARY);
                 intent3.putExtra(VIDEO_PATH_KEY, path);
                 startActivity(intent3);

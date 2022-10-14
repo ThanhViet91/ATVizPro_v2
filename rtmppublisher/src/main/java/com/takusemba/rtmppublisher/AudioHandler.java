@@ -30,7 +30,7 @@ class AudioHandler implements AudioRecorder.OnAudioRecorderStateChangedListener 
         audioRecorder = new AudioRecorder(SAMPLE_RATE);
         audioRecorder.setOnAudioRecorderStateChangedListener(this);
 
-        HandlerThread handlerThread = new HandlerThread("VideoHandler");
+        HandlerThread handlerThread = new HandlerThread("AudioHandler");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
     }
@@ -40,8 +40,13 @@ class AudioHandler implements AudioRecorder.OnAudioRecorderStateChangedListener 
             @Override
             public void run() {
                 audioEncoder.prepare(bitrate, SAMPLE_RATE, startStreamingAt);
-                audioEncoder.start();
-                audioRecorder.start();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        audioEncoder.start();
+                        audioRecorder.start();
+                    }
+                }, 500);
             }
         });
     }

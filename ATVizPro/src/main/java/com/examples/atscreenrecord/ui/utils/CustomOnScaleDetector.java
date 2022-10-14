@@ -19,18 +19,17 @@ public class CustomOnScaleDetector extends ScaleGestureDetector.SimpleOnScaleGes
     }
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
-        System.out.println("thanhlv  detector.getScaleFactor() " + detector.getScaleFactor() + "/// "+detector.getCurrentSpan());
         if (detector.getScaleFactor() > 1) {
             //zoom out
             if (last == 0) last = detector.getCurrentSpan();
-            if (detector.getCurrentSpan() - last > 10) {
+            if (detector.getCurrentSpan() - last > 24) {
                 mListener.zoomOut();
                 last = detector.getCurrentSpan();
             }
         } else {
             //zoom in
             if (last == 0) last = detector.getCurrentSpan();
-            if (last-detector.getCurrentSpan() > 10) {
+            if (last-detector.getCurrentSpan() > 24) {
                 mListener.zoomIn();
                 last = detector.getCurrentSpan();
             }

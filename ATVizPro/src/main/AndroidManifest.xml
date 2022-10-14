@@ -69,6 +69,12 @@
             android:label="ReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
+        <activity android:name=".ui.activities.PlayVideoDetailActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:screenOrientation="portrait"
+            android:label="ReactCam"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
 
         <activity android:name=".ui.activities.PrepareVideoActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"

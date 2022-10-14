@@ -86,6 +86,15 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>
+    <style name="Body_List_Item_White_16_450" parent="White_Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">450</item>
+    </style>
+
+    <style name="Body_List_Item_White_16_200" parent="White_Text">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textFontWeight" tools:ignore="NewApi">200</item>
+    </style>
 
     <style name="Body_List_Item_White_18_400" parent="White_Text">
         <item name="android:textSize">18sp</item>

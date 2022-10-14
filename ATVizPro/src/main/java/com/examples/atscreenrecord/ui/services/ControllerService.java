@@ -1,5 +1,6 @@
 package com.examples.atscreenrecord.ui.services;
 
+import static com.examples.atscreenrecord.Core.isConnected;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
@@ -122,7 +123,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
                 System.out.println("thanhlv ------------- ACTION_DISCONNECT_LIVE_FROM_HOME");
-                onClickClose();
+                onClickClose(false);
+                break;
+            case MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE:
+                onClickStop();
+                System.out.println("thanhlv ------------- ACTION_DISCONNECT_WHEN_STOP_LIVE");
+                onClickClose(true);
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:
                 mMode = intent.getIntExtra(MyUtils.KEY_CONTROLlER_MODE, MyUtils.MODE_RECORDING);
@@ -153,9 +159,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 updateUI();
                 break;
 
-            case MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE:
-                handleNotifyFromStreamService(intent);
-                break;
+//            case MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE:
+//                handleNotifyFromStreamService(intent);
+//                break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
 //                    mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
@@ -232,7 +238,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     @Override
     public void onCreate() {
         super.onCreate();
-        if (DEBUG) Log.i(TAG, "StreamingControllerService: onCreate");
+        if (DEBUG) Log.i(TAG, "ControllerService: onCreate");
 
         updateScreenSize();
         if (paramViewRoot == null) {
@@ -248,8 +254,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID);
                 Notification notification = notificationBuilder.setOngoing(true)
-                        .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle("ATVizPro is running in background")
+                        .setSmallIcon(R.drawable.ic_launcher_2_foreground)
+                        .setContentTitle("Screen Recorder is running in background")
                         .setPriority(NotificationManager.IMPORTANCE_MIN)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build();
@@ -500,25 +506,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
 
-//        mImgPause.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                MyUtils.toast(getApplicationContext(), "Pause will available soon!", Toast.LENGTH_SHORT);
-//                toggleNavigationButton(View.GONE);
-//
-//                mRecordingPaused = true;
-//            }
-//        });
-
-//        mImgResume.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                MyUtils.toast(getApplicationContext(), "Resume will available soon!", Toast.LENGTH_SHORT);
-//                toggleNavigationButton(View.GONE);
-//                mRecordingPaused = false;
-//            }
-//        });
-
         mImgSetting.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -555,12 +542,21 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                             toggleView(mCountdownLayout, View.GONE);
                             toggleView(mViewRoot, View.VISIBLE);
                             mRecordingStarted = true;
-                            mService.startPerformService();
 
-                            if (mMode == MyUtils.MODE_RECORDING)
+                            if (mMode == MyUtils.MODE_RECORDING) {
+                                mService.startPerformService();
                                 MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
-                            else
-                                MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
+                            }
+                            else {
+                                if (isConnected) {
+                                    mService.startPerformService();
+                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
+                                } else {
+                                    mRecordingStarted = false;
+                                    MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
+                                }
+                            }
+
                         }
                     }.start();
 
@@ -577,40 +573,14 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             @Override
             public void onSingleClick(View v) {
                 onClickStop();
-
             }
         });
-
-//        mImgLive.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                toggleNavigationButton(View.GONE);
-//                if(!MainActivity.active) {
-//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
-//                    startActivity(intent);
-//                }
-//            }
-//        });
 
         mImgClose.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                onClickClose();
+                onClickClose(false);
 
-
-//                if(!DEBUG)
-//                if(!MainActivity.active) {
-//                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    if (mMode == MyUtils.MODE_RECORDING) {
-//                        intent.setAction(MyUtils.ACTION_OPEN_VIDEO_MANAGER_ACTIVITY);
-//                    } else {
-//                        intent.setAction(MyUtils.ACTION_OPEN_LIVE_ACTIVITY);
-//                    }
-//                    startActivity(intent);
-//                }
             }
         });
 
@@ -706,16 +676,16 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
-    private void onClickClose() {
+    private void onClickClose(boolean keepRunningService) {
         if (mRecordingStarted) {
             mImgStop.performClick();
         }
         if (!clickStop) onClickStop();
         mService.closePerformService();
-        stopService();
-
-        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
-
+        if (!keepRunningService) {
+            stopService();
+            SettingManager2.setLiveStreamType(getApplicationContext(), 0);
+        }
         clickStop = false;
         MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
 
@@ -772,8 +742,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             if (mMode == MyUtils.MODE_STREAMING) {
                 binder = (StreamingBinder) service;
                 mService = ((StreamingBinder) binder).getService();
-
-
                 mService.openPerformService();
 //                MyUtils.toast(getApplicationContext(), "Livestream service connected", Toast.LENGTH_SHORT);
             } else {

@@ -239,7 +239,7 @@ public class ExecuteService extends Service {
                 .setOngoing(true)
                 .setCustomBigContentView(notificationLayoutExpanded)
                 .setVibrate(new long[]{0L})
-                .setContentTitle("AT Screen Recorder")
+                .setContentTitle("Screen Recorder")
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
                 .setContentIntent(pendingIntent)

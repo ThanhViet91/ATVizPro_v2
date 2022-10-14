@@ -147,7 +147,6 @@ public class RTMPLiveAddressFragment extends Fragment {
                 } else {
                     MyUtils.showSnackBarNotification(view, String.format("Livestream on %s is running!",
                             parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
-                    return;
                 }
             } else {
                 saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
@@ -296,7 +295,6 @@ public class RTMPLiveAddressFragment extends Fragment {
             SettingManager2.setRTMPTwitch(requireContext(), rtmp);
             SettingManager2.setStreamKeyTwitch(requireContext(), streamkey);
         }
-        SettingManager2.setLiveStreamType(requireContext(), type);
     }
 
     public void fillData(String mRTMP, String mStreamKey) {
@@ -377,7 +375,6 @@ public class RTMPLiveAddressFragment extends Fragment {
                 switch (notify_msg) {
                     case NOTIFY_MSG_CONNECTION_STARTED:
                         buildDialog("Connecting...");
-                        isConnected = false;
                         tvStartLiveStream.setEnabled(false);
                         edtRTMPAddress.setEnabled(false);
                         edtStreamKey.setEnabled(false);
@@ -387,15 +384,12 @@ public class RTMPLiveAddressFragment extends Fragment {
                         btnClearStreamKey.setEnabled(false);
                         break;
                     case NOTIFY_MSG_CONNECTED:
-                        isConnected = true;
                         if (mProgressDialog != null) mProgressDialog.dismiss();
                         mParentActivity.removeAllFragment();
-                        mParentActivity.updateService();
                         break;
 
                     case NOTIFY_MSG_CONNECTION_FAILED:
                         if (mProgressDialog != null) mProgressDialog.dismiss();
-                        isConnected = false;
                         edtRTMPAddress.setEnabled(true);
                         edtStreamKey.setEnabled(true);
                         btnClearRTMP.setVisibility(View.VISIBLE);

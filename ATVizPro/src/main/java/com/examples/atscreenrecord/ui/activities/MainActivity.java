@@ -6,6 +6,7 @@ import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.A
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
@@ -94,11 +95,14 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_SHOW_PROJECTS_DEFAULT = 105;
     private static final String THE_FIRST_TIME_SCREEN_RECORD = "action_first_record";
     private static final String THE_FIRST_TIME_LIVESTREAM = "action_first_livestream";
+    private static final int CHOOSE_MY_RECORD = 222;
+    private static final int CHOOSE_GALLERY = 333;
     public static boolean active = false;
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
+    public static final String KEY_VIDEO_NAME = "key_video_selected_name";
 
     public void showProductRemoveAds() {
         handlerProductList(mProductDetailsList);
@@ -415,16 +419,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else
                 liveStreaming.setText(getString(R.string.livestreaming));
+            if (type == 0) {
+                imgLiveType.setVisibility(View.GONE);
+                return;
+            }
             imgLiveType.setVisibility(View.VISIBLE);
-            if (type == SOCIAL_TYPE_YOUTUBE)
+            if (type == SOCIAL_TYPE_YOUTUBE) {
                 imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
-            if (type == SOCIAL_TYPE_FACEBOOK)
+                return;
+            }
+            if (type == SOCIAL_TYPE_FACEBOOK) {
                 imgLiveType.setBackgroundResource(R.drawable.ic_facebook);
+                return;
+            }
             if (type == SOCIAL_TYPE_TWITCH)
                 imgLiveType.setBackgroundResource(R.drawable.ic_twitch);
         } else {
-            imgLiveType.setVisibility(View.GONE);
             liveStreaming.setText(getString(R.string.livestreaming));
+            imgLiveType.setVisibility(View.GONE);
         }
     }
 
@@ -510,7 +522,7 @@ public class MainActivity extends AppCompatActivity {
                             .setMessage("Do you want to disconnect livestream?")
                             .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                                 // Continue with delete operation
-                                sendDisconnectToService();
+                                sendDisconnectToService(false);
                             })
                             .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
 
@@ -529,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
             showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY);
         });
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
-        btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT));
+        btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT, CHOOSE_MY_RECORD));
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
         btn_editor.setOnClickListener(view -> {
             if (checkServiceBusy()) return;
@@ -627,13 +639,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClickCameraRoll() {
-                showDialogPickFromGallery(requestVideoFor);
+//                showDialogPickFromGallery(requestVideoFor);
+                showInterstitialAd(requestVideoFor, CHOOSE_GALLERY);
             }
 
             @Override
             public void onClickMyRecordings() {
-//                showInterstitialAd(requestVideoFor);
-                showMyRecordings(requestVideoFor);
+                showInterstitialAd(requestVideoFor, CHOOSE_MY_RECORD);
+//                showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
     }
@@ -679,7 +692,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void showInterstitialAd(int from_code) {
+    public void showInterstitialAd(int from_code, int type) {
         if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
             mInterstitialAdAdmob.show(this);
             mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
@@ -689,13 +702,15 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onAdDismissedFullScreenContent() {
-                    showMyRecordings(from_code);
+                    if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
+                    if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
                     createInterstitialAdmob();
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                    showMyRecordings(from_code);
+                    if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
+                    if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
                 }
 
                 @Override
@@ -707,7 +722,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            showMyRecordings(from_code);
+            if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
+            if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
         }
     }
 
@@ -838,10 +854,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendDisconnectToService() {
+    public void sendDisconnectToService(boolean keepRunningService) {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-            controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+            if (keepRunningService) {
+                controller.setAction(MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE);
+            } else {
+                controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
             } else {
@@ -849,6 +869,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     public void updateIconService() {
         updateService();
@@ -884,7 +905,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(controller);
         }
-        updateService();
+//        updateService();
     }
 
     public void removeAllFragment() {
@@ -894,7 +915,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //        while (getSupportFragmentManager().getFragments().size() > 0)
 //            getSupportFragmentManager().popBackStack();
-        for(int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
+        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
             getSupportFragmentManager().popBackStack();
         }
     }
@@ -959,8 +980,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (notify_msg) {
 
 //                    case NOTIFY_MSG_CONNECTION_STARTED:
-//                    case NOTIFY_MSG_STREAM_STOPPED:
-//                        updateService();
+//                    case NOTIFY_MSG_CONNECTED:
 //                        break;
 //                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
 //                    case MESSAGE_DISCONNECT_LIVE:
@@ -968,7 +988,7 @@ public class MainActivity extends AppCompatActivity {
 //                        break;
                     case NOTIFY_MSG_CONNECTION_FAILED:
                         liveStreaming.setText(getString(R.string.livestreaming));
-                        sendDisconnectToService();
+                        sendDisconnectToService(true);
                         break;
                     default:
                 }

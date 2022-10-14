@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AT Screen Record</string>
+    <string name="app_name">Screen Recorder</string>
     <string name="email">infoboy.ftu.edu@gmail.com</string>
     <string name="full_app_name">ATVizPro</string>
     <string name="welcome_demo">Demo shows how easy it is for every application to run FFMpeg commands.</string>
@@ -167,7 +167,6 @@
 <!--    FAQ fragment-->
 
     <string name="faq">FAQ</string>
-    <string name="before_starting_your_screen_recording_make_sure_your_phone_is_not_in_slient_mode_and_the_volume_is_on_some_apps_do_not_allow_the_sound_to_be_recorded_and_it_is_a_limitation_we_cannot_bypass">Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.</string>
     <string name="sound_is_not_working">Sound is not working</string>
     <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/StreamKey?</u></string>
     <string name="edit">Edit</string>
@@ -191,6 +190,8 @@
     <string name="twitch_livestreaming">Twitch livestreaming</string>
     <string name="youtube_livestreaming">Youtube livestreaming</string>
     <string name="enter_text">Enter text</string>
+    <string name="do_you_want_cancel_the_process">Do you want to cancel the process?</string>
+    <string name="livestreaming_is_stopped">Livestreaming is stopped!</string>
 
 
 </resources>

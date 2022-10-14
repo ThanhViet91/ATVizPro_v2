@@ -21,7 +21,7 @@
         <TextView
             android:id="@+id/title"
             style="@style/Title_Box_Black"
-            android:text="AT Screen Recorder"
+            android:text="Screen Recorder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

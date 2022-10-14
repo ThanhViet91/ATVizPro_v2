@@ -31,7 +31,7 @@ public class TranslucentActivity extends AppCompatActivity{
 
         new AlertDialog.Builder(this)
                 .setTitle("Notice!")
-                .setMessage("Your previous video in processing, do you want to cancel?")
+                .setMessage(getString(R.string.do_you_want_cancel_the_process))
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     stopProcessing();
                     finish();

@@ -2,7 +2,6 @@ package com.examples.atscreenrecord.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoModel;
+import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-
+import java.io.File;
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
@@ -25,7 +25,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     private boolean selectable = false;
 
     public interface VideoProjectsListener {
-        void onSelected(String path);
+        void onSelected(VideoModel videoModel);
     }
 
     private VideoProjectsListener listener;
@@ -62,7 +62,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         return new ViewHolder(view);
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint({"NotifyDataSetChanged", "DefaultLocale"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         VideoModel video = list.get(position);
@@ -73,6 +73,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             holder.checkBox.setVisibility(View.GONE);
 
         holder.duration.setText(video.getDuration());
+        holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
         Glide.with(context)
                 .load(video.getPath())
                 .into(holder.img);
@@ -84,18 +85,18 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                 holder.checkBox.setChecked(!holder.checkBox.isChecked());
                 list.get(position).setSelected(holder.checkBox.isChecked());
             }
-            listener.onSelected(list.get(position).getPath());
+            listener.onSelected(list.get(position));
         }});
         holder.checkBox.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
             list.get(position).setSelected(holder.checkBox.isChecked());
-            listener.onSelected(list.get(position).getPath());
+            listener.onSelected(list.get(position));
         }});
         holder.itemView.setOnLongClickListener(view -> {
             if (!selectable) {
                 list.get(position).setSelected(true);
-                listener.onSelected("longClick");
+                listener.onSelected(null);
             }
             return false;
         });
@@ -111,6 +112,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         private final ImageView img;
         private final TextView name;
         private final TextView duration;
+        private TextView size;
         private final CheckBox checkBox;
 
         public ViewHolder(@NonNull View itemView) {
@@ -119,6 +121,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             img = itemView.findViewById(R.id.img_item_video_thumb);
             name = itemView.findViewById(R.id.tv_video_name);
             duration = itemView.findViewById(R.id.tv_video_duration);
+            size = itemView.findViewById(R.id.tv_video_size);
         }
     }
 }

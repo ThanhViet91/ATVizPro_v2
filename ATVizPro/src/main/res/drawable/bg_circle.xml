@@ -5,18 +5,14 @@
 <item >
     <shape android:shape="oval">
         <solid
-            android:color="#4DF3EDED"/>
-
-        <size
-            android:width="192dp"
-            android:height="192dp"/>
+            android:color="@color/white_60"/>
     </shape>
 </item>
-<item android:right="1dp" android:left="1dp" android:bottom="2dp">
-    <shape
-        android:shape="oval">
-        <solid android:color="#4DFFFFFF"/>
-        <corners android:radius="5dp"/>
-    </shape>
-</item>
+<!--<item android:right="1dp" android:left="1dp" android:bottom="2dp">-->
+<!--    <shape-->
+<!--        android:shape="oval">-->
+<!--        <solid android:color="#4DFFFFFF"/>-->
+<!--        <corners android:radius="5dp"/>-->
+<!--    </shape>-->
+<!--</item>-->
 </layer-list>

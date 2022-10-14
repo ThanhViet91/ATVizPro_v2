@@ -165,7 +165,7 @@ public class RtmpConnection implements RtmpPublisher {
       if (!tlsEnabled) {
         socket = new Socket();
         SocketAddress socketAddress = new InetSocketAddress(host, port);
-        socket.connect(socketAddress, 5000);
+        socket.connect(socketAddress, 10000);
       } else {
         socket = CreateSSLSocket.createSSlSocket(host, port);
         if (socket == null) throw new IOException("Socket creation failed");
@@ -507,7 +507,7 @@ public class RtmpConnection implements RtmpPublisher {
       }
       outputStream.flush();
     } catch (IOException ioe) {
-      connectCheckerRtmp.onConnectionFailedRtmp("Error send packet: " + ioe.getMessage());
+      connectCheckerRtmp.onConnectionFailedRtmp("Error send packet: " + ioe.getMessage()); // disconnet from server
       Log.e(TAG, "Caught IOException during write loop, shutting down: " + ioe.getMessage());
       Thread.currentThread().interrupt();
     }

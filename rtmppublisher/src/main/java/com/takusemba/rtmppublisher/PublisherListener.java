@@ -24,7 +24,7 @@ public interface PublisherListener {
     /**
      * Called when failed to connect
      */
-    void onFailedToConnect();
+    void onFailedToConnect(String reason);
 
     /**
      * test fucntion to check fame sent

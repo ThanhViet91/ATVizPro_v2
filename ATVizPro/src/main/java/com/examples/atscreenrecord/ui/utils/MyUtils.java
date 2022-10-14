@@ -67,6 +67,7 @@ public class MyUtils {
     public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
     public static final String ACTION_CONNECT_FAILED_FROM_SERVICE = "ACTION_CONNECT_FAILED_FROM_SERVICE";
     public static final String ACTION_DISCONNECT_LIVE_FROM_HOME = "ACTION_DISCONNECT_LIVE_FROM_HOME";
+    public static final String ACTION_DISCONNECT_WHEN_STOP_LIVE = "ACTION_DISCONNECT_WHEN_STOP_LIVE";
     public static final String KEY_CAMERA_AVAILABLE = "KEY_CAMERA_AVAILABLE";
     public static final String KEY_CONTROLlER_MODE = "KEY_CONTROLLER_MODE";
     public static final String ACTION_INIT_CONTROLLER = "ACTION INIT CONTROLLER";
@@ -145,6 +146,13 @@ public class MyUtils {
                 }
             }
             return result; // return the file size
+        }
+        return 0;
+    }
+    public static float fileSize(File file) {
+
+        if (file.exists()) {
+            return file.length()*1f/(1024*1024); // return the file size MB
         }
         return 0;
     }

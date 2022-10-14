@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
+import static com.examples.atscreenrecord.Core.isConnected;
+import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting2;
 import com.examples.atscreenrecord.ui.services.BaseService;
@@ -52,13 +54,15 @@ public class StreamingService extends BaseService implements PublisherListener {
     //Implement Publisher listener
     @Override
     public void onStarted() {
-        if (DEBUG) Log.i(TAG, "onStarted connect");
+        isConnected = false;
+        hasNotice = false;
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_STARTED);
     }
 
     @Override
     public void onConnected() {
         System.out.println("thanhlv onConnected callback");
+        isConnected = true;
         notifyStreamingCallback(NOTIFY_MSG_CONNECTED);
         MyUtils.toast(getApplicationContext(), "Connection success!", Toast.LENGTH_LONG);
     }
@@ -66,24 +70,32 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onStopped() {
         if (DEBUG) Log.i(TAG, "onStopped live");
+        isConnected = false;
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
     }
 
     @Override
     public void onDisconnected() {
+        isConnected = false;
         if (DEBUG) Log.i(TAG, "onDisconnected");
 //        notifyStreamingCallback(NOTIFY_MSG_CONNECTION_DISCONNECTED);
     }
 
+    boolean hasNotice = false;
+
     @Override
-    public void onFailedToConnect() {
-//        if (mPublisher != null && mPublisher.isPublishing())
-//            System.out.println("thanhlv ------------- onFailedToConnect");
-//            mPublisher.closePublishing();
+    public void onFailedToConnect(String reason) {
+        isConnected = false;
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
         if (DEBUG) Log.i(TAG, "onFailedToConnect");
 
-        MyUtils.toast(getApplicationContext(), "Connection failed, please check stream link again!", Toast.LENGTH_LONG);
+        if (!hasNotice) {
+            hasNotice = true;
+            if (reason.contains("Error send packet")) {
+                MyUtils.toast(getApplicationContext(), getString(R.string.livestreaming_is_stopped), Toast.LENGTH_LONG);
+            } else
+                MyUtils.toast(getApplicationContext(), "Connection failed, please check stream link again!", Toast.LENGTH_LONG);
+        }
     }
 
     @Override
@@ -116,6 +128,7 @@ public class StreamingService extends BaseService implements PublisherListener {
         super.onDestroy();
         System.out.println("thanhlv ------------- onDestroy");
         closeStreaming();
+//        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
     }
 
     @Override
@@ -216,6 +229,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void updateUrl(String url) {
         mUrl = url;
     }
+
     public void prepareConnection() {
         synchronized (sSync) {
             if (mPublisher == null) {
@@ -227,8 +241,7 @@ public class StreamingService extends BaseService implements PublisherListener {
                             .setSize(videoSetting.getWidth(), videoSetting.getHeight())
 //                            .setSize(mScreenWidth, mScreenHeight)
                             .setAudioBitrate(Publisher.Builder.DEFAULT_AUDIO_BITRATE)
-//                            .setVideoBitrate(videoSetting.getBitrate())
-                            .setVideoBitrate(Publisher.Builder.DEFAULT_VIDEO_BITRATE)
+                            .setVideoBitrate(videoSetting.getBitrate())
                             .setDensity(mScreenDensity)
                             .setListener(this)
                             .setMediaProjection(mMediaProjection)
@@ -267,7 +280,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     public void closeStreaming() {
-        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
+//        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
         if (mPublisher != null && mPublisher.isPublishing()) {
             System.out.println("thanhlv ------------- closeStreaming");
             mPublisher.closePublishing();

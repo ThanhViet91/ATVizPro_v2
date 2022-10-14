@@ -1,5 +1,7 @@
 package com.examples.atscreenrecord.ui.activities;
 
+import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
+import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_VIDEO_NAME;
 import static com.examples.atscreenrecord.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
@@ -233,7 +235,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void handleDeleteButton() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Video")
-                .setMessage("Are you sure you want to delete video?")
+                .setMessage("Do you want to delete video?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(getVideoListSelected()))
                 .show();
@@ -372,8 +374,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     @Override
-    public void onSelected(String path) {
-        if (path.equals("longClick")) {
+    public void onSelected(VideoModel video) {
+        if (video == null) {
             if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
                 mAdapter.setSelectable(true);
             } else {
@@ -385,30 +387,39 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             return;
         }
 
-        switch (from_code) {
-            case REQUEST_VIDEO_FOR_REACT_CAM:
-                Intent intent = new Intent(this, PrepareVideoActivity.class);
-                intent.setAction(MyUtils.ACTION_FOR_REACT);
-                intent.putExtra(VIDEO_PATH_KEY, path);
-                startActivity(intent);
-                break;
-            case REQUEST_VIDEO_FOR_VIDEO_EDIT:
-                Intent intent2 = new Intent(this, VideoEditorActivity.class);
-                intent2.setAction(MyUtils.ACTION_FOR_EDIT);
-                intent2.putExtra(VIDEO_PATH_KEY, path);
-                startActivity(intent2);
-                break;
-            case REQUEST_VIDEO_FOR_COMMENTARY:
-                Intent intent3 = new Intent(this, PrepareVideoActivity.class);
-                intent3.setAction(MyUtils.ACTION_FOR_COMMENTARY);
-                intent3.putExtra(VIDEO_PATH_KEY, path);
-                startActivity(intent3);
-                break;
-            case REQUEST_SHOW_PROJECTS_DEFAULT:
-            default:
-                Intent intent4 = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
-                intent4.setDataAndType(Uri.parse(path), "video/*");
-                startActivity(intent4);
+        if (video != null){
+
+            switch (from_code) {
+                case REQUEST_VIDEO_FOR_REACT_CAM:
+                    Intent intent = new Intent(this, PrepareVideoActivity.class);
+                    intent.setAction(MyUtils.ACTION_FOR_REACT);
+                    intent.putExtra(VIDEO_PATH_KEY, video.getPath());
+                    startActivity(intent);
+                    break;
+                case REQUEST_VIDEO_FOR_VIDEO_EDIT:
+                    Intent intent2 = new Intent(this, VideoEditorActivity.class);
+                    intent2.setAction(MyUtils.ACTION_FOR_EDIT);
+                    intent2.putExtra(VIDEO_PATH_KEY, video.getPath());
+                    startActivity(intent2);
+                    break;
+                case REQUEST_VIDEO_FOR_COMMENTARY:
+                    Intent intent3 = new Intent(this, PrepareVideoActivity.class);
+                    intent3.setAction(MyUtils.ACTION_FOR_COMMENTARY);
+                    intent3.putExtra(VIDEO_PATH_KEY, video.getPath());
+                    startActivity(intent3);
+                    break;
+                case REQUEST_SHOW_PROJECTS_DEFAULT:
+                default:
+//                Intent intent4 = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
+//                intent4.setDataAndType(Uri.parse(path), "video/*");
+//                startActivity(intent4);
+
+                    Intent intent4 = new Intent(this, PlayVideoDetailActivity.class);
+                    intent4.putExtra(KEY_PATH_VIDEO, video.getPath());
+                    intent4.putExtra(KEY_VIDEO_NAME, video.getName());
+                    System.out.println("thanhlv PlayVideoDetailActivity "+ video.getPath());
+                    startActivity(intent4);
+            }
         }
     }
 

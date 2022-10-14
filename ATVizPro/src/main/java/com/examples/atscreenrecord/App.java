@@ -99,7 +99,7 @@ public class App extends Application {
     private void createChannelNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "AT Screen Recorder", NotificationManager.IMPORTANCE_NONE);
+                    "Screen Recorder", NotificationManager.IMPORTANCE_NONE);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);

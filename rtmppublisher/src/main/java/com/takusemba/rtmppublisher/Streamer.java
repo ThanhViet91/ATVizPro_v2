@@ -17,10 +17,9 @@ import net.ossrs.rtmp.SrsFlvMuxer;
 import java.nio.ByteBuffer;
 
 
-class Streamer
-        implements AudioHandler.OnAudioEncoderStateListener, VideoHandler.OnVideoEncoderStateListener {
+class Streamer implements AudioHandler.OnAudioEncoderStateListener, VideoHandler.OnVideoEncoderStateListener {
 
-    private static final String TAG = "Streamer_chienpm_log";
+    private static final String TAG = "Streamer";
 
     private static final boolean DEBUG = false;
 
@@ -50,7 +49,7 @@ class Streamer
             @Override
             public void onConnectionFailedRtmp(@NonNull String reason) {
                 System.out.println("thanhlv onConnectionFailedRtmp " + reason);
-                if (listener != null) listener.onFailedToConnect();
+                if (listener != null) listener.onFailedToConnect(reason);
             }
 
             @Override

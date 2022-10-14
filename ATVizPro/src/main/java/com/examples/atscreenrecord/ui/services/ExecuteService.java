@@ -3,38 +3,28 @@ package com.examples.atscreenrecord.ui.services;
 import static com.examples.atscreenrecord.App.CHANNEL_ID;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.utils.TranscodingAsyncTask.ERROR_CODE;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.widget.RemoteViews;
-
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-
-import com.bumptech.glide.request.target.ThumbnailImageViewTarget;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.model.VideoProfileExecute;
-import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 import com.examples.atscreenrecord.utils.VideoUtil;
-
 import java.util.Random;
 
 
 public class ExecuteService extends Service {
-
-
-    private static final String ACTION_CANCEL = "ACTION_CANCEL";
+    
     private static int NOTIFICATION_ID = 9;
     String originalVideoPath, cameraCachePath;
     long startTime, endTime, duration = 10000;
@@ -45,7 +35,7 @@ public class ExecuteService extends Service {
     int progress = 0;
     CountDownTimer countDownTimer;
     public int generateProgress(int lastProgress) {
-        return Math.min(99, (int)(lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration))));
+        return Math.min(99, lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration)));
     }
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
@@ -59,13 +49,12 @@ public class ExecuteService extends Service {
             }
         }
 
-        duration = intent.getLongExtra("bundle_video_execute_time", 0);
+        duration = intent != null ? intent.getLongExtra("bundle_video_execute_time", 0) : 0;
         NOTIFICATION_ID = (int) duration;
-        Bundle bundle = intent.getExtras();
+        Bundle bundle = intent != null ? intent.getExtras() : null;
         VideoProfileExecute videoProfileExecute = null;
         if (bundle != null) {
             videoProfileExecute = (VideoProfileExecute) bundle.get("package_video_profile");
-
             originalVideoPath = videoProfileExecute.getOriginalVideoPath();
             cameraCachePath = videoProfileExecute.getOverlayVideoPath();
             startTime = videoProfileExecute.getStartTime();

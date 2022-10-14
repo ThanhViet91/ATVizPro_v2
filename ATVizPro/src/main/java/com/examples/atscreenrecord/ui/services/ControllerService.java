@@ -4,7 +4,6 @@ import static com.examples.atscreenrecord.Core.isConnected;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -37,9 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.core.app.NotificationCompat;
-
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.CameraSetting;
 import com.examples.atscreenrecord.controllers.settings.SettingManager;
@@ -56,30 +53,22 @@ import com.examples.atscreenrecord.ui.utils.NotificationHelper;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
-    private final boolean DEBUG = MyUtils.DEBUG;
+//    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;
     private View mViewRoot;
     private View mCameraLayout;
     private WindowManager mWindowManager;
-
     WindowManager.LayoutParams paramViewRoot;
-
     WindowManager.LayoutParams paramCam;
-
     WindowManager.LayoutParams paramCountdown;
-
     private Intent mScreenCaptureIntent = null;
-
-    private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgPause, mImgResume, mImgCapture, mImgLive, mImgSetting;
+    private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgCapture, mImgSetting;
     private Boolean mRecordingStarted = false;
-    private Boolean mRecordingPaused = false;
     private Camera mCamera;
     private LinearLayout cameraPreview;
-    private CameraPreview mPreview;
     private int mScreenWidth, mScreenHeight;
     private TextView mTvCountdown;
     private View mCountdownLayout;
@@ -94,12 +83,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         String action = intent.getAction();
         if (action != null) {
             handleIncomeAction(intent);
-
-            if (DEBUG) Log.i(TAG, "return START_REDELIVER_INTENT" + action);
-
+//            if (DEBUG) Log.i(TAG, "return START_REDELIVER_INTENT" + action);
             return START_NOT_STICKY;
         }
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -122,12 +108,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         switch (action) {
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
-                System.out.println("thanhlv ------------- ACTION_DISCONNECT_LIVE_FROM_HOME");
+//                System.out.println("thanhlv ------------- ACTION_DISCONNECT_LIVE_FROM_HOME");
                 onClickClose(false);
                 break;
             case MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE:
                 onClickStop();
-                System.out.println("thanhlv ------------- ACTION_DISCONNECT_WHEN_STOP_LIVE");
+//                System.out.println("thanhlv ------------- ACTION_DISCONNECT_WHEN_STOP_LIVE");
                 onClickClose(true);
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:
@@ -138,14 +124,14 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 boolean isCamera = intent.getBooleanExtra(MyUtils.KEY_CAMERA_AVAILABLE, false);
 
                 if (isCamera && mCamera == null) {
-                    if (DEBUG) Log.i(TAG, "onStartCommand: before initCameraView");
+//                    if (DEBUG) Log.i(TAG, "onStartCommand: before initCameraView");
                     initCameraView();
                 }
                 if (mScreenCaptureIntent == null) {
                     Log.i(TAG, "mScreenCaptureIntent is NULL");
                     stopService();
                 } else if (!mRecordingServiceBound) {
-                    if (DEBUG) Log.i(TAG, "before run bindStreamService()" + action);
+//                    if (DEBUG) Log.i(TAG, "before run bindStreamService()" + action);
                     bindStreamingService();
                 }
 
@@ -158,14 +144,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             case MyUtils.ACTION_UPDATE_TYPE_LIVE:
                 updateUI();
                 break;
-
-//            case MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE:
-//                handleNotifyFromStreamService(intent);
-//                break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
-//                    mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
-//                    ((StreamingService)mService).updateStreamProfile(mStreamProfile);
                     String url = intent.getStringExtra(MyUtils.NEW_URL);
                     ((StreamingService) mService).updateUrl(url);
                     ((StreamingService) mService).prepareConnection();
@@ -177,11 +157,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
-    private void handleNotifyFromStreamService(Intent intent2) {
-        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
-        MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
-    }
-
+    @SuppressLint("NonConstantResourceId")
     private void handleUpdateSetting(Intent intent) {
         int key = intent.getIntExtra(MyUtils.ACTION_UPDATE_SETTING, -1);
         switch (key) {
@@ -211,8 +187,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     private void updateCameraPosition() {
-        if (DEBUG)
-            Log.i(TAG, "updateCameraPosition: ");
+//        if (DEBUG)            Log.i(TAG, "updateCameraPosition: ");
         CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
         paramCam.gravity = profile.getParamGravity();
         paramCam.x = 0;
@@ -238,8 +213,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     @Override
     public void onCreate() {
         super.onCreate();
-        if (DEBUG) Log.i(TAG, "ControllerService: onCreate");
-
+//        if (DEBUG) Log.i(TAG, "ControllerService: onCreate");
         updateScreenSize();
         if (paramViewRoot == null) {
             initParam();
@@ -268,7 +242,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     private void initParam() {
-        if (DEBUG) Log.i(TAG, "initParam: ");
+//        if (DEBUG) Log.i(TAG, "initParam: ");
         int LAYOUT_FLAG;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -306,9 +280,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mScreenHeight = metrics.heightPixels;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "InflateParams"})
     private void initCameraView() {
-        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeCamera()");
+//        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeCamera()");
         CameraSetting cameraProfile = SettingManager.getCameraProfile(getApplication());
 
         mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
@@ -327,9 +301,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         paramCam.gravity = cameraProfile.getParamGravity();
         paramCam.x = 0;
         paramCam.y = 0;
-
-        mPreview = new CameraPreview(this, mCamera);
-
+        CameraPreview mPreview = new CameraPreview(this, mCamera);
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mCameraLayout, paramCam);
@@ -353,14 +325,13 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y, xx, yy;
-            private int pointerId1, pointerId2;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 if (event.getPointerCount() > 1) {
-                    pointerId1 = event.getPointerId(0);
-                    pointerId2 = event.getPointerId(1);
+                    int pointerId1 = event.getPointerId(0);
+                    int pointerId2 = event.getPointerId(1);
 
                     if (event.getX(pointerId1) < 0 || event.getX(pointerId2) < 0
                             || event.getX(pointerId1) > v.getWidth() || event.getX(pointerId2) > v.getWidth()
@@ -417,21 +388,18 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
         if (mScreenWidth > mScreenHeight) {//landscape
             mCameraWidth = mScreenWidth / factor;
-//            mCameraHeight = mScreenHeight / factor;
-            mCameraHeight = mCameraWidth * 3 / 4;
         } else {
             mCameraWidth = mScreenHeight / factor;
-//            mCameraHeight = mScreenWidth/factor;
-            mCameraHeight = mCameraWidth * 3 / 4;
         }
-        if (DEBUG) Log.i(TAG, "calculateCameraSize: " + mScreenWidth + "x" + mScreenHeight);
+        mCameraHeight = mCameraWidth * 3 / 4;
+//        if (DEBUG) Log.i(TAG, "calculateCameraSize: " + mScreenWidth + "x" + mScreenHeight);
     }
 
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
 //        super.onConfigurationChanged(newConfig);
-        if (DEBUG) Log.i(TAG, "onConfigurationChanged: DETECTED" + newConfig.orientation);
+//        if (DEBUG) Log.i(TAG, "onConfigurationChanged: DETECTED" + newConfig.orientation);
         updateScreenSize();
 
         if (paramViewRoot != null) {
@@ -448,7 +416,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
                 params.height = width;
                 params.width = height;
-
             } else {
                 params.height = height;
                 params.width = width;
@@ -458,8 +425,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
+    @SuppressLint("InflateParams")
     private void initializeViews() {
-        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeViews()");
+//        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeViews()");
 
         mViewRoot = LayoutInflater.from(this).inflate(R.layout.layout_recording, null);
 
@@ -481,14 +449,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgRec = mViewRoot.findViewById(R.id.imgRec);
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
         mImgClose = mViewRoot.findViewById(R.id.imgClose);
-//        mImgLive = mViewRoot.findViewById(R.id.imgLive);
-//        mImgPause = mViewRoot.findViewById(R.id.imgPause);
         mImgStart = mViewRoot.findViewById(R.id.imgStart);
         mImgSetting = mViewRoot.findViewById(R.id.imgSetting);
         mImgStop = mViewRoot.findViewById(R.id.imgStop);
-//        mImgResume = mViewRoot.findViewById(R.id.imgResume);
-
-//        toggleView(mImgResume, View.GONE);
         toggleView(mImgStop, View.GONE);
         toggleNavigationButton(View.GONE);
 
@@ -533,9 +496,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                     new CountDownTimer(countdown, 1000) {
 
+                        @SuppressLint("DefaultLocale")
                         public void onTick(long millisUntilFinished) {
                             toggleView(mViewRoot, View.GONE);
-                            mTvCountdown.setText("" + (millisUntilFinished / 1000 + 1));
+                            mTvCountdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
                         }
 
                         public void onFinish() {
@@ -546,8 +510,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                             if (mMode == MyUtils.MODE_RECORDING) {
                                 mService.startPerformService();
                                 MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
-                            }
-                            else {
+                            } else {
                                 if (isConnected) {
                                     mService.startPerformService();
                                     MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
@@ -604,7 +567,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         initialTouchY = event.getRawY();
                         return true;
                     case MotionEvent.ACTION_UP:
-                        if (event.getRawX() < mScreenWidth / 2) {
+                        if (event.getRawX() < mScreenWidth / 2f) {
                             paramViewRoot.x = 0;
                         } else {
                             paramViewRoot.x = mScreenWidth;
@@ -695,10 +658,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 stopForeground(true);
-                stopSelf();
-            } else {
-                stopSelf();
             }
+            stopSelf();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -710,11 +671,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     private void bindStreamingService() {
-        if (DEBUG)
-            Log.i(TAG, "Controller: bindService()");
-
+//        if (DEBUG) Log.i(TAG, "Controller: bindService()");
         Intent service;
-
         if (mMode == MyUtils.MODE_STREAMING) {
             if (mStreamProfile == null)
                 throw new RuntimeException("Streaming proflie is null");
@@ -766,33 +724,20 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
     void toggleNavigationButton(int viewMode) {
         //Todo: make animation here
-
         mImgStart.setVisibility(viewMode);
         mImgSetting.setVisibility(viewMode);
-//        mImgPause.setVisibility(viewMode);
         mImgCapture.setVisibility(viewMode);
-//        mImgLive.setVisibility(viewMode);
         mImgClose.setVisibility(viewMode);
         mImgStop.setVisibility(viewMode);
-//        mImgResume.setVisibility(viewMode);
 
-        if (viewMode == View.GONE) {
-            mViewRoot.setPadding(32, 32, 32, 32);
-        } else {
+        if (viewMode != View.GONE) {
             if (mRecordingStarted) {
                 mImgStart.setVisibility(View.GONE);
             } else {
                 mImgStop.setVisibility(View.GONE);
             }
-
-//            if(mRecordingPaused){
-//                mImgPause.setVisibility(View.GONE);
-//            }
-//            else{
-//                mImgResume.setVisibility(View.GONE);
-//            }
-            mViewRoot.setPadding(32, 32, 32, 32);
         }
+        mViewRoot.setPadding(32, 32, 32, 32);
     }
 
     private void releaseCamera() {

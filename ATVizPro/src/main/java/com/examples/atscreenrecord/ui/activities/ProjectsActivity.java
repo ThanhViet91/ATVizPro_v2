@@ -2,11 +2,11 @@ package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_VIDEO_NAME;
-import static com.examples.atscreenrecord.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
+import static com.examples.atscreenrecord.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
 import android.annotation.SuppressLint;
@@ -28,11 +28,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -211,17 +208,14 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         DialogHelper.getInstance(new DialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (VideoModel videoModel : videoList)
-                            if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
-                                videoModel.setPath(oldPath.replace(oldName, result));
-                                videoModel.setName(result);
-                                mAdapter.updateData(videoList);
-                                break;
-                            }
-                    }
+                new Handler().postDelayed(() -> {
+                    for (VideoModel videoModel : videoList)
+                        if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
+                            videoModel.setPath(oldPath.replace(oldName, result));
+                            videoModel.setName(result);
+                            mAdapter.updateData(videoList);
+                            break;
+                        }
                 }, 200);
 
             }
@@ -423,12 +417,12 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
     }
 
-    private final ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
-        // handle intent result here
-        if (result.getResultCode() == RESULT_OK) {
-            Toast.makeText(this, "The video is deleted! " + result.getData(), Toast.LENGTH_SHORT).show();
-        }
-    });
+//    private final ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+//        // handle intent result here
+//        if (result.getResultCode() == RESULT_OK) {
+//            Toast.makeText(this, "The video is deleted! " + result.getData(), Toast.LENGTH_SHORT).show();
+//        }
+//    });
 
     public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
         PendingIntent pendingIntent = null;

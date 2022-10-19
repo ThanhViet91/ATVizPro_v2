@@ -1,6 +1,9 @@
 package com.examples.atscreenrecord.ui.activities;
 
 import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
+import static com.examples.atscreenrecord.ui.fragments.PopupConfirm.KEY_NEGATIVE;
+import static com.examples.atscreenrecord.ui.fragments.PopupConfirm.KEY_POSITIVE;
+import static com.examples.atscreenrecord.ui.fragments.PopupConfirm.KEY_TITLE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 
 import android.animation.ObjectAnimator;
@@ -22,25 +25,21 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.bumptech.glide.Glide;
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.VideoProfileExecute;
+import com.examples.atscreenrecord.ui.fragments.IConfirmPopupListener;
+import com.examples.atscreenrecord.ui.fragments.PopupConfirm;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.StorageUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,9 +56,10 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     int timeCounter = 0;
     private TextView number_countdown;
     private LinearLayout layoutCountdown;
-    private ImageView toggleReactCam;
+    private ImageView toggleReactCam, thumbVideo;
     private boolean hasAudioFile = false;
     private int endTime = 0;
+    private AdsUtil mAdManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,11 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
         TextView tvTitle = findViewById(R.id.tv_title);
         tvTitle.setText(getString(R.string.commentary));
+
+        ImageView btnInfo = findViewById(R.id.img_btn_info);
+        btnInfo.setVisibility(View.GONE);
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
+        thumbVideo = findViewById(R.id.thumbnail_video);
         btnRetake = findViewById(R.id.img_btn_discard);
         btnNext = findViewById(R.id.tv_next_react_cam);
         btnRetake.setVisibility(View.GONE);
@@ -98,14 +102,11 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onResume() {
         super.onResume();
-        if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-            createInterstitialAdmob();
-        } else mInterstitialAdAdmob = null;
-
         addVideoView();
-        AdView mAdview = findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(this, mAdview);
-        mAdview.setAdListener(new AdListener() {
+        RelativeLayout mAdview = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(this, mAdview);
+        mAdManager.loadBanner();
+        mAdManager.getAdView().setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
@@ -114,6 +115,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
                 }
             }
         });
+
+        mAdManager.createInterstitialAdmob();
     }
 
     @Override
@@ -151,12 +154,18 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     int videoDuration = 0;
 
     private void addVideoView() {
+
         videoView = findViewById(R.id.video_main1);
         videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
-        if (!videoFile.equals(""))
+        if (!videoFile.equals("")) {
             videoView.setVideoPath(videoFile);
+            Glide.with(this)
+                    .load(videoFile)
+                    .into(thumbVideo);
+        }
 //        videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
+        videoView.setZOrderOnTop(false);
         videoView.setOnPreparedListener(mp -> {
             videoDuration = mp.getDuration();
             animationProgressBar.setDuration(videoDuration);
@@ -196,6 +205,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             }
         }
         videoView.setLayoutParams(lpVideo);
+        videoView.seekTo(100);
     }
 
     ImageView btn_back;
@@ -246,11 +256,13 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
 
         if (v == findViewById(R.id.img_btn_discard)) {
-            showDialogConfirm("Retake this video?", "Start over");
+//            showDialogConfirm("Retake this video?", "Start over");
+            showPopupConfirm("Retake this video?", "Start over", "Cancel", false);
         }
 
         if (v == findViewById(R.id.tv_next_react_cam)) {
-            showDialogConfirmExecute();
+//            showDialogConfirmExecute();
+            showPopupConfirm(getString(R.string.confirm_execute_react_cam), null, null, true);
         }
 
         if (v == findViewById(R.id.img_btn_react_cam)) {
@@ -273,17 +285,39 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
                 return;
             }
             if (hasAudioFile) {   //da co file audio
-                showDialogConfirm("Discard the last clip?", "Discard");
+//                showDialogConfirm("Discard the last clip?", "Discard");
+                showPopupConfirm("Discard the last clip?", "Discard", "Cancel", false);
             } else {
                 finish();
             }
         }
     }
 
+    private void showPopupConfirm(String title, String pos, String neg, boolean requiredFinish) {
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_TITLE, title);
+        bundle.putString(KEY_POSITIVE, pos);
+        bundle.putString(KEY_NEGATIVE, neg);
+        PopupConfirm.newInstance(new IConfirmPopupListener(){
+            @Override
+            public void onClickPositiveButton() {
+                if (requiredFinish) {
+                    showInterstitialAd();
+                    finish();
+                } else {
+                    doPositiveButton(pos);
+                }
+            }
+            @Override
+            public void onClickNegativeButton() {
+            }
+        }, bundle).show(getSupportFragmentManager(), "");
+    }
+
     public void retakeVideo() {
         progressBar.setProgress(0);
-        videoView.seekTo(0);
         tvDurationCounter.setText("");
+        thumbVideo.setVisibility(View.VISIBLE);
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg);
         if (!cacheAudioFilePath.equals("")) {
             boolean deleteAudioCache = new File(cacheAudioFilePath).delete();
@@ -303,27 +337,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         finish();
     }
 
-    private InterstitialAd mInterstitialAdAdmob = null;
+//    private InterstitialAd mInterstitialAdAdmob = null;
 
-    public void createInterstitialAdmob() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAdAdmob = interstitialAd;
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        mInterstitialAdAdmob = null;
-                        createInterstitialAdmob();
-                    }
-                });
-    }
 
     private void startExecuteService() {
         VideoProfileExecute videoProfile = new VideoProfileExecute(MyUtils.TYPE_COMMENTARY_VIDEO, videoFile, cacheAudioFilePath,
@@ -336,32 +351,33 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         startService(intent);
     }
 
+    public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+        @Override
+        public void onAdClicked() {
+        }
+
+        @Override
+        public void onAdDismissedFullScreenContent() {
+            startExecuteService();
+        }
+
+        @Override
+        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+            startExecuteService();
+        }
+
+        @Override
+        public void onAdImpression() {
+        }
+
+        @Override
+        public void onAdShowedFullScreenContent() {
+        }
+    };
+
     public void showInterstitialAd() {
-        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
-            mInterstitialAdAdmob.show(this);
-            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdClicked() {
-                }
-
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    startExecuteService();
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                    startExecuteService();
-                }
-
-                @Override
-                public void onAdImpression() {
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-                }
-            });
+        if (mAdManager.interstitialAdAlready()) {
+            mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
             startExecuteService();
         }
@@ -386,16 +402,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         return String.format("%d:%02d:%02d", hh, mm, ss);
     }
 
-    public void showDialogConfirm(String title, String action) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title)
-                .setCancelable(true)
-                .setPositiveButton(action, (dialog, id) -> doPositiveButton(action))
-                .setNegativeButton("Cancel", (dialogInterface, i) -> {
-                })
-                .create().show();
-    }
-
     private void doPositiveButton(String action) {
         if (action.equals("Start over")) {
             retakeVideo();
@@ -404,18 +410,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         if (action.equals("Discard")) {
             discardVideo();
         }
-    }
-
-    public void showDialogConfirmExecute() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirmation").setMessage(getString(R.string.confirm_execute_react_cam));
-        builder.setCancelable(true);
-        builder.setPositiveButton("OK", (dialog, id) -> {
-            showInterstitialAd();
-            finish();
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 
     private void getEndCommentary() {
@@ -437,6 +431,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void getStartCommentary() {
+        thumbVideo.setVisibility(View.GONE);
         mediaRecorder.start();
         videoView.start();
         timeCounter = 0;

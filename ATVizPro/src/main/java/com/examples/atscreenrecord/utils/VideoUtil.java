@@ -64,6 +64,22 @@ public class VideoUtil {
         return filePath;
     }
 
+    public static String generateFileOutput(String prefix) {
+        if (prefix.equals("")) return generateFileOutput();
+        String filePath = "";
+        try {
+            File outputFile = new File(MyUtils.getBaseStorageDirectory(), prefix + "_" + MyUtils.getTimeStamp() + ".mp4");
+            if (!outputFile.getParentFile().exists()) {
+                outputFile.getParentFile().mkdirs();
+            }
+            filePath = outputFile.getAbsolutePath();
+        } catch (final NullPointerException e) {
+            throw new RuntimeException("This app has no permission of writing external storage");
+        }
+        return filePath;
+    }
+
+
     public String getOutputVideoPath(){
         return outputVideoPath;
     }

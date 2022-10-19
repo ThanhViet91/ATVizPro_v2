@@ -31,7 +31,19 @@
             android:layout_height="40dp"
             android:layout_marginStart="16dp"
             android:paddingStart="10dp"
-            android:src="@drawable/ic_back_header_24" />
+            android:src="@drawable/ic_back_header_24"
+            tools:ignore="ContentDescription,RtlSymmetry" />
+
+        <ImageView
+            android:id="@+id/img_btn_info"
+            android:layout_alignParentEnd="true"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:padding="3dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_info"
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/tv_next_react_cam"
@@ -68,55 +80,62 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" />
 
-
         </FrameLayout>
 
-
-        <LinearLayout
-            android:id="@+id/ln_countdown"
-            android:layout_width="280dp"
-            android:layout_height="156dp"
-            android:layout_centerInParent="true"
-            android:background="@drawable/shape_round_countdown"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tv_number_countdown"
-                style="@style/Title_Box_White"
-                android:layout_width="wrap_content"
-                android:layout_height="110dp"
-                android:layout_gravity="center_horizontal"
-                android:text="1"
-                android:textFontWeight="700"
-                android:textSize="96sp"
-                tools:targetApi="p" />
-
-            <TextView
-                style="@style/Title_Box_White"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Preparing for recording"
-                android:textFontWeight="700"
-                android:textSize="20sp"
-                tools:targetApi="p" />
-
-
-        </LinearLayout>
-
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/animation_view"
+        <ImageView
+            android:id="@+id/thumbnail_video"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_centerInParent="true"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/reload" />
+            android:layout_height="match_parent"
+            tools:ignore="ContentDescription" />
+
+
 
     </RelativeLayout>
 
+
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_centerInParent="true"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/reload" />
+
+    <LinearLayout
+        android:id="@+id/ln_countdown"
+        android:layout_width="280dp"
+        android:layout_height="156dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/shape_round_countdown"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_number_countdown"
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="110dp"
+            android:layout_gravity="center_horizontal"
+            android:text="1"
+            android:textFontWeight="700"
+            android:textSize="90sp"
+            tools:targetApi="p"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            style="@style/Title_Box_White"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/preparing_for_recording"
+            android:textFontWeight="700"
+            android:textSize="20sp"
+            tools:targetApi="p" />
+
+
+    </LinearLayout>
 
 
 
@@ -128,27 +147,13 @@
         android:layout_marginBottom="@dimen/normal_margin">
 
         <TextView
-            android:id="@+id/des"
-            android:visibility="gone"
-            style="@style/Text_Description_White_15_400"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/normal_margin"
-            android:layout_marginBottom="@dimen/small_margin"
-            android:text="@string/camera_site_can_zoom_and_move_before_start" />
-
-        <TextView
             android:id="@+id/tv_count_duration"
             style="@style/Text_Description_White_15_400"
+            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/des"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/small_margin" />
-
-
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -168,7 +173,8 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_below="@id/tv_count_duration"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:visibility="gone"
@@ -180,20 +186,19 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/lager_margin"
             android:padding="@dimen/small_padding"
-            android:src="@drawable/ic_retake" />
+            android:src="@drawable/ic_retake"
+            tools:ignore="ContentDescription" />
 
     </RelativeLayout>
 
 
-    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+    <RelativeLayout
         android:id="@+id/adView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/bottom_line"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111"/>
+        android:visibility="gone"/>
 
     <View
         android:id="@+id/bottom_line"

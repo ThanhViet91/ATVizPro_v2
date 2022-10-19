@@ -32,10 +32,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoOptionAdapter;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -88,7 +87,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private ArrayList<String> videoOptions = new ArrayList<>();
     private VideoOptionAdapter mAdapter;
 
-    private AdView mAdview;
+    private RelativeLayout mAdview;
     private MediaPlayer mediaPlayer;
 
     public interface VideoEditorListener {
@@ -153,9 +152,11 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         btn_save.setVisibility(VISIBLE);
     }
 
+    private AdsUtil mAdManager;
     public void showOrHideAdBanner(){
-        AdUtil.createBannerAdmob(mContext, mAdview);
-        mAdview.setAdListener(new AdListener() {
+        mAdManager = new AdsUtil(mContext, mAdview);
+        mAdManager.loadBanner();
+        mAdManager.getAdView().setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
@@ -278,12 +279,10 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private void videoPrepared(MediaPlayer mp) {
         updateVideoView(mp);
         mDuration = mVideoView.getDuration();
-        if (!getRestoreState()) {
-            seekTo((int) mRedProgressBarPos);
-        } else {
+        if (getRestoreState()) {
             setRestoreState(false);
-            seekTo((int) mRedProgressBarPos);
         }
+        seekTo((int) mRedProgressBarPos);
         initRangeSeekBarView();
         startShootVideoThumbs(mContext, mSourceUri, mThumbsTotalCount, 0, mDuration);
     }

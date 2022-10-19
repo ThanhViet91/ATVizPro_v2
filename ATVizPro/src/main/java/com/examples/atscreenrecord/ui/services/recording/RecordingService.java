@@ -28,6 +28,7 @@ import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.controllers.settings.VideoSetting2;
 import com.examples.atscreenrecord.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord.ui.services.BaseService;
+import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
 
 import java.io.IOException;
@@ -193,12 +194,16 @@ public class RecordingService extends BaseService {
     }
 
     public void showResultActivity(String finalVideoCachePath) {
-        Intent intent = new Intent(this, ResultVideoFinishActivity.class);
+        Intent intent = new Intent(getApplicationContext(), ResultVideoFinishActivity.class);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent.setAction(MyUtils.ACTION_END_RECORD);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         System.out.println("thanhlv showResultActivity " + finalVideoCachePath);
         startActivity(intent);
+
+        Intent intent2 = new Intent(getApplicationContext(), ControllerService.class);
+        intent2.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
+        intent2.setAction(MyUtils.ACTION_END_RECORD);
     }
 
     public void insertVideoToGallery() {

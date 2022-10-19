@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,12 +20,11 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
-import com.examples.atscreenrecord.ui.activities.MainActivity;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,17 +41,12 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
     TextView btnContinue;
     ImageView imgBack;
     int i = 0;
-
-
-    private MainActivity mParentActivity = null;
-    private App mApplication;
+    boolean isFirstTime = true;
     private FragmentManager mFragmentManager;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.mParentActivity = (MainActivity) context;
-        this.mApplication = (App) context.getApplicationContext();
         mFragmentManager = getParentFragmentManager();
 
     }
@@ -59,7 +54,9 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View mViewRoot = inflater.inflate(R.layout.fragment_twitch_live_streaming, container, false);
+        View mViewRoot = inflater.inflate(R.layout.fragment_facebook_live_streaming, container, false);
+        isFirstTime  = SettingManager2.getFirstTimeLiveStreamTwitch(requireContext());
+        SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
         return mViewRoot;
     }
 
@@ -68,10 +65,14 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewPager2 = view.findViewById(R.id.view_pager_img_twitch);
-        circleIndicator3 = view.findViewById(R.id.circle_indicator_twitch);
-        btnContinue = view.findViewById(R.id.btn_continue_twitch_livestreaming);
-        imgBack = view.findViewById(R.id.img_back_tw_slider);
+        viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
+        circleIndicator3 = view.findViewById(R.id.circle_indicator);
+        btnContinue = view.findViewById(R.id.btn_continue_);
+        imgBack = view.findViewById(R.id.tv_btn_skip);
+        TextView tvTitle = view.findViewById(R.id.title_name);
+        tvTitle.setText(getString(R.string.twitch_livestreaming));
+        TextView tvDes = view.findViewById(R.id.tv_decs);
+        tvDes.setText(getString(R.string.description_tw_live));
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
         viewPager2.setAdapter(photoAdapter);
@@ -84,12 +85,9 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
 
         CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
         compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-        compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View page, float position) {
-                float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r * 0.15f);
-            }
+        compositePageTransformer.addTransformer((page, position) -> {
+            float r = 1 - Math.abs(position);
+            page.setScaleY(0.85f + r * 0.15f);
         });
 
         viewPager2.setPageTransformer(compositePageTransformer);
@@ -99,37 +97,34 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                 super.onPageSelected(position);
                 i = position;
                 if (i == getListPhoto().size() - 1){
-                    if (!SettingManager2.getFirstTimeLiveStreamYoutube(requireContext()))
+                    if (!isFirstTime)
                         btnContinue.setText(getString(R.string.done_));
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
                 }
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                i = i + 1;
-                viewPager2.setCurrentItem(i);
-                if (i == getListPhoto().size() - 1)
-                    if (!SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
-                        btnContinue.setText(getString(R.string.done_));
-                    }
-
-                if (i == getListPhoto().size()) {
-                    if (SettingManager2.getFirstTimeLiveStreamTwitch(requireContext())) {
-                        RTMPLiveAddressFragment fragment = new RTMPLiveAddressFragment();
-                        fragment.setSocialType(SOCIAL_TYPE_TWITCH);
-                        mFragmentManager.beginTransaction()
-                                .replace(R.id.frame_layout_fragment, fragment)
-                                .addToBackStack("")
-                                .commit();
-                    } else {
-                        mFragmentManager.popBackStack();
-                    }
-                    SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
-                    i = 0;
+        btnContinue.setOnClickListener(v -> {
+            i = i + 1;
+            viewPager2.setCurrentItem(i);
+            if (i == getListPhoto().size() - 1)
+                if (!isFirstTime) {
+                    btnContinue.setText(getString(R.string.done_));
                 }
+
+            if (i == getListPhoto().size()) {
+                if (isFirstTime) {
+                    RTMPLiveAddressFragment fragment = new RTMPLiveAddressFragment();
+                    fragment.setSocialType(SOCIAL_TYPE_TWITCH);
+                    mFragmentManager.beginTransaction()
+                            .replace(R.id.frame_layout_fragment, fragment)
+                            .addToBackStack("")
+                            .commit();
+                } else {
+                    mFragmentManager.popBackStack();
+                }
+//                    SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
+                i = 0;
             }
         });
         imgBack.setOnClickListener(new OnSingleClickListener() {
@@ -138,6 +133,8 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                 mFragmentManager.popBackStack();
             }
         });
+        RelativeLayout mAdview = view.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdview).loadBanner();
 
     }
 

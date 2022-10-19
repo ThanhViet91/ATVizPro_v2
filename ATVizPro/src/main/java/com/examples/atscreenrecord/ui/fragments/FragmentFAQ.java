@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,9 +17,10 @@ import com.examples.atscreenrecord.AppConfigs;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.FAQAdapter;
 import com.examples.atscreenrecord.model.FAQItem;
-import com.examples.atscreenrecord.utils.AdUtil;
-import com.google.android.gms.ads.AdView;
+import com.examples.atscreenrecord.utils.AdsUtil;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class FragmentFAQ extends Fragment {
@@ -61,8 +63,8 @@ public class FragmentFAQ extends Fragment {
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(view1 -> requireActivity().onBackPressed());
 
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
+        RelativeLayout mAdView = view.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdView).loadBanner();
     }
 
     @Override

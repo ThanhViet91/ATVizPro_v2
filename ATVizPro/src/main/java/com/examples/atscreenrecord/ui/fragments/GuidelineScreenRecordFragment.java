@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,9 +24,8 @@ import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,9 +43,16 @@ public class GuidelineScreenRecordFragment extends Fragment {
     ImageView btnBack;
     int i = 0;
 
+    boolean isFirstTime = true;
+
     private Activity mParentActivity = null;
     private FragmentManager mFragmentManager;
     private TextView tvDecs;
+
+    boolean fromSettings;
+    public GuidelineScreenRecordFragment(boolean fromSettings) {
+        this.fromSettings = fromSettings;
+    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -60,6 +67,8 @@ public class GuidelineScreenRecordFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mViewRoot = inflater.inflate(R.layout.fragment_guideline, container, false);
+        isFirstTime  = SettingManager2.getFirstTimeRecord(requireContext());
+        SettingManager2.setFirstTimeRecord(requireContext(), false);
         return mViewRoot;
     }
 
@@ -79,7 +88,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
 
         btnBack =  view.findViewById(R.id.img_btn_back_header);
 
-        if (SettingManager2.getFirstTimeRecord(requireContext())) {
+        if (isFirstTime && !fromSettings) {
             btnBack.setVisibility(View.GONE);
             tvSkip.setVisibility(View.VISIBLE);
         } else {
@@ -98,12 +107,9 @@ public class GuidelineScreenRecordFragment extends Fragment {
 
         CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
         compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-        compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View page, float position) {
-                float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r*0.15f);
-            }
+        compositePageTransformer.addTransformer((page, position) -> {
+            float r = 1 - Math.abs(position);
+            page.setScaleY(0.85f + r*0.15f);
         });
 
         viewPager2.setPageTransformer(compositePageTransformer);
@@ -113,12 +119,12 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                    if (isFirstTime) {
                         tvSkip.setText(getString(R.string.done_));
                     }
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                    if (isFirstTime) {
                         tvSkip.setText(getString(R.string.skip));
                     }
                 }
@@ -126,23 +132,20 @@ public class GuidelineScreenRecordFragment extends Fragment {
                 i = position;
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                i = i +1;
-                if (i == getListPhoto().size() - 1){
-                    btnContinue.setText(getString(R.string.done_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
-                        tvSkip.setText(getString(R.string.done_));
-                    }
+        btnContinue.setOnClickListener(v -> {
+            i = i +1;
+            if (i == getListPhoto().size() - 1){
+                btnContinue.setText(getString(R.string.done_));
+                if (isFirstTime) {
+                    tvSkip.setText(getString(R.string.done_));
                 }
-                if (i >= getListPhoto().size()) {
-                    mFragmentManager.popBackStack();
-                    return;
-                }
-                viewPager2.setCurrentItem(i);
-                setDecs(i);
             }
+            if (i >= getListPhoto().size()) {
+                mFragmentManager.popBackStack();
+                return;
+            }
+            viewPager2.setCurrentItem(i);
+            setDecs(i);
         });
         tvSkip.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -150,8 +153,6 @@ public class GuidelineScreenRecordFragment extends Fragment {
                     mParentActivity.onBackPressed();
             }
         });
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
         btnBack.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -163,14 +164,13 @@ public class GuidelineScreenRecordFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SettingManager2.setFirstTimeRecord(mParentActivity, false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        AdView mAdview = mViewRoot.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(requireContext(), mAdview);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdview).loadBanner();
     }
 
     private void setDecs(int i) {
@@ -184,11 +184,11 @@ public class GuidelineScreenRecordFragment extends Fragment {
     public List<PhotoModel> getListPhoto(){
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_record_1));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_record_2));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_record_3));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_record_4));
-        mListPhoto.add(new PhotoModel(R.drawable.guideline_record_5));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_1));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_2));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_3));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_4));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_5));
         return mListPhoto;
     }
 }

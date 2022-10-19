@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.appcompat.app.AlertDialog;
@@ -42,10 +43,9 @@ import com.examples.atscreenrecord.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord.model.VideoModel;
 import com.examples.atscreenrecord.ui.utils.DialogHelper;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.DisplayUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -108,8 +108,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         } else {
             toggleView(tv_noData, View.GONE);
         }
-        AdView mAdView = findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(this, mAdView);
+        RelativeLayout mAdView = findViewById(R.id.adView);
+        AdsUtil mAdManager = new AdsUtil(this, mAdView);
+        mAdManager.loadBanner();
         if (mAdapter != null && mAdapter.getSelectable()) {
             checkNumberSelected();
         }

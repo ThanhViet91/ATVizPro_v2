@@ -6,16 +6,13 @@
       android:versionCode="102"
       android:versionName="1.0.2">
 
-<!--    <uses-permission android:name="android.permission.WAKE_LOCK" />-->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -23,10 +20,8 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
-
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     
     <application
@@ -55,67 +50,61 @@
             android:name=".ui.activities.ReactCamActivity"
             android:hardwareAccelerated="true"
             android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
-
-            android:label="ReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.ResultVideoFinishActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden"
+        <activity android:name=".ui.activities.ResultVideoFinishActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-
-            android:label="ReactCam"
+            android:launchMode="singleTask"
             tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name=".ui.activities.PlayVideoDetailActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
+        <activity android:name=".ui.activities.PlayVideoDetailActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
-            android:label="ReactCam"
-            tools:ignore="LockedOrientationActivity">
-        </activity>
-
-        <activity android:name=".ui.activities.PrepareVideoActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:screenOrientation="portrait"
-            android:label="TrimBeforeReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-
-        <activity android:name=".ui.activities.CommentaryActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden"
+        <activity android:name=".ui.activities.PrepareVideoActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:label="TrimBeforeReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.VideoEditorActivity" android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateAlwaysHidden"
+        <activity android:name=".ui.activities.CommentaryActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:label="TrimBeforeReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.ProjectsActivity" android:configChanges="keyboardHidden|orientation|screenSize"
+        <activity android:name=".ui.activities.VideoEditorActivity"
+            android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
-            android:label="TrimBeforeReactCam"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
+        <activity android:name=".ui.activities.ProjectsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
+        </activity>
 
         <activity
             android:name=".ui.activities.SplashActivity"
+            android:screenOrientation="portrait"
             android:noHistory="true"
-            android:exported="true">
+            android:exported="true"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
@@ -123,22 +112,26 @@
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
+
         <activity android:name=".ui.activities.TranslucentActivity"
             android:theme="@style/Theme.Transparent"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
+
         <service
             android:name=".ui.services.BaseService"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false"/>
+
         <service
             android:name=".ui.services.recording.RecordingService"
             android:stopWithTask="true"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false" />
+
         <service android:name=".ui.services.streaming.StreamingService" />
 
         <service
@@ -147,7 +140,7 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="@string/admob_sdk_id"/>
 
         <service android:name=".ui.services.ExecuteService" />
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,16 +22,13 @@ import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.PhotoAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.PhotoModel;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 import me.relex.circleindicator.CircleIndicator3;
 
@@ -42,10 +40,14 @@ public class GuidelineLiveStreamFragment extends Fragment {
     TextView tvSkip;
     ImageView btnBack;
     int i = 0;
+    boolean isFirstTime = true;
 
     private FragmentManager mFragmentManager;
     private TextView tvDecs;
-
+    boolean fromSettings = false;
+    public GuidelineLiveStreamFragment(boolean fromSettings) {
+        this.fromSettings = fromSettings;
+    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -58,6 +60,8 @@ public class GuidelineLiveStreamFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         mViewRoot = inflater.inflate(R.layout.fragment_guideline, container, false);
+        isFirstTime  = SettingManager2.getFirstTimeLiveStream(requireContext());
+        SettingManager2.setFirstTimeLiveStream(requireContext(), false);
         return mViewRoot;
     }
 
@@ -75,7 +79,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
         btnContinue =  view.findViewById(R.id.btn_continue_);
         tvSkip =  view.findViewById(R.id.tv_btn_skip);
 
-        if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+        if (isFirstTime && !fromSettings) {
             btnBack.setVisibility(View.GONE);
             tvSkip.setVisibility(View.VISIBLE);
         } else {
@@ -110,12 +114,12 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 super.onPageSelected(position);
                 if (position == getListPhoto().size()-1) {
                     btnContinue.setText(getString(R.string.done_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                    if (isFirstTime) {
                         tvSkip.setText(getString(R.string.done_));
                     }
                 } else {
                     btnContinue.setText(getString(R.string.continue_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                    if (isFirstTime) {
                         tvSkip.setText(getString(R.string.skip));
                     }
                 }
@@ -129,7 +133,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = i +1;
                 if (i == getListPhoto().size() - 1){
                     btnContinue.setText(getString(R.string.done_));
-                    if (SettingManager2.getFirstTimeLiveStream(requireContext())) {
+                    if (isFirstTime) {
                         tvSkip.setText(getString(R.string.done_));
                     }
                 }
@@ -153,21 +157,19 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 mFragmentManager.popBackStack();
             }
         });
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        SettingManager2.setFirstTimeLiveStream(requireContext(), false);
+//        SettingManager2.setFirstTimeLiveStream(requireContext(), false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        AdView mAdview = mViewRoot.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(requireContext(), mAdview);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdview).loadBanner();
     }
 
     private void setDecs(int i) {
@@ -180,8 +182,8 @@ public class GuidelineLiveStreamFragment extends Fragment {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
         mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_1));
-        mListPhoto.add(new PhotoModel(R.drawable.bg_step2_howto_live_facebook));
-        mListPhoto.add(new PhotoModel(R.drawable.bg_step3_howto_live));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_2));
+        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_3));
         return mListPhoto;
     }
 }

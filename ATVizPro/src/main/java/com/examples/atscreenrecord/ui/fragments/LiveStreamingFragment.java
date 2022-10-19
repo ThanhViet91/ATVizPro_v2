@@ -2,13 +2,12 @@ package com.examples.atscreenrecord.ui.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,15 +18,10 @@ import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
-import com.examples.atscreenrecord.ui.services.ControllerService;
-import com.examples.atscreenrecord.ui.utils.MyUtils;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class LiveStreamingFragment extends Fragment {
 
@@ -83,8 +77,8 @@ public class LiveStreamingFragment extends Fragment {
             }
         });
 
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
+        RelativeLayout mAdView = view.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdView).loadBanner();
     }
 
 

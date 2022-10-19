@@ -1,9 +1,11 @@
 package com.examples.atscreenrecord.ui.services;
 
 import static com.examples.atscreenrecord.Core.isConnected;
+import static com.examples.atscreenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -36,12 +38,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.core.app.NotificationCompat;
+
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.CameraSetting;
 import com.examples.atscreenrecord.controllers.settings.SettingManager;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
+import com.examples.atscreenrecord.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord.ui.services.recording.RecordingService;
 import com.examples.atscreenrecord.ui.services.recording.RecordingService.RecordingBinder;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
@@ -55,7 +60,7 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
-//    private final boolean DEBUG = MyUtils.DEBUG;
+    //    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;
     private View mViewRoot;
@@ -75,6 +80,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     private int mCameraWidth = 160, mCameraHeight = 120;
     private StreamProfile mStreamProfile;
     private int mMode;
+    private String videoFileEndRecord = "";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -138,11 +144,14 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 updateUI();
                 break;
 
-            case MyUtils.ACTION_UPDATE_SETTING:
-                handleUpdateSetting(intent);
-                break;
+//            case MyUtils.ACTION_UPDATE_SETTING:
+//                handleUpdateSetting(intent);
+//                break;
             case MyUtils.ACTION_UPDATE_TYPE_LIVE:
                 updateUI();
+                break;
+            case MyUtils.ACTION_END_RECORD:
+                videoFileEndRecord = intent.getStringExtra(KEY_PATH_VIDEO);
                 break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
@@ -174,31 +183,31 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     private void updateCameraMode() {
-        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
-        if (profile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
-            toggleView(mCameraLayout, View.GONE);
-        else {
-            if (mCameraLayout != null) {
-                mWindowManager.removeViewImmediate(mCameraLayout);
-                releaseCamera();
-                initCameraView();
-            }
-        }
+//        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
+//        if (profile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
+//            toggleView(mCameraLayout, View.GONE);
+//        else {
+//            if (mCameraLayout != null) {
+//                mWindowManager.removeViewImmediate(mCameraLayout);
+//                releaseCamera();
+//                initCameraView();
+//            }
+//        }
     }
 
     private void updateCameraPosition() {
 //        if (DEBUG)            Log.i(TAG, "updateCameraPosition: ");
-        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
-        paramCam.gravity = profile.getParamGravity();
-        paramCam.x = 0;
-        paramCam.y = 0;
-        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+//        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
+//        paramCam.gravity = profile.getParamGravity();
+//        paramCam.x = 0;
+//        paramCam.y = 0;
+//        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
     }
 
     private void updateCameraSize() {
-        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
-        calculateCameraSize(profile);
-        onConfigurationChanged(getResources().getConfiguration());
+//        CameraSetting profile = SettingManager.getCameraProfile(getApplicationContext());
+//        calculateCameraSize(profile);
+//        onConfigurationChanged(getResources().getConfiguration());
     }
 
     public ControllerService() {
@@ -472,13 +481,28 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgSetting.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                MyUtils.toast(getApplicationContext(), "Go home!", Toast.LENGTH_SHORT);
-                toggleNavigationButton(View.GONE);
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setAction(MyUtils.ACTION_OPEN_SETTING_ACTIVITY);
-                startActivity(intent);
 
+//                if (mMode == MyUtils.MODE_RECORDING){
+//                    if (isSaved) {
+//                        gotoMain();
+//                        return;
+//                    }
+//                    gotoTransparent();
+//                    new AlertDialog.Builder(getApplicationContext())
+//                            .setTitle("Save Video")
+//                            .setMessage("Do you want to save this video?")
+//                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+//                                // Continue with delete operation
+//                                saveVideo(videoFileEndRecord);
+//                                gotoMain();
+//                            })
+//                            .setNegativeButton(android.R.string.no, (dialogInterface, i) -> gotoMain())
+//                            .setIcon(android.R.drawable.ic_dialog_alert)
+//                            .show();
+
+
+//                } else gotoMain();
+                gotoMain();
             }
         });
 
@@ -615,6 +639,26 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         });
     }
+
+    public void gotoMain() {
+        MyUtils.toast(getApplicationContext(), "Go home!", Toast.LENGTH_SHORT);
+        toggleNavigationButton(View.GONE);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.setAction(MyUtils.ACTION_OPEN_SETTING_ACTIVITY);
+        startActivity(intent);
+    }
+
+    public void gotoTransparent() {
+        toggleNavigationButton(View.GONE);
+        Intent intent = new Intent(getApplicationContext(), TranslucentActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(KEY_PATH_VIDEO, videoFileEndRecord);
+        intent.setAction(MyUtils.ACTION_SHOW_POPUP_GO_HOME);
+        startActivity(intent);
+    }
+
+
 
     boolean clickStop = false;
     boolean clickStart = false;

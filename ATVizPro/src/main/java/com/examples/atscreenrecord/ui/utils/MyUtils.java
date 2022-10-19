@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -27,8 +26,6 @@ import androidx.annotation.NonNull;
 
 import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord.controllers.settings.VideoSetting;
-import com.examples.atscreenrecord.data.entities.Video;
 import com.examples.atscreenrecord.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.serenegiant.utils.UIThreadHelper;
@@ -36,7 +33,6 @@ import com.serenegiant.utils.UIThreadHelper;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -53,19 +49,20 @@ public class MyUtils {
     public static final String SCREEN_CAPTURE_INTENT_RESULT_CODE = "SCREEN_CAPTURE_INTENT_RESULT_CODE";
     public static final String ACTION_GO_HOME = "ACTION_GO_HOME";
     public static final String ACTION_OPEN_SETTING_ACTIVITY = "ACTION_OPEN_SETTING_ACTIVITY";
-    public static final String ACTION_OPEN_LIVE_ACTIVITY = "ACTION_OPEN_LIVE_ACTIVITY";
-    public static final String ACTION_OPEN_VIDEO_MANAGER_ACTIVITY = "ACTION_OPEN_VIDOE_MANAGER_ACTIVITY";
+    public static final String ACTION_SHOW_POPUP_GO_HOME = "ACTION_SHOW_POPUP_GO_HOME";
+//    public static final String ACTION_OPEN_LIVE_ACTIVITY = "ACTION_OPEN_LIVE_ACTIVITY";
+//    public static final String ACTION_OPEN_VIDEO_MANAGER_ACTIVITY = "ACTION_OPEN_VIDOE_MANAGER_ACTIVITY";
     public static final String ACTION_UPDATE_SETTING = "ACTION_UPDATE_SETTING";
     public static final String NEW_URL = "NEW_URL";
-    public static final int SELECTED_MODE_EMPTY = 0;
-    public static final int SELECTED_MODE_ALL = 1;
-    public static final int SELECTED_MODE_MULTIPLE = 2;
-    public static final int SELECTED_MODE_SINGLE = 3;
-    public static final String DRIVE_MASTER_FOLDER = "Zecorder";
+//    public static final int SELECTED_MODE_EMPTY = 0;
+//    public static final int SELECTED_MODE_ALL = 1;
+//    public static final int SELECTED_MODE_MULTIPLE = 2;
+//    public static final int SELECTED_MODE_SINGLE = 3;
+//    public static final String DRIVE_MASTER_FOLDER = "Zecorder";
     public static final String STREAM_PROFILE = "Stream_Profile";
-    public static final String ACTION_NOTIFY_FROM_STREAM_SERVICE = "ACTION_NOTIFY_FROM_STREAM_SERVICE";
-    public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
-    public static final String ACTION_CONNECT_FAILED_FROM_SERVICE = "ACTION_CONNECT_FAILED_FROM_SERVICE";
+//    public static final String ACTION_NOTIFY_FROM_STREAM_SERVICE = "ACTION_NOTIFY_FROM_STREAM_SERVICE";
+//    public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
+//    public static final String ACTION_CONNECT_FAILED_FROM_SERVICE = "ACTION_CONNECT_FAILED_FROM_SERVICE";
     public static final String ACTION_DISCONNECT_LIVE_FROM_HOME = "ACTION_DISCONNECT_LIVE_FROM_HOME";
     public static final String ACTION_DISCONNECT_WHEN_STOP_LIVE = "ACTION_DISCONNECT_WHEN_STOP_LIVE";
     public static final String KEY_CAMERA_AVAILABLE = "KEY_CAMERA_AVAILABLE";
@@ -74,10 +71,10 @@ public class MyUtils {
 //    public static final String SAMPLE_RMPT_URL = "rtmp://10.199.220.239/live/test";
 //    public static final String SAMPLE_RMPT_URL = "rtmps://live-api-s.facebook.com:443/rtmp/FB-2214421522061173-0-AbwXJyetmt7gRPGb";
     public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/thanh";
-    public static final String KEY_STREAM_URL = "rtmp stream";
-    public static final String KEY_STREAM_LOG = "Stream log";
+//    public static final String KEY_STREAM_URL = "rtmp stream";
+//    public static final String KEY_STREAM_LOG = "Stream log";
     public static final String KEY_MESSAGE = "KEY_MESSAGE";
-    public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
+//    public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
     public static final String ACTION_UPDATE_STREAM_PROFILE = "ACTION_UPDATE_STREAM_PROFILE";
     public static final String ACTION_UPDATE_TYPE_LIVE = "ACTION_UPDATE_TYPE_LIVE";
     public static final String ACTION_START_CAPTURE_NOW = "ACTION_START_CAPTURE_NOW";
@@ -135,13 +132,13 @@ public class MyUtils {
             long result = 0;
             File[] fileList = dir.listFiles();
             if (fileList != null) {
-                for(int i = 0; i < fileList.length; i++) {
+                for (File file : fileList) {
                     // Recursive call if it's a directory
-                    if(fileList[i].isDirectory()) {
-                        result += dirSize(fileList[i]);
+                    if (file.isDirectory()) {
+                        result += dirSize(file);
                     } else {
                         // Sum the file size in bytes
-                        result += fileList[i].length();
+                        result += file.length();
                     }
                 }
             }
@@ -168,14 +165,18 @@ public class MyUtils {
     public static String getBaseStorageDirectory() {
         File directory = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MOVIES) + "/Recorder");
-        if (!directory.exists()) directory.mkdirs();
+        if (!directory.exists()) {
+            boolean a = directory.mkdirs();
+        }
         return directory.getAbsolutePath();
     }
 
     @NonNull
     public static String getCacheDirectory() {
-        File directory = new File(StorageUtil.getCacheDir().toString());
-        if (!directory.exists()) directory.mkdirs();
+        File directory = new File(StorageUtil.getCacheDir());
+        if (!directory.exists()) {
+            boolean a = directory.mkdirs();
+        }
         return directory.getAbsolutePath();
     }
 
@@ -300,8 +301,6 @@ public class MyUtils {
             } finally {
                 if (os != null) os.close();
             }
-        } catch (final FileNotFoundException e) {
-            Log.w(TAG, "failed to save file", e);
         } catch (final IOException e) {
             Log.w(TAG, "failed to save file", e);
         }
@@ -325,7 +324,7 @@ public class MyUtils {
         return matcher.find();
     }
 
-    public static Video tryToExtractVideoInfoFile(Context context, VideoSetting videoSetting) {
+    /*public static Video tryToExtractVideoInfoFile(Context context, VideoSetting videoSetting) {
         Video mVideo = null;
         try {
 
@@ -368,14 +367,14 @@ public class MyUtils {
 
 //            retriever.release();
 
-            Log.i(TAG, "tryToExtractVideoInfoFile: "+mVideo.toString());
+            Log.i(TAG, "tryToExtractVideoInfoFile: "+ mVideo);
 
         } catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG, "tryToExtractVideoInfoFile: error-"+ e.getMessage());
         }
         return mVideo;
-    }
+    }*/
 
     public static boolean isMyServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

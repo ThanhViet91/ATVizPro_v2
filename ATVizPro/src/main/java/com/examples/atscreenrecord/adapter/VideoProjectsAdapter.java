@@ -76,6 +76,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
         Glide.with(context)
                 .load(video.getPath())
+                .thumbnail(0.1f)
                 .into(holder.img);
         holder.name.setText(video.getName());
         holder.itemView.setOnClickListener(new OnSingleClickListener() {

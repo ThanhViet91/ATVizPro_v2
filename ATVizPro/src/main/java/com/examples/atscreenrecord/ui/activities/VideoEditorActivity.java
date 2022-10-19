@@ -9,28 +9,23 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord.ui.VideoEditorView;
 import com.examples.atscreenrecord.ui.IVideoStreamView;
+import com.examples.atscreenrecord.ui.VideoEditorView;
 import com.examples.atscreenrecord.ui.fragments.IOptionFragmentListener;
 import com.examples.atscreenrecord.ui.fragments.OptionAddImageFragment;
 import com.examples.atscreenrecord.ui.fragments.OptionAddTextFragment;
 import com.examples.atscreenrecord.ui.fragments.OptionChangeSpeedFragment;
 import com.examples.atscreenrecord.ui.fragments.OptionTrimFragment;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.VideoUtil;
 import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -47,6 +42,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     private String pathOriginalVideo = "";
 
     private LottieAnimationView animationView;
+    private AdsUtil mAdManager;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,8 +65,11 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     @Override
     protected void onResume() {
         super.onResume();
+
+        mAdManager = new AdsUtil(this, null);
+        mAdManager.createInterstitialAdmob();
+
         videoEditorView.showOrHideAdBanner();
-        createInterstitialAdmob();
     }
 
     @Override
@@ -140,72 +139,39 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         showInterstitialAd();
     }
 
-
-    InterstitialAd mInterstitialAdAdmob = null;
-    int loadAgain = 0;
-
-    public void createInterstitialAdmob() {
-        if (SettingManager2.getRemoveAds(this)) {
-            mInterstitialAdAdmob = null;
-            return;
+    public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+        @Override
+        public void onAdClicked() {
         }
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAdAdmob = interstitialAd;
-                        loadAgain = 0;
-                    }
 
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        mInterstitialAdAdmob = null;
-//                        loadAgain++;
-//                        if (loadAgain < 2)
-//                            createInterstitialAdmob();
+        @Override
+        public void onAdDismissedFullScreenContent() {
+            Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
+//            mAdManager.createInterstitialAdmob();
+            finish();
+        }
 
-                    }
-                });
-    }
+        @Override
+        public void onAdFailedToShowFullScreenContent(AdError adError) {
+            Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
+            finish();
+
+        }
+
+        @Override
+        public void onAdImpression() {
+        }
+
+        @Override
+        public void onAdShowedFullScreenContent() {
+        }
+    };
 
     public void showInterstitialAd(){
-        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
-            mInterstitialAdAdmob.show(this);
-            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdClicked() {
-                }
-
-                @Override
-                public void onAdDismissedFullScreenContent() {
-
-                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
-
-//                    createInterstitialAdmob();
-                    finish();
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-                    Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
-                    finish();
-
-                }
-
-                @Override
-                public void onAdImpression() {
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-                }
-            });
+        if (mAdManager.interstitialAdAlready()) {
+            mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
-            Toast.makeText(getApplicationContext(), "Video is saved in your phone!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
             finish();
         }
     }

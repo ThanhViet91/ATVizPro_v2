@@ -41,4 +41,7 @@
     <color name="black_translucent">#50000000</color>
     <color name="top_bottom">#42BAF8</color>
     <color name="red100">#FF0000</color>
+    <color name="gray_line">#dadada</color>
+    <color name="blue_positive">#28B2FF</color>
+    <color name="red_negative">#FF5454</color>
 </resources>

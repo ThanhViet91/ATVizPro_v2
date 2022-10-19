@@ -2,35 +2,15 @@
 <resources>
 
     <string name="app_name">Screen Recorder</string>
-    <string name="email">infoboy.ftu.edu@gmail.com</string>
-    <string name="full_app_name">ATVizPro</string>
-    <string name="welcome_demo">Demo shows how easy it is for every application to run FFMpeg commands.</string>
-    <string name="welcome_1">Simple example using a AsyncTask without progress bar.\n
-    When using this technique, you will not be able to stop the operation while its running.</string>
-    <string name="welcome_2">Simple progress bar example with stop support (you can cancel the transcoding when its running).</string>
-    <string name="welcome_3">Progress bar with notification example (and stop / cancel support).\n
-    The notification will work only on Android 4 or above.\n
-    To support notifications on older versions, use the Android support library</string>
-    <string name="welcome_4">using an AsyncTask to run multiply commands.</string>
-    <string name="commandTextView">This command will rotate /sdcard/videokit/in.mp4 90 degrees, and create /sdcard/videokit/out.mp4:</string>
-    <string name="commandTextView4">See the commands in the code</string>
-    <string name="commandText">ffmpeg -y -i /sdcard/videokit/in.mp4 -strict experimental -vf transpose=1 -s 160x120 -r 30 -aspect 4:3 -ab 48000 -ac 2 -ar 22050 -b 2097k /sdcard/videokit/out.mp4</string>
+    <string name="full_app_name">Screen Recorder</string>
 
-    <string name="video_shoot_tip">Drag to select the segment within %d second that you want to post！</string>
-    <string name="recording">RECORD</string>
-    <string name="back">Back</string>
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
     <string name="select_all">Select all</string>
     <string name="deselect_all">Deselect all</string>
-    <string name="unselect">Unselect</string>
-    <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="choose">Choose</string>
-    <string name="finish">Finish</string>
     <string name="prepare_video">Prepare video...</string>
-    <string name="trimmed_done">video trim completed！</string>
-
 
     <!--RemoveAds settings-->
     <string name="setting_remove_ads">setting_remove_ads</string>
@@ -77,19 +57,11 @@
     <string name="default_camera_position">Bottom Right</string>
     <string name="default_camera_size">Medium</string>
     <string name="default_audio_source">Microphone</string>
-    <string name="file_created">File created</string>
-    <string name="file_create_error">File create error</string>
-    <string name="pref_drive_folderId">pref_drive_folderId</string>
-
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="video_resolution">Video Resolution</string>
     <string name="bitrate">Bitrate</string>
     <string name="frame_rate">Frame rate</string>
     <string name="_1080p_fhd">1080p (HD)</string>
-    <string name="_720p_hd">720p (HD)</string>
     <string name="_480p_sd">480p (SD)</string>
-    <string name="_360p_ssd">360p (SD)</string>
     <string name="settings">Settings</string>
     <string name="how_to_record_your_screen">How to record your screen</string>
     <string name="how_to_livestream">How to livestream</string>
@@ -100,17 +72,7 @@
     <string name="recording_cache_0_kb">Recording Cache: </string>
     <string name="support_us_by_rating_our_app">Support us by rating our app</string>
     <string name="contact_us">Contact us</string>
-    <string name="personalized_ads_off">Personalized Ads: Off</string>
-    <string name="label_permissions">Please enable Microphone and Storage permissions.</string>
-    <string name="title_activity_react_cam">ReactCamActivity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
-    <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="select_video_source">Select Video Source</string>
     <string name="react_to_videos_from_camera_roll">React to videos from my recordings\n or Camera Roll</string>
     <string name="edit_video_from_my_recordings_or_camera_roll">Edit videos from my recordings\n or Camera Roll</string>
@@ -119,23 +81,19 @@
     <string name="react_cam">React Cam</string>
     <string name="video_editor">Video Editor</string>
     <string name="commentary">Commentary</string>
-
-
-    <string name="description_fb_live">Get the facebook livestream URL and start livestreaming at the RTMP URL page. The livestream URL can be saved in the RTMP page. After settingthe livecode, you can use it all the time unless you change it.</string>
+    <string name="description_fb_live">Get the Facebook livestream URL and start livestreaming at the RTMP URL page. The livestream URL can be saved in the RTMP page. After setting the livecode, you can use it all the time unless you change it.</string>
+    <string name="description_yt_live">Get the Youtube livestream URL and start livestreaming at the RTMP URL page. The livestream URL can be saved in the RTMP page. After setting the livecode, you can use it all the time unless you change it.</string>
+    <string name="description_tw_live">Get the Twitch livestream URL and start livestreaming at the RTMP URL page. The livestream URL can be saved in the RTMP page. After setting the livecode, you can use it all the time unless you change it.</string>
     <string name="continue_">Continue</string>
     <string name="done_">Done</string>
     <string name="paste">Paste</string>
     <string name="start_livestreming">Start Livestreaming</string>
     <string name="enter_key">Please enter stream key here.</string>
-    <string name="new_">New</string>
-    <string name="save_to_gallery">Saved to gallery</string>
     <string name="share">Share</string>
     <string name="my_recordings">My Recordings</string>
     <string name="screen_recorder">Screen Recorder</string>
     <string name="tap_to_start_nrecording_screen">Tap to start\nrecording screen</string>
     <string name="no_video">No Videos\nLet\'s make a new video! </string>
-    <string name="admob_banner_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="admob_intersitial_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="resolution">Resolution</string>
     <string name="_4mbps">4Mbps</string>
     <string name="_30fps">30fps</string>
@@ -145,8 +103,21 @@
     <string name="unlimited_duration_of_videos">Unlimited duration of videos</string>
     <string name="you_can_live_stream">You can live stream</string>
     <string name="remove_ads">Remove Ads</string>
+    <string name="skip"><u>Skip</u></string>
 
-<!--    product_id_remove_ads-->
+    <!--    id admod release-->
+    <string name="admob_sdk_id">ca-app-pub-2210513256218688~4750691232</string>
+    <string name="admob_openapp_id">ca-app-pub-2210513256218688/4175976164</string>
+    <string name="admob_banner_id">ca-app-pub-2210513256218688/7767736814</string>
+    <string name="admob_intersitial_id">ca-app-pub-2210513256218688/1025400348</string>
+
+    <!--    id admod debug-->
+    <string name="admob_sdk_id_debug">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="admob_openapp_id_debug">ca-app-pub-2210513256218688/4175976164</string>
+    <string name="admob_banner_id_debug">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_intersitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
+
+    <!--    product_id_remove_ads-->
     <string name="product_id_remove_ads">remove_ads_50</string>
 
     <!--    guideline_record-->
@@ -160,12 +131,10 @@
     <string name="guideline_live_step_2">Step 2: Tap to choose social go to live</string>
     <string name="guideline_live_step_3">Step 3: Fill RTMP address and Stream key to start</string>
 
-<!--    ConfirmExecute-->
+    <!--    ConfirmExecute-->
     <string name="confirm_execute_react_cam">This video is being processed in the background. This may take some time depending on the size of the video and the power of your device.</string>
-    <string name="skip"><u>Skip</u></string>
 
-<!--    FAQ fragment-->
-
+    <!--    FAQ fragment-->
     <string name="faq">FAQ</string>
     <string name="sound_is_not_working">Sound is not working</string>
     <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/StreamKey?</u></string>
@@ -192,6 +161,7 @@
     <string name="enter_text">Enter text</string>
     <string name="do_you_want_cancel_the_process">Do you want to cancel the process?</string>
     <string name="livestreaming_is_stopped">Livestreaming is stopped!</string>
+    <string name="preparing_for_recording">Preparing for recording</string>
 
 
 </resources>

@@ -22,27 +22,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.model.VideoModel;
-import com.examples.atscreenrecord.ui.services.ExecuteService;
-import com.examples.atscreenrecord.ui.utils.MyUtils;
-import com.examples.atscreenrecord.utils.AdUtil;
-import com.examples.atscreenrecord.utils.VideoUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdView;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.URLConnection;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 
 public class PlayVideoDetailActivity extends AppCompatActivity implements View.OnClickListener {
-
-    private ImageView btn_back;
-    private boolean isSaved = false;
-    private AdView mAdView;
+    private RelativeLayout mAdView;
     private TextView title;
 
     @Override
@@ -50,23 +37,17 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video_detail);
         hideStatusBar(this);
-
         ImageView btn_delete_video = findViewById(R.id.img_btn_delete);
         title = findViewById(R.id.title_video);
         ImageView btn_share_video = findViewById(R.id.img_btn_share);
         mAdView = findViewById(R.id.adView);
-
         videoView = findViewById(R.id.video_main);
-
         btn_share_video.setOnClickListener(this);
         btn_delete_video.setOnClickListener(this);
-
-        btn_back = findViewById(R.id.img_btn_back_header);
+        ImageView btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
         handleIntent();
         addVideoView();
-
-        System.out.println("thanhlv result intent === action : " + getIntent().getAction());
     }
 
     private void handleIntent() {
@@ -77,11 +58,13 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         }
     }
 
+    private AdsUtil mAdManager;
     @Override
     protected void onResume() {
         super.onResume();
-        AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-        mAdView.setAdListener(new AdListener() {
+        mAdManager = new AdsUtil(this, mAdView);
+        mAdManager.loadBanner();
+        mAdManager.getAdView().setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
@@ -104,14 +87,12 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
     VideoView videoView;
 
     private void addVideoView() {
-
         if (videoFile == null) return;
         if (!videoFile.equals("")) {
             videoView.setVideoPath(videoFile);
         }
         videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
-        videoView.seekTo(0);
         videoView.setOnPreparedListener(mp -> {
             mediaPlayer = mp;
             mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
@@ -181,8 +162,6 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         } else {
             Toast.makeText(this, "Delete failed, have some problem.", Toast.LENGTH_SHORT).show();
         }
-            System.out.println("thanhlv delllllllllllllllllllllllllllllllllle " + filePath);
-
     }
 
     public void onClick(View v) {
@@ -200,7 +179,6 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Share File"));
         }
-
         if (v == findViewById(R.id.img_btn_back_header)) finish();
     }
 }

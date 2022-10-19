@@ -1,7 +1,7 @@
 package com.examples.atscreenrecord.controllers.encoder;
 /*
  * ScreenRecordingSample
- * Sample project to cature and save audio from internal and video from screen as MPEG4 file.
+ * Sample project to capture and save audio from internal and video from screen as MPEG4 file.
  *
  * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
  *
@@ -22,6 +22,8 @@ package com.examples.atscreenrecord.controllers.encoder;
  * All files in the folder are under this Apache License, Version 2.0.
  */
 
+import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
@@ -33,23 +35,21 @@ import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
-
 import androidx.core.app.ActivityCompat;
 
 import com.examples.atscreenrecord.App;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public class MediaAudioEncoder extends MediaEncoder {
     private static final String TAG = MediaAudioEncoder.class.getSimpleName();
 
     private static final String MIME_TYPE = "audio/mp4a-latm";
     private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
-    private static final int BIT_RATE = 64000;
+    private static final int BIT_RATE = 96000;
     public static final int SAMPLES_PER_FRAME = 1024;    // AAC, bytes/frame/channel
-    public static final int FRAMES_PER_BUFFER = 25;    // AAC, frame/buffer/sec
+    public static final int FRAMES_PER_BUFFER = 30;    // AAC, frame/buffer/sec
 
     private AudioThread mAudioThread = null;
 

@@ -34,6 +34,9 @@ public class ExecuteService extends Service {
     long countDownInterval = 1000;
     int progress = 0;
     CountDownTimer countDownTimer;
+
+    private int type = 0;
+
     public int generateProgress(int lastProgress) {
         return Math.min(99, lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration)));
     }
@@ -64,7 +67,7 @@ public class ExecuteService extends Service {
             camSize = videoProfileExecute.getCamSize();
 
         }
-        int type = 0;
+
         if (videoProfileExecute != null) {
             type = videoProfileExecute.getType();
         }
@@ -180,7 +183,8 @@ public class ExecuteService extends Service {
     private void updatePendingIntent(String finalVideoCachePath) {
 
         Intent intent = new Intent(this, ResultVideoFinishActivity.class);
-        intent.setAction(MyUtils.ACTION_END_REACT);
+        if (type == MyUtils.TYPE_REACT_VIDEO) intent.setAction(MyUtils.ACTION_END_REACT);
+        if (type == MyUtils.TYPE_COMMENTARY_VIDEO) intent.setAction(MyUtils.ACTION_END_COMMENTARY);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);
         @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})

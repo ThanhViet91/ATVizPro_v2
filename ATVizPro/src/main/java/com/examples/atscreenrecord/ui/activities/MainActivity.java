@@ -6,7 +6,6 @@ import static com.examples.atscreenrecord.ui.fragments.DialogSelectVideoSource.A
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
@@ -29,6 +28,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -51,7 +51,7 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
-import com.examples.atscreenrecord.AppOpenManager;
+import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
@@ -69,16 +69,11 @@ import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.services.ExecuteService;
 import com.examples.atscreenrecord.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.DisplayUtil;
 import com.examples.atscreenrecord.utils.PathUtil;
 import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -206,12 +201,19 @@ public class MainActivity extends AppCompatActivity {
 
     private BillingClient billingClient;
 
-    private AdView mAdView;
+    private RelativeLayout mAdViewRoot;
 
     @Override
     protected void onPause() {
         super.onPause();
         pulsator.stop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Move the task containing the MainActivity to the back of the activity stack, instead of
+        // destroying it. Therefore, MainActivity will be shown when the user switches back to the app.
+        moveTaskToBack(true);
     }
 
     @Override
@@ -246,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!SettingManager2.getRemoveAds(getApplicationContext())) {
                         runOnUiThread(() -> {
                             System.out.println("thanhlv createBannerAdmob connectGooglePlayBilling ");
-                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                            mAdManager.loadBanner();
                         });
                     }
                 }
@@ -361,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!SettingManager2.getRemoveAds(getApplicationContext())) {
                         runOnUiThread(() -> {
                             System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
-                            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
+                            mAdManager.loadBanner();
                         });
 
                     }
@@ -443,8 +445,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkShowAd() {
         if (initialAds) {
-            AdUtil.createBannerAdmob(getApplicationContext(), mAdView);
-            createInterstitialAdmob();
+            mAdManager = new AdsUtil(this, mAdViewRoot);
+            mAdManager.loadBanner();
+            mAdManager.createInterstitialAdmob();
         }
     }
 
@@ -471,9 +474,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mImgRec, imgLiveType;
     private PulsatorLayout pulsator;
     private TextView liveStreaming;
+    private AdsUtil mAdManager;
 
     private void initViews() {
-        mAdView = findViewById(R.id.adView);
+        mAdViewRoot = findViewById(R.id.adView);
         pulsator = findViewById(R.id.pulsator);
         liveStreaming = findViewById(R.id.tv_live_streaming);
         imgLiveType = findViewById(R.id.img_live_type);
@@ -599,7 +603,7 @@ public class MainActivity extends AppCompatActivity {
     private void showTutorialScreenRecord() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment())
+                .add(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment(false))
                 .addToBackStack("")
                 .commit();
     }
@@ -607,7 +611,7 @@ public class MainActivity extends AppCompatActivity {
     private void showTutorialLiveStream() {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment())
+                .add(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment(false))
                 .addToBackStack("")
                 .commit();
     }
@@ -663,64 +667,38 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
     }
 
-
-    InterstitialAd mInterstitialAdAdmob = null;
-
-    int loadAgain = 0;
-
-    public void createInterstitialAdmob() {
-        if (SettingManager2.getRemoveAds(this)) {
-            mInterstitialAdAdmob = null;
-            return;
+    int videoSource, fromFunction;
+    public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+        @Override
+        public void onAdClicked() {
         }
-        AdRequest adRequest = new AdRequest.Builder().build();
-        InterstitialAd.load(getApplicationContext(), "ca-app-pub-3940256099942544/1033173712", adRequest,
-                new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        // The mInterstitialAd reference will be null until
-                        // an ad is loaded.
-                        mInterstitialAdAdmob = interstitialAd;
-                        loadAgain = 0;
-                    }
 
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        // Handle the error
-                        mInterstitialAdAdmob = null;
-                    }
-                });
-    }
+        @Override
+        public void onAdDismissedFullScreenContent() {
+            if (videoSource == CHOOSE_MY_RECORD) showMyRecordings(fromFunction);
+            if (videoSource == CHOOSE_GALLERY) showDialogPickFromGallery(fromFunction);
+//            mAdManager.createInterstitialAdmob();
+        }
 
+        @Override
+        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+            if (videoSource == CHOOSE_MY_RECORD) showMyRecordings(fromFunction);
+            if (videoSource == CHOOSE_GALLERY) showDialogPickFromGallery(fromFunction);
+        }
+
+        @Override
+        public void onAdImpression() {
+        }
+
+        @Override
+        public void onAdShowedFullScreenContent() {
+        }
+    };
     public void showInterstitialAd(int from_code, int type) {
-        if (mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(this)) {
-            mInterstitialAdAdmob.show(this);
-            mInterstitialAdAdmob.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdClicked() {
-                }
-
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
-                    if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
-                    createInterstitialAdmob();
-                }
-
-                @Override
-                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                    if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
-                    if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
-                }
-
-                @Override
-                public void onAdImpression() {
-                }
-
-                @Override
-                public void onAdShowedFullScreenContent() {
-                }
-            });
+        if (mAdManager.interstitialAdAlready()) {
+            videoSource = type;
+            fromFunction = from_code;
+            mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
             if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
             if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
@@ -775,7 +753,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        AppOpenManager.isPickFromGallery = true;
+        App.isPickFromGallery = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
             final Uri selectedUri = data != null ? data.getData() : null;
             if (selectedUri != null) {
@@ -785,9 +763,9 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                Intent intent = new Intent(MainActivity.this, PrepareVideoActivity.class);
-                intent.setAction(MyUtils.ACTION_FOR_REACT);
-                intent.putExtra(VIDEO_PATH_KEY, pathVideo);
+                Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
+//                intent.setAction(MyUtils.ACTION_FOR_REACT);
+                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
                 startActivity(intent);
             }
         }
@@ -803,10 +781,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                Bundle bundle = new Bundle();
-                bundle.putString(VIDEO_PATH_KEY, pathVideo);
                 Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
-                intent.putExtras(bundle);
+                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
                 startActivity(intent);
             }
         }
@@ -976,16 +952,7 @@ public class MainActivity extends AppCompatActivity {
                 if (TextUtils.isEmpty(notify_msg))
                     return;
                 updateService();
-                System.out.println("thanhlv messsssssssssss " + notify_msg);
                 switch (notify_msg) {
-
-//                    case NOTIFY_MSG_CONNECTION_STARTED:
-//                    case NOTIFY_MSG_CONNECTED:
-//                        break;
-//                    case NOTIFY_MSG_CONNECTION_DISCONNECTED:
-//                    case MESSAGE_DISCONNECT_LIVE:
-//                        updateService();
-//                        break;
                     case NOTIFY_MSG_CONNECTION_FAILED:
                         liveStreaming.setText(getString(R.string.livestreaming));
                         sendDisconnectToService(true);

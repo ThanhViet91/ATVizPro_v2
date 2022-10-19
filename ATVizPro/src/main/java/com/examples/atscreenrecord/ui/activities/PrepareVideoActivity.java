@@ -34,7 +34,6 @@ public class PrepareVideoActivity extends AppCompatActivity implements ChooseVid
     @Override
     protected void onStart() {
         super.onStart();
-        System.out.println("thanhlv onStart PrepareVideoActivity");
     }
 
     @Override
@@ -57,7 +56,6 @@ public class PrepareVideoActivity extends AppCompatActivity implements ChooseVid
     protected void onResume() {
         super.onResume();
         prepareVideoView.showOrHideAdBanner();
-        System.out.println("thanhlv PrepareVideoActivity onResume ");
     }
 
     @Override
@@ -78,13 +76,10 @@ public class PrepareVideoActivity extends AppCompatActivity implements ChooseVid
 //        runCompressVideo();
         if (checkServiceBusy()) return;
         buildDialog(getResources().getString(R.string.prepare_video)).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
-                if (actionType.equals(MyUtils.ACTION_FOR_REACT)) nextToReactCam();
-                if (actionType.equals(MyUtils.ACTION_FOR_COMMENTARY)) nextToCommentary();
-            }
+        new Handler().postDelayed(() -> {
+            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+            if (actionType.equals(MyUtils.ACTION_FOR_REACT)) nextToReactCam();
+            if (actionType.equals(MyUtils.ACTION_FOR_COMMENTARY)) nextToCommentary();
         }, 2000);
     }
     private void turnOffServiceUseCamera() {

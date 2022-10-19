@@ -31,10 +31,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.R;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
 import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdView;
 
 import iknow.android.utils.callback.SingleCallback;
 import iknow.android.utils.thread.BackgroundExecutor;
@@ -78,7 +77,7 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
   private int mThumbsTotalCount;
   private ValueAnimator mRedProgressAnimator;
   private Handler mAnimationHandler = new Handler();
-  private AdView mAdview;
+  private RelativeLayout mAdview;
 
   public VideoBeforeReactView(Context context, AttributeSet attrs) {
     this(context, attrs, 0);
@@ -108,9 +107,11 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     setUpListeners();
   }
 
+  private AdsUtil mAdManager;
   public void showOrHideAdBanner(){
-    AdUtil.createBannerAdmob(mContext, mAdview);
-    mAdview.setAdListener(new AdListener() {
+    mAdManager = new AdsUtil(mContext, mAdview);
+    mAdManager.loadBanner();
+    mAdManager.getAdView().setAdListener(new AdListener() {
       @Override
       public void onAdLoaded() {
         super.onAdLoaded();
@@ -170,13 +171,6 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
     mSourceUri = videoURI;
     mVideoView.setVideoURI(videoURI);
     mVideoView.requestFocus();
-//    mVideoView.start();
-//    new Handler().postDelayed(new Runnable() {
-//      @Override
-//      public void run() {
-//        mVideoView.pause();
-//      }
-//    }, 1000);
   }
 
   private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {
@@ -232,12 +226,10 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
   private void videoPrepared(MediaPlayer mp) {
     updateVideoView(mp);
     mDuration = mVideoView.getDuration();
-    if (!getRestoreState()) {
-      seekTo((int) mRedProgressBarPos);
-    } else {
+    if (getRestoreState()) {
       setRestoreState(false);
-      seekTo((int) mRedProgressBarPos);
     }
+    seekTo((int) mRedProgressBarPos);
     initRangeSeekBarView();
 
     startShootVideoThumbs(mContext, mSourceUri, mThumbsTotalCount, 0, mDuration);

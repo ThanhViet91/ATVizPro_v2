@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,15 +24,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord.AppConfigs;
-import com.examples.atscreenrecord.BuildConfig;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.SettingsAdapter;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.SettingsItem;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
-import com.examples.atscreenrecord.utils.AdUtil;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.examples.atscreenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -88,8 +87,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             }
         });
 
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
     }
 
     @Override
@@ -102,8 +99,8 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onResume() {
         super.onResume();
-        AdView mAdView = mViewRoot.findViewById(R.id.adView);
-        AdUtil.createBannerAdmob(getContext(), mAdView);
+        RelativeLayout mAdView = mViewRoot.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdView).loadBanner();
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 
@@ -140,7 +137,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.how_to_record_your_screen))) {
             System.out.println("thanhlv how_to_record_your_screen");
             mFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment())
+                    .replace(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment(true))
                     .addToBackStack("")
                     .commit();
         }
@@ -148,7 +145,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.how_to_livestream))) {
             System.out.println("thanhlv how_to_livestream");
             mFragmentManager.beginTransaction()
-                    .replace(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment())
+                    .replace(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment(true))
                     .addToBackStack("")
                     .commit();
         }

@@ -22,7 +22,9 @@
     <LinearLayout
         android:id="@+id/box_settings"
         android:layout_width="match_parent"
-        android:layout_height="62dp"
+        android:layout_marginStart="@dimen/normal_margin"
+        android:layout_marginEnd="@dimen/normal_margin"
+        android:layout_height="60dp"
         android:layout_below="@id/title_app"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
@@ -31,19 +33,19 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/normal_margin"
-            android:layout_weight="3.2"
-            android:background="@drawable/bg_round_white_20"
+            android:layout_height="match_parent"
+            android:layout_marginStart="6dp"
+            android:layout_weight="3.5"
+            android:background="@drawable/bg_round_15_white_20"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:weightSum="3">
+            android:weightSum="3.1">
 
             <LinearLayout
                 android:id="@+id/set_video_resolution"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_weight="1.1"
                 android:gravity="center"
                 android:orientation="vertical"
                 tools:ignore="NestedWeights">
@@ -61,6 +63,7 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
+                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -73,7 +76,7 @@
                         android:text="@string/resolution"
                         android:textColor="@color/white_60"
                         android:textFontWeight="400"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         tools:targetApi="p" />
 
                     <ImageView
@@ -86,11 +89,11 @@
             </LinearLayout>
 
             <View
-                android:layout_width="2dp"
+                android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/black_bg_settings_item" />
+                android:background="@color/white_60" />
 
             <LinearLayout
                 android:id="@+id/set_bitrate"
@@ -113,6 +116,7 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
+                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -125,7 +129,7 @@
                         android:text="@string/bitrate"
                         android:textColor="@color/white_60"
                         android:textFontWeight="400"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         tools:targetApi="p" />
 
                     <ImageView
@@ -138,11 +142,11 @@
             </LinearLayout>
 
             <View
-                android:layout_width="2dp"
+                android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:background="@color/black_bg_settings_item" />
+                android:background="@color/white_60" />
 
             <LinearLayout
                 android:id="@+id/set_frame_rate"
@@ -165,6 +169,7 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
+                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -177,7 +182,7 @@
                         android:text="@string/framerate"
                         android:textColor="@color/white_60"
                         android:textFontWeight="400"
-                        android:textSize="12sp"
+                        android:textSize="11sp"
                         tools:targetApi="p" />
 
                     <ImageView
@@ -193,14 +198,16 @@
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="4dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.8"
+            android:layout_weight="0.5"
             android:gravity="center">
 
             <ImageView
                 android:id="@+id/img_settings"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:padding="6dp"
                 android:src="@drawable/ic_settings" />
         </LinearLayout>
@@ -242,7 +249,7 @@
             android:layout_height="130dp"
             android:layout_centerInParent="true"
             android:padding="36dp"
-            android:src="@drawable/img_btn_record_home" />
+            android:src="@drawable/img_button_record_home" />
 
         <ImageView
             android:id="@+id/img_live_type"
@@ -261,13 +268,20 @@
         android:layout_marginStart="@dimen/normal_margin_left"
         android:layout_marginEnd="@dimen/normal_margin_right"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="10dp">
 
         <ImageView
             android:id="@+id/img_live"
             android:layout_width="match_parent"
-            android:layout_height="92dp"
+            android:layout_gravity="center_vertical"
+            android:layout_height="78dp"
+            android:layout_marginEnd="6dp"
             android:background="@drawable/bg_live_home" />
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:background="@drawable/ava_live" />
 
         <TextView
             android:id="@+id/tv_live_streaming"
@@ -308,7 +322,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:background="@drawable/bg_item_home" />
 
             <LinearLayout
@@ -346,7 +360,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:background="@drawable/bg_item_home" />
 
             <LinearLayout
@@ -357,7 +371,7 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="50dp"
+                    android:layout_width="48dp"
                     android:layout_height="40dp"
                     android:src="@drawable/ic_video_editor_svg" />
 
@@ -385,7 +399,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="100dp"
                 android:background="@drawable/bg_item_home" />
 
             <LinearLayout
@@ -396,10 +410,10 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="20dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_microphone" />
+                    android:src="@drawable/ic_microphone_2" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -438,7 +452,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="106dp"
                 android:background="@drawable/bg_item_home" />
 
             <LinearLayout
@@ -477,7 +491,7 @@
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="106dp"
                 android:background="@drawable/bg_item_home" />
 
             <LinearLayout
@@ -493,7 +507,7 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/ic_faq" />
+                    android:src="@drawable/ic_faq_svg" />
 
                 <TextView
                     android:layout_width="wrap_content"

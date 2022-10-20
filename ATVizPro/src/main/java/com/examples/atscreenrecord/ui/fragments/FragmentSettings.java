@@ -83,7 +83,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             @Override
             public void onSingleClick(View v) {
                 ((MainActivity) requireActivity()).checkShowAd();
-                requireActivity().onBackPressed();
+                mFragmentManager.popBackStack();
             }
         });
 

@@ -137,7 +137,7 @@
     <!--    FAQ fragment-->
     <string name="faq">FAQ</string>
     <string name="sound_is_not_working">Sound is not working</string>
-    <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/StreamKey?</u></string>
+    <string name="get_rtmp_address_and_streamkey"><u>Get RTMP URL/Stream key?</u></string>
     <string name="edit">Edit</string>
     <string name="livestreaming">Livestream</string>
     <string name="disconnect_livestream">Disconnect livestream</string>
@@ -164,4 +164,21 @@
     <string name="preparing_for_recording">Preparing for recording</string>
 
 
+    <!--    FAQ-->
+    <string name="question_1">Sound is not working</string>
+    <string name="answer_1">Before starting your screen recording,make sure your phone is not in slient mode and the volume is on. Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.</string>
+    <string name="question_2">How do I turn on the microphone?</string>
+    <string name="answer_2">Make sure you long press (or 3D touch it available) the record button, so a menu will appear to turn on the microphone.</string>
+    <string name="question_3">I want to Face Cam while I screen record</string>
+    <string name="answer_3">Currently, it is not possible to Face Cam and record your screen at the same time. However, you can add a Face Cam reaction after you finish your recording. Just open the video recording in our app and select “ Face Cam”.</string>
+    <string name="question_4">My Video is saved to camera roll and I want to save it on the app</string>
+    <string name="answer_4">Just make sure you long press (or 3D touch if available) the record button on the control center. Then, select Record it! as the destination app.</string>
+    <string name="question_5">Error while recording or recording won’t stop</string>
+    <string name="answer_5">Somethings the recording engine gets stuck due to a memory bug on some IOS devices. Try restarting you device and close all other apps.</string>
+    <string name="question_6">My record button is greyed out</string>
+    <string name="answer_6">Make sure Screen Recording is Not Restricted with Parental Control: Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. Then scroll and look if Screen Recorder is restricted. If so, turn it off.</string>
+    <string name="question_7">I still have a question</string>
+    <string name="answer_7">vv</string>
+    <string name="question_8">Why react cam or commentary microphone sound is not good?</string>
+    <string name="answer_8">Use headphones for better experience.</string>
 </resources>

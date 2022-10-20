@@ -138,11 +138,11 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/huge_margin"
+            android:layout_marginEnd="@dimen/header_top_margin"
             android:layout_toStartOf="@id/img_btn_delete"
             android:contentDescription="@string/todo"
             android:padding="@dimen/small_padding"
-            android:src="@drawable/ic_rename" />
+            android:src="@drawable/ic_rename_2" />
 
     </RelativeLayout>
 

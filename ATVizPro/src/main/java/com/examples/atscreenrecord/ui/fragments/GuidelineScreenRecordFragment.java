@@ -150,13 +150,13 @@ public class GuidelineScreenRecordFragment extends Fragment {
         tvSkip.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                    mParentActivity.onBackPressed();
+                    mFragmentManager.popBackStack();
             }
         });
         btnBack.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                mParentActivity.onBackPressed();
+                mFragmentManager.popBackStack();
             }
         });
     }

@@ -13,7 +13,7 @@
         android:id="@+id/rl_head_faq"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="56dp">
+        android:minHeight="60dp">
 
         <TextView
             android:id="@+id/tv_question"
@@ -26,7 +26,7 @@
             android:layout_marginEnd="50dp"
             android:text="@string/sound_is_not_working"
             android:textFontWeight="500"
-            android:textSize="18sp"
+            android:textSize="17sp"
             tools:targetApi="p" />
 
         <ImageView
@@ -57,12 +57,13 @@
     <TextView
         android:id="@+id/tv_answer"
         style="@style/Body_List_Item_White_16_400"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="15dp"
         android:visibility="gone" />
 
 </LinearLayout>

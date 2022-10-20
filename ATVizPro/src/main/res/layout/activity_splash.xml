@@ -10,26 +10,26 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:ignore="UselessParent">
 
         <TextView
             android:id="@+id/title_app"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_regular"
             android:gravity="center"
-            android:text="Screen Record"
+            android:text="@string/app_name"
             android:textColor="@color/white"
             android:textFontWeight="700"
-            android:textSize="28sp"/>
+            android:textSize="28sp"
+            tools:targetApi="p" />
 
         <pl.bclogic.pulsator4droid.library.PulsatorLayout
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="36dp"
             android:id="@+id/pulsator"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/title_app"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
             app:pulse_color="#FFFFFF"
             app:pulse_count="4"
             app:pulse_duration="3000"
@@ -39,10 +39,11 @@
 
             <ImageView
                 android:id="@+id/img_record"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/img_btn_record_home" />
+                android:src="@drawable/img_button_record_home"
+                tools:ignore="ContentDescription" />
         </pl.bclogic.pulsator4droid.library.PulsatorLayout>
     </LinearLayout>
 

@@ -5,16 +5,13 @@ import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOC
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTED;
-import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_DISCONNECTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_STARTED;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_ERROR;
 import static com.examples.atscreenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_STREAM_STOPPED;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
-import static com.examples.atscreenrecord.ui.utils.MyUtils.MESSAGE_DISCONNECT_LIVE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideSoftInput;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
-import static com.examples.atscreenrecord.ui.utils.MyUtils.toast;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -31,9 +28,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,19 +37,17 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.examples.atscreenrecord.App;
-import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.ui.services.ControllerService;
 import com.examples.atscreenrecord.ui.services.recording.RecordingService;
 import com.examples.atscreenrecord.ui.utils.MyUtils;
+import com.examples.atscreenrecord.utils.AdsUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class RTMPLiveAddressFragment extends Fragment {
 
@@ -262,8 +256,10 @@ public class RTMPLiveAddressFragment extends Fragment {
         btnClearStreamKey.setOnClickListener(v -> {
             edtStreamKey.setText("");
         });
-        LinearLayout rootView = view.findViewById(R.id.root_container);
+        RelativeLayout rootView = view.findViewById(R.id.root_container);
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
+        RelativeLayout mAdview = view.findViewById(R.id.adView);
+        new AdsUtil(getContext(), mAdview).loadBanner();
     }
 
     private String parseType(int type) {

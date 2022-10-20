@@ -33,21 +33,15 @@ public class FragmentFAQ extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View mViewRoot = inflater.inflate(R.layout.fragment_faq, container, false);
-        mFAQs.add(new FAQItem("Sound is not working", "Before starting your screen recording,make sure your phone is not in silent mode and the volume is on. " +
-                "Some apps do not allow the sound to be recorded, and it is a limitation we cannot bypass.", false));
-        mFAQs.add(new FAQItem("How do I turn on the microphone?", "Make sure you long press (or 3D touch it available) the record button, " +
-                "so a menu will appear to turn on the microphone.", false));
-        mFAQs.add(new FAQItem("I want to Face Cam while I screen record", "Currently, it is not possible to Face Cam and record your screen at the same time. " +
-                "However, you can add a Face Cam reaction after you finish your recording. Just open the video recording in our app and select “ Face Cam”.", false));
-        mFAQs.add(new FAQItem("My Video is saved to camera roll and I want to save it on the app", "Just make sure you long press (or 3D touch if available) " +
-                "the record button on the control center. Then, select Record it! as the destination app.", false));
-        mFAQs.add(new FAQItem("Error while recording or recording won’t stop", "Somethings the recording engine gets stuck due to a memory bug on some IOS devices." +
-                " Try restarting you device and close all other apps.", false));
-        mFAQs.add(new FAQItem("My record button is greyed out", "Make sure Screen Recording is Not Restricted with Parental Control: " +
-                "Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. " +
-                "Then scroll and look if Screen Recorder is restricted. If so, turn it off.", false));
-        mFAQs.add(new FAQItem("I still have a question", "Contact us at "+ AppConfigs.getInstance().getConfigModel().getFeedbackEmail() +" so we can help you.", false));
 
+        mFAQs.add(new FAQItem(getString(R.string.question_1), getString(R.string.answer_1), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_2), getString(R.string.answer_2), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_3), getString(R.string.answer_3), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_4), getString(R.string.answer_4), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_5), getString(R.string.answer_5), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_6), getString(R.string.answer_6), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_8), getString(R.string.answer_8), false));
+        mFAQs.add(new FAQItem(getString(R.string.question_7), "Contact us at " + AppConfigs.getInstance().getConfigModel().getFeedbackEmail() + " so we can help you.", false));
         return mViewRoot;
     }
 
@@ -61,7 +55,7 @@ public class FragmentFAQ extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
-        btn_back.setOnClickListener(view1 -> requireActivity().onBackPressed());
+        btn_back.setOnClickListener(view1 -> getParentFragmentManager().popBackStack());
 
         RelativeLayout mAdView = view.findViewById(R.id.adView);
         new AdsUtil(getContext(), mAdView).loadBanner();

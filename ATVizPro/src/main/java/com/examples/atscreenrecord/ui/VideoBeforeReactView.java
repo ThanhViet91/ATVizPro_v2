@@ -471,6 +471,9 @@ public class VideoBeforeReactView extends FrameLayout implements IVideoCustomVie
    * Cancel trim thread execut action when finish
    */
   @Override public void onDestroy() {
+    mVideoView.setVideoURI(null);
+    mVideoView.clearAnimation();
+    mVideoView.suspend();
     BackgroundExecutor.cancelAll("", true);
     UiThreadExecutor.cancelAll("");
   }

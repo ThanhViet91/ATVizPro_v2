@@ -99,9 +99,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
 
-    public void showProductRemoveAds() {
-        handlerProductList(mProductDetailsList);
-    }
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -213,7 +210,13 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         // Move the task containing the MainActivity to the back of the activity stack, instead of
         // destroying it. Therefore, MainActivity will be shown when the user switches back to the app.
-        moveTaskToBack(true);
+//        List<Fragment> all_fragss = getSupportFragmentManager().getFragments();
+        int all_frags = getSupportFragmentManager().getBackStackEntryCount();
+        if (all_frags == 0) {
+            moveTaskToBack(true);
+        } else {
+            getSupportFragmentManager().popBackStack();
+        }
     }
 
     @Override

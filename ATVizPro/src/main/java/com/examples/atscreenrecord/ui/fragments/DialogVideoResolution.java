@@ -1,9 +1,6 @@
 package com.examples.atscreenrecord.ui.fragments;
 
 
-import static android.content.Context.MODE_PRIVATE;
-
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +13,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.examples.atscreenrecord.Constants;
 import com.examples.atscreenrecord.Core;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.VideoSettingsAdapter;
@@ -32,7 +28,6 @@ public class DialogVideoResolution extends DialogFragmentBase{
 
     RecyclerView recyclerView;
     ArrayList<VideoProperties> mVideoResolutions;
-    SharedPreferences pref;
     public IVideoSettingListener callback;
     public DialogVideoResolution(IVideoSettingListener callback) {
         this.callback = callback;

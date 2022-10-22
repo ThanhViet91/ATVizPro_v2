@@ -2,14 +2,10 @@ package com.takusemba.rtmppublisher;
 
 import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
-import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-
-import com.serenegiant.utils.UIThreadHelper;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 import net.ossrs.rtmp.SrsFlvMuxer;
@@ -42,35 +38,35 @@ class Streamer implements AudioHandler.OnAudioEncoderStateListener, VideoHandler
         srsFlvMuxer = new SrsFlvMuxer(new ConnectCheckerRtmp() {
             @Override
             public void onConnectionSuccessRtmp() {
-                System.out.println("thanhlv onConnectionSuccessRtmp");
+//                System.out.println("thanhlv onConnectionSuccessRtmp");
                 if (listener != null) listener.onConnected();
             }
 
             @Override
             public void onConnectionFailedRtmp(@NonNull String reason) {
-                System.out.println("thanhlv onConnectionFailedRtmp " + reason);
+//                System.out.println("thanhlv onConnectionFailedRtmp " + reason);
                 if (listener != null) listener.onFailedToConnect(reason);
             }
 
             @Override
             public void onNewBitrateRtmp(long bitrate) {
-                System.out.println("thanhlv onNewBitrateRtmp");
+//                System.out.println("thanhlv onNewBitrateRtmp");
             }
 
             @Override
             public void onDisconnectRtmp() {
-                System.out.println("thanhlv onDisconnectRtmp");
+//                System.out.println("thanhlv onDisconnectRtmp");
                 if (listener != null) listener.onDisconnected();
             }
 
             @Override
             public void onAuthErrorRtmp() {
-                System.out.println("thanhlv onAuthErrorRtmp");
+//                System.out.println("thanhlv onAuthErrorRtmp");
             }
 
             @Override
             public void onAuthSuccessRtmp() {
-                System.out.println("thanhlv onAuthSuccessRtmp");
+//                System.out.println("thanhlv onAuthSuccessRtmp");
             }
         });
         srsFlvMuxer.setVideoResolution(width, height);
@@ -132,21 +128,20 @@ class Streamer implements AudioHandler.OnAudioEncoderStateListener, VideoHandler
     public void onAudioDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
         fixTimeStamp(info);
         srsFlvMuxer.sendAudio(h264Buffer, info);
-
-        System.out.println("thanhlv sendAudio " + info.size);
+//        System.out.println("thanhlv sendAudio " + info.size);
     }
 
     @Override
     public void onSpsPps(ByteBuffer sps, ByteBuffer pps) {
         srsFlvMuxer.setSpsPPs(sps, pps);
-        System.out.println("thanhlv onSpsPps " + sps.toString());
+//        System.out.println("thanhlv onSpsPps " + sps.toString());
     }
 
     @Override
     public void onVideoDataEncoded(ByteBuffer h264Buffer, MediaCodec.BufferInfo info) {
         fixTimeStamp(info);
         srsFlvMuxer.sendVideo(h264Buffer, info);
-        System.out.println("thanhlv sendVideo " + info.size);
+//        System.out.println("thanhlv sendVideo " + info.size);
     }
 
     long oldTimeStamp = 0L;

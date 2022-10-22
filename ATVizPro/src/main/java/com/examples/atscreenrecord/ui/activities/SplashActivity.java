@@ -29,7 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
         if (SettingManager2.getRemoveAds(App.getAppContext())) {
-            System.out.println("thanhlv Ad was removed");
+//            System.out.println("thanhlv Ad was removed");
             new Handler().postDelayed(this::startMainActivity, 3000);
         } else {
             createTimer();
@@ -52,7 +52,7 @@ public class SplashActivity extends AppCompatActivity {
                 new CountDownTimer((long) 5 * 1000, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        System.out.println("thanhlv remainnnnnnn ===  " + millisUntilFinished/1000);
+//                        System.out.println("thanhlv remainnnnnnn ===  " + millisUntilFinished/1000);
                     }
 
                     @Override

@@ -1,6 +1,5 @@
 package com.examples.atscreenrecord.ui.fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -30,14 +29,13 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = OptionChangeSpeedFragment.class.getSimpleName();
 
-    public IOptionFragmentListener mCallback = null;
+    public IOptionFragmentListener mCallback;
 
     public static OptionChangeSpeedFragment newInstance(IOptionFragmentListener callback, Bundle args) {
         OptionChangeSpeedFragment dialogSelectVideoSource = new OptionChangeSpeedFragment(callback);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public ISelectVideoSourceListener callback = null;
 
     public OptionChangeSpeedFragment(IOptionFragmentListener callback) {
         mCallback = callback;
@@ -113,16 +111,6 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
             }
         });
     }
-
-    private ProgressDialog mProgressDialog;
-    private ProgressDialog buildDialog(String msg) {
-        if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getContext(), "", msg);
-        }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
-    }
-
 
     @Override
     public void updateUI() {

@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atscreenrecord.AppConfigs;
 import com.examples.atscreenrecord.R;
 import com.examples.atscreenrecord.adapter.SettingsAdapter;
-import com.examples.atscreenrecord.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord.model.SettingsItem;
 import com.examples.atscreenrecord.ui.activities.MainActivity;
 import com.examples.atscreenrecord.utils.AdsUtil;
@@ -53,9 +52,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         mViewRoot = inflater.inflate(R.layout.fragment_settings_home, container, false);
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
+
+        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_live));
         settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
-//        settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
 //        settingsItems.add(new SettingsItem(getString(R.string.personalized_ads_off), R.drawable.ic_noti_ads));
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.share_app_to_friends), R.drawable.ic_share_settings2));
@@ -121,7 +121,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv upgrade_to_pro");
             ((MainActivity) requireActivity()).showProductRemoveAds();
-            SettingManager2.setRemoveAds(requireActivity().getApplicationContext(), true);
+        }
+        if (code.equals(getString(R.string.restore_purchase))) {
+            System.out.println("thanhlv restore_purchase");
+            ((MainActivity) requireActivity()).restoreRemoveAds();
         }
 
         if (code.equals(getString(R.string.share_app_to_friends))) {

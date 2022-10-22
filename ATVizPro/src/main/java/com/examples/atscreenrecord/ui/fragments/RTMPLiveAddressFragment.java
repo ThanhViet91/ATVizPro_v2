@@ -136,8 +136,8 @@ public class RTMPLiveAddressFragment extends Fragment {
             if (isMyServiceRunning(requireContext(), ControllerService.class)) {
                 if (!isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
                     saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
-                    mParentActivity.sendNewURL(mUrl);
-                    mParentActivity.notifyUpdateStreamProfile();
+//                    mParentActivity.sendNewURL(mUrl);
+                    mParentActivity.notifyUpdateStreamProfile(mUrl);
                 } else {
                     MyUtils.showSnackBarNotification(view, String.format("Livestream on %s is running!",
                             parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
@@ -146,14 +146,6 @@ public class RTMPLiveAddressFragment extends Fragment {
                 saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
                 mParentActivity.shouldStartControllerService();
             }
-//            tvStartLiveStream.setEnabled(false);
-//            edtRTMPAddress.setEnabled(false);
-//            edtStreamKey.setEnabled(false);
-//            btnClearRTMP.setVisibility(View.GONE);
-//            btnClearStreamKey.setVisibility(View.GONE);
-//            btnClearRTMP.setEnabled(false);
-//            btnClearStreamKey.setEnabled(false);
-//            MyUtils.showSnackBarNotification(view, "Stream connected!", Snackbar.LENGTH_LONG);
         });
 
         tvPasteStreamKey.setOnClickListener(v -> {
@@ -250,12 +242,8 @@ public class RTMPLiveAddressFragment extends Fragment {
 
             }
         });
-        btnClearRTMP.setOnClickListener(v -> {
-            edtRTMPAddress.setText("");
-        });
-        btnClearStreamKey.setOnClickListener(v -> {
-            edtStreamKey.setText("");
-        });
+        btnClearRTMP.setOnClickListener(v -> edtRTMPAddress.setText(""));
+        btnClearStreamKey.setOnClickListener(v -> edtStreamKey.setText(""));
         RelativeLayout rootView = view.findViewById(R.id.root_container);
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
         RelativeLayout mAdview = view.findViewById(R.id.adView);
@@ -270,12 +258,11 @@ public class RTMPLiveAddressFragment extends Fragment {
 
     private ProgressDialog mProgressDialog;
 
-    private ProgressDialog buildDialog(String msg) {
+    private void buildDialog() {
         if (mProgressDialog == null) {
-            mProgressDialog = ProgressDialog.show(getContext(), "", msg);
+            mProgressDialog = ProgressDialog.show(getContext(), "", "Connecting...");
         }
-        mProgressDialog.setMessage(msg);
-        return mProgressDialog;
+        mProgressDialog.setMessage("Connecting...");
     }
 
     private void saveData(String rtmp, String streamkey) {
@@ -370,7 +357,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                     return;
                 switch (notify_msg) {
                     case NOTIFY_MSG_CONNECTION_STARTED:
-                        buildDialog("Connecting...");
+                        buildDialog();
                         tvStartLiveStream.setEnabled(false);
                         edtRTMPAddress.setEnabled(false);
                         edtStreamKey.setEnabled(false);
@@ -398,8 +385,6 @@ public class RTMPLiveAddressFragment extends Fragment {
                         break;
 
                     case NOTIFY_MSG_STREAM_STOPPED:
-                        break;
-
                     case NOTIFY_MSG_ERROR:
                         break;
 

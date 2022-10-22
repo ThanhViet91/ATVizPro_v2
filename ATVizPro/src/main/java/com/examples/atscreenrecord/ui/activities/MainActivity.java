@@ -10,7 +10,6 @@ import static com.examples.atscreenrecord.ui.services.streaming.StreamingService
 import static com.examples.atscreenrecord.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord.ui.utils.MyUtils.isMyServiceRunning;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -30,14 +29,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -49,7 +46,6 @@ import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord.App;
 import com.examples.atscreenrecord.Core;
@@ -77,10 +73,8 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
-
 import java.net.URISyntaxException;
 import java.util.List;
-
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
-
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -128,7 +121,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        System.out.println("thanhlv getIntentttttt ==== " + intent.getAction());
         if (intent.getAction() != null && intent.getAction().equals(MyUtils.ACTION_GO_HOME)) {
             removeAllFragment();
         }
@@ -155,37 +147,65 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mMessageReceiver);
     }
 
-    void handlePurchase(Purchase purchase) {
-        // Purchase retrieved from BillingClient#queryPurchasesAsync or your PurchasesUpdatedListener.
-        // Verify the purchase.
-        // Ensure entitlement was not already granted for this purchaseToken.
-        // Grant entitlement to the user.
-        if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-            if (!purchase.isAcknowledged()) {
-                AcknowledgePurchaseParams acknowledgePurchaseParams =
-                        AcknowledgePurchaseParams.newBuilder()
-                                .setPurchaseToken(purchase.getPurchaseToken())
-                                .build();
-                billingClient.acknowledgePurchase(acknowledgePurchaseParams, billingResult -> {
-                    if (billingResult.getResponseCode() == 0) {
-                        if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
-                            SettingManager2.setRemoveAds(getApplicationContext(), true);
-                            initialAds = false;
-                        }
-                    }
-                });
-            }
-        }
+    public void showProductRemoveAds() {
+        launchPurchaseFlow(mProductDetailsList.get(0));
     }
 
+    public void restoreRemoveAds() {
+        restorePurchases();
+    }
+
+    void handlePurchase(Purchase purchase) {
+
+        if (!purchase.isAcknowledged()) {
+            billingClient.acknowledgePurchase(AcknowledgePurchaseParams
+                    .newBuilder()
+                    .setPurchaseToken(purchase.getPurchaseToken())
+                    .build(), billingResult -> {
+
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    //Setting setIsRemoveAd to true
+                    if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
+                        SettingManager2.setRemoveAds(getApplicationContext(), true);
+                        initialAds = false;
+                    }
+                }
+            });
+        }
+
+    }
+
+    void restorePurchases() {
+        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {
+        }).build();
+        final BillingClient finalBillingClient = billingClient;
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingServiceDisconnected() {
+                connectGooglePlayBilling();
+            }
+
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    finalBillingClient.queryPurchasesAsync(
+                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), (billingResult1, list) -> {
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                    SettingManager2.setRemoveAds(getApplicationContext(), list.size() > 0);
+                                }
+                            });
+                }
+            }
+        });
+    }
 
     private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
         // To be implemented in a later section.
-
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
                 && purchases != null) {
             for (Purchase purchase : purchases) {
                 handlePurchase(purchase);
+//                verifyPurchase(purchase);
             }
         } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
             // Handle an error caused by a user cancelling the purchase flow.
@@ -195,9 +215,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
-
     private BillingClient billingClient;
-
     private RelativeLayout mAdViewRoot;
 
     @Override
@@ -208,9 +226,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Move the task containing the MainActivity to the back of the activity stack, instead of
-        // destroying it. Therefore, MainActivity will be shown when the user switches back to the app.
-//        List<Fragment> all_fragss = getSupportFragmentManager().getFragments();
         int all_frags = getSupportFragmentManager().getBackStackEntryCount();
         if (all_frags == 0) {
             moveTaskToBack(true);
@@ -224,18 +239,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
+        if (!hasPermission()) requestPermissions();
+        initViews();
         billingClient = BillingClient.newBuilder(this)
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
                 .build();
-//        SettingManager2.setRemoveAds(this, false);
-        initViews();
         connectGooglePlayBilling();
-        if (!hasPermission()) requestPermissions();
+//        SettingManager2.setRemoveAds(this, false);
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
-
     }
 
     private void connectGooglePlayBilling() {
@@ -245,12 +259,11 @@ public class MainActivity extends AppCompatActivity {
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     // The BillingClient is ready. You can query purchases here.
                     showProducts();
-                    getPurchaseHistory();
                 } else {
                     //check show ad banner when connectGGBill fail
                     if (!SettingManager2.getRemoveAds(getApplicationContext())) {
                         runOnUiThread(() -> {
-                            System.out.println("thanhlv createBannerAdmob connectGooglePlayBilling ");
+                            System.out.println("thanhlv BillingClient not already in connectGooglePlayBilling ");
                             mAdManager.loadBanner();
                         });
                     }
@@ -261,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
             public void onBillingServiceDisconnected() {
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
+                connectGooglePlayBilling();
             }
         });
 
@@ -269,107 +283,55 @@ public class MainActivity extends AppCompatActivity {
     private List<ProductDetails> mProductDetailsList;
 
     private void showProducts() {
-        QueryProductDetailsParams queryProductDetailsParams =
-                QueryProductDetailsParams.newBuilder()
-                        .setProductList(
-                                ImmutableList.of(
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("at_screen_record_remove_ads_10")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("at_screen_record_remove_ads_20")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_thanh_10")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_thanh_20")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_50")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_40")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_30")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_20")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build(),
-                                        QueryProductDetailsParams.Product.newBuilder()
-                                                .setProductId("remove_ads_10")
-                                                .setProductType(BillingClient.ProductType.INAPP)
-                                                .build()
-                                )
-                        ).build();
-
-        billingClient.queryProductDetailsAsync(
-                queryProductDetailsParams,
-                (billingResult, productDetailsList) -> {
-                    // check billingResult
-                    // process returned productDetailsList
-                    mProductDetailsList = productDetailsList;
-                }
-        );
-
-
-    }
-
-    private void handlerProductList(List<ProductDetails> productDetailsList) {
-        if (productDetailsList == null || productDetailsList.size() == 0) return;
-        ImmutableList productDetailsParamsList;
-        productDetailsParamsList = ImmutableList.of(
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                        // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-                        .setProductDetails(productDetailsList.get(0))
-                        // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
-                        // for a list of offers that are available to the user
-//                                                .setOfferToken(productDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken())
+        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("at_screen_record_remove_ads_10")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("at_screen_record_remove_ads_20")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_thanh_10")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_thanh_20")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_50")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_40")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_30")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_20")
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId("remove_ads_10")
+                        .setProductType(BillingClient.ProductType.INAPP)
                         .build()
         );
 
-        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
+        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                .setProductList(productList)
                 .build();
 
-        // Launch the billing flow
-        BillingResult billingResult = billingClient.launchBillingFlow(this, billingFlowParams);
-    }
-
-    public void getPurchaseHistory() {
-        billingClient.queryPurchaseHistoryAsync(
-                QueryPurchaseHistoryParams.newBuilder()
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                (billingResult, purchasesHistoryList) -> {
-                    // check billingResult
-                    // process returned purchase history list, e.g. display purchase history
-
-                    if (purchasesHistoryList != null) {
-                        for (Object purchase : purchasesHistoryList) {
-                            if (purchase.toString().contains(getString(R.string.product_id_remove_ads))) {
-                                SettingManager2.setRemoveAds(getApplicationContext(), true);
-                                initialAds = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                        runOnUiThread(() -> {
-                            System.out.println("thanhlv createBannerAdmob getPurchaseHistory ");
-                            mAdManager.loadBanner();
-                        });
-
-                    }
+        billingClient.queryProductDetailsAsync(
+                params,
+                (billingResult, prodDetailsList) -> {
+                    // Process the result
+                    mProductDetailsList.clear();
+                    mProductDetailsList.addAll(prodDetailsList);
                 }
         );
     }
@@ -391,11 +353,24 @@ public class MainActivity extends AppCompatActivity {
         billingClient.consumeAsync(consumeParams, listener);
     }
 
+    void launchPurchaseFlow(ProductDetails productDetails) {
+        ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
+                ImmutableList.of(
+                        BillingFlowParams.ProductDetailsParams.newBuilder()
+                                .setProductDetails(productDetails)
+                                .build()
+                );
+        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build();
+
+        billingClient.launchBillingFlow(this, billingFlowParams);
+    }
+
     public static boolean initialAds = false;
 
     protected void onResume() {
         super.onResume();
-        System.out.println("thanhlv onResume mainnnnnnnnn");
         pulsator.start();
         updateService();
         billingClient.queryPurchasesAsync(
@@ -404,12 +379,14 @@ public class MainActivity extends AppCompatActivity {
                     if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         for (Purchase purchase : list) {
                             if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged()) {
-                                verifyPurchase(purchase);
+//                                verifyPurchase(purchase);
+                                handlePurchase(purchase);
                             }
                         }
                     }
                 }
         );
+
         checkShowAd();
     }
 
@@ -445,7 +422,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void checkShowAd() {
         if (initialAds) {
             mAdManager = new AdsUtil(this, mAdViewRoot);
@@ -456,7 +432,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleIncomingRequest(Intent intent) {
         if (intent.getAction() != null) {
-            System.out.println("thanhlv Main intent === action : " + intent.getAction());
             switch (intent.getAction()) {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
@@ -485,8 +460,8 @@ public class MainActivity extends AppCompatActivity {
         liveStreaming = findViewById(R.id.tv_live_streaming);
         imgLiveType = findViewById(R.id.img_live_type);
         pulsator.start();
-        generateVideoSettings();
-        updateVideoSettings();
+        initVideoSettings();
+        updateUISettings();
         mImgRec = findViewById(R.id.img_record);
         ImageView btn_setting = findViewById(R.id.img_settings);
         LinearLayout btn_set_resolution = findViewById(R.id.set_video_resolution);
@@ -497,9 +472,9 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.frame_layout_fragment, new FragmentSettings(), "")
                 .addToBackStack("")
                 .commit());
-        btn_set_resolution.setOnClickListener(view -> new DialogVideoResolution(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
-        bnt_set_bitrate.setOnClickListener(view -> new DialogBitrate(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
-        btn_set_fps.setOnClickListener(view -> new DialogFrameRate(this::updateVideoSettings).show(getSupportFragmentManager(), ""));
+        btn_set_resolution.setOnClickListener(view -> new DialogVideoResolution(this::updateUISettings).show(getSupportFragmentManager(), ""));
+        bnt_set_bitrate.setOnClickListener(view -> new DialogBitrate(this::updateUISettings).show(getSupportFragmentManager(), ""));
+        btn_set_fps.setOnClickListener(view -> new DialogFrameRate(this::updateUISettings).show(getSupportFragmentManager(), ""));
         mImgRec.setOnClickListener(view -> {
             if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
@@ -517,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
         lnFAQ.setOnClickListener(view -> showFAQFragment());
         LinearLayout react_cam = findViewById(R.id.ln_react_cam);
         react_cam.setOnClickListener(view -> {
-            if (checkServiceBusy()) return;
+            if (checkExecuteServiceBusy()) return;
             showDialogPickVideo(REQUEST_VIDEO_FOR_REACT_CAM);
         });
         ImageView btn_live = findViewById(R.id.img_live);
@@ -544,14 +519,14 @@ public class MainActivity extends AppCompatActivity {
         });
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
         btn_commentary.setOnClickListener(view -> {
-            if (checkServiceBusy()) return;
+            if (checkExecuteServiceBusy()) return;
             showDialogPickVideo(REQUEST_VIDEO_FOR_COMMENTARY);
         });
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
         btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT, CHOOSE_MY_RECORD));
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
         btn_editor.setOnClickListener(view -> {
-            if (checkServiceBusy()) return;
+            if (checkExecuteServiceBusy()) return;
             showDialogPickVideo(REQUEST_VIDEO_FOR_VIDEO_EDIT);
         });
     }
@@ -572,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private boolean checkServiceBusy() {
+    private boolean checkExecuteServiceBusy() {
         boolean bb = false;
         if (isMyServiceRunning(this, ExecuteService.class)) {
             bb = true;
@@ -593,13 +568,11 @@ public class MainActivity extends AppCompatActivity {
                 showTutorialScreenRecord();
                 return true;
             }
-
         if (type.equals(THE_FIRST_TIME_LIVESTREAM))
             if (SettingManager2.getFirstTimeLiveStream(this)) {
                 showTutorialLiveStream();
                 return true;
             }
-
         return false;
     }
 
@@ -619,18 +592,16 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void updateVideoSettings() {
-
+    private void updateUISettings() {
         TextView tv_resolution = findViewById(R.id.tv_video_resolution);
         TextView tv_bitrate = findViewById(R.id.tv_bitrate);
         TextView tv_frame_rate = findViewById(R.id.tv_frame_rate);
-
         tv_resolution.setText(SettingManager2.getVideoResolution(this));
         tv_bitrate.setText(SettingManager2.getVideoBitrate(this));
         tv_frame_rate.setText(SettingManager2.getVideoFPS(this));
     }
 
-    private void generateVideoSettings() {
+    private void initVideoSettings() {
         Core.resolution = SettingManager2.getVideoResolution(this);
         Core.bitrate = SettingManager2.getVideoBitrate(this);
         Core.frameRate = SettingManager2.getVideoFPS(this);
@@ -641,19 +612,13 @@ public class MainActivity extends AppCompatActivity {
         bundle.putInt(ARG_PARAM1, requestVideoFor);
         DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
             @Override
-            public void onClick() {
-            }
-
-            @Override
             public void onClickCameraRoll() {
-//                showDialogPickFromGallery(requestVideoFor);
                 showInterstitialAd(requestVideoFor, CHOOSE_GALLERY);
             }
 
             @Override
             public void onClickMyRecordings() {
                 showInterstitialAd(requestVideoFor, CHOOSE_MY_RECORD);
-//                showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
     }
@@ -670,7 +635,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
     }
 
-    int videoSource, fromFunction;
+    private int videoSource, fromFunction;
     public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
         @Override
         public void onAdClicked() {
@@ -680,7 +645,6 @@ public class MainActivity extends AppCompatActivity {
         public void onAdDismissedFullScreenContent() {
             if (videoSource == CHOOSE_MY_RECORD) showMyRecordings(fromFunction);
             if (videoSource == CHOOSE_GALLERY) showDialogPickFromGallery(fromFunction);
-//            mAdManager.createInterstitialAdmob();
         }
 
         @Override
@@ -697,6 +661,7 @@ public class MainActivity extends AppCompatActivity {
         public void onAdShowedFullScreenContent() {
         }
     };
+
     public void showInterstitialAd(int from_code, int type) {
         if (mAdManager.interstitialAdAlready()) {
             videoSource = type;
@@ -709,7 +674,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void requestPermissions() {
-
         // PERMISSION DRAW OVER
         if (!Settings.canDrawOverlays(this)) {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -733,7 +697,6 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                 }
-//                shouldStartControllerService();
             }
         }
     }
@@ -752,7 +715,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean hasCaptureIntent() {
         return mScreenCaptureIntent != null;// || mScreenCaptureResultCode == MyUtils.RESULT_CODE_FAILED;
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -849,7 +811,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void updateIconService() {
         updateService();
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
@@ -884,16 +845,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startService(controller);
         }
-//        updateService();
     }
 
     public void removeAllFragment() {
-//        List<Fragment> all_frags = getSupportFragmentManager().getFragments();
-//        for (Fragment frag : all_frags) {
-//            getSupportFragmentManager().beginTransaction().remove(frag).commit();
-//        }
-//        while (getSupportFragmentManager().getFragments().size() > 0)
-//            getSupportFragmentManager().popBackStack();
         for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
             getSupportFragmentManager().popBackStack();
         }
@@ -904,8 +858,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressLint("UnsupportedChromeOsCameraSystemFeature")
     private boolean checkCameraHardware(Context context) {
-        // this device has a camera
-        // no camera on this device
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
 
@@ -924,17 +876,11 @@ public class MainActivity extends AppCompatActivity {
         this.mStreamProfile = streamProfile;
     }
 
-    String mURL = "";
-
-    public void sendNewURL(String url) {
-        mURL = url;
-    }
-
-    public void notifyUpdateStreamProfile() {
+    public void notifyUpdateStreamProfile(String url) {
         if (mMode == MyUtils.MODE_STREAMING) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
             controller.setAction(MyUtils.ACTION_UPDATE_STREAM_PROFILE);
-            controller.putExtra(MyUtils.NEW_URL, mURL);
+            controller.putExtra(MyUtils.NEW_URL, url);
             Bundle bundle = new Bundle();
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
             controller.putExtras(bundle);
@@ -942,25 +888,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
             String action = intent.getAction();
-            if (!TextUtils.isEmpty(action) &&
-                    MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
-
+            if (!TextUtils.isEmpty(action) && MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
                 String notify_msg = intent.getStringExtra(KEY_MESSAGE);
                 if (TextUtils.isEmpty(notify_msg))
                     return;
                 updateService();
-                switch (notify_msg) {
-                    case NOTIFY_MSG_CONNECTION_FAILED:
-                        liveStreaming.setText(getString(R.string.livestreaming));
-                        sendDisconnectToService(true);
-                        break;
-                    default:
+                if (NOTIFY_MSG_CONNECTION_FAILED.equals(notify_msg)) {
+                    liveStreaming.setText(getString(R.string.livestreaming));
+                    sendDisconnectToService(true);
                 }
             }
         }

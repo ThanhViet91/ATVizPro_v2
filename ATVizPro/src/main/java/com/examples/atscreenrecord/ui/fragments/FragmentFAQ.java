@@ -41,7 +41,7 @@ public class FragmentFAQ extends Fragment {
         mFAQs.add(new FAQItem(getString(R.string.question_5), getString(R.string.answer_5), false));
         mFAQs.add(new FAQItem(getString(R.string.question_6), getString(R.string.answer_6), false));
         mFAQs.add(new FAQItem(getString(R.string.question_8), getString(R.string.answer_8), false));
-        mFAQs.add(new FAQItem(getString(R.string.question_7), "Contact us at " + AppConfigs.getInstance().getConfigModel().getFeedbackEmail() + " so we can help you.", false));
+        mFAQs.add(new FAQItem(getString(R.string.question_7), String.format(getString(R.string.answer_7), AppConfigs.getInstance().getConfigModel().getFeedbackEmail()), false));
         return mViewRoot;
     }
 

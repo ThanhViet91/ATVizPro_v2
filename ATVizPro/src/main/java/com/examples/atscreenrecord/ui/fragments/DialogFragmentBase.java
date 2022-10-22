@@ -29,7 +29,6 @@ public class DialogFragmentBase extends DialogFragment {
     }
 
     public interface ISelectVideoSourceListener {
-        void onClick();
         void onClickCameraRoll();
         void onClickMyRecordings();
     }

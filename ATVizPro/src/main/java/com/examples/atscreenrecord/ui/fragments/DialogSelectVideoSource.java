@@ -34,7 +34,7 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
-    public ISelectVideoSourceListener callback = null;
+    public ISelectVideoSourceListener callback;
 
     public DialogSelectVideoSource(ISelectVideoSourceListener callback) {
         this.callback = callback;

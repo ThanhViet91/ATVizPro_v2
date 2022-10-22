@@ -22,11 +22,12 @@ package com.examples.atscreenrecord.controllers.encoder;
  * All files in the folder are under this Apache License, Version 2.0.
  */
 
+import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
+
 import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -35,8 +36,6 @@ import com.examples.atscreenrecord.ui.utils.MyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
 
 public class MediaMuxerWrapper {
     private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
@@ -65,7 +64,6 @@ public class MediaMuxerWrapper {
                 outputFile.getParentFile().mkdirs();
             }
             mOutputPath = outputFile.getAbsolutePath();
-            System.out.println("thanhlv path == " + mOutputPath);
         } catch (final NullPointerException e) {
             throw new RuntimeException("This app has no permission of writing external storage");
         }

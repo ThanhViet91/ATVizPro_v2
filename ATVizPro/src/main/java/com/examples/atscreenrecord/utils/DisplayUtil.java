@@ -24,12 +24,6 @@ public class DisplayUtil {
         int densityDpi = getDisplayMetrics().densityDpi;
         float scaledDensity = getDisplayMetrics().scaledDensity;
         int ww = getDisplayMetrics().widthPixels;
-
-        System.out.println("thanhlv inffooooo  == " + xdpi);
-        System.out.println("thanhlv inffooooo  == " + density);
-        System.out.println("thanhlv inffooooo  == " + densityDpi);
-        System.out.println("thanhlv inffooooo  == " + scaledDensity);
-        System.out.println("thanhlv inffooooo  == " + ww);
     }
     public static float dpToPx(float dp) {
         return dp * getDisplayMetrics().density;

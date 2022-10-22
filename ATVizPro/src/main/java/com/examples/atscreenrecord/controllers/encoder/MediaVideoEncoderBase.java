@@ -22,6 +22,9 @@ package com.examples.atscreenrecord.controllers.encoder;
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
+import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
+import static com.takusemba.rtmppublisher.VideoEncoder.MIME_TYPE;
+
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -34,9 +37,6 @@ import com.examples.atscreenrecord.controllers.encoder.hw.FormatVideoEncoder;
 
 import java.io.IOException;
 import java.util.List;
-
-import static com.examples.atscreenrecord.ui.utils.MyUtils.DEBUG;
-import static com.takusemba.rtmppublisher.VideoEncoder.MIME_TYPE;
 
 
 public abstract class MediaVideoEncoderBase extends MediaEncoder {
@@ -52,7 +52,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 		super(muxer, listener);
 		mWidth = width;
 		mHeight = height;
-		System.out.println("thanhlv dddddd" + width + " llll "+height);
+//		System.out.println("thanhlv dddddd" + width + " llll "+height);
 	}
 
 	/**
@@ -85,7 +85,6 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
         if (videoCodecInfo !=null) {
 			if (DEBUG) Log.i(TAG, "selected codec: " + videoCodecInfo.getName());
 
-//        mMediaCodec = MediaCodec.createEncoderByType(mime);
 			mMediaCodec = MediaCodec.createByCodecName(videoCodecInfo.getName());
 
 			final MediaFormat format = create_encoder_format(mime, frame_rate, bitrate);

@@ -192,7 +192,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private int calculateSpanCount() {
-        DisplayUtil.info();
+//        DisplayUtil.info();
         float screenWidth = DisplayUtil.getDeviceWidthDpi();
         return (int)screenWidth/180 + 1;
     }
@@ -412,7 +412,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     Intent intent4 = new Intent(this, PlayVideoDetailActivity.class);
                     intent4.putExtra(KEY_PATH_VIDEO, video.getPath());
                     intent4.putExtra(KEY_VIDEO_NAME, video.getName());
-                    System.out.println("thanhlv PlayVideoDetailActivity "+ video.getPath());
+//                    System.out.println("thanhlv PlayVideoDetailActivity "+ video.getPath());
                     startActivity(intent4);
             }
         }

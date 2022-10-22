@@ -130,11 +130,11 @@ public class App extends Application
         // Show the ad (if available) when the app moves to foreground.
 
         if (SettingManager2.getRemoveAds(App.getAppContext())) {
-            System.out.println("thanhlv Ad was removed");
+//            System.out.println("thanhlv Ad was removed");
             return;
         }
         if (isPickFromGallery){
-            System.out.println("thanhlv Ad was isPickFromGallery ==== true");
+//            System.out.println("thanhlv Ad was isPickFromGallery ==== true");
             isPickFromGallery = false;
             return;
         }
@@ -191,11 +191,11 @@ public class App extends Application
         // We wrap the showAdIfAvailable to enforce that other classes only interact with MyApplication
         // class.
         if (SettingManager2.getRemoveAds(App.getAppContext())) {
-            System.out.println("thanhlv Ad was removed 222");
+//            System.out.println("thanhlv Ad was removed 222");
             return;
         }
         if (isPickFromGallery){
-            System.out.println("thanhlv Ad was isPickFromGallery ==== true 222");
+//            System.out.println("thanhlv Ad was isPickFromGallery ==== true 222");
             isPickFromGallery = false;
             return;
         }

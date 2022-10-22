@@ -178,7 +178,7 @@
     <string name="question_6">My record button is greyed out</string>
     <string name="answer_6">Make sure Screen Recording is Not Restricted with Parental Control: Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. Then scroll and look if Screen Recorder is restricted. If so, turn it off.</string>
     <string name="question_7">I still have a question</string>
-    <string name="answer_7">vv</string>
+    <string name="answer_7">Contact us at %s so we can help you.</string>
     <string name="question_8">Why react cam or commentary microphone sound is not good?</string>
     <string name="answer_8">Use headphones for better experience.</string>
 </resources>

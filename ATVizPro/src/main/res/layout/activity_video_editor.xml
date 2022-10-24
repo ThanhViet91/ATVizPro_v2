@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <com.examples.atscreenrecord.ui.VideoEditorView
+        <com.examples.atscreenrecord_test.ui.VideoEditorView
             android:id="@+id/trimmer_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

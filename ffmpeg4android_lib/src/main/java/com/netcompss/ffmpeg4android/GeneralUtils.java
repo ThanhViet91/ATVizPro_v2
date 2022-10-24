@@ -346,10 +346,10 @@ public class GeneralUtils {
 					timeStr = line.substring(i1 + 5, i2 - 1);
 					Log.d(Prefs.TAG, "Found timeStr: " + timeStr);
 				}
-				else if (line.startsWith("atscreenrecord: 0")) {
+				else if (line.startsWith("atscreenrecord_test: 0")) {
 					timeStr = "exit";
 				}
-				else if (line.startsWith("atscreenrecord: 1") ) {
+				else if (line.startsWith("atscreenrecord_test: 1") ) {
 						Log.w(Prefs.TAG, "error line: " + line);
 						Log.w(Prefs.TAG, "Looks like error in the log");
 						timeStr = "error";

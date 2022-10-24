@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.examples.atscreenrecord"
+    package="com.examples.atscreenrecord_test"
       android:installLocation="internalOnly"
-      android:versionCode="102"
-      android:versionName="1.0.2">
+      android:versionCode="103"
+      android:versionName="1.0.3">
 
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+<!--    <uses-permission android:name="android.permission.CAMERA" />-->
+<!--    <uses-permission android:name="android.permission.RECORD_AUDIO" />-->
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
@@ -26,7 +26,7 @@
     <uses-feature android:name="android.hardware.camera.front" android:required="false" />
     
     <application
-        android:name=".App"
+        android:name="com.examples.atscreenrecord_test.App"
         android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:allowBackup="true"
@@ -48,53 +48,53 @@
         </provider>
 
         <activity
-            android:name=".ui.activities.ReactCamActivity"
+            android:name="com.examples.atscreenrecord_test.ui.activities.ReactCamActivity"
             android:hardwareAccelerated="true"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.ResultVideoFinishActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.ResultVideoFinishActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"
             tools:ignore="LockedOrientationActivity">
         </activity>
-        <activity android:name=".ui.activities.PlayVideoDetailActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.PrepareVideoActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.CommentaryActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.CommentaryActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.VideoEditorActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.ProjectsActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.ProjectsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
         <activity
-            android:name=".ui.activities.SplashActivity"
+            android:name="com.examples.atscreenrecord_test.ui.activities.SplashActivity"
             android:screenOrientation="portrait"
             android:noHistory="true"
             android:exported="true"
@@ -106,7 +106,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activities.MainActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateAlwaysHidden"
@@ -114,36 +114,36 @@
             tools:ignore="LockedOrientationActivity">
         </activity>
 
-        <activity android:name=".ui.activities.TranslucentActivity"
+        <activity android:name="com.examples.atscreenrecord_test.ui.activities.TranslucentActivity"
             android:theme="@style/Theme.Transparent"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
         </activity>
 
         <service
-            android:name=".ui.services.BaseService"
+            android:name="com.examples.atscreenrecord_test.ui.services.BaseService"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false"/>
 
         <service
-            android:name=".ui.services.recording.RecordingService"
+            android:name="com.examples.atscreenrecord_test.ui.services.recording.RecordingService"
             android:stopWithTask="true"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:enabled="true"
             android:exported="false" />
 
-        <service android:name=".ui.services.streaming.StreamingService" />
+        <service android:name="com.examples.atscreenrecord_test.ui.services.streaming.StreamingService" />
 
         <service
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
-            android:name=".ui.services.ControllerService" />
+            android:name="com.examples.atscreenrecord_test.ui.services.ControllerService" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_sdk_id"/>
 
-        <service android:name=".ui.services.ExecuteService" />
+        <service android:name="com.examples.atscreenrecord_test.ui.services.ExecuteService" />
 
     </application>
    

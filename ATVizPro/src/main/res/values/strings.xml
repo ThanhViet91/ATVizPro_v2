@@ -118,7 +118,7 @@
     <string name="admob_intersitial_id_debug">ca-app-pub-3940256099942544/1033173712</string>
 
     <!--    product_id_remove_ads-->
-    <string name="product_id_remove_ads">remove_ads_50</string>
+    <string name="product_id_remove_ads">test_ad_1</string>
 
     <!--    guideline_record-->
     <string name="guideline_record_step_1">Step 1: Tap the flashing icon</string>

@@ -30,6 +30,7 @@
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_check.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_checked.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_close.xml" value="0.124" />
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_crown.xml" value="0.2595" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_group_575.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_launcher_2_background.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_microphone_2.xml" value="0.257" />
@@ -42,7 +43,9 @@
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_projects_svg.xml" value="0.257" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_react_cam_svg.xml" value="0.1545" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_react_cam_svg_large.xml" value="0.166" />
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_recorder_settings.xml" value="0.2595" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_recording_popup_2.xml" value="0.166" />
+        <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_restore.xml" value="0.2595" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_settings.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_start.xml" value="0.124" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_sync.xml" value="0.124" />

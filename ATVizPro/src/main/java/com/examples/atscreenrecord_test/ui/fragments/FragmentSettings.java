@@ -277,7 +277,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                     finalBillingClient.queryPurchasesAsync(
                             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(), (billingResult1, list) -> {
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    System.out.println("thanhlv ffffffffffffff = == " + list.size());
+                                    System.out.println("thanhlv fffffffffffff  f = == " + list.size());
                                     SettingManager2.setRemoveAds(requireContext(), list.size() > 0);
                                 }
                             });

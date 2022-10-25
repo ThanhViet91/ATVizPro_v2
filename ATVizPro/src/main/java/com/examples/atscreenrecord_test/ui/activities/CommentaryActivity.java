@@ -213,7 +213,10 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onPause() {
         super.onPause();
-        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
+//        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
+        if (!hasEndCommentary) {
+            getEndCommentary();
+        }
     }
 
     private void checkHasChangeVideoCamView() {
@@ -412,6 +415,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    boolean hasEndCommentary = false;
     private void getEndCommentary() {
         if (videoView.isPlaying()) videoView.pause();
         endTime = mediaPlayer.getCurrentPosition();
@@ -428,6 +432,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         btnRetake.setVisibility(View.VISIBLE);
         btnNext.setVisibility(View.VISIBLE);
         pauseRecord = true;
+        hasEndCommentary = true;
     }
 
     private void getStartCommentary() {
@@ -439,6 +444,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         mCounterUpdateHandler.post(mUpdateCounter);
         hasAudioFile = false;
         pauseRecord = false;
+        hasEndCommentary = false;
     }
 
 }

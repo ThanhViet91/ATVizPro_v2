@@ -35,6 +35,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
@@ -148,77 +150,6 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mMessageReceiver);
     }
 
-    public void showProductRemoveAds() {
-        if (mProductDetailsList == null || mProductDetailsList.size() == 0) return;
-        launchPurchaseFlow(mProductDetailsList.get(0));
-    }
-
-    public void restoreRemoveAds() {
-        restorePurchases();
-    }
-
-    void handlePurchase(Purchase purchase) {
-
-        if (!purchase.isAcknowledged()) {
-            billingClient.acknowledgePurchase(AcknowledgePurchaseParams
-                    .newBuilder()
-                    .setPurchaseToken(purchase.getPurchaseToken())
-                    .build(), billingResult -> {
-
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    //Setting setIsRemoveAd to true
-                    if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
-                        SettingManager2.setRemoveAds(getApplicationContext(), true);
-                        initialAds = false;
-                    }
-                }
-            });
-        }
-
-    }
-
-    void restorePurchases() {
-        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {
-        }).build();
-        final BillingClient finalBillingClient = billingClient;
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingServiceDisconnected() {
-                connectGooglePlayBilling();
-            }
-
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    finalBillingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(), (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    System.out.println("thanhlv ffffffffffffff = == " + list.size());
-                                    SettingManager2.setRemoveAds(getApplicationContext(), list.size() > 0);
-                                }
-                            });
-                }
-            }
-        });
-    }
-
-    private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
-        // To be implemented in a later section.
-        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                && purchases != null) {
-            for (Purchase purchase : purchases) {
-                handlePurchase(purchase);
-//                verifyPurchase(purchase);
-            }
-        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-            // Handle an error caused by a user cancelling the purchase flow.
-            //TODO
-        } else {
-            //TODO
-        }
-
-    };
-    private BillingClient billingClient;
     private RelativeLayout mAdViewRoot;
 
     @Override
@@ -243,116 +174,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
         if (!hasPermission()) requestPermissions();
+
         initViews();
-        billingClient = BillingClient.newBuilder(this)
-                .setListener(purchasesUpdatedListener)
-                .enablePendingPurchases()
-                .build();
-        connectGooglePlayBilling();
-//        SettingManager2.setRemoveAds(this, false);
+        SettingManager2.setRemoveAds(this, false);
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
-    }
-
-    private void connectGooglePlayBilling() {
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    // The BillingClient is ready. You can query purchases here.
-                    showProducts();
-                } else {
-                    //check show ad banner when connectGGBill fail
-                    if (!SettingManager2.getRemoveAds(getApplicationContext())) {
-                        runOnUiThread(() -> {
-                            System.out.println("thanhlv BillingClient not already in connectGooglePlayBilling ");
-                            mAdManager.loadBanner();
-                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-                connectGooglePlayBilling();
-            }
-        });
-
-    }
-
-    private ArrayList<ProductDetails> mProductDetailsList;
-
-    private void showProducts() {
-        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId("test_ad_1")
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId("test_ad_2")
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId("test_ad_3")
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId("test_ad_4")
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId("test_ad_5")
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build()
-        );
-
-        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
-                .setProductList(productList)
-                .build();
-
-        billingClient.queryProductDetailsAsync(
-                params,
-                (billingResult, prodDetailsList) -> {
-                    // Process the result
-//                    mProductDetailsList.clear();
-                    mProductDetailsList = new ArrayList<>();
-                    mProductDetailsList.addAll(prodDetailsList);
-                }
-        );
-    }
-
-    void confirmPurchase(Purchase purchase) {
-        if (purchase.getProducts().get(0).equals(getString(R.string.product_id_remove_ads)))
-            SettingManager2.setRemoveAds(this, true);
-    }
-
-    void verifyPurchase(Purchase purchase) {
-        ConsumeParams consumeParams = ConsumeParams.newBuilder()
-                .setPurchaseToken(purchase.getPurchaseToken())
-                .build();
-        ConsumeResponseListener listener = (billingResult, s) -> {
-            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                confirmPurchase(purchase);
-            }
-        };
-        billingClient.consumeAsync(consumeParams, listener);
-    }
-
-    void launchPurchaseFlow(ProductDetails productDetails) {
-        ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
-                ImmutableList.of(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                                .setProductDetails(productDetails)
-                                .build()
-                );
-        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build();
-
-        billingClient.launchBillingFlow(this, billingFlowParams);
     }
 
     public static boolean initialAds = false;
@@ -361,19 +188,6 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         pulsator.start();
         updateService();
-        billingClient.queryPurchasesAsync(
-                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
-                (billingResult, list) -> {
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        for (Purchase purchase : list) {
-                            if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged()) {
-//                                verifyPurchase(purchase);
-                                handlePurchase(purchase);
-                            }
-                        }
-                    }
-                }
-        );
 
         checkShowAd();
     }
@@ -412,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void checkShowAd() {
         if (initialAds) {
-            mAdManager = new AdsUtil(this, mAdViewRoot);
             mAdManager.loadBanner();
             mAdManager.createInterstitialAdmob();
         }
@@ -444,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         mAdViewRoot = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(this, mAdViewRoot);
         pulsator = findViewById(R.id.pulsator);
         liveStreaming = findViewById(R.id.tv_live_streaming);
         imgLiveType = findViewById(R.id.img_live_type);

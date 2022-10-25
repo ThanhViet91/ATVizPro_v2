@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
+    android:clickable="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="KeyboardInaccessibleWidget">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="60dp">
+
+            <RelativeLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="42dp">
+
+                <ImageView
+                    android:id="@+id/img_btn_back_header"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/medium_margin"
+                    android:contentDescription="@string/todo"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_dismiss_subscription" />
+
+                <TextView
+                    android:id="@+id/tv_btn_restore"
+                    style="@style/Title_Box_White"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="22dp"
+                    android:text="Restore"
+                    android:textColor="#BBBBBB"
+                    android:textSize="18sp" />
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/ava_ss"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="58dp"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/ic_app_ss" />
+
+            <TextView
+                android:id="@+id/text1"
+                style="@style/Title_Box_Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/ava_ss"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:text="Screen Recorder"
+                android:textFontWeight="700"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@id/text2"
+                style="@style/Title_Box_Black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text1"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:text="Unlock Unlimited Access"
+                android:textFontWeight="700"
+                android:textSize="26sp" />
+
+            <LinearLayout
+                android:id="@+id/line1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text2"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/huge_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_unlimited" />
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_margin"
+                    android:text="Unlimited duration of videos"
+                    android:textFontWeight="550"
+
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/line2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/line1"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/huge_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_unlimited" />
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_margin"
+                    android:text="You can live stream"
+                    android:textFontWeight="550"
+
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/line3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/line2"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/huge_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_unlimited" />
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/small_margin"
+                    android:text="No Ads"
+                    android:textFontWeight="550"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/check1"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_below="@id/line3"
+                android:layout_marginStart="@dimen/normal_margin_left"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="@dimen/normal_margin_right"
+                android:background="@drawable/shape_round_ss_checked"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_select_sub" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Title_Box_Black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-2dp"
+                        android:text="đ92.000,00/month, auto renewable"
+                        android:textFontWeight="600"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        style="@style/Title_Box_Black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-4dp"
+                        android:text="3-day FREE TRIAL"
+                        android:textColor="#B0B0B0"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/check2"
+                android:layout_width="match_parent"
+                android:layout_height="58dp"
+                android:layout_below="@id/check1"
+                android:layout_marginStart="@dimen/normal_margin_left"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="@dimen/normal_margin_right"
+                android:background="@drawable/shape_round_ss_check"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_select_sub" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/Title_Box_Black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-2dp"
+                        android:text="đ399.000,00/year, auto renewable"
+                        android:textFontWeight="600"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        style="@style/Title_Box_Black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="-4dp"
+                        android:text="1-Week FREE TRIAL"
+                        android:textColor="#B0B0B0"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/check3"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_below="@id/check2"
+                android:layout_marginStart="@dimen/normal_margin_left"
+                android:layout_marginTop="22dp"
+                android:layout_marginEnd="@dimen/normal_margin_right"
+                android:background="@drawable/shape_round_ss_check_3">
+
+                <ImageView
+                    android:id="@+id/ava_check"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_select_sub" />
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/normal_margin"
+                    android:layout_toRightOf="@id/ava_check"
+                    android:text="đ699.000,00,Lifetime"
+                    android:textFontWeight="600"
+                    android:textSize="14sp" />
+
+                <FrameLayout
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/normal_margin"
+                    android:background="@drawable/bg_save_ss">
+
+                    <TextView
+                        style="@style/Title_Box_Black"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="5dp"
+                        android:text="Save 89%"
+                        android:textColor="#fff"
+                        android:textSize="13sp" />
+
+                </FrameLayout>
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/btn_start_plan"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/check3"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="52dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/btn_start_plan" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/btn_start_plan"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="Terms of Service"
+                    android:textFontWeight="600"
+                    android:textSize="13sp" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="#000" />
+
+                <TextView
+                    style="@style/Title_Box_Black"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:text="Privacy Notice"
+                    android:textFontWeight="600"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </RelativeLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+</LinearLayout>

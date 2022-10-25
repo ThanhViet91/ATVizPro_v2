@@ -157,7 +157,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
             videoPrepared(mp);
             mediaPlayer = mp;
-            videoView.setOnCompletionListener(mediaPlayer -> getEndReactCam());
+            videoView.setOnCompletionListener(mediaPlayer -> {
+//                endTime = mediaPlayer.getCurrentPosition() + 50;
+                getEndReactCam();
+            });
             initCamView();
         });
     }
@@ -218,10 +221,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     int[] camViewSize = new int[7];
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
-        //pause seekbar
-        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
+        if (!hasEndReact) getEndReactCam();
     }
 
     RelativeLayout root;
@@ -408,6 +410,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     countDownTimer.start();
                 }
             } else {
+//                endTime = mediaPlayer.getCurrentPosition() + 50;
                 getEndReactCam();
             }
         }
@@ -501,9 +504,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private final Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter)));
-            timeCounter++;
-            mCounterUpdateHandler.postDelayed(this, 1000);
+            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter/1000)));
+            timeCounter = timeCounter + 50;
+            mCounterUpdateHandler.postDelayed(this, 50);
         }
     };
 
@@ -543,9 +546,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (action.equals("Discard")) discardVideo();
     }
 
+    boolean hasEndReact = false;
     private void getEndReactCam() {
         if (videoView.isPlaying()) videoView.pause();
-        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
+//        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
+        endTime = timeCounter;
 //        System.out.println("thanhlv endTime = mediaPlayer.getCurrentPosition() " + endTime);
         new Handler().postDelayed(() -> {
             rtmpCamera.stopRecord();
@@ -559,12 +564,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         btnInformation.setVisibility(View.GONE);
         btnRetake.setVisibility(View.VISIBLE);
         btnNext.setVisibility(View.VISIBLE);
+        hasEndReact = true;
     }
 
     int startTime, endTime = 0;
     int posX, posY;
 
     private void getStartReactCam() throws IOException {
+
         thumbVideo.setVisibility(View.GONE);
         rtmpCamera.startRecord(cameraCahePath);
         videoView.start();
@@ -575,6 +582,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
         posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);
         hasCamVideo = false;
+        hasEndReact = false;
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -588,7 +596,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
-        if (mHolder.getSurface() == null) {
+        if (mHolder == null && mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }

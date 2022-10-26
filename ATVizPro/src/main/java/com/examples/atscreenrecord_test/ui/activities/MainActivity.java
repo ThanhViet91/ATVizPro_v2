@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.MediaMetadataRetriever;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
@@ -55,6 +56,7 @@ import com.examples.atscreenrecord_test.ui.fragments.FragmentSettings;
 import com.examples.atscreenrecord_test.ui.fragments.GuidelineLiveStreamFragment;
 import com.examples.atscreenrecord_test.ui.fragments.GuidelineScreenRecordFragment;
 import com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment;
+import com.examples.atscreenrecord_test.ui.fragments.SubscriptionFragment;
 import com.examples.atscreenrecord_test.ui.services.ControllerService;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.services.streaming.StreamingService;
@@ -169,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
         if (!hasPermission()) requestPermissions();
 
         initViews();
-//        SettingManager2.setProApp(this, false);
         Intent intent = getIntent();
         if (intent != null)
             handleIncomingRequest(intent);
@@ -286,6 +287,16 @@ public class MainActivity extends AppCompatActivity {
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
 
+            if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
+            if (!SettingManager2.isProApp(this)) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                        .addToBackStack("")
+                        .commit();
+                return;
+            }
+
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
                 if (isConnected) {
                     new AlertDialog.Builder(this)
@@ -303,7 +314,6 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
             }
-            if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
             showLiveStreamFragment();
         });
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
@@ -623,6 +633,15 @@ public class MainActivity extends AppCompatActivity {
         return mScreenCaptureIntent != null;// || mScreenCaptureResultCode == MyUtils.RESULT_CODE_FAILED;
     }
 
+    public long getDurationMs(String path) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(this, Uri.parse(path));
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        retriever.release();
+        long timeInMs = Long.parseLong(time);
+        return timeInMs;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         App.isPickFromGallery = true;
@@ -635,6 +654,21 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
+                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                                    .addToBackStack("")
+                                    .commitAllowingStateLoss();
+                        }
+                    });
+
+                    return;
+                }
+
                 Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
 //                intent.setAction(MyUtils.ACTION_FOR_REACT);
                 intent.putExtra(KEY_PATH_VIDEO, pathVideo);
@@ -653,6 +687,15 @@ public class MainActivity extends AppCompatActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
+
+                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .addToBackStack("")
+                            .commitAllowingStateLoss();
+                    return;
+                }
                 Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
                 intent.putExtra(KEY_PATH_VIDEO, pathVideo);
                 startActivity(intent);
@@ -669,6 +712,14 @@ public class MainActivity extends AppCompatActivity {
                     pathVideo = PathUtil.getPath(this, selectedUri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
+                }
+                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .addToBackStack("")
+                            .commitAllowingStateLoss();
+                    return;
                 }
                 Bundle bundle = new Bundle();
                 bundle.putString(VIDEO_PATH_KEY, pathVideo);

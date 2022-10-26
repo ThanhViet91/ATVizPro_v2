@@ -223,7 +223,15 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onPause() {
         super.onPause();
-        if (!hasEndReact) getEndReactCam();
+        if (!hasEndReact) {
+            getEndReactCam();
+        } else {
+            countDownTimer.cancel();
+            layoutCountdown.setVisibility(View.GONE);
+            thumbVideo.setVisibility(View.VISIBLE);
+            toggleReactCam.setEnabled(true);
+            inRecording = false;
+        }
     }
 
     RelativeLayout root;
@@ -267,12 +275,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         root = findViewById(R.id.root_container);
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
-        cameraView = new SurfaceView(this);
-        rtmpCamera = new RtmpLiveStream(cameraView);
-        if (cameraView.getParent() != null) {
+        if (cameraPreview != null && cameraView.getParent() != null) {
             ((ViewGroup) cameraView.getParent()).removeView(cameraView); // <- fix
         }
-
+        cameraView = new SurfaceView(this);
+        rtmpCamera = new RtmpLiveStream(cameraView);
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
@@ -548,12 +555,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (action.equals("Discard")) discardVideo();
     }
 
-    boolean hasEndReact = false;
+    boolean hasEndReact = true;
     private void getEndReactCam() {
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
         endTime = timeCounter;
-//        System.out.println("thanhlv endTime = mediaPlayer.getCurrentPosition() " + endTime);
         new Handler().postDelayed(() -> {
             rtmpCamera.stopRecord();
             rtmpCamera.stopPreview();
@@ -598,7 +604,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
-        if (mHolder == null && mHolder.getSurface() == null) {
+        if (mHolder == null) {
             // preview surface does not exist
             return;
         }
@@ -606,8 +612,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        rtmpCamera.stopPreview();
-        mHolder.removeCallback(null);
+        if (rtmpCamera != null) rtmpCamera.stopPreview();
+        if (mHolder != null) mHolder.removeCallback(null);
         mHolder = null;
         rtmpCamera = null;
     }

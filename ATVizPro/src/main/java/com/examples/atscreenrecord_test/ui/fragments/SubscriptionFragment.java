@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,10 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.CompositePageTransformer;
-import androidx.viewpager2.widget.MarginPageTransformer;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
@@ -35,23 +30,14 @@ import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.R;
-import com.examples.atscreenrecord_test.adapter.PhotoAdapter;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord_test.model.PhotoModel;
 import com.examples.atscreenrecord_test.model.SubscriptionsItemModel;
-import com.examples.atscreenrecord_test.ui.activities.MainActivity;
-import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import me.relex.circleindicator.CircleIndicator3;
 
 public class SubscriptionFragment extends Fragment {
 
@@ -64,7 +50,6 @@ public class SubscriptionFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        this.mParentActivity = (MainActivity) context;
         mFragmentManager = getParentFragmentManager();
         WEEK_SUBS_ID = requireContext().getString(R.string.product_id_week);
         MONTH_SUBS_ID = requireContext().getString(R.string.product_id_month);
@@ -101,6 +86,8 @@ public class SubscriptionFragment extends Fragment {
                     //Setting setIsRemoveAd to true
                     if (purchase.getProducts().get(0).contains(subs.get(selected).getKeyID())) {
                         SettingManager2.setProApp(requireContext(), true);
+                        System.out.println("thanhlv buyyyyyyyyyyyyyy OKKKKKKK");
+                        mFragmentManager.popBackStack();
                     }
                 }
             });

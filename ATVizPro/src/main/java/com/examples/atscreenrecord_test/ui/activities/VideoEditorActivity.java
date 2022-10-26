@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -129,11 +130,12 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         animationView.playAnimation();
     }
 
+    boolean enableSave = false;
     @Override
     public void onClickNext() {
         //pressSave
         try {
-            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput()));
+            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -202,6 +204,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         animationView.setVisibility(View.GONE);
         videoEditorView.onPressSave();
         videoEditorView.initVideoByURI(Uri.parse(outPath));
+        enableSave = true;
     }
 
 
@@ -222,7 +225,26 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
     @Override
     public void onCancel() {
-        finish();
+        if (enableSave) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Save Video")
+                    .setMessage("Do you want to save this video?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        try {
+                            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        finish();
+                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+                        finish();
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else finish();
+
     }
 
     @Override

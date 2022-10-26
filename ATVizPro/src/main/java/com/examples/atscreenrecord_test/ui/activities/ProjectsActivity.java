@@ -40,7 +40,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.examples.atscreenrecord_test.BuildConfig;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.VideoProjectsAdapter;
+import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.model.VideoModel;
+import com.examples.atscreenrecord_test.ui.fragments.SubscriptionFragment;
 import com.examples.atscreenrecord_test.ui.utils.DialogHelper;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
@@ -194,10 +196,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private int calculateSpanCount() {
 //        DisplayUtil.info();
         float screenWidth = DisplayUtil.getDeviceWidthDpi();
-        return (int)screenWidth/180 + 1;
+        return (int) screenWidth / 180 + 1;
     }
 
     private VideoModel videoModelOld;
+
     private void handleRenameButton(VideoModel oldVideo) {
         videoModelOld = new VideoModel();
         videoModelOld.setPath(oldVideo.getPath());
@@ -382,7 +385,18 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             return;
         }
 
-        if (video != null){
+        if (video != null) {
+
+            if (from_code != REQUEST_SHOW_PROJECTS_DEFAULT
+                    && video.getDurationMs(this) > 60000
+                    && !SettingManager2.isProApp(this)) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                        .addToBackStack("")
+                        .commit();
+                return;
+            }
 
             switch (from_code) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
@@ -405,25 +419,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     break;
                 case REQUEST_SHOW_PROJECTS_DEFAULT:
                 default:
-//                Intent intent4 = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
-//                intent4.setDataAndType(Uri.parse(path), "video/*");
-//                startActivity(intent4);
-
                     Intent intent4 = new Intent(this, PlayVideoDetailActivity.class);
                     intent4.putExtra(KEY_PATH_VIDEO, video.getPath());
                     intent4.putExtra(KEY_VIDEO_NAME, video.getName());
-//                    System.out.println("thanhlv PlayVideoDetailActivity "+ video.getPath());
                     startActivity(intent4);
             }
         }
     }
-
-//    private final ActivityResultLauncher<IntentSenderRequest> loginResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
-//        // handle intent result here
-//        if (result.getResultCode() == RESULT_OK) {
-//            Toast.makeText(this, "The video is deleted! " + result.getData(), Toast.LENGTH_SHORT).show();
-//        }
-//    });
 
     public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
         PendingIntent pendingIntent = null;

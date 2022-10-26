@@ -97,12 +97,13 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
         prepareAudioRecorder();
+
+        addVideoView();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        addVideoView();
         RelativeLayout mAdview = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdview);
         mAdManager.loadBanner();
@@ -141,7 +142,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         mediaRecorder.setAudioEncodingBitRate(16 * 96000);
         mediaRecorder.setAudioSamplingRate(96000);
         mediaRecorder.setOutputFile(cacheAudioFilePath);
-
         try {
             mediaRecorder.prepare();
         } catch (IllegalStateException | IOException e) {
@@ -163,9 +163,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
                     .load(videoFile)
                     .into(thumbVideo);
         }
-//        videoView.setMediaController(new MediaController(this));
         videoView.requestFocus();
-        videoView.setZOrderOnTop(false);
         videoView.setOnPreparedListener(mp -> {
             videoDuration = mp.getDuration();
             animationProgressBar.setDuration(videoDuration);
@@ -216,7 +214,15 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 //        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         if (!hasEndCommentary) {
             getEndCommentary();
+        } else {
+
+            countDownTimer.cancel();
+            layoutCountdown.setVisibility(View.GONE);
+            thumbVideo.setVisibility(View.VISIBLE);
+            pauseRecord = true;
+            toggleReactCam.setEnabled(true);
         }
+
     }
 
     private void checkHasChangeVideoCamView() {
@@ -301,7 +307,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         bundle.putString(KEY_TITLE, title);
         bundle.putString(KEY_POSITIVE, pos);
         bundle.putString(KEY_NEGATIVE, neg);
-        PopupConfirm.newInstance(new IConfirmPopupListener(){
+        PopupConfirm.newInstance(new IConfirmPopupListener() {
             @Override
             public void onClickPositiveButton() {
                 if (requiredFinish) {
@@ -311,6 +317,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
                     doPositiveButton(pos);
                 }
             }
+
             @Override
             public void onClickNegativeButton() {
             }
@@ -392,9 +399,9 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     private final Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter)));
-            timeCounter++;
-            mCounterUpdateHandler.postDelayed(this, 1000);
+            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter/1000)));
+            timeCounter = timeCounter + 50;
+            mCounterUpdateHandler.postDelayed(this, 50);
         }
     };
 
@@ -417,16 +424,15 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
-    boolean hasEndCommentary = false;
+    boolean hasEndCommentary = true;
+
     private void getEndCommentary() {
         if (videoView.isPlaying()) videoView.pause();
-        endTime = mediaPlayer.getCurrentPosition();
-        new Handler().postDelayed(() -> {
-            mediaRecorder.stop();
-            mediaRecorder.release();
-            mediaRecorder = null;
-            hasAudioFile = true;
-        }, 100);
+        endTime = timeCounter;
+        mediaRecorder.stop();
+        mediaRecorder.release();
+        mediaRecorder = null;
+        hasAudioFile = true;
         progressBar.clearAnimation();
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();

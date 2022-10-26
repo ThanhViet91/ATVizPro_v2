@@ -23,15 +23,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.R;
@@ -41,7 +35,6 @@ import com.examples.atscreenrecord_test.model.SettingsItem;
 import com.examples.atscreenrecord_test.ui.activities.MainActivity;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -123,14 +116,36 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         super.onDestroyView();
     }
 
+    private BillingClient billingClient;
+    private void getPurchase() {
+        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingServiceDisconnected() {
+                getPurchase();
+            }
+
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+
+                if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                    billingClient.queryPurchasesAsync(
+                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
+                            (billingResult1, list) -> {
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                    SettingManager2.setProApp(requireContext(), list.size() > 0);
+                                }
+                            });
+                }
+            }
+        });
+    }
 
     @Override
     public void onClickItem(String code) {
 
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv upgrade_to_pro");
-//            if (mProductDetailsList == null || mProductDetailsList.size() == 0) return;
-//            launchPurchaseFlow(mProductDetailsList.get(0));
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
                     .addToBackStack("")
@@ -138,8 +153,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
         if (code.equals(getString(R.string.restore_purchase))) {
             System.out.println("thanhlv restore_purchase");
-//            restorePurchases();
-//            getPurchase();
+            getPurchase();
         }
 
         if (code.equals(getString(R.string.share_app_to_friends))) {

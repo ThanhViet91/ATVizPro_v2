@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <defaults>
   <entry>
-    <key>Subscriptions</key>
-    <value>[{"name":"BEST VALUE","keyID":"com.vuquynh.iwidget.removeads","description":"Lifetime","selected":false,"sort":0},{"name":"MOST POPULAR","keyID":"com.vuquynh.iwidget.monthlySub","description":"Month","selected":true,"sort":1},{"name":"Save 80%","keyID":"com.vuquynh.iwidget.yearlySub","description":"Year","selected":false,"sort":2}]</value>
+    <key>Configs</key>
+    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream â„¢","interstitialPercent":50,"frequencyCapping":15,"termsURL":"https://atsoft.io/terms","privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
   </entry>
   <entry>
-    <key>Configs</key>
-    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream â„¢","interstitialPercent":100,"frequencyCapping":10,"termsURL":"https://atsoft.io/terms","privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
+    <key>Subscriptions</key>
+    <value>[{"name":" week, auto renewable","keyID":"com.atsoft.screenrecorder.weekly","description":"BEST VALUE","selected":false,"sort":0},{"name":" month, auto renewable","keyID":"com.atsoft.screenrecorder.monthly","description":"3 days FREE TRIAL","selected":false,"sort":1},{"name":" year, auto renewable","keyID":"com.atsoft.screenrecorder.yearly","description":"7 days FREE TRIAL","selected":true,"sort":2}]</value>
   </entry>
 </defaults>

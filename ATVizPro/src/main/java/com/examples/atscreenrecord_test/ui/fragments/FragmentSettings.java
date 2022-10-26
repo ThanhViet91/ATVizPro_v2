@@ -28,8 +28,6 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
@@ -49,16 +47,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
     RecyclerView recyclerView;
     ArrayList<SettingsItem> settingsItems = new ArrayList<>();
     private FragmentManager mFragmentManager;
-
-    private BillingClient billingClient;
+    private SettingsAdapter adapter;
     View mViewRoot;
 
     @SuppressLint("DefaultLocale")
@@ -79,139 +74,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " "+String.format("%.1f MB",dirSize(new File(getBaseStorageDirectory()))*1f/(1024*1024)), R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
-        billingClient = BillingClient.newBuilder(requireContext())
-                .setListener(purchasesUpdatedListener)
-                .enablePendingPurchases()
-                .build();
-        connectGooglePlayBilling();
-
         return mViewRoot;
     }
 
-    private ArrayList<ProductDetails> mProductDetailsList;
-    private void showProducts() {
-        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(getString(R.string.product_id_remove_ads))
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build()
-        );
-
-        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
-                .setProductList(productList)
-                .build();
-
-        billingClient.queryProductDetailsAsync(
-                params,
-                (billingResult, prodDetailsList) -> {
-                    // Process the result
-                    System.out.println("thanhlv prodDetailsList  === "+prodDetailsList.size());
-                    mProductDetailsList = new ArrayList<>();
-                    mProductDetailsList.addAll(prodDetailsList);
-//                    launchPurchaseFlow2(mProductDetailsList.get(0));
-                }
-        );
-    }
-
-    public void getPurchase() {
-        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
-        final BillingClient finalBillingClient = billingClient;
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingServiceDisconnected() {
-            }
-
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-
-                if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                    finalBillingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
-                            (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                    System.out.println("thanhlv ggggggggggg: "+list);
-                                }
-                            });
-                }
-            }
-        });
-    }
-    private void connectGooglePlayBilling() {
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    // The BillingClient is ready. You can query purchases here.
-                    showProducts();
-                }
-            }
-
-            @Override
-            public void onBillingServiceDisconnected() {
-                // Try to restart the connection on the next request to
-                // Google Play by calling the startConnection() method.
-                connectGooglePlayBilling();
-            }
-        });
-
-    }
-    private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
-        // To be implemented in a later section.
-        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                && purchases != null) {
-            for (Purchase purchase : purchases) {
-                handlePurchase(purchase);
-            }
-        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-            // Handle an error caused by a user cancelling the purchase flow.
-            //TODO
-        } else {
-            //TODO
-        }
-
-    };
-//    @SuppressLint("NotifyDataSetChanged")
-//    void handlePurchase(Purchase purchase) {
-//
-//        if (!purchase.isAcknowledged()) {
-//            billingClient.acknowledgePurchase(AcknowledgePurchaseParams
-//                    .newBuilder()
-//                    .setPurchaseToken(purchase.getPurchaseToken())
-//                    .build(), billingResult -> {
-//
-//                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-//                    //Setting setIsRemoveAd to true
-//                    if (purchase.getProducts().get(0).contains(getString(R.string.product_id_remove_ads))) {
-//                        SettingManager2.setRemoveAds(requireContext(), true);
-//                        System.out.println("thanhlvSettingManager2.setRemoveAds(requireContext(), true); ");
-//                        if (adapter != null) adapter.notifyDataSetChanged();
-//                    }
-//                }
-//            });
-//        }
-//
-//    }
-    private void handlePurchase(Purchase purchase) {
-        ConsumeParams consumeParams =
-                ConsumeParams.newBuilder()
-                        .setPurchaseToken(purchase.getPurchaseToken())
-                        .build();
-
-        ConsumeResponseListener listener = new ConsumeResponseListener() {
-            @Override
-            public void onConsumeResponse(BillingResult billingResult, String purchaseToken) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    // Handle the success of the consume operation.
-                    System.out.println("thanhlv: success");
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        };
-
-        billingClient.consumeAsync(consumeParams, listener);
-    }
-
-    public SettingsAdapter adapter;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -232,59 +97,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         });
 
     }
-    void launchPurchaseFlow2(ProductDetails productDetails) {
-        assert productDetails.getSubscriptionOfferDetails() != null;
-        ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
-                ImmutableList.of(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                                .setProductDetails(productDetails)
-                                .setOfferToken(productDetails.getSubscriptionOfferDetails().get(0).getOfferToken())
-                                .build()
-                );
-        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build();
-
-        billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
-    }
-
-    void launchPurchaseFlow(ProductDetails productDetails) {
-        ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
-                ImmutableList.of(
-                        BillingFlowParams.ProductDetailsParams.newBuilder()
-                                .setProductDetails(productDetails)
-                                .build()
-                );
-        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build();
-
-        billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
-    }
-    void restorePurchases() {
-        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {
-        }).build();
-        final BillingClient finalBillingClient = billingClient;
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingServiceDisconnected() {
-                connectGooglePlayBilling();
-            }
-
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    finalBillingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(), (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    System.out.println("thanhlv ffffff     fffffff  f = == " + list.size());
-                                    SettingManager2.setRemoveAds(requireContext(), list.size() > 0);
-                                }
-                            });
-                }
-            }
-        });
-    }
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -295,21 +107,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onResume() {
         super.onResume();
+//        System.out.println("thanhlv upgrade_to_pro onResumeonResumeonResumeonResume");
         RelativeLayout mAdView = mViewRoot.findViewById(R.id.adView);
         new AdsUtil(getContext(), mAdView).loadBanner();
         if (adapter != null) adapter.notifyDataSetChanged();
-        billingClient.queryPurchasesAsync(
-                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
-                (billingResult, list) -> {
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        for (Purchase purchase : list) {
-                            if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED && !purchase.isAcknowledged()) {
-                                handlePurchase(purchase);
-                            }
-                        }
-                    }
-                }
-        );
     }
 
     @Override
@@ -328,17 +129,17 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         if (code.equals(getString(R.string.upgrade_to_pro))) {
             System.out.println("thanhlv upgrade_to_pro");
-            if (mProductDetailsList == null || mProductDetailsList.size() == 0) return;
-            launchPurchaseFlow2(mProductDetailsList.get(0));
-//            mFragmentManager.beginTransaction()
-//                    .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
-//                    .addToBackStack("")
-//                    .commit();
+//            if (mProductDetailsList == null || mProductDetailsList.size() == 0) return;
+//            launchPurchaseFlow(mProductDetailsList.get(0));
+            mFragmentManager.beginTransaction()
+                    .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
+                    .addToBackStack("")
+                    .commit();
         }
         if (code.equals(getString(R.string.restore_purchase))) {
             System.out.println("thanhlv restore_purchase");
 //            restorePurchases();
-            getPurchase();
+//            getPurchase();
         }
 
         if (code.equals(getString(R.string.share_app_to_friends))) {

@@ -12,6 +12,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +21,12 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
+import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -59,33 +65,41 @@ public class App extends Application
 
         // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
-        if (!SettingManager2.getRemoveAds(this)) {
-            MobileAds.initialize(
-                    this,
-                    new OnInitializationCompleteListener() {
-                        @Override
-                        public void onInitializationComplete(
-                                @NonNull InitializationStatus initializationStatus) {
-                            initialAds = true;
-                        }
-                    });
-        }
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
         appOpenAdManager = new AppOpenAdManager();
-
         App.context = this;
-        if (!SettingManager2.getRemoveAds(this)) {
-            MobileAds.initialize(this, new OnInitializationCompleteListener() {
-                @Override
-                public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
-                    initialAds = true;
-                }
-            });
-        }
-
+        getPurchase();
         configs();
-
         createChannelNotification();
+    }
+
+    private BillingClient billingClient;
+    private void getPurchase() {
+        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingServiceDisconnected() {
+                getPurchase();
+            }
+
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+
+                if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                    billingClient.queryPurchasesAsync(
+                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
+                            (billingResult1, list) -> {
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                    SettingManager2.setProApp(context, list.size() > 0);
+                                    System.out.println("thanhlv Apppppppp get subs: "+list.size());
+                                    if (list.size() == 0) {
+                                        MobileAds.initialize(context, initializationStatus -> initialAds = true);
+                                    }
+                                }
+                            });
+                }
+            }
+        });
     }
 
     private void configs() {
@@ -106,6 +120,7 @@ public class App extends Application
     }
 
     private void initConfigs() {
+
 
     }
 
@@ -129,12 +144,11 @@ public class App extends Application
     protected void onMoveToForeground() {
         // Show the ad (if available) when the app moves to foreground.
 
-        if (SettingManager2.getRemoveAds(App.getAppContext())) {
-//            System.out.println("thanhlv Ad was removed");
+        if (SettingManager2.isProApp(App.getAppContext())) {
+            System.out.println("thanhlv Ad was removed");
             return;
         }
         if (isPickFromGallery){
-//            System.out.println("thanhlv Ad was isPickFromGallery ==== true");
             isPickFromGallery = false;
             return;
         }
@@ -190,7 +204,7 @@ public class App extends Application
             @NonNull OnShowAdCompleteListener onShowAdCompleteListener) {
         // We wrap the showAdIfAvailable to enforce that other classes only interact with MyApplication
         // class.
-        if (SettingManager2.getRemoveAds(App.getAppContext())) {
+        if (SettingManager2.isProApp(App.getAppContext())) {
 //            System.out.println("thanhlv Ad was removed 222");
             return;
         }

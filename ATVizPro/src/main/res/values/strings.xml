@@ -13,7 +13,7 @@
     <string name="prepare_video">Prepare video...</string>
 
     <!--RemoveAds settings-->
-    <string name="setting_remove_ads">setting_remove_ads</string>
+    <string name="setting_up_to_pro">setting_up_to_pro</string>
 
     <!--Video settings-->
     <string name="setting_first_time_record">setting_first_time_record</string>
@@ -119,6 +119,9 @@
 
     <!--    product_id_remove_ads-->
     <string name="product_id_remove_ads">testing2</string>
+    <string name="product_id_week">com.atsoft.screenrecorder.weekly</string>
+    <string name="product_id_month">com.atsoft.screenrecorder.monthly</string>
+    <string name="product_id_year">com.atsoft.screenrecorder.yearly</string>
 
     <!--    guideline_record-->
     <string name="guideline_record_step_1">Step 1: Tap the flashing icon</string>

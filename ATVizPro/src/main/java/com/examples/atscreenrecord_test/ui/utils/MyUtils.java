@@ -25,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.examples.atscreenrecord_test.App;
+import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
@@ -94,8 +95,8 @@ public class MyUtils {
     public static final String ACTION_FOR_EDIT = "ACTION_FOR_EDIT";
     public static final String ACTION_CANCEL_PROCESSING = "ACTION_CANCEL_PROCESSING";
 
-    public static boolean checkRandomPercentInterstitial(Context context) {
-        return new Random().nextInt(100) < SettingManager2.getInterstitialPercent(context);
+    public static boolean checkRandomPercentInterstitial() {
+        return new Random().nextInt(100) < AppConfigs.getInstance().getConfigModel().getInterstitialPercent();
 
     }
 
@@ -108,6 +109,10 @@ public class MyUtils {
     @NonNull
     public static String createFileName(@NonNull String ext) {
         return "Record_" +getTimeStamp()+ ext;
+    }
+
+    public static long getCurrentTimeStamp() {
+        return (new Date()).getTime();
     }
 
     @SuppressLint("SimpleDateFormat")

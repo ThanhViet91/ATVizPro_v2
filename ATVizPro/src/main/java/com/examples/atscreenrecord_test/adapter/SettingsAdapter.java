@@ -1,5 +1,6 @@
 package com.examples.atscreenrecord_test.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord_test.R;
@@ -18,7 +20,7 @@ import java.util.ArrayList;
 
 public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Context mContext;
-    private ArrayList<SettingsItem> mFAQs;
+    private final ArrayList<SettingsItem> mSettingList;
 
     public interface SettingsListener {
 
@@ -29,14 +31,15 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public SettingsAdapter(Context context, ArrayList<SettingsItem> list) {
         this.mContext = context;
-        this.mFAQs = list;
+        this.mSettingList = list;
     }
 
     public void setListener(SettingsListener listener) {
         this.listener = listener;
     }
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         switch (viewType) {
             case 1:
@@ -44,9 +47,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 return new ViewHolderNormal(view);
             case 2:
                 View view2 = inflater.inflate(R.layout.layout_item_settings_up_to_pro, parent, false);
-                return new ViewHolderUptoPro(view2);
+                return new ViewHolderUpToPro(view2);
         }
-        return null;
+        return new ViewHolderNormal(inflater.inflate(R.layout.layout_item_settings, parent, false));
     }
 
     @Override
@@ -58,13 +61,13 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         switch (holder.getItemViewType()) {
             case 1:
                 ViewHolderNormal viewHolder1 = (ViewHolderNormal)holder;
-                SettingsItem item = mFAQs.get(position);
-                if (item.getContent().equals(mContext.getString(R.string.upgrade_to_pro))) {
-                    if (SettingManager2.getRemoveAds(mContext)) {
+                SettingsItem item = mSettingList.get(position);
+                if (item.getContent().equals(mContext.getString(R.string.restore_purchase))) {
+                    if (SettingManager2.isProApp(mContext)) {
                         viewHolder1.itemView.setAlpha(0.5f);
                     } else viewHolder1.itemView.setAlpha(1f);
                 }
@@ -73,21 +76,20 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 viewHolder1.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
+                        if (listener != null) listener.onClickItem(mSettingList.get(position).getContent());
                     }
                 });
                 break;
 
             case 2:
-                ViewHolderUptoPro viewHolder2 = (ViewHolderUptoPro)holder;
-                if (SettingManager2.getRemoveAds(mContext))  {
+                ViewHolderUpToPro viewHolder2 = (ViewHolderUpToPro)holder;
+                if (SettingManager2.isProApp(mContext)) {
                     viewHolder2.itemView.setAlpha(0.5f);
-                    return;
-                }
+                } else viewHolder2.itemView.setAlpha(1f);
                 viewHolder2.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if (listener != null) listener.onClickItem(mFAQs.get(position).getContent());
+                        if (listener != null && !SettingManager2.isProApp(mContext)) listener.onClickItem(mSettingList.get(position).getContent());
                     }
                 });
                 break;
@@ -98,10 +100,10 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public int getItemCount() {
-        return mFAQs.size();
+        return mSettingList.size();
     }
 
-    public class ViewHolderNormal extends RecyclerView.ViewHolder {
+    public static class ViewHolderNormal extends RecyclerView.ViewHolder {
         public TextView content_settings;
         public ImageView ava_settings;
 
@@ -113,9 +115,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    public class ViewHolderUptoPro extends RecyclerView.ViewHolder {
+    public static class ViewHolderUpToPro extends RecyclerView.ViewHolder {
 
-        public ViewHolderUptoPro(View itemView) {
+        public ViewHolderUpToPro(View itemView) {
             super(itemView);
 
         }

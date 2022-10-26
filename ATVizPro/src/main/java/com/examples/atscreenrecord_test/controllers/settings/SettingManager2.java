@@ -11,20 +11,6 @@ import com.examples.atscreenrecord_test.R;
 
 public class SettingManager2 {
 
-    public static void setInterstitialPercent(Context context, int value) {
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_interstitial_percent);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(key, value);
-        editor.apply();
-    }
-
-    public static int getInterstitialPercent(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_interstitial_percent);
-        return preferences.getInt(key, 100);
-    }
-
     public static void setLiveStreamType(Context context, int value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_livestream_type);
@@ -202,17 +188,17 @@ public class SettingManager2 {
     }
 
 
-    public static void setRemoveAds(Context context, boolean value) {
+    public static void setProApp(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_remove_ads);
+        String key = getStringRes(context, R.string.setting_up_to_pro);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(key, value);
         editor.apply();
     }
 
-    public static boolean getRemoveAds(Context context) {
+    public static boolean isProApp(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
-        String key = getStringRes(context, R.string.setting_remove_ads);
+        String key = getStringRes(context, R.string.setting_up_to_pro);
         return preferences.getBoolean(key, false);
     }
 

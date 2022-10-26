@@ -463,6 +463,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         public void onAdDismissedFullScreenContent() {
+
+            AdsUtil.lastTime = (new Date()).getTime();
             startExecuteService();
         }
 

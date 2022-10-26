@@ -361,6 +361,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
         @Override
         public void onAdDismissedFullScreenContent() {
+
+            AdsUtil.lastTime = (new Date()).getTime();
             startExecuteService();
         }
 

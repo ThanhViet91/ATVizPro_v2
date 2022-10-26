@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.BuildConfig;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
@@ -17,6 +18,8 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+
+import java.util.Date;
 
 public class AdsUtil {
 
@@ -48,7 +51,7 @@ public class AdsUtil {
         return this.adView;
     }
     public void loadBanner() {
-        if (SettingManager2.getRemoveAds(mContext)) {
+        if (SettingManager2.isProApp(mContext)) {
             mAdViewRoot.setVisibility(View.GONE);
             return;
         }
@@ -69,11 +72,15 @@ public class AdsUtil {
     public InterstitialAd getInterstitialAdAdmob() {
         return this.mInterstitialAdAdmob;
     }
+
+    public static long lastTime = 0;
     public boolean interstitialAdAlready() {
-        return this.mInterstitialAdAdmob != null && MyUtils.checkRandomPercentInterstitial(mContext);
+        return this.mInterstitialAdAdmob != null
+                && MyUtils.checkRandomPercentInterstitial()
+                && ((new Date()).getTime() - lastTime) > AppConfigs.getInstance().getConfigModel().getFrequencyCapping()*1000L;
     }
     public void createInterstitialAdmob() {
-        if (SettingManager2.getRemoveAds(mContext)) {
+        if (SettingManager2.isProApp(mContext)) {
             mInterstitialAdAdmob = null;
             return;
         }

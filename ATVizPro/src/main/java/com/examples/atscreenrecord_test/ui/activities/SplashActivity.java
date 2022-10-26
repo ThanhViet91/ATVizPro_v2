@@ -28,13 +28,12 @@ public class SplashActivity extends AppCompatActivity {
         hideStatusBar(this);
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-        if (SettingManager2.getRemoveAds(App.getAppContext())) {
+        if (SettingManager2.isProApp(App.getAppContext())) {
 //            System.out.println("thanhlv Ad was removed");
             new Handler().postDelayed(this::startMainActivity, 3000);
         } else {
             createTimer();
         }
-        SettingManager2.setInterstitialPercent(this, AppConfigs.getInstance().getConfigModel().getInterstitialPercent());
     }
 
     @Override

@@ -215,7 +215,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         if (!hasEndCommentary) {
             getEndCommentary();
         } else {
-
             countDownTimer.cancel();
             layoutCountdown.setVisibility(View.GONE);
             thumbVideo.setVisibility(View.VISIBLE);
@@ -286,19 +285,25 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            if (!pauseRecord && !hasAudioFile) {    //da bam start nhung chua bam stop
-                mediaRecorder.stop();
-                mediaRecorder.release();
-                mediaRecorder = null;
-                discardVideo();
-                return;
+            if (pauseRecord) { // khi da bam stop hoac chua thuc su start
+                if (hasAudioFile) { // neu da co video ok
+                    showPopupConfirm("Discard the last clip?", "Discard", "Cancel", false);
+                } else finish();
+            } else { // dang trong tien trinh ghi
+                showPopupConfirm("Do you want to cancel processing?", "Yes", "No", false);
             }
-            if (hasAudioFile) {   //da co file audio
-//                showDialogConfirm("Discard the last clip?", "Discard");
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        if (pauseRecord) { // khi da bam stop hoac chua thuc su start
+            if (hasAudioFile) { // neu da co video ok
                 showPopupConfirm("Discard the last clip?", "Discard", "Cancel", false);
-            } else {
-                finish();
-            }
+            } else finish();
+        } else { // dang trong tien trinh ghi
+            showPopupConfirm("Do you want to cancel processing?", "Yes", "No", false);
         }
     }
 
@@ -329,7 +334,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         tvDurationCounter.setText("");
         thumbVideo.setVisibility(View.VISIBLE);
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg);
-        if (!cacheAudioFilePath.equals("")) {
+        if (hasAudioFile) {
             boolean deleteAudioCache = new File(cacheAudioFilePath).delete();
             cacheAudioFilePath = "";
             hasAudioFile = false;
@@ -341,14 +346,11 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void discardVideo() {
-        if (!cacheAudioFilePath.equals("")) {
+        if (hasAudioFile) {
             boolean deleteAudioCache = new File(cacheAudioFilePath).delete();
         }
         finish();
     }
-
-//    private InterstitialAd mInterstitialAdAdmob = null;
-
 
     private void startExecuteService() {
         VideoProfileExecute videoProfile = new VideoProfileExecute(MyUtils.TYPE_COMMENTARY_VIDEO, videoFile, cacheAudioFilePath,
@@ -399,7 +401,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     private final Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter/1000)));
+            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter / 1000)));
             timeCounter = timeCounter + 50;
             mCounterUpdateHandler.postDelayed(this, 50);
         }
@@ -415,13 +417,20 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void doPositiveButton(String action) {
-        if (action.equals("Start over")) {
-            retakeVideo();
-        }
 
-        if (action.equals("Discard")) {
-            discardVideo();
+        if (action == null) return;
+        if (action.equals("Start over")) retakeVideo();
+        if (action.equals("Discard")) discardVideo();
+        if (action.equals("Yes")) doCancelCommentary();
+    }
+
+    private void doCancelCommentary() {
+        if (!pauseRecord && !hasAudioFile && mediaRecorder != null) {    // dang trong tien trinh ghi
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            mediaRecorder = null;
         }
+        finish();
     }
 
     boolean hasEndCommentary = true;
@@ -429,16 +438,18 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     private void getEndCommentary() {
         if (videoView.isPlaying()) videoView.pause();
         endTime = timeCounter;
-        mediaRecorder.stop();
-        mediaRecorder.release();
+        if (mediaRecorder != null) {
+            mediaRecorder.stop();
+            mediaRecorder.release();
+        }
         mediaRecorder = null;
-        hasAudioFile = true;
         progressBar.clearAnimation();
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         btnRetake.setVisibility(View.VISIBLE);
         btnNext.setVisibility(View.VISIBLE);
+        hasAudioFile = true;
         pauseRecord = true;
         hasEndCommentary = true;
     }

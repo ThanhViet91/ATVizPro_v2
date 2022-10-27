@@ -91,9 +91,9 @@ public class OptionTrimFragment extends DialogFragmentBase {
         rangeSlider.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
             @Override
             public void onProgressChanged(RangeSeekBar rangeSeekBar, int i, int i1, boolean b) {
+                if (i1 - i < 3000) return;
                 tvStartTime.setText(secToTime((long)i));
                 tvEndTime.setText(secToTime((long)i1));
-
                 startTime = i;
                 endTime = i1;
             }

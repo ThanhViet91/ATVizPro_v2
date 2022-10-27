@@ -33,8 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -63,6 +61,7 @@ import com.examples.atscreenrecord_test.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.DisplayUtil;
+import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.examples.atscreenrecord_test.utils.PathUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -71,7 +70,6 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Random;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
@@ -168,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
-        if (!hasPermission()) requestPermissions();
+//        if (!hasPermission()) requestPermissions();
 
         initViews();
         Intent intent = getIntent();
@@ -253,50 +251,35 @@ public class MainActivity extends AppCompatActivity {
         mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
         pulsator = findViewById(R.id.pulsator);
-        liveStreaming = findViewById(R.id.tv_live_streaming);
-        imgLiveType = findViewById(R.id.img_live_type);
         pulsator.start();
         initVideoSettings();
         updateUISettings();
-        mImgRec = findViewById(R.id.img_record);
-        ImageView btn_setting = findViewById(R.id.img_settings);
+
         LinearLayout btn_set_resolution = findViewById(R.id.set_video_resolution);
         LinearLayout bnt_set_bitrate = findViewById(R.id.set_bitrate);
         LinearLayout btn_set_fps = findViewById(R.id.set_frame_rate);
+        btn_set_resolution.setOnClickListener(view -> new DialogVideoResolution(this::updateUISettings).show(getSupportFragmentManager(), ""));
+        bnt_set_bitrate.setOnClickListener(view -> new DialogBitrate(this::updateUISettings).show(getSupportFragmentManager(), ""));
+        btn_set_fps.setOnClickListener(view -> new DialogFrameRate(this::updateUISettings).show(getSupportFragmentManager(), ""));
+
+        ImageView btn_setting = findViewById(R.id.img_settings);
         btn_setting.setOnClickListener(view -> getSupportFragmentManager()
                 .beginTransaction()
                 .add(R.id.frame_layout_fragment, new FragmentSettings(), "")
                 .addToBackStack("")
                 .commit());
-        btn_set_resolution.setOnClickListener(view -> new DialogVideoResolution(this::updateUISettings).show(getSupportFragmentManager(), ""));
-        bnt_set_bitrate.setOnClickListener(view -> new DialogBitrate(this::updateUISettings).show(getSupportFragmentManager(), ""));
-        btn_set_fps.setOnClickListener(view -> new DialogFrameRate(this::updateUISettings).show(getSupportFragmentManager(), ""));
+
+        mImgRec = findViewById(R.id.img_record);
         mImgRec.setOnClickListener(view -> {
             if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
             openRecordService();
         });
-        LinearLayout lnFAQ = findViewById(R.id.ln_btn_faq);
-        lnFAQ.setOnClickListener(view -> showFAQFragment());
-        LinearLayout react_cam = findViewById(R.id.ln_react_cam);
-        react_cam.setOnClickListener(view -> {
-            if (checkExecuteServiceBusy()) return;
-            if (hasAllPermission())
-                showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);
 
-        });
+        imgLiveType = findViewById(R.id.img_live_type);
+        liveStreaming = findViewById(R.id.tv_live_streaming);
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
-
             if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
-            if (!SettingManager2.isProApp(this)) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new SubscriptionFragment())
-                        .addToBackStack("")
-                        .commit();
-                return;
-            }
-
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
                 if (isConnected) {
                     new AlertDialog.Builder(this)
@@ -316,27 +299,49 @@ public class MainActivity extends AppCompatActivity {
             }
             showLiveStreamFragment();
         });
-        LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
-        btn_commentary.setOnClickListener(view -> {
+
+        LinearLayout react_cam = findViewById(R.id.ln_react_cam);
+        react_cam.setOnClickListener(view -> {
             if (checkExecuteServiceBusy()) return;
-            if (hasAllPermission())
-                showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
+//            if (hasAllPermissionForReact())
+                showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);
+
         });
-        LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
-        btn_projects.setOnClickListener(view -> showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT));
+
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
         btn_editor.setOnClickListener(view -> {
             if (checkExecuteServiceBusy()) return;
             showInterstitialAd(REQUEST_VIDEO_FOR_VIDEO_EDIT);
         });
+
+        LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
+        btn_commentary.setOnClickListener(view -> {
+            if (checkExecuteServiceBusy()) return;
+//            if (hasAllPermissionForReact())
+                showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
+        });
+        LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
+        btn_projects.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT);
+            }
+        });
+
+        LinearLayout lnFAQ = findViewById(R.id.ln_btn_faq);
+        lnFAQ.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                showFAQFragment();
+            }
+        });
     }
 
-    public boolean hasAllPermission() {
+    public boolean hasAllPermissionForReact() {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
             return true;
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA,
@@ -344,6 +349,20 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE}, 666);  // Comment 26
             System.out.println("thanhlv go to requestPermissions");
+        }
+        return false;
+    }
+
+    public boolean hasAllPermissionForCommentary() {
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, 888);  // Comment 26
+            System.out.println("thanhlv go to requestPermissions Commentary");
         }
         return false;
     }
@@ -475,12 +494,25 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onAdDismissedFullScreenContent() {
+
+            AdsUtil.lastTime = (new Date()).getTime();
             if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
                 return;
             }
-            showDialogPickVideo(fromFunction);
-            AdsUtil.lastTime = (new Date()).getTime();
+
+            if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
+                showDialogPickVideo(fromFunction);
+                return;
+            }
+            if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
+                showDialogPickVideo(fromFunction);
+                return;
+            }
+
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+                showDialogPickVideo(fromFunction);
+            }
         }
 
         @Override
@@ -489,7 +521,19 @@ public class MainActivity extends AppCompatActivity {
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
                 return;
             }
-            showDialogPickVideo(fromFunction);
+
+            if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
+                showDialogPickVideo(fromFunction);
+                return;
+            }
+            if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
+                showDialogPickVideo(fromFunction);
+                return;
+            }
+
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+                showDialogPickVideo(fromFunction);
+            }
         }
 
         @Override
@@ -510,7 +554,19 @@ public class MainActivity extends AppCompatActivity {
                 showMyRecordings(from_code);
                 return;
             }
-            showDialogPickVideo(from_code);
+
+            if (from_code == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
+                showDialogPickVideo(from_code);
+                return;
+            }
+            if (from_code == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
+                showDialogPickVideo(from_code);
+                return;
+            }
+
+            if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+                showDialogPickVideo(from_code);
+            }
         }
     }
 
@@ -536,12 +592,29 @@ public class MainActivity extends AppCompatActivity {
                     for (int grantResult : grantResults) {
                         if (grantResult != granted) {
                             MyUtils.showSnackBarNotification(mImgRec, "Please grant all permissions to record screen.", Snackbar.LENGTH_LONG);
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                            alertDialogBuilder.setTitle("Change Permissions in Settings");
+                            alertDialogBuilder
+                                    .setMessage("" +
+                                            "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
+                                    .setCancelable(true)
+                                    .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                            Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                            intent.setData(uri);
+                                            startActivityForResult(intent, 1000);     // Comment 3.
+                                        }
+                                    });
+
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
                             return;
                         }
                     }
                 }
                 break;
-            case 666: // Allowed was selected so Permission granted
+            case 666: // Allowed was selected so Permission granted for React
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
@@ -560,7 +633,7 @@ public class MainActivity extends AppCompatActivity {
                     alertDialogBuilder
                             .setMessage("" +
                                     "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
-                            .setCancelable(false)
+                            .setCancelable(true)
                             .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -584,7 +657,68 @@ public class MainActivity extends AppCompatActivity {
                         alertDialogBuilder.setTitle("Second Chance");
                         alertDialogBuilder
                                 .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
-                                .setCancelable(false)
+                                .setCancelable(true)
+                                .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
+                                        Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(i);
+                                    }
+                                })
+                                .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+//                                        finish();
+                                        dialog.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                    }
+                }
+                break;
+
+            case 888: // Allowed was selected so Permission granted for React
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                    // do your work here
+
+                } else
+                if (!shouldShowRequestPermissionRationale(permissions[1])
+                        || !shouldShowRequestPermissionRationale(permissions[2])
+                        || !shouldShowRequestPermissionRationale(permissions[3])) {
+                    // User selected the Never Ask Again Option Change settings in app settings manually
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                    alertDialogBuilder.setTitle("Change Permissions in Settings");
+                    alertDialogBuilder
+                            .setMessage("" +
+                                    "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
+                            .setCancelable(true)
+                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                    intent.setData(uri);
+                                    startActivityForResult(intent, 1000);     // Comment 3.
+                                }
+                            });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+                } else {
+                    // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
+                    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
+                            && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                            && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                        alertDialogBuilder.setTitle("Second Chance");
+                        alertDialogBuilder
+                                .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
+                                .setCancelable(true)
                                 .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));

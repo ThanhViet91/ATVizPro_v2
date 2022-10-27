@@ -219,9 +219,9 @@ public class SubscriptionFragment extends Fragment {
         LinearLayout ln_sub_2 = view.findViewById(R.id.check2);
         LinearLayout ln_sub_3 = view.findViewById(R.id.check3);
 
-        ln_sub_1.setOnClickListener(new OnSingleClickListener() {
+        ln_sub_1.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View view) {
                 ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_checked);
                 btn_check_1.setBackgroundResource(R.drawable.ic_select_sub);
                 ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_check);
@@ -231,9 +231,9 @@ public class SubscriptionFragment extends Fragment {
                 selected = 0;
             }
         });
-        ln_sub_2.setOnClickListener(new OnSingleClickListener() {
+        ln_sub_2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View view) {
                 ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_checked);
                 btn_check_2.setBackgroundResource(R.drawable.ic_select_sub);
                 ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);
@@ -243,9 +243,9 @@ public class SubscriptionFragment extends Fragment {
                 selected = 1;
             }
         });
-        ln_sub_3.setOnClickListener(new OnSingleClickListener() {
+        ln_sub_3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View view) {
                 ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_checked);
                 btn_check_3.setBackgroundResource(R.drawable.ic_select_sub);
                 ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);

@@ -183,7 +183,6 @@
                         style="@style/Title_Box_Black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="đ92.000,00/month, auto renewable"
                         android:textFontWeight="600"
                         android:textSize="14sp" />
 
@@ -193,7 +192,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-2dp"
-                        android:text="3-day FREE TRIAL"
                         android:textColor="#B0B0B0"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -232,7 +230,6 @@
                         style="@style/Title_Box_Black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="đ399.000,00/year, auto renewable"
                         android:textFontWeight="600"
                         android:textSize="14sp" />
 
@@ -242,7 +239,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-2dp"
-                        android:text="1-Week FREE TRIAL"
                         android:textColor="#B0B0B0"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -282,7 +278,6 @@
                         style="@style/Title_Box_Black"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="đ399.000,00/year, auto renewable"
                         android:textFontWeight="600"
                         android:textSize="14sp" />
 
@@ -292,7 +287,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-2dp"
-                        android:text="1-Week FREE TRIAL"
                         android:textColor="#B0B0B0"
                         android:textSize="12sp" />
                 </LinearLayout>

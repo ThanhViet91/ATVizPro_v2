@@ -123,9 +123,10 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     public void onClickClose() {
     }
 
+    boolean isStartCompress = false;
     @Override
     public void onClickDone() {
-
+        isStartCompress = true;
         animationView.setVisibility(View.VISIBLE);
         animationView.playAnimation();
     }
@@ -152,7 +153,6 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
             AdsUtil.lastTime = (new Date()).getTime();
             Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
-//            mAdManager.createInterstitialAdmob();
             finish();
         }
 
@@ -243,7 +243,68 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
-        } else finish();
+        } else {
+            if (!isStartCompress) {
+                finish();
+                return;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Cancel edit!")
+                    .setMessage("Do you want to cancel processing?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        finish();
+                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+//                        finish();
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+//            finish();
+        }
+
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        if (enableSave) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Save Video")
+                    .setMessage("Do you want to save this video?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        try {
+                            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        finish();
+                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+                        finish();
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        } else {
+            if (!isStartCompress) {
+                finish();
+                return;
+            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Cancel edit!")
+                    .setMessage("Do you want to cancel processing?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        // Continue with delete operation
+                        finish();
+                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+//                        finish();
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+//            finish();
+        }
 
     }
 

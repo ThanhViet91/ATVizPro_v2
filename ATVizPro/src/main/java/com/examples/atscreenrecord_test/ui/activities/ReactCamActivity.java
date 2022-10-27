@@ -417,22 +417,30 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     countDownTimer.start();
                 }
             } else {
-//                endTime = mediaPlayer.getCurrentPosition() + 50;
                 getEndReactCam();
             }
         }
 
         if (v == findViewById(R.id.img_btn_back_header)) {
-            if (rtmpCamera.isRecording()) {
-                rtmpCamera.stopRecord();
-                discardVideo();
-                return;
-            }
-            if (!cameraCahePath.equals("")) {
-                showPopupConfirm("Discard the last clip?","Discard", "Cancel",  false);
+            if (!rtmpCamera.isRecording()) {
+                if (hasCamVideo) {
+                    showPopupConfirm("Discard the last clip?","Discard", "Cancel",  false);
+                } else finish();
             } else {
-                finish();
+                showPopupConfirm("Do you want to cancel processing?","Yes", "No",  false);
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        if (!rtmpCamera.isRecording()) {
+            if (hasCamVideo) {
+                showPopupConfirm("Discard the last clip?","Discard", "Cancel",  false);
+            } else finish();
+        } else {
+            showPopupConfirm("Do you want to cancel processing?","Yes", "No",  false);
         }
     }
 
@@ -443,7 +451,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         tvDurationCounter.setText("");
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg);
         inRecording = false;
-        if (!cameraCahePath.equals("")) {
+        if (hasCamVideo) {
             boolean deleteCamCache = new File(cameraCahePath).delete();
             cameraCahePath = "";
             hasCamVideo = false;
@@ -456,7 +464,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void discardVideo() {
-        if (!cameraCahePath.equals("")) {
+        if (hasCamVideo) {
             boolean deleteCamCache = new File(cameraCahePath).delete();
         }
         finish();
@@ -553,6 +561,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (action == null) return;
         if (action.equals("Start over")) retakeVideo();
         if (action.equals("Discard")) discardVideo();
+        if (action.equals("Yes")) doCancelReact();
+    }
+
+    public void doCancelReact() {
+        if (rtmpCamera.isRecording()) rtmpCamera.stopRecord();
+        finish();
     }
 
     boolean hasEndReact = true;

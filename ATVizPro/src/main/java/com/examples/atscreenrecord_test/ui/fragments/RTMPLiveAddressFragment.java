@@ -123,6 +123,13 @@ public class RTMPLiveAddressFragment extends Fragment {
 
         tvStartLiveStream.setOnClickListener(v -> {
             hideSoftInput(requireActivity());
+            if (!SettingManager2.isProApp(requireContext())) {
+                mFragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
+                        .addToBackStack("")
+                        .commit();
+                return;
+            }
             mParentActivity.mMode = MyUtils.MODE_STREAMING;
             mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
             if (isMyServiceRunning(requireContext(), RecordingService.class)) {
@@ -136,7 +143,6 @@ public class RTMPLiveAddressFragment extends Fragment {
             if (isMyServiceRunning(requireContext(), ControllerService.class)) {
                 if (!isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
                     saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
-//                    mParentActivity.sendNewURL(mUrl);
                     mParentActivity.notifyUpdateStreamProfile(mUrl);
                 } else {
                     MyUtils.showSnackBarNotification(view, String.format("Livestream on %s is running!",

@@ -11,6 +11,7 @@ import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.BuildConfig;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -46,6 +47,7 @@ public class AdsUtil {
     private Context mContext;
     private ViewGroup mAdViewRoot;
     private AdView adView;
+    private boolean isLoaded = false;
 
     public AdView getAdView() {
         return this.adView;
@@ -55,9 +57,17 @@ public class AdsUtil {
             mAdViewRoot.setVisibility(View.GONE);
             return;
         }
+        if (isLoaded) return;
         mAdViewRoot.setVisibility(View.VISIBLE);
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                isLoaded = true;
+            }
+        });
     }
 
 

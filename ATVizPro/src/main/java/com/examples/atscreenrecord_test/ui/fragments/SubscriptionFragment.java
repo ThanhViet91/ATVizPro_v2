@@ -3,6 +3,8 @@ package com.examples.atscreenrecord_test.ui.fragments;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -179,7 +181,7 @@ public class SubscriptionFragment extends Fragment {
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewRoot = inflater.inflate(R.layout.ss_layout, container, false);
+        mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
 
         subs = new ArrayList<SubscriptionsItemModel>(AppConfigs.getInstance().getSubsModel());
         billingClient = BillingClient.newBuilder(requireContext())
@@ -191,7 +193,7 @@ public class SubscriptionFragment extends Fragment {
     }
 
     ArrayList<SubscriptionsItemModel> subs;
-    int selected = 2;
+    int selected = 0;
     TextView tvName1, tvName2, tvName3;
 
     @SuppressLint("SetTextI18n")
@@ -276,13 +278,21 @@ public class SubscriptionFragment extends Fragment {
         tvTermsOfService.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-//                mFragmentManager.popBackStack();
+                System.out.println("thanhlv getTermsURL");
+                String url = AppConfigs.getInstance().getConfigModel().getTermsURL();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
         });
         tvPrivacyNotice.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-//                mFragmentManager.popBackStack();
+                System.out.println("thanhlv getPrivacyPolicyURL");
+                String url = AppConfigs.getInstance().getConfigModel().getPrivacyPolicyURL();
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
         });
     }

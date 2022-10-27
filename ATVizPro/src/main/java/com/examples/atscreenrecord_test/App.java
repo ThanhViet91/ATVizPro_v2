@@ -107,7 +107,7 @@ public class App extends Application
         AppConfigs.getInstance().setConfig(config);
         FirebaseRemoteConfigSettings settings = new FirebaseRemoteConfigSettings.Builder()
                 //3600
-                .setMinimumFetchIntervalInSeconds(3600)
+                .setMinimumFetchIntervalInSeconds(10)
                 .build();
         config.setConfigSettingsAsync(settings);
         config.setDefaultsAsync(R.xml.remote_config_defaults);
@@ -115,6 +115,7 @@ public class App extends Application
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         initConfigs();
+                        System.out.println("thanhlv task.isSuccessful() ==== " + task.getResult());
                     }
                 });
     }

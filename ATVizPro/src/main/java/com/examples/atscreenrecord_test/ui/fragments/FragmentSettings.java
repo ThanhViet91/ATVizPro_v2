@@ -160,7 +160,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             System.out.println("thanhlv share_app_to_friends");
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                    "Hey check out my app at: https://play.google.com/store/apps/details?id=Zzic&hl=vi&gl=US"/* + BuildConfig.APPLICATION_ID*/);
+                    AppConfigs.getInstance().getConfigModel().getShareText());
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, "choose one"));
         }

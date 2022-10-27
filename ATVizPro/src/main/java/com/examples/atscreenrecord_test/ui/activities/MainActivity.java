@@ -501,17 +501,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void showInterstitialAd(int from_code, int type) {
-        if (mAdManager.interstitialAdAlready()) {
-            videoSource = type;
-            fromFunction = from_code;
-            mAdManager.showInterstitialAd(fullScreenContentCallback);
-        } else {
-            if (type == CHOOSE_MY_RECORD) showMyRecordings(from_code);
-            if (type == CHOOSE_GALLERY) showDialogPickFromGallery(from_code);
-        }
-    }
-
     public void showInterstitialAd(int from_code) {
         if (mAdManager.interstitialAdAlready()) {
             fromFunction = from_code;
@@ -828,14 +817,6 @@ public class MainActivity extends AppCompatActivity {
                 && Settings.canDrawOverlays(this)
                 && mScreenCaptureIntent != null
                 && mScreenCaptureResultCode != MyUtils.RESULT_CODE_FAILED;
-    }
-
-    public boolean hasPermissionReact() {
-        int granted = PackageManager.PERMISSION_GRANTED;
-        return ContextCompat.checkSelfPermission(this, mPermission[0]) == granted
-                && ContextCompat.checkSelfPermission(this, mPermission[1]) == granted
-                && ContextCompat.checkSelfPermission(this, mPermission[2]) == granted
-                && ContextCompat.checkSelfPermission(this, mPermission[3]) == granted;
     }
 
     public void setStreamProfile(StreamProfile streamProfile) {

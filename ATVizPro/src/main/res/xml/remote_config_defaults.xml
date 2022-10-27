@@ -2,7 +2,7 @@
 <defaults>
   <entry>
     <key>Configs</key>
-    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream â„¢","interstitialPercent":50,"frequencyCapping":15,"termsURL":"https://atsoft.io/terms","privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
+    <value>{"feedbackEmail":"minhtuong@atsoft.io","shareText":"Screen Recorder - Livestream ™","interstitialPercent":50,"frequencyCapping":15,"termsURL":"https://atsoft.io/terms","privacyPolicyURL":"https://atsoft.io/privacy-policy"}</value>
   </entry>
   <entry>
     <key>Subscriptions</key>

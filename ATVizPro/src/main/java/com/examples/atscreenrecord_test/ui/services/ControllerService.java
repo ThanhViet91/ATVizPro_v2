@@ -22,6 +22,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -224,6 +225,16 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         super.onCreate();
 //        if (DEBUG) Log.i(TAG, "ControllerService: onCreate");
         updateScreenSize();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("thanhlv updatePendingIntent onFinishTranscoding ControllerService");
+                Intent myIntent = new Intent(ControllerService.this, TranslucentActivity.class);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(myIntent);
+            }
+        }, 10000);
         if (paramViewRoot == null) {
             initParam();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -482,26 +493,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             @Override
             public void onSingleClick(View v) {
 
-//                if (mMode == MyUtils.MODE_RECORDING){
-//                    if (isSaved) {
-//                        gotoMain();
-//                        return;
-//                    }
-//                    gotoTransparent();
-//                    new AlertDialog.Builder(getApplicationContext())
-//                            .setTitle("Save Video")
-//                            .setMessage("Do you want to save this video?")
-//                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-//                                // Continue with delete operation
-//                                saveVideo(videoFileEndRecord);
-//                                gotoMain();
-//                            })
-//                            .setNegativeButton(android.R.string.no, (dialogInterface, i) -> gotoMain())
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-//                            .show();
-
-
-//                } else gotoMain();
                 gotoMain();
             }
         });

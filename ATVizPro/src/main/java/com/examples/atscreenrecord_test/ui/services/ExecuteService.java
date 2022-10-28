@@ -3,29 +3,36 @@ package com.examples.atscreenrecord_test.ui.services;
 import static com.examples.atscreenrecord_test.App.CHANNEL_ID;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.utils.TranscodingAsyncTask.ERROR_CODE;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.widget.RemoteViews;
+
 import androidx.annotation.RequiresApi;
+
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.model.VideoProfileExecute;
 import com.examples.atscreenrecord_test.ui.activities.ResultVideoFinishActivity;
 import com.examples.atscreenrecord_test.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.VideoUtil;
+
 import java.util.Random;
 
 
 public class ExecuteService extends Service {
-    
+
     private static int NOTIFICATION_ID = 9;
+    public static final String KEY_ACTION_STOP_SERVICE = "KEY_ACTION_STOP_SERVICE";
     String originalVideoPath, cameraCachePath;
     long startTime, endTime, duration = 10000;
     int posX, posY, camSize;
@@ -38,8 +45,9 @@ public class ExecuteService extends Service {
     private int type = 0;
 
     public int generateProgress(int lastProgress) {
-        return Math.min(99, lastProgress + new Random().nextInt(1+(int)(100*countDownInterval/duration)));
+        return Math.min(99, lastProgress + new Random().nextInt(1 + (int) (100 * countDownInterval / duration)));
     }
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -75,7 +83,7 @@ public class ExecuteService extends Service {
         System.out.println("thanhlv onStartCommand .......... " + duration);
         if (duration < 10000) duration = 10000;
 
-        if (duration < 1000*60*10) {
+        if (duration < 1000 * 60 * 10) {
             countDownInterval = 1000;
         } else countDownInterval = 2000;
 
@@ -83,9 +91,11 @@ public class ExecuteService extends Service {
             @Override
             public void onTick(long l) {
                 if (!finishExecute) {
-                    progress = generateProgress(100-(int)(100*l/duration));
-                    System.out.println("thanhlv progressssssssss == "+l +" // "+progress);
+                    progress = generateProgress(100 - (int) (100 * l / duration));
+                    System.out.println("thanhlv progressssssssss == " + l + " // " + progress);
                     notificationBuilder.setProgress(100, progress, false);
+
+                    notificationBuilder.setPriority(Notification.PRIORITY_MIN);
                     notificationBuilder.setContentText("In progress: " + progress + "%");
                     startForeground(NOTIFICATION_ID, notification);
                 }
@@ -102,41 +112,50 @@ public class ExecuteService extends Service {
         };
         countDownTimer.start();
 
-
-        if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO)
-        {
+        if (videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO) {
             flipCamera(cameraCachePath);
             System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_REACT_VIDEO");
         }
-        if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO)
-        {
-            commentaryAudio(originalVideoPath, cameraCachePath);
+        if (videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO) {
+            executeCommentaryAudio(originalVideoPath, cameraCachePath);
             System.out.println("thanhlv videoProfileExecute.getType() == MyUtils.TYPE_COMMENTARY_VIDEO");
         }
 
         return START_NOT_STICKY;
     }
+    
+    public void showPopUpResult() {
+        System.out.println("thanhlv showPopUpResult..............");
+        Intent myIntent = new Intent(ExecuteService.this, TranslucentActivity.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        myIntent.putExtra(KEY_ACTION_STOP_SERVICE, true);
+        startActivity(myIntent);
+    }
 
-    private void commentaryAudio(String videoPath, String audioPath) {
+
+    private void executeCommentaryAudio(String videoPath, String audioPath) {
         VideoUtil.getInstance().commentaryAudio(videoPath, audioPath, new VideoUtil.ITranscoding() {
-                @Override
-                public void onStartTranscoding(String outPath) {
-                }
+            @Override
+            public void onStartTranscoding(String outPath) {
+            }
 
-                @RequiresApi(api = Build.VERSION_CODES.S)
-                @Override
-                public void onFinishTranscoding(String code) {
-                    if (!code.equals(ERROR_CODE)) {
-                        finishExecute = true;
-                        notificationBuilder.setProgress(0, 0, false);
-                        notificationBuilder.setContentText("In progress: 100%");
-                        finalVideoCachePath = code;
-                        updatePendingIntent(finalVideoCachePath);
-                        startForeground(NOTIFICATION_ID, notification);
+            @RequiresApi(api = Build.VERSION_CODES.S)
+            @Override
+            public void onFinishTranscoding(String code) {
+                if (!code.equals(ERROR_CODE)) {
+                    finishExecute = true;
+                    notificationBuilder.setProgress(0, 0, false);
+                    notificationBuilder.setContentText("In progress: 100%");
+                    finalVideoCachePath = code;
+//                    updatePendingIntent(finalVideoCachePath);
+                    startForeground(NOTIFICATION_ID, notification);
 
-                    }
+                    System.out.println("thanhlv onFinishTranscoding commentaryAudio");
+                    showPopUpResult();
+
                 }
-            });
+            }
+        });
 
     }
 
@@ -156,6 +175,7 @@ public class ExecuteService extends Service {
     }
 
     private String finalVideoCachePath = "";
+
     public void executeFFmpegReactCam(String overlayVideoPath) {
         VideoUtil.getInstance().reactCamera(originalVideoPath, overlayVideoPath, startTime, endTime, camSize,
                 posX, posY, false, false, new VideoUtil.ITranscoding() {
@@ -170,9 +190,13 @@ public class ExecuteService extends Service {
                             finishExecute = true;
                             notificationBuilder.setProgress(0, 0, false);
                             notificationBuilder.setContentText("In progress: 100%");
+                            notificationBuilder.setPriority(Notification.PRIORITY_MAX);
                             finalVideoCachePath = code;
-                            updatePendingIntent(finalVideoCachePath);
+//                            updatePendingIntent(finalVideoCachePath);
                             startForeground(NOTIFICATION_ID, notification);
+                            
+                            System.out.println("thanhlv onFinishTranscoding executeFFmpegReactCam");
+                            showPopUpResult();
 
                         }
                     }
@@ -186,7 +210,7 @@ public class ExecuteService extends Service {
         if (type == MyUtils.TYPE_REACT_VIDEO) intent.setAction(MyUtils.ACTION_END_REACT);
         if (type == MyUtils.TYPE_COMMENTARY_VIDEO) intent.setAction(MyUtils.ACTION_END_COMMENTARY);
         intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-        System.out.println("thanhlv updatePendingIntent "+finalVideoCachePath);
+        System.out.println("thanhlv updatePendingIntent " + finalVideoCachePath);
         @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
         notificationBuilder.setContentIntent(pendingIntent);
@@ -201,7 +225,32 @@ public class ExecuteService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                System.out.println("thanhlv updatePendingIntent onFinishTranscoding ControllerService");
+//                Intent myIntent = new Intent(ExecuteService.this, TranslucentActivity.class);
+//                myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(myIntent);
+//            }
+//        }, 10000);
+
+//        if (paramViewRoot == null)
+//            initParam();
+//
+//        if (mViewRoot == null)
+//            initializeViews();
+
 //        createNotification();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+//            askPermission();
+//        }
+    }
+
+    public void askPermission() {
+        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + getPackageName()));
+//        startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
     }
 
     Notification.Builder notificationBuilder = null;
@@ -211,13 +260,16 @@ public class ExecuteService extends Service {
     private void createNotification(int type) {
 
         Intent intent = new Intent(this, TranslucentActivity.class);
+        intent.putExtra(KEY_ACTION_STOP_SERVICE, false);
         @SuppressLint({"UnspecifiedImmutableFlag", "WrongConstant"})
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
 
         RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
 
-        if (type == MyUtils.TYPE_REACT_VIDEO) notificationLayoutExpanded.setTextViewText(R.id.des, "React in processing");
-        if (type == MyUtils.TYPE_COMMENTARY_VIDEO) notificationLayoutExpanded.setTextViewText(R.id.des, "Commentary in processing");
+        if (type == MyUtils.TYPE_REACT_VIDEO)
+            notificationLayoutExpanded.setTextViewText(R.id.des, "React in processing");
+        if (type == MyUtils.TYPE_COMMENTARY_VIDEO)
+            notificationLayoutExpanded.setTextViewText(R.id.des, "Commentary in processing");
         notificationLayoutExpanded.setImageViewResource(R.id.ic_app, R.drawable.ic_app);
 
         notificationLayoutExpanded.setOnClickPendingIntent(R.id.btn_cancel_notification, pendingIntent);
@@ -230,16 +282,18 @@ public class ExecuteService extends Service {
             notificationBuilder = new Notification.Builder(getApplicationContext());
         notificationBuilder
                 .setOngoing(true)
+                .setPriority(Notification.PRIORITY_MAX)
                 .setCustomBigContentView(notificationLayoutExpanded)
                 .setVibrate(new long[]{0L})
                 .setContentTitle("Screen Recorder")
                 .setContentText("In progress...")
                 .setSmallIcon(R.drawable.ic_app)
+                .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)
                 .setProgress(100, 0, false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            notificationBuilder.setCategory(Notification.CATEGORY_NAVIGATION);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            notificationBuilder.setCategory(Notification.CATEGORY_NAVIGATION);
+//        }
         //Send the notification:
         notification = notificationBuilder.build();
         startForeground(NOTIFICATION_ID, notification);

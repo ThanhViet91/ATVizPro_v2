@@ -11,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -513,7 +514,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = new Intent(this, ExecuteService.class);
         intent.putExtras(bundle);
         intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 2.5));
-        startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
+//        startService(intent);
     }
 
 

@@ -143,7 +143,9 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_sdk_id"/>
 
-        <service android:name="com.examples.atscreenrecord_test.ui.services.ExecuteService" />
+        <service
+            android:foregroundServiceType="mediaProjection|location|camera|microphone"
+            android:name="com.examples.atscreenrecord_test.ui.services.ExecuteService" />
 
     </application>
    

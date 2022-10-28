@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-<style name="t1">
+
+    <style name="t1">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/white</item>
-</style>
-<style name="h1">
+    </style>
+
+    <style name="h1">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@android:color/white</item>
-         <item name="android:textStyle">bold</item>
-</style>
+        <item name="android:textStyle">bold</item>
+    </style>
 
-<style name="h2">
+    <style name="h2">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@android:color/white</item>
-         <item name="android:textStyle">bold</item>
-</style>
+        <item name="android:textStyle">bold</item>
+    </style>
 
     <style name="Theme.Transparent" parent="Theme.AppCompat">
         <item name="android:windowIsTranslucent">true</item>
@@ -26,8 +28,14 @@
     </style>
 
 
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:colorAccent">#ff0000</item>
+        <item name="colorAccent">#ff0000</item>
+        <item name="android:background">#00FFFFFF</item>
+    </style>
 
-<!--    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">-->
+
+    <!--    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">-->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
 
         <!-- Customize your theme here. -->
@@ -88,6 +96,7 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>
+
     <style name="Body_List_Item_White_16_450" parent="White_Text">
         <item name="android:textSize">16sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">450</item>

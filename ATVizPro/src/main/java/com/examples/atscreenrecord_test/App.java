@@ -128,7 +128,7 @@ public class App extends Application
     private void createChannelNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Screen Recorder", NotificationManager.IMPORTANCE_NONE);
+                    "Screen Recorder", NotificationManager.IMPORTANCE_HIGH);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
@@ -192,6 +192,7 @@ public class App extends Application
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
+        System.out.println("thanhlv onActivityDestroyed");
     }
 
     /**

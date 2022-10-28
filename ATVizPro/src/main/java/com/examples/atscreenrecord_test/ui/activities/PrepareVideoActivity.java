@@ -80,7 +80,7 @@ public class PrepareVideoActivity extends AppCompatActivity implements ChooseVid
             if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
             if (actionType.equals(MyUtils.ACTION_FOR_REACT)) nextToReactCam();
             if (actionType.equals(MyUtils.ACTION_FOR_COMMENTARY)) nextToCommentary();
-        }, 2000);
+        }, 1500);
     }
     private void turnOffServiceUseCamera() {
         if (isMyServiceRunning(this, RecordingService.class)) {

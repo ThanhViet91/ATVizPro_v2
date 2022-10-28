@@ -320,7 +320,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         videoList.clear();
         readData();
         processingData();
-        mAdapter.updateData(videoList);
+        if (mAdapter != null) mAdapter.updateData(videoList);
     }
 
     private void processingData() {

@@ -28,9 +28,7 @@ public class TranslucentActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_translucent);
         if (getIntent() != null) {
-            if (getIntent().getBooleanExtra(KEY_ACTION_STOP_SERVICE, false)) {
 
-            } else {
                 new AlertDialog.Builder(this)
                         .setTitle("Notice!")
                         .setMessage(getString(R.string.do_you_want_cancel_the_process))
@@ -42,7 +40,7 @@ public class TranslucentActivity extends AppCompatActivity{
                         .setOnCancelListener(dialogInterface -> finish())
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .show();
-            }
+
         }
 
     }

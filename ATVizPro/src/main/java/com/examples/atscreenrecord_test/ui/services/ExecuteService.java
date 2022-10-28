@@ -33,6 +33,7 @@ public class ExecuteService extends Service {
 
     private static int NOTIFICATION_ID = 9;
     public static final String KEY_ACTION_STOP_SERVICE = "KEY_ACTION_STOP_SERVICE";
+
     String originalVideoPath, cameraCachePath;
     long startTime, endTime, duration = 10000;
     int posX, posY, camSize;

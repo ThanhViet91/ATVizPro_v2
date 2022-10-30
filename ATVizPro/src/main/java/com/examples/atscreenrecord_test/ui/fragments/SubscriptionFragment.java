@@ -278,7 +278,7 @@ public class SubscriptionFragment extends Fragment {
         tvTermsOfService.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                System.out.println("thanhlv getTermsURL");
+//                System.out.println("thanhlv getTermsURL");
                 String url = AppConfigs.getInstance().getConfigModel().getTermsURL();
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
@@ -288,7 +288,7 @@ public class SubscriptionFragment extends Fragment {
         tvPrivacyNotice.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                System.out.println("thanhlv getPrivacyPolicyURL");
+//                System.out.println("thanhlv getPrivacyPolicyURL");
                 String url = AppConfigs.getInstance().getConfigModel().getPrivacyPolicyURL();
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));

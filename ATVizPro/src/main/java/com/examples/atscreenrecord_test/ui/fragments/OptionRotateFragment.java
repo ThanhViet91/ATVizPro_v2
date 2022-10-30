@@ -197,8 +197,8 @@ public class OptionRotateFragment extends DialogFragmentBase implements Sticker2
         }
         return listSticker;
     }
-    int[] resourceID = {R.drawable.ic_flip_h,
-            R.drawable.ic_flip_v,
+    int[] resourceID = {R.drawable.ic_flip_ver,
+            R.drawable.ic_flip_hor,
             R.drawable.ic_clock_180,
             R.drawable.ic_clock_90,
             R.drawable.ic_clock_90_,

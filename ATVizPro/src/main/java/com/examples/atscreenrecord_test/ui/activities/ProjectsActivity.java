@@ -8,6 +8,7 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 import static com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
+import static com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity.finishEdit;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_REACT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
@@ -63,14 +64,14 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_video_projects);
         hideStatusBar(this);
+
         if (getIntent() != null) {
             fromFunction = getIntent().getIntExtra(KEY_FROM_FUNCTION, 0);
 
             if (getIntent().getAction() != null) {
                 videoPath = getIntent().getStringExtra(KEY_PATH_VIDEO);
                 if (ACTION_GO_TO_EDIT.equals(getIntent().getAction())) {
-                    if (requireSubscription(videoPath)) return;
-                    gotoEditVideo(videoPath);
+                    if (!requireSubscription(videoPath)) gotoEditVideo(videoPath);
                 }
                 if (ACTION_GO_TO_PLAY.equals(getIntent().getAction())) {
                     gotoPlayVideoDetail(this, videoPath);
@@ -78,6 +79,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             }
 
         }
+
         fetchData();
         initViews();
     }
@@ -85,11 +87,16 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     @Override
     public void onResume() {
         super.onResume();
+        if (finishEdit) fetchData();
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
         } else {
             toggleView(tv_noData, View.GONE);
         }
+        if (videoList.size() == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+            toggleView(tv_select, View.GONE);
+        }
+
         RelativeLayout mAdView = findViewById(R.id.adView);
         AdsUtil mAdManager = new AdsUtil(this, mAdView);
         mAdManager.loadBanner();
@@ -119,6 +126,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
             toggleView(tv_cancel, View.GONE);
             toggleView(btn_back, View.VISIBLE);
+            toggleView(tv_select, View.VISIBLE);
         } else {
             toggleView(tv_cancel, View.VISIBLE);
             toggleView(btn_back, View.GONE);
@@ -162,11 +170,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             }
         });
 
-        if (totalVideos == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
-            toggleView(tv_cancel, View.GONE);
-            toggleView(btn_back, View.VISIBLE);
-            toggleView(tv_select, View.GONE);
-        }
+
         mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
         mAdapter.setHasStableIds(true);
@@ -227,6 +231,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         runOnUiThread(() -> {
             if (mAdapter != null) mAdapter.updateData(videoList);
+            if (videoList.size() == 0) {
+                toggleView(tv_cancel, View.GONE);
+                toggleView(btn_back, View.VISIBLE);
+                toggleView(tv_select, View.GONE);
+                toggleView(findViewById(R.id.option), View.GONE);
+                toggleView(tv_noData, View.VISIBLE);
+            }
         });
     }
 
@@ -335,6 +346,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 totalVideos++;
             }
         }
+        if (totalVideos == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+            toggleView(tv_cancel, View.GONE);
+            toggleView(btn_back, View.VISIBLE);
+            toggleView(tv_select, View.GONE);
+        }
     }
 
     @Override
@@ -352,7 +368,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
 
         if (video != null) {
-            if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT && requireSubscription(video.getPath())) return;
+            if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT && requireSubscription(video.getPath()))
+                return;
             switch (fromFunction) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
                     gotoPrepareVideo(video.getPath(), ACTION_FOR_REACT);
@@ -371,7 +388,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     public boolean requireSubscription(String path) {
-        if ( !SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000){
+        if (!SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000) {
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(R.id.frame_layout_fragment, new SubscriptionFragment())

@@ -22,6 +22,8 @@ package com.examples.atscreenrecord_test.controllers.encoder;
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.DEBUG;
+
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -29,8 +31,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.DEBUG;
 
 public abstract class MediaEncoder implements Runnable {
 	private static final String TAG = MediaEncoder.class.getSimpleName();
@@ -305,7 +305,7 @@ public abstract class MediaEncoder implements Runnable {
 	            if (length <= 0) {
 	            	// send EOS
 	            	mIsEOS = true;
-	            	if (DEBUG) Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
+//	            	if (DEBUG) Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
 	            	mMediaCodec.queueInputBuffer(inputBufferIndex, 0, 0,
 	            		presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
 		            break;
@@ -332,7 +332,7 @@ public abstract class MediaEncoder implements Runnable {
         final MediaMuxerWrapper muxer = mWeakMuxer.get();
         if (muxer == null) {
 //        	throw new NullPointerException("muxer is unexpectedly null");
-        	Log.w(TAG, "muxer is unexpectedly null");
+//        	Log.w(TAG, "muxer is unexpectedly null");
         	return;
         }
 LOOP:	while (mIsEncoding) {
@@ -345,12 +345,12 @@ LOOP:	while (mIsEncoding) {
                 		break LOOP;		// out of while
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-            	if (DEBUG) Log.i(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
+//            	if (DEBUG) Log.i(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                 // this should not come when encoding
                 encoderOutputBuffers = mMediaCodec.getOutputBuffers();
 
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-            	if (DEBUG) Log.i(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
+//            	if (DEBUG) Log.i(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
             	// this status indicate the output format of codec is changed
                 // this should come only once before actual encoded data
             	// but this status never come on Android4.3 or less
@@ -376,7 +376,7 @@ LOOP:	while (mIsEncoding) {
                	}
             } else if (encoderStatus < 0) {
             	// unexpected status
-            	if (DEBUG) Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
+//            	if (DEBUG) Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
             } else {
                 final ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                 if (encodedData == null) {
@@ -388,7 +388,7 @@ LOOP:	while (mIsEncoding) {
                 	// but MediaCodec#getOutputFormat can not call here(because INFO_OUTPUT_FORMAT_CHANGED don't come yet)
                 	// therefor we should expand and prepare output format from buffer data.
                 	// This sample is for API>=18(>=Android 4.3), just ignore this flag here
-					if (DEBUG) Log.i(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
+//					if (DEBUG) Log.i(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
 					mBufferInfo.size = 0;
                 }
 
@@ -402,7 +402,7 @@ LOOP:	while (mIsEncoding) {
                     // write encoded data to muxer(need to adjust presentationTimeUs.
 					if (!mRequestPause) {
 	                   	mBufferInfo.presentationTimeUs = getPTSUs();
-						Log.i(TAG, "drain : "+this.getClass().getName());
+//						Log.i(TAG, "drain : "+this.getClass().getName());
 	                   	muxer.writeSampleData(mTrackIndex, encodedData, mBufferInfo);
 						prevOutputPTSUs = mBufferInfo.presentationTimeUs;
 					}

@@ -4,9 +4,7 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PA
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_VIDEO_NAME;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
-import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +17,13 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord_test.R;
+import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.google.android.gms.ads.AdListener;
 
 import java.io.File;
-import java.net.URLConnection;
 
 public class PlayVideoDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private RelativeLayout mAdView;
@@ -170,14 +167,15 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         }
 
         if (v == findViewById(R.id.img_btn_share)) {
-            File file = new File(videoFile);
-            Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atscreenrecord_test.provider", file);
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
-            intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
-            intent.putExtra(Intent.EXTRA_STREAM, uri);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Share File"));
+            MyUtils.shareVideo(this, videoFile);
+//            File file = new File(videoFile);
+//            Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atscreenrecord_test.provider", file);
+//            Intent intent = new Intent(Intent.ACTION_SEND);
+//            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
+//            intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
+//            intent.putExtra(Intent.EXTRA_STREAM, uri);
+//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//            startActivity(Intent.createChooser(intent, "Share File"));
         }
         if (v == findViewById(R.id.img_btn_back_header)) finish();
     }

@@ -179,6 +179,7 @@ public class RecordingService extends BaseService {
         synchronized (sSync) {
             if (mMuxer != null) {
 
+                System.out.println("thanhlv if (mMuxer != null)if (mMuxer != null)if (mMuxer != null)");
                 outputFile = mMuxer.getOutputPath();
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
@@ -186,7 +187,7 @@ public class RecordingService extends BaseService {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-
+                        System.out.println("thanhlv showResultActivity(outputFile);showResultActivity(outputFile);");
                         showResultActivity(outputFile);
                     }
                 }, 1000);
@@ -205,13 +206,14 @@ public class RecordingService extends BaseService {
 //        startActivity(intent);
 
         App.ignoreOpenAd = true;
-        Intent myIntent = new Intent(RecordingService.this, PopUpResultVideoTranslucentActivity.class);
+        Intent myIntent = new Intent(getApplicationContext(), PopUpResultVideoTranslucentActivity.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         myIntent.setAction(ACTION_STOP_SERVICE);
         myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);
         startActivity(myIntent);
 
-        Intent intent2 = new Intent(RecordingService.this, ControllerService.class);
+        Intent intent2 = new Intent(getApplicationContext(), ControllerService.class);
         intent2.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent2.setAction(MyUtils.ACTION_END_RECORD);
     }

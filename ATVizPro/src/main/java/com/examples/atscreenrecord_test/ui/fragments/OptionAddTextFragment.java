@@ -10,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -135,9 +136,13 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
     int sizeOfText = 20;
 
     private void processingAddText() {
+        if (inputText.getText().toString().equals("")) {
+            inputText.requestFocus();
+            Toast.makeText(requireContext(), "Text is empty!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         dismiss();
         mCallback.onClickDone();
-        if (inputText.getText().toString().equals("")) return;
         FFmpegUtil.getInstance().addText(video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {

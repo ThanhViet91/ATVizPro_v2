@@ -33,7 +33,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
 
         Intent intent = getIntent();
         if (intent != null) {
-            stopProcessing();
+            stopExecuteService();
             videoPath = intent.getStringExtra(KEY_VIDEO_PATH);
         }
 
@@ -97,12 +97,17 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
                 .setTitle("Delete Video")
                 .setMessage("Do you want to delete this video from My Recordings?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> StorageUtil.deleteFile(videoPath))
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    StorageUtil.deleteFile(videoPath);
+                    onBackPressed();
+                } )
                 .show();
     }
 
 
     private void gotoPlayVideo() {
+
+        // open home >>> my recording >>> play video
 //        ProjectsActivity.gotoPlayVideoDetail(this, videoPath, videoName);
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(ACTION_GO_TO_PLAY);
@@ -119,11 +124,11 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     }
 
     private void gotoShareVideo() {
-        // open home >>> my recording >>> share
-
+        MyUtils.shareVideo(this, videoPath);
+//        onBackPressed();
     }
 
-    private void stopProcessing() {
+    private void stopExecuteService() {
         if (isMyServiceRunning(this, ExecuteService.class)) {
             Intent controller = new Intent(this, ExecuteService.class);
             controller.setAction(MyUtils.ACTION_EXIT_SERVICE);

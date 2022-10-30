@@ -137,6 +137,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     }
 
     boolean enableSave = false;
+    public static boolean finishEdit = false;
     @Override
     public void onClickNext() {
         //pressSave
@@ -146,6 +147,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
             e.printStackTrace();
         }
         showInterstitialAd();
+        finishEdit = true;
     }
 
     public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {

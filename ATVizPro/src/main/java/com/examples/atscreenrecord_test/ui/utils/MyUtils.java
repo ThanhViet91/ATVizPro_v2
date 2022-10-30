@@ -182,6 +182,7 @@ public class MyUtils {
         retriever.setDataSource(context, Uri.parse(path));
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         retriever.release();
+        if (time == null) return 0;
         timeInMs = Long.parseLong(time);
         return timeInMs;
     }

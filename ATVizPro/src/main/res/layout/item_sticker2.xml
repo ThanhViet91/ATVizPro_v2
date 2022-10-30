@@ -5,8 +5,8 @@
     <ImageView
         android:id="@+id/img_sticker"
         android:src="@drawable/youtube_slider1"
-        android:padding="10dp"
+        android:padding="8dp"
         android:adjustViewBounds="true"
-        android:layout_width="wrap_content"
-        android:layout_height="64dp"/>
+        android:layout_width="70dp"
+        android:layout_height="60dp"/>
 </LinearLayout>

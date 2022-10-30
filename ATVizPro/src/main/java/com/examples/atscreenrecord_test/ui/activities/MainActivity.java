@@ -481,13 +481,11 @@ public class MainActivity extends BaseFragmentActivity {
         DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
             @Override
             public void onClickCameraRoll() {
-//                showInterstitialAd(requestVideoFor, CHOOSE_GALLERY);
                 showDialogPickFromGallery(requestVideoFor);
             }
 
             @Override
             public void onClickMyRecordings() {
-//                showInterstitialAd(requestVideoFor, CHOOSE_MY_RECORD);
                 showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");

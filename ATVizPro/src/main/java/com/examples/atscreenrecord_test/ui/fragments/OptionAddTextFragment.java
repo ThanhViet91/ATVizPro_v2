@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.BasicAdapter;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -138,7 +138,7 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         dismiss();
         mCallback.onClickDone();
         if (inputText.getText().toString().equals("")) return;
-        VideoUtil.getInstance().addText(getActivity(), video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new VideoUtil.ITranscoding() {
+        FFmpegUtil.getInstance().addText(video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
             }

@@ -12,13 +12,11 @@ public class VideoProfileExecute implements Serializable {
     private int posY;
     private boolean isMuteAudioOriginal = false;
     private boolean isMuteAudioOverlay = false;
-    private int type;
 
-    public VideoProfileExecute(int type, String originalVideoPath, String overlayVideoPath,
+    public VideoProfileExecute(String originalVideoPath, String overlayVideoPath,
                                long startTime, long endTime, int camSize,
                                int posX, int posY,
                                boolean isMuteAudioOriginal, boolean isMuteAudioOverlay) {
-        this.type = type;
         this.originalVideoPath = originalVideoPath;
         this.overlayVideoPath = overlayVideoPath;
         this.startTime = startTime;
@@ -28,14 +26,6 @@ public class VideoProfileExecute implements Serializable {
         this.posY = posY;
         this.isMuteAudioOriginal = isMuteAudioOriginal;
         this.isMuteAudioOverlay = isMuteAudioOverlay;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     public String getOriginalVideoPath() {

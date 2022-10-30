@@ -32,6 +32,7 @@
     <string name="setting_stream_key_twitch">setting_stream_key_twitch</string>
     <string name="setting_livestream_type">setting_livestream_type</string>
     <string name="setting_interstitial_percent">setting_interstitial_percent</string>
+    <string name="setting_enable_camera_view">setting_enable_camera_view</string>
 
     <!--Camera settings-->
     <string name="setting_camera_mode">setting_camera_mode</string>

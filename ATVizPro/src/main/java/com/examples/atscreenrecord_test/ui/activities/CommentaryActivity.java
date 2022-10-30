@@ -4,6 +4,7 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PA
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_NEGATIVE;
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_POSITIVE;
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_TITLE;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.animation.ObjectAnimator;
@@ -11,12 +12,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -355,13 +353,14 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void startExecuteService() {
-        VideoProfileExecute videoProfile = new VideoProfileExecute(MyUtils.TYPE_COMMENTARY_VIDEO, videoFile, cacheAudioFilePath,
+        VideoProfileExecute videoProfile = new VideoProfileExecute(videoFile, cacheAudioFilePath,
                 0, 0, 0, 0, 0, false, false);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("package_video_profile", videoProfile);
+        bundle.putSerializable(MyUtils.KEY_SEND_PACKAGE_VIDEO, videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
+        intent.setAction(ACTION_FOR_COMMENTARY);
         intent.putExtras(bundle);
-        intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 2.5));
+        intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 4));
         startService(intent);
     }
 

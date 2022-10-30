@@ -11,6 +11,20 @@ import com.examples.atscreenrecord_test.R;
 
 public class SettingManager2 {
 
+    public static void setEnableCamView(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_enable_camera_view);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean isEnableCamView(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_enable_camera_view);
+        return preferences.getBoolean(key, false);
+    }
+
     public static void setLiveStreamType(Context context, int value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_livestream_type);

@@ -1,11 +1,8 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
-import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_ACTION_STOP_SERVICE;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,13 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 public class TranslucentActivity extends AppCompatActivity{
 

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -23,10 +25,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.AppConfigs;
-import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.serenegiant.utils.UIThreadHelper;
@@ -36,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,31 +54,20 @@ public class MyUtils {
     public static final String ACTION_GO_HOME = "ACTION_GO_HOME";
     public static final String ACTION_OPEN_SETTING_ACTIVITY = "ACTION_OPEN_SETTING_ACTIVITY";
     public static final String ACTION_SHOW_POPUP_GO_HOME = "ACTION_SHOW_POPUP_GO_HOME";
-//    public static final String ACTION_OPEN_LIVE_ACTIVITY = "ACTION_OPEN_LIVE_ACTIVITY";
-//    public static final String ACTION_OPEN_VIDEO_MANAGER_ACTIVITY = "ACTION_OPEN_VIDOE_MANAGER_ACTIVITY";
     public static final String ACTION_UPDATE_SETTING = "ACTION_UPDATE_SETTING";
+    public static final String ACTION_GO_TO_EDIT = "ACTION_GO_TO_EDIT";
+    public static final String ACTION_GO_TO_PLAY = "ACTION_GO_TO_PLAY";
+    public static final String ACTION_GO_TO_SHARE = "ACTION_GO_TO_SHARE";
     public static final String NEW_URL = "NEW_URL";
-//    public static final int SELECTED_MODE_EMPTY = 0;
-//    public static final int SELECTED_MODE_ALL = 1;
-//    public static final int SELECTED_MODE_MULTIPLE = 2;
-//    public static final int SELECTED_MODE_SINGLE = 3;
-//    public static final String DRIVE_MASTER_FOLDER = "Zecorder";
     public static final String STREAM_PROFILE = "Stream_Profile";
-//    public static final String ACTION_NOTIFY_FROM_STREAM_SERVICE = "ACTION_NOTIFY_FROM_STREAM_SERVICE";
-//    public static final String ACTION_DISCONNECT_LIVE_FROM_SERVICE = "ACTION_DISCONNECT_LIVE_FROM_SERVICE";
-//    public static final String ACTION_CONNECT_FAILED_FROM_SERVICE = "ACTION_CONNECT_FAILED_FROM_SERVICE";
     public static final String ACTION_DISCONNECT_LIVE_FROM_HOME = "ACTION_DISCONNECT_LIVE_FROM_HOME";
     public static final String ACTION_DISCONNECT_WHEN_STOP_LIVE = "ACTION_DISCONNECT_WHEN_STOP_LIVE";
     public static final String KEY_CAMERA_AVAILABLE = "KEY_CAMERA_AVAILABLE";
     public static final String KEY_CONTROLlER_MODE = "KEY_CONTROLLER_MODE";
     public static final String ACTION_INIT_CONTROLLER = "ACTION INIT CONTROLLER";
-//    public static final String SAMPLE_RMPT_URL = "rtmp://10.199.220.239/live/test";
-//    public static final String SAMPLE_RMPT_URL = "rtmps://live-api-s.facebook.com:443/rtmp/FB-2214421522061173-0-AbwXJyetmt7gRPGb";
     public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/thanh";
-//    public static final String KEY_STREAM_URL = "rtmp stream";
-//    public static final String KEY_STREAM_LOG = "Stream log";
     public static final String KEY_MESSAGE = "KEY_MESSAGE";
-//    public static final String KEY_STREAM_IS_TESTED = "KEY_STREAM_IS_TESTED";
+    public static final String KEY_SEND_PACKAGE_VIDEO = "key_send_package_video";
     public static final String ACTION_UPDATE_STREAM_PROFILE = "ACTION_UPDATE_STREAM_PROFILE";
     public static final String ACTION_UPDATE_TYPE_LIVE = "ACTION_UPDATE_TYPE_LIVE";
     public static final String ACTION_START_CAPTURE_NOW = "ACTION_START_CAPTURE_NOW";
@@ -85,19 +77,18 @@ public class MyUtils {
     public static final String ACTION_END_COMMENTARY = "ACTION_END_COMMENTARY";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 
-    private static final String TAG = "chienpm_utils";
+    private static final String TAG = "my_utils";
     public static final int MODE_STREAMING = 101;
     public static final int MODE_RECORDING = 102;
-    public static final int TYPE_REACT_VIDEO = 103;
-    public static final int TYPE_COMMENTARY_VIDEO = 104;
     public static final String ACTION_FOR_REACT = "ACTION_FOR_REACT";
     public static final String ACTION_FOR_COMMENTARY = "ACTION_FOR_COMMENTARY";
     public static final String ACTION_FOR_EDIT = "ACTION_FOR_EDIT";
     public static final String ACTION_CANCEL_PROCESSING = "ACTION_CANCEL_PROCESSING";
+    public static final String ACTION_EXIT_SERVICE = "ACTION_EXIT_SERVICE";
+    public static final String APP_DIRECTORY_PATH = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES) + "/Recorder";
 
     public static boolean checkRandomPercentInterstitial() {
         return new Random().nextInt(100) < AppConfigs.getInstance().getConfigModel().getInterstitialPercent();
-
     }
 
     public static void sendBroadCastMessageFromService(Context context, String message) {
@@ -168,8 +159,7 @@ public class MyUtils {
 
     @NonNull
     public static String getBaseStorageDirectory() {
-        File directory = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES) + "/Recorder");
+        File directory = new File(APP_DIRECTORY_PATH);
         if (!directory.exists()) {
             boolean a = directory.mkdirs();
         }
@@ -185,6 +175,41 @@ public class MyUtils {
         return directory.getAbsolutePath();
     }
 
+    public static long getDurationMs(Context context, String path) {
+        if (path.equals("")) return 0;
+        long timeInMs = 0;
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(context, Uri.parse(path));
+        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        retriever.release();
+        timeInMs = Long.parseLong(time);
+        return timeInMs;
+    }
+
+    public static String getDurationTime(Context context, String path) {
+        if (path.equals("")) return "00:00";
+        return parseLongToTime(getDurationMs(context, path));
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String parseLongToTime(long durationInMillis) {
+        long second = (durationInMillis / 1000) % 60;
+        long minute = (durationInMillis / (1000 * 60)) % 60;
+        long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
+        if (hour == 0) return String.format("%02d:%02d", minute, second);
+        return String.format("%02d:%02d:%02d", hour, minute, second);
+    }
+
+    public static void shareVideo(Context context, String videoFile) {
+        File file = new File(videoFile);
+        Uri uri = FileProvider.getUriForFile(context, "com.examples.atscreenrecord_test.provider", file);
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
+        intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        context.startActivity(Intent.createChooser(intent, "Share Video"));
+    }
 
     public static void showSnackBarNotification(View view, String msg, int length) {
         Snackbar.make(view, msg, length).show();
@@ -218,8 +243,6 @@ public class MyUtils {
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
     }
-
-
 
     public static void toast(Context mContext, String msg, int length) {
         UIThreadHelper.runOnUiThread(() -> Toast.makeText(mContext, msg, length).show());
@@ -328,58 +351,6 @@ public class MyUtils {
         Matcher matcher = domainPattern.matcher(url);
         return matcher.find();
     }
-
-    /*public static Video tryToExtractVideoInfoFile(Context context, VideoSetting videoSetting) {
-        Video mVideo = null;
-        try {
-
-            File file = new File(Uri.parse(videoSetting.getOutputPath()).toString());
-            Log.i(TAG, "tryToExtractVideoInfoFile: "+file);
-            long size = file.length();
-            String title = file.getName();
-
-            String localPath = videoSetting.getOutputPath();
-            int bitrate = videoSetting.getBitrate();
-            int width = videoSetting.getWidth();
-            int height = videoSetting.getHeight();
-            int fps = videoSetting.getFPS();
-            //Todo: fix it
-            long duration = 0;
-
-//            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            //use one of overloaded setDataSource() functions to set your data source
-//            retriever.setDataSource(file.getAbsolutePath());
-//            String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-//            String sBitrate = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
-//            String sWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-//            String sHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-//            String sFps = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE);
-
-//            try {
-//                bitrate = Integer.parseInt(sBitrate);
-//            }catch (Exception e){
-//                bitrate = videoSetting.getBitrate();
-//            }
-//
-//            try {
-//                duration = Long.parseLong(time)/1000;
-//            } catch (Exception e){
-//                duration = 0;
-//            }
-
-
-            mVideo = new Video(title, duration, bitrate, fps, width, height, size, localPath, 0, "", "");
-
-//            retriever.release();
-
-            Log.i(TAG, "tryToExtractVideoInfoFile: "+ mVideo);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.i(TAG, "tryToExtractVideoInfoFile: error-"+ e.getMessage());
-        }
-        return mVideo;
-    }*/
 
     public static boolean isMyServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);

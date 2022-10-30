@@ -36,7 +36,7 @@ public abstract class BaseEncoder implements EncoderCallback {
 
   public void restart() {
     start(false);
-    System.out.println("thanh ====> BaseEncoder ---38 -- "+ mCamID);
+//    System.out.println("thanh ====> BaseEncoder ---38 -- "+ mCamID);
     initCodec();
   }
 
@@ -46,7 +46,7 @@ public abstract class BaseEncoder implements EncoderCallback {
     }
     mCamID = camId;
     start(true);
-    System.out.println("thanh ====> BaseEncoder ---48 -- "+ mCamID);
+//    System.out.println("thanh ====> BaseEncoder ---48 -- "+ mCamID);
     initCodec();
   }
 

@@ -444,7 +444,7 @@ public abstract class Camera1Base
 //      }
       cameraManager.setRotation(rotation);
 
-      System.out.println("thanh ====> Camera1Base --- " + cameraFacing.name());
+//      System.out.println("thanh ====> Camera1Base --- " + cameraFacing.name());
 
       cameraManager.start(cameraFacing, width, height, videoEncoder.getFps());
 
@@ -546,7 +546,7 @@ public abstract class Camera1Base
     cameraManager.setRotation(videoEncoder.getRotation());
     if (!cameraManager.isRunning() && videoEncoder.getWidth() != previewWidth
         || videoEncoder.getHeight() != previewHeight) {
-      System.out.println("thanh ====> Camera1ApiManager --- - 549");
+//      System.out.println("thanh ====> Camera1ApiManager --- - 549");
       cameraManager.start(videoEncoder.getWidth(), videoEncoder.getHeight(), videoEncoder.getFps());
     }
     onPreview = true;

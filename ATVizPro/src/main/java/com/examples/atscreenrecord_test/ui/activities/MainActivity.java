@@ -7,6 +7,9 @@ import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragmen
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 import static com.examples.atscreenrecord_test.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_HOME;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
@@ -24,6 +27,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -36,11 +40,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.examples.atscreenrecord_test.App;
+import com.examples.atscreenrecord_test.BuildConfig;
 import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
@@ -73,7 +77,7 @@ import java.util.Date;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseFragmentActivity {
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
@@ -86,8 +90,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
+    private static final int PERMISSION_ACCESS_ALL_FILE = 3007;
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
+    public static final String KEY_FROM_FUNCTION = "key_from_code";
+    public static final String KEY_NAVIGATE_TO = "key_navigate_to";
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -100,11 +107,11 @@ public class MainActivity extends AppCompatActivity {
     private int mScreenCaptureResultCode = MyUtils.RESULT_CODE_FAILED;
     private StreamProfile mStreamProfile;
 
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(MyUtils.KEY_CONTROLlER_MODE, mMode);
-    }
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putInt(MyUtils.KEY_CONTROLlER_MODE, mMode);
+//    }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -117,9 +124,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getAction() != null && intent.getAction().equals(MyUtils.ACTION_GO_HOME)) {
-            removeAllFragment();
-        }
+        System.out.println("thanhlv onNewIntent Mainnnnnnnnnnn ");
+        if (intent != null)
+            handleIncomingRequest(intent);
     }
 
     @Override
@@ -127,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         active = true;
         registerSyncServiceReceiver();
-
     }
 
     private void registerSyncServiceReceiver() {
@@ -142,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
         active = false;
         unregisterReceiver(mMessageReceiver);
     }
-
-    private RelativeLayout mAdViewRoot;
 
     @Override
     protected void onPause() {
@@ -164,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.out.println("thanhlv onCreate Mainnnnnnnnnnn ");
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
@@ -217,10 +222,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void checkShowAd() {
-        if (initialAds) {
-            mAdManager.loadBanner();
-            mAdManager.createInterstitialAdmob();
-        }
+        mAdManager.loadBanner();
+        mAdManager.createInterstitialAdmob();
     }
 
     private void handleIncomingRequest(Intent intent) {
@@ -230,6 +233,15 @@ public class MainActivity extends AppCompatActivity {
                     mImgRec.performClick();
                     break;
                 case "from_notification":
+                    break;
+                case ACTION_GO_TO_EDIT:
+                    showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT, ACTION_GO_TO_EDIT, intent.getStringExtra(KEY_PATH_VIDEO));
+                    break;
+                case ACTION_GO_TO_PLAY:
+                    showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT, ACTION_GO_TO_PLAY, intent.getStringExtra(KEY_PATH_VIDEO));
+                    break;
+                case ACTION_GO_HOME:
+                    removeAllFragment();
                     break;
             }
         }
@@ -242,13 +254,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void requestAccessAllFiles() {
+        if (mScreenCaptureIntent == null) {
+            MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+            startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
+        }
+    }
+
     private ImageView mImgRec, imgLiveType;
     private PulsatorLayout pulsator;
     private TextView liveStreaming;
     private AdsUtil mAdManager;
 
     private void initViews() {
-        mAdViewRoot = findViewById(R.id.adView);
+        RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
         pulsator = findViewById(R.id.pulsator);
         pulsator.start();
@@ -304,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         react_cam.setOnClickListener(view -> {
             if (checkExecuteServiceBusy()) return;
 //            if (hasAllPermissionForReact())
-                showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);
+            showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);
 
         });
 
@@ -318,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
         btn_commentary.setOnClickListener(view -> {
             if (checkExecuteServiceBusy()) return;
 //            if (hasAllPermissionForReact())
-                showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
+            showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
         });
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
         btn_projects.setOnClickListener(new OnSingleClickListener() {
@@ -475,8 +494,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMyRecordings(int from_code) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                return;
+            }
+        }
         Intent intent = new Intent(this, ProjectsActivity.class);
-        intent.putExtra("key_from_code", from_code);
+        intent.putExtra(KEY_FROM_FUNCTION, from_code);
+        startActivity(intent);
+    }
+
+    private void showMyRecordings(int from_code, String navigate, String videoPath) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                return;
+            }
+        }
+        Intent intent = new Intent(this, ProjectsActivity.class);
+        intent.setAction(navigate);
+        intent.putExtra(KEY_PATH_VIDEO, videoPath);
         startActivity(intent);
     }
 
@@ -510,7 +550,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
                 showDialogPickVideo(fromFunction);
             }
         }
@@ -531,7 +571,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
                 showDialogPickVideo(fromFunction);
             }
         }
@@ -546,8 +586,8 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public void showInterstitialAd(int from_code) {
+        fromFunction = from_code;
         if (mAdManager.interstitialAdAlready()) {
-            fromFunction = from_code;
             mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
             if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
@@ -564,7 +604,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT){
+            if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
                 showDialogPickVideo(from_code);
             }
         }
@@ -577,6 +617,14 @@ public class MainActivity extends AppCompatActivity {
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
         }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            if (!Environment.isExternalStorageManager()) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+//                return;
+//            }
+//        }
+
         ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
 
     }
@@ -621,12 +669,12 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[2] == PackageManager.PERMISSION_GRANTED
                         && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
+                    showDialogPickVideo(fromFunction);
 
-                } else
-                    if (!shouldShowRequestPermissionRationale(permissions[0])
-                            || !shouldShowRequestPermissionRationale(permissions[1])
-                            || !shouldShowRequestPermissionRationale(permissions[2])
-                            || !shouldShowRequestPermissionRationale(permissions[3])) {
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                        || !shouldShowRequestPermissionRationale(permissions[1])
+                        || !shouldShowRequestPermissionRationale(permissions[2])
+                        || !shouldShowRequestPermissionRationale(permissions[3])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                     alertDialogBuilder.setTitle("Change Permissions in Settings");
@@ -649,9 +697,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
-                            && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
-                            && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                            && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
+                            || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                         alertDialogBuilder.setTitle("Second Chance");
@@ -684,9 +732,8 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
                         && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
-
-                } else
-                if (!shouldShowRequestPermissionRationale(permissions[1])
+                    showDialogPickVideo(fromFunction);
+                } else if (!shouldShowRequestPermissionRationale(permissions[1])
                         || !shouldShowRequestPermissionRationale(permissions[2])
                         || !shouldShowRequestPermissionRationale(permissions[3])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
@@ -711,8 +758,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
-                            && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                            && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                         alertDialogBuilder.setTitle("Second Chance");
@@ -744,7 +791,6 @@ public class MainActivity extends AppCompatActivity {
     public void shouldStartControllerService() {
         if (!hasCaptureIntent())
             requestScreenCaptureIntent();
-
         if (hasPermission()) {
             startControllerService();
         } else {
@@ -767,7 +813,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        App.isPickFromGallery = true;
+        App.ignoreOpenAd = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
             final Uri selectedUri = data != null ? data.getData() : null;
             if (selectedUri != null) {
@@ -778,16 +824,11 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getSupportFragmentManager()
-                                    .beginTransaction()
-                                    .add(R.id.frame_layout_fragment, new SubscriptionFragment())
-                                    .addToBackStack("")
-                                    .commitAllowingStateLoss();
-                        }
-                    });
+                    runOnUiThread(() -> getSupportFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .addToBackStack("")
+                            .commitAllowingStateLoss());
 
                     return;
                 }
@@ -852,8 +893,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
+        if (requestCode == PERMISSION_ACCESS_ALL_FILE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                //Check if the permission is granted or not.
+                if (!Environment.isExternalStorageManager()) { //Permission is not available
+                    MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
+                } else {
+                    showMyRecordings(fromFunction);
+                }
+            }
+        }
 
+        if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
             //Check if the permission is granted or not.
             if (resultCode != RESULT_OK) { //Permission is not available
                 MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);

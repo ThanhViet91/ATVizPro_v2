@@ -26,7 +26,7 @@
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
             android:padding="3dp"
-            android:src="@drawable/ic_capture_service"
+            android:src="@drawable/ic_capture_disable"
             app:layout_constraintCircle="@+id/imgRec"
             app:layout_constraintCircleAngle="90"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"
@@ -68,7 +68,7 @@
             tools:ignore="ContentDescription,MissingConstraints" />
 
         <ImageView
-            android:id="@+id/imgSetting"
+            android:id="@+id/imgHome"
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
             android:src="@drawable/ic_home_service"

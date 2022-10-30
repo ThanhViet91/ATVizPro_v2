@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.BasicAdapter;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -98,7 +98,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
     private void processingAddText() {
         dismiss();
         mCallback.onClickDone();
-        VideoUtil.getInstance().changeSpeed(getActivity(), video_path, speed_selected,  new VideoUtil.ITranscoding() {
+        FFmpegUtil.getInstance().changeSpeed(video_path, speed_selected,  new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
 

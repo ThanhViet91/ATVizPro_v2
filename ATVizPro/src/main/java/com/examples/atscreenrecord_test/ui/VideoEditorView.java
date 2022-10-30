@@ -132,7 +132,6 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         videoOptions.add("Speed");
         videoOptions.add("Text");
         videoOptions.add("Image");
-        videoOptions.add("Merge");
         rcVideoOptions = findViewById(R.id.recycler_view_position);
         mAdapter = new VideoOptionAdapter(context, videoOptions, this);
         rcVideoOptions.setAdapter(mAdapter);

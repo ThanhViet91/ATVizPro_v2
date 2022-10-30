@@ -18,7 +18,7 @@ import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 
 import java.util.List;
 
-public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoViewHolder> {
+public class Sticker2Adapter extends RecyclerView.Adapter<Sticker2Adapter.PhotoViewHolder> {
 
     private Context context;
     private List<PhotoModel> list;
@@ -29,7 +29,7 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoVie
 
     private StickerAdapterListener listener;
 
-    public StickerAdapter(Context context, List<PhotoModel> list, StickerAdapterListener listener) {
+    public Sticker2Adapter(Context context, List<PhotoModel> list, StickerAdapterListener listener) {
         this.context = context;
         this.list = list;
         this.listener = listener;
@@ -38,7 +38,7 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerAdapter.PhotoVie
     @NonNull
     @Override
     public PhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sticker, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sticker2, parent, false);
         return new PhotoViewHolder(view);
     }
 

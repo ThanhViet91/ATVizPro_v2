@@ -21,10 +21,11 @@ import com.examples.atscreenrecord_test.ui.fragments.IOptionFragmentListener;
 import com.examples.atscreenrecord_test.ui.fragments.OptionAddImageFragment;
 import com.examples.atscreenrecord_test.ui.fragments.OptionAddTextFragment;
 import com.examples.atscreenrecord_test.ui.fragments.OptionChangeSpeedFragment;
+import com.examples.atscreenrecord_test.ui.fragments.OptionRotateFragment;
 import com.examples.atscreenrecord_test.ui.fragments.OptionTrimFragment;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.material.snackbar.Snackbar;
@@ -113,6 +114,10 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
             case "Image":
                 OptionAddImageFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
+
+            case "Rotate":
+                OptionRotateFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
+                break;
             default:
                 MyUtils.showSnackBarNotification(videoEditorView, "This fun is coming soon!!", Snackbar.LENGTH_SHORT);
         }
@@ -136,7 +141,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     public void onClickNext() {
         //pressSave
         try {
-            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
+            copyFile(new File(cacheOutputPath), new File(FFmpegUtil.generateFileOutput("Edit")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -232,7 +237,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         // Continue with delete operation
                         try {
-                            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
+                            copyFile(new File(cacheOutputPath), new File(FFmpegUtil.generateFileOutput("Edit")));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -275,7 +280,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         // Continue with delete operation
                         try {
-                            copyFile(new File(cacheOutputPath), new File(VideoUtil.generateFileOutput("Edit")));
+                            copyFile(new File(cacheOutputPath), new File(FFmpegUtil.generateFileOutput("Edit")));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

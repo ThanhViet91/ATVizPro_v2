@@ -22,7 +22,6 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -71,7 +70,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     WindowManager.LayoutParams paramCam;
     WindowManager.LayoutParams paramCountdown;
     private Intent mScreenCaptureIntent = null;
-    private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgCapture, mImgSetting;
+    private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgCapture, mImgHome;
     private Boolean mRecordingStarted = false;
     private Camera mCamera;
     private LinearLayout cameraPreview;
@@ -223,18 +222,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     @Override
     public void onCreate() {
         super.onCreate();
-//        if (DEBUG) Log.i(TAG, "ControllerService: onCreate");
         updateScreenSize();
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("thanhlv updatePendingIntent onFinishTranscoding ControllerService");
-                Intent myIntent = new Intent(ControllerService.this, TranslucentActivity.class);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(myIntent);
-            }
-        }, 10000);
         if (paramViewRoot == null) {
             initParam();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -338,6 +326,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         camWidth = camViewSize[camSize];  // ~270px
         camHeight = camWidth * 4 / 3f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+
+        if (SettingManager2.isEnableCamView(getApplicationContext())) {
+            toggleView(mCameraLayout, View.VISIBLE);
+        } else toggleView(mCameraLayout, View.GONE);
 
         final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
 
@@ -470,10 +462,11 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
         mImgClose = mViewRoot.findViewById(R.id.imgClose);
         mImgStart = mViewRoot.findViewById(R.id.imgStart);
-        mImgSetting = mViewRoot.findViewById(R.id.imgSetting);
+        mImgHome = mViewRoot.findViewById(R.id.imgHome);
         mImgStop = mViewRoot.findViewById(R.id.imgStop);
         toggleView(mImgStop, View.GONE);
         toggleNavigationButton(View.GONE);
+
 
 
         mImgCapture.setOnClickListener(new OnSingleClickListener() {
@@ -483,16 +476,19 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 toggleNavigationButton(View.GONE);
                 if (mCameraLayout.getVisibility() == View.GONE) {
                     toggleView(mCameraLayout, View.VISIBLE);
+                    mImgCapture.setImageResource(R.drawable.ic_capture_disable);
+                    SettingManager2.setEnableCamView(getApplicationContext(), true);
                 } else {
                     toggleView(mCameraLayout, View.GONE);
+                    mImgCapture.setImageResource(R.drawable.ic_capture_enable);
+                    SettingManager2.setEnableCamView(getApplicationContext(), false);
                 }
             }
         });
 
-        mImgSetting.setOnClickListener(new OnSingleClickListener() {
+        mImgHome.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
                 gotoMain();
             }
         });
@@ -754,13 +750,13 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     };
 
     private boolean isViewCollapsed() {
-        return mViewRoot == null || mViewRoot.findViewById(R.id.imgSetting).getVisibility() == View.GONE;
+        return mViewRoot == null || mViewRoot.findViewById(R.id.imgHome).getVisibility() == View.GONE;
     }
 
     void toggleNavigationButton(int viewMode) {
         //Todo: make animation here
         mImgStart.setVisibility(viewMode);
-        mImgSetting.setVisibility(viewMode);
+        mImgHome.setVisibility(viewMode);
         mImgCapture.setVisibility(viewMode);
         mImgClose.setVisibility(viewMode);
         mImgStop.setVisibility(viewMode);

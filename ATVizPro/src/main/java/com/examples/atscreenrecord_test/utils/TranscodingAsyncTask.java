@@ -22,9 +22,9 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     Context context;
     String commandStr;
     String outputPath="";
-    VideoUtil.ITranscoding mCallback = null;
+    FFmpegUtil.ITranscoding mCallback = null;
 
-    public TranscodingAsyncTask (Context act, String command, String outPath, VideoUtil.ITranscoding callback) {
+    public TranscodingAsyncTask (Context act, String command, String outPath, FFmpegUtil.ITranscoding callback) {
         context = act;
         commandStr = command;
         outputPath = outPath;

@@ -5,7 +5,6 @@ import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +17,18 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 import com.google.android.gms.ads.AdListener;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 
 public class ResultVideoFinishActivity extends AppCompatActivity implements View.OnClickListener {
@@ -167,7 +164,7 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
     public void saveVideo(String videoFile){
         if (!isSaved) {
             try {
-                finalVideoSaved = VideoUtil.generateFileOutput(preName);
+                finalVideoSaved = FFmpegUtil.generateFileOutput(preName);
                 copyFile(new File(videoFile), new File(finalVideoSaved));
                 isSaved = true;
                 Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
@@ -192,14 +189,7 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
         }
 
         if (v == findViewById(R.id.img_btn_share)) {
-            File file = new File(videoFile);
-            Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atscreenrecord_test.provider", file);
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
-            intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
-            intent.putExtra(Intent.EXTRA_STREAM, uri);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Share File"));
+            MyUtils.shareVideo(getApplicationContext(), videoFile);
         }
 
         if (v == findViewById(R.id.img_btn_home)) {

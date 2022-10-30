@@ -141,6 +141,11 @@ public class StorageUtil {
     return 0;
   }
 
+  public static String getFileName(String path) {
+    if (TextUtils.isEmpty(path)) return "";
+    File file = new File(path);
+    return file.getName().replace(".mp4", "");
+  }
   /**
    * @param length 长度 byte为单位
    * 将文件大小转换为KB,MB格式

@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -116,7 +116,7 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
         callback.onClickDone();
 
-        VideoUtil.getInstance().trimVideo(getActivity(), video_path, startTime, endTime, new VideoUtil.ITranscoding() {
+        FFmpegUtil.getInstance().trimVideo(video_path, startTime, endTime, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
             }

@@ -1,5 +1,6 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
+import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_FROM_FUNCTION;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_VIDEO_NAME;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
@@ -7,37 +8,28 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 import static com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_REACT;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.app.RecoverableSecurityException;
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.IntentSenderRequest;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.examples.atscreenrecord_test.BuildConfig;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
@@ -48,7 +40,7 @@ import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.DisplayUtil;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.google.android.material.snackbar.Snackbar;
+import com.examples.atscreenrecord_test.utils.StorageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,49 +54,37 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private VideoProjectsAdapter mAdapter;
     private final ArrayList<VideoModel> videoList = new ArrayList<>();
     private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
-    private int from_code = 0;
-    final static int APP_STORAGE_ACCESS_REQUEST_CODE = 501; // Any value
-
-    private RelativeLayout rootView;
+    private int fromFunction = 0;
+    private String navigateTo = "";
+    String videoPath, videoName;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_video_projects);
-        rootView = findViewById(R.id.root_container);
         hideStatusBar(this);
-        if (getIntent() != null) from_code = getIntent().getIntExtra("key_from_code", 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                startActivityForResult(intent, APP_STORAGE_ACCESS_REQUEST_CODE);
-            } else {
-                initViews();
-            }
-        } else {
-            initViews();
-        }
+        if (getIntent() != null) {
+            fromFunction = getIntent().getIntExtra(KEY_FROM_FUNCTION, 0);
 
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == APP_STORAGE_ACCESS_REQUEST_CODE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                if (Environment.isExternalStorageManager()) {
-                    // Permission granted. Now resume your workflow.
-                    MyUtils.showSnackBarNotification(rootView, "Please grant all permissions to access files.", Snackbar.LENGTH_LONG);
+            if (getIntent().getAction() != null) {
+                videoPath = getIntent().getStringExtra(KEY_PATH_VIDEO);
+                if (ACTION_GO_TO_EDIT.equals(getIntent().getAction())) {
+                    if (requireSubscription(videoPath)) return;
+                    gotoEditVideo(videoPath);
+                }
+                if (ACTION_GO_TO_PLAY.equals(getIntent().getAction())) {
+                    gotoPlayVideoDetail(this, videoPath);
                 }
             }
 
         }
+        fetchData();
+        initViews();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        reloadData();
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
         } else {
@@ -133,9 +113,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         ImageView btn_delete = findViewById(R.id.img_btn_delete);
         btn_rename = findViewById(R.id.img_btn_rename);
         tv_selected = findViewById(R.id.tv_selected);
+
         toggleView(findViewById(R.id.option), View.GONE);
         tv_select.setText(getString(R.string.select));
-        if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+        if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
             toggleView(tv_cancel, View.GONE);
             toggleView(btn_back, View.VISIBLE);
         } else {
@@ -146,7 +127,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         tv_cancel.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+                if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                     for (VideoModel video : videoList) video.setSelected(false);
                     mAdapter.setSelectable(false);
                     toggleView(btn_back, View.VISIBLE);
@@ -180,21 +161,22 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 handleRenameButton(getVideoListSelected().get(0));
             }
         });
-        final SwipeRefreshLayout srl = findViewById(R.id.swipeLayout);
-        srl.setOnRefreshListener(() -> {
-            reloadData();
-            srl.setRefreshing(false);
-        });
-//        readData();
+
+        if (totalVideos == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+            toggleView(tv_cancel, View.GONE);
+            toggleView(btn_back, View.VISIBLE);
+            toggleView(tv_select, View.GONE);
+        }
         mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
+        mAdapter.setHasStableIds(true);
+
         recyclerView.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
         recyclerView.setLayoutManager(gridLayoutManager);
     }
 
     private int calculateSpanCount() {
-//        DisplayUtil.info();
         float screenWidth = DisplayUtil.getDeviceWidthDpi();
         return (int) screenWidth / 180 + 1;
     }
@@ -233,7 +215,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void handleDeleteButton() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Video")
-                .setMessage("Do you want to delete video?")
+                .setMessage(String.format("Do you want to delete %s", countVideoSelected == 1 ? "video?" : "videos?"))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(getVideoListSelected()))
                 .show();
@@ -241,29 +223,23 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     private void deleteVideos(ArrayList<VideoModel> listSelected) {
         for (VideoModel video : listSelected) {
-            File file = new File(video.getPath());
-            if (file.delete()) videoList.remove(video);
-//            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-//                    (s, uri) -> {
-//                        ContentResolver contentResolver = getApplicationContext().getContentResolver();
-//                        try {
-//                            //delete object using resolver
-//                            contentResolver.delete(uri, null, null);
-//                            videoList.remove(video);
-//                            runOnUiThread(() -> mAdapter.updateData(videoList));
-//                            Toast.makeText(getApplicationContext(), "The video is deleted!", Toast.LENGTH_SHORT).show();
-//                        } catch (SecurityException e) {
-//                            delete(e, loginResultHandler, uri, contentResolver);
-//                        }
-//                    });
+            if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
         }
-        runOnUiThread(() -> mAdapter.updateData(videoList));
+        runOnUiThread(() -> {
+            if (mAdapter != null) mAdapter.updateData(videoList);
+        });
     }
 
+    private int countVideoSelected = 0;
+
     private ArrayList<VideoModel> getVideoListSelected() {
+        countVideoSelected = 0;
         ArrayList<VideoModel> list = new ArrayList<>();
         for (VideoModel item : videoList)
-            if (item.isSelected()) list.add(0, item);
+            if (item.isSelected()) {
+                list.add(0, item);
+                countVideoSelected++;
+            }
         return list;
     }
 
@@ -314,7 +290,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         tv_selected.setText(String.format("%d item selected", getVideoListSelected().size()));
     }
 
-    private void reloadData() {
+    private void fetchData() {
         videoList_temp.clear();
         videoList_temp = new ArrayList<>(videoList);
         videoList.clear();
@@ -334,7 +310,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
     }
 
+    private int totalVideos = 0;
+
     private void readData() {
+        totalVideos = 0;
         listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoList.size() > 1) {
             videoList.sort((t0, t1) -> t0.getLastModified() > t1.getLastModified() ? -1 : 0);
@@ -347,34 +326,21 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 listFilesForFolder(fileEntry);
             } else {
                 if (fileEntry.getName().contains(".mp4"))
-                    videoList.add(0, new VideoModel(fileEntry.getName().replace(".mp4", ""),
-                            fileEntry.getAbsolutePath(), getDuration(fileEntry.getAbsolutePath()), fileEntry.lastModified()));
+                    videoList.add(0,
+                            new VideoModel(fileEntry.getName().replace(".mp4", ""),
+                                    fileEntry.getAbsolutePath(),
+                                    MyUtils.getDurationTime(this, fileEntry.getAbsolutePath()),
+                                    fileEntry.lastModified())
+                    );
+                totalVideos++;
             }
         }
-    }
-
-    public String getDuration(String path) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(this, Uri.parse(path));
-        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        retriever.release();
-        long timeInMs = Long.parseLong(time);
-        return parseLongToTime(timeInMs);
-    }
-
-    @SuppressLint("DefaultLocale")
-    public String parseLongToTime(long durationInMillis) {
-        long second = (durationInMillis / 1000) % 60;
-        long minute = (durationInMillis / (1000 * 60)) % 60;
-        long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
-        if (hour == 0) return String.format("%02d:%02d", minute, second);
-        return String.format("%02d:%02d:%02d", hour, minute, second);
     }
 
     @Override
     public void onSelected(VideoModel video) {
         if (video == null) {
-            if (from_code == REQUEST_SHOW_PROJECTS_DEFAULT) {
+            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                 mAdapter.setSelectable(true);
             } else {
                 return;
@@ -386,75 +352,87 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
 
         if (video != null) {
-
-            if (from_code != REQUEST_SHOW_PROJECTS_DEFAULT
-                    && video.getDurationMs(this) > 60000
-                    && !SettingManager2.isProApp(this)) {
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(R.id.frame_layout_fragment, new SubscriptionFragment())
-                        .addToBackStack("")
-                        .commit();
-                return;
-            }
-
-            switch (from_code) {
+            if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT && requireSubscription(video.getPath())) return;
+            switch (fromFunction) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
-                    Intent intent = new Intent(this, PrepareVideoActivity.class);
-                    intent.setAction(MyUtils.ACTION_FOR_REACT);
-                    intent.putExtra(VIDEO_PATH_KEY, video.getPath());
-                    startActivity(intent);
+                    gotoPrepareVideo(video.getPath(), ACTION_FOR_REACT);
                     break;
                 case REQUEST_VIDEO_FOR_VIDEO_EDIT:
-                    Intent intent2 = new Intent(this, VideoEditorActivity.class);
-                    intent2.setAction(MyUtils.ACTION_FOR_EDIT);
-                    intent2.putExtra(VIDEO_PATH_KEY, video.getPath());
-                    startActivity(intent2);
+                    gotoEditVideo(video.getPath());
                     break;
                 case REQUEST_VIDEO_FOR_COMMENTARY:
-                    Intent intent3 = new Intent(this, PrepareVideoActivity.class);
-                    intent3.setAction(MyUtils.ACTION_FOR_COMMENTARY);
-                    intent3.putExtra(VIDEO_PATH_KEY, video.getPath());
-                    startActivity(intent3);
+                    gotoPrepareVideo(video.getPath(), ACTION_FOR_COMMENTARY);
                     break;
                 case REQUEST_SHOW_PROJECTS_DEFAULT:
                 default:
-                    Intent intent4 = new Intent(this, PlayVideoDetailActivity.class);
-                    intent4.putExtra(KEY_PATH_VIDEO, video.getPath());
-                    intent4.putExtra(KEY_VIDEO_NAME, video.getName());
-                    startActivity(intent4);
+                    gotoPlayVideoDetail(this, video.getPath());
             }
         }
     }
 
-    public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
-        PendingIntent pendingIntent = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ArrayList<Uri> collection = new ArrayList<>();
-            collection.add(uri);
-            pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            //if exception is recoverable then again send delete request using intent
-            if (e instanceof RecoverableSecurityException) {
-                RecoverableSecurityException exception = (RecoverableSecurityException) e;
-                pendingIntent = exception.getUserAction().getActionIntent();
-            }
+    public boolean requireSubscription(String path) {
+        if ( !SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                    .addToBackStack("")
+                    .commit();
+            return true;
         }
-        if (pendingIntent != null) {
-            IntentSender sender = pendingIntent.getIntentSender();
-            IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
-            launcher.launch(request);
-        }
+        return false;
     }
 
-    public void rename(Uri uri, String rename) {
-        //create content values with new name and update
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, rename);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ContentResolver contentResolver = getApplicationContext().getContentResolver();
-            contentResolver.update(uri, contentValues, null);
-        }
+    public void gotoEditVideo(String path) {
+        Intent intent = new Intent(this, VideoEditorActivity.class);
+        intent.setAction(MyUtils.ACTION_FOR_EDIT);
+        intent.putExtra(VIDEO_PATH_KEY, path);
+        startActivity(intent);
     }
+
+    public void gotoPrepareVideo(String path, String action) {
+        Intent intent = new Intent(this, PrepareVideoActivity.class);
+        intent.setAction(action);
+        intent.putExtra(VIDEO_PATH_KEY, path);
+        startActivity(intent);
+    }
+
+    public static void gotoPlayVideoDetail(Context context, String path) {
+        if (path.equals("")) return;
+        String name = new File(path).getName().replace(".mp4", "");
+        Intent intent = new Intent(context, PlayVideoDetailActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, path);
+        intent.putExtra(KEY_VIDEO_NAME, name);
+        context.startActivity(intent);
+    }
+
+//    public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
+//        PendingIntent pendingIntent = null;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            ArrayList<Uri> collection = new ArrayList<>();
+//            collection.add(uri);
+//            pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            //if exception is recoverable then again send delete request using intent
+//            if (e instanceof RecoverableSecurityException) {
+//                RecoverableSecurityException exception = (RecoverableSecurityException) e;
+//                pendingIntent = exception.getUserAction().getActionIntent();
+//            }
+//        }
+//        if (pendingIntent != null) {
+//            IntentSender sender = pendingIntent.getIntentSender();
+//            IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+//            launcher.launch(request);
+//        }
+//    }
+//
+//    public void rename(Uri uri, String rename) {
+//        //create content values with new name and update
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, rename);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            ContentResolver contentResolver = getApplicationContext().getContentResolver();
+//            contentResolver.update(uri, contentValues, null);
+//        }
+//    }
 }

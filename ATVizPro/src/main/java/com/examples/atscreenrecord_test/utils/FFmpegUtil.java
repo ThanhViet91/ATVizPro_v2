@@ -1,7 +1,6 @@
 package com.examples.atscreenrecord_test.utils;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -22,9 +21,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class VideoUtil {
+public class FFmpegUtil {
 
-    private static VideoUtil INSTANCE;
+    private static FFmpegUtil INSTANCE;
     @SuppressLint("SimpleDateFormat")
     public String getTimeStamp() {
         return new SimpleDateFormat("MMdd_HHmmss").format(new Date());
@@ -38,12 +37,12 @@ public class VideoUtil {
         void onFinishTranscoding(String code);
     }
 
-    private VideoUtil() {
+    private FFmpegUtil() {
     }
 
-    public static VideoUtil getInstance() {
+    public static FFmpegUtil getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new VideoUtil();
+            INSTANCE = new FFmpegUtil();
         }
         return INSTANCE;
     }
@@ -93,7 +92,8 @@ public class VideoUtil {
 
     public void reactCamera(String originalPath, String overlayPath, long startTime, long endTime,
                             int sizeCam, int posX, int posY, boolean isMuteAudioOriginal, boolean isMuteAudioOverlay, ITranscoding callback) {
-        outputVideoPath = StorageUtil.getCacheDir() + "/CacheReactCam_" + getTimeStamp() + ".mp4";
+//        outputVideoPath = StorageUtil.getCacheDir() + "/CacheReactCam_" + getTimeStamp() + ".mp4";
+        outputVideoPath = generateFileOutput("React");
         String cmd = "ffmpeg -i " + overlayPath + " -i " + originalPath + " -filter_complex [0]scale="
                 + sizeCam + ":-1[overlay];[1][overlay]overlay="
                 + "enable='between(t," + parseSecond2Ms(startTime) + "," + parseSecond2Ms(endTime) + ")':x=" + posX + ":y=" + posY + ";[0:a][1:a]amix -preset ultrafast " + outputVideoPath;
@@ -103,30 +103,29 @@ public class VideoUtil {
 
 
     public void commentaryAudio(String originalVideoPath, String audioPath, ITranscoding callback) {
-        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCommentaryAudio_" + getTimeStamp() + ".mp4";
+//        outputVideoPath = StorageUtil.getCacheDir() + "/CacheCommentaryAudio_" + getTimeStamp() + ".mp4";
+        outputVideoPath = generateFileOutput("Commentary");
         String cmd = "ffmpeg -i " + originalVideoPath + " -i " + audioPath + " -vcodec copy -filter_complex amix -map 0:v -map 0:a -map 1:a -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
         transcodingAsyncTask.execute();
     }
 
 
-    public void trimVideo(Activity act, String originalVideoPath, long startTime, long endTime, ITranscoding callback) {
+    public void trimVideo(String originalVideoPath, long startTime, long endTime, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheTrimVideo_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -ss " + parseSecond2Ms(startTime) + " -i " + originalVideoPath + " -to " + parseSecond2Ms(endTime) + " -c:v copy -c:a copy -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
         transcodingAsyncTask.execute();
     }
 
-    public void addText(Activity act, String originalVideoPath, String text, int color, int size, String position, ITranscoding callback) {
+    public void addText(String originalVideoPath, String text, int color, int size, String position, ITranscoding callback) {
+        if (text.equals("")) return;
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheAddText_" + getTimeStamp() + ".mp4";
         textAsBitmap(text, size, color, null);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                String cmd = "ffmpeg -i " + originalVideoPath + " -i " + overlayImagePath.getAbsolutePath() + " -filter_complex [0:v][1:v]overlay=" + position+ " -preset ultrafast " + outputVideoPath;
-                transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
-                transcodingAsyncTask.execute();
-            }
+        new Handler().postDelayed(() -> {
+            String cmd = "ffmpeg -i " + originalVideoPath + " -i " + overlayImagePath.getAbsolutePath() + " -filter_complex [0:v][1:v]overlay=" + position+ " -preset ultrafast " + outputVideoPath;
+            transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
+            transcodingAsyncTask.execute();
         }, 1000);
     }
 
@@ -170,7 +169,7 @@ public class VideoUtil {
         }
     }
 
-    public void changeSpeed(Activity act, String originalVideoPath, String speed, ITranscoding callback) {
+    public void changeSpeed(String originalVideoPath, String speed, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheChangeSpeed_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -i " + originalVideoPath + " -filter_complex [0:v]setpts=" + convertSpeed(speed) + "*PTS[v];[0:a]atempo="+ speed +"[a] -map [v] -map [a] -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
@@ -184,7 +183,7 @@ public class VideoUtil {
         return ff.replace(",", ".");
     }
 
-    public void addImage(Activity act, String originalVideoPath, String imagePath, String position, ITranscoding callback) {
+    public void addImage(String originalVideoPath, String imagePath, String position, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheAddImage_" + getTimeStamp() + ".mp4";
         String cmd = "ffmpeg -i " + originalVideoPath + " -i " + imagePath + " -filter_complex [0:v][1:v]overlay=" + position+ " -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
@@ -205,9 +204,9 @@ public class VideoUtil {
         transcodingAsyncTask.execute();
     }
 
-    public void rotate(String originalVideoPath, int angle, ITranscoding callback) {
+    public void rotate(String originalVideoPath, String angle, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheCamera_rotate_" + getTimeStamp() + ".mp4";
-        String cmd = "ffmpeg -i "+ originalVideoPath + " -vf transpose="+angle+" -preset ultrafast " + outputVideoPath;
+        String cmd = "ffmpeg -i "+ originalVideoPath + angle+ " -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
         transcodingAsyncTask.execute();
     }

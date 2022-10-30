@@ -1,4 +1,5 @@
 package com.examples.atscreenrecord_test;
+
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.initialAds;
 import static com.examples.atscreenrecord_test.utils.AdsUtil.AD_OPEN_APP_ID;
 import static com.examples.atscreenrecord_test.utils.AdsUtil.AD_OPEN_APP_ID_DEV;
@@ -12,7 +13,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +26,6 @@ import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
-import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -34,8 +33,6 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.appopen.AppOpenAd.AppOpenAdLoadCallback;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -128,7 +125,7 @@ public class App extends Application
     private void createChannelNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Screen Recorder", NotificationManager.IMPORTANCE_HIGH);
+                    "Screen Recorder", NotificationManager.IMPORTANCE_NONE);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
@@ -136,7 +133,7 @@ public class App extends Application
         }
     }
 
-    public static boolean isPickFromGallery = false;
+    public static boolean ignoreOpenAd = false;
 
     /**
      * LifecycleObserver method that shows the app open ad when the app moves to foreground.
@@ -149,8 +146,8 @@ public class App extends Application
             System.out.println("thanhlv Ad was removed");
             return;
         }
-        if (isPickFromGallery){
-            isPickFromGallery = false;
+        if (ignoreOpenAd){
+            ignoreOpenAd = false;
             return;
         }
         appOpenAdManager.showAdIfAvailable(currentActivity);
@@ -192,7 +189,7 @@ public class App extends Application
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        System.out.println("thanhlv onActivityDestroyed");
+//        System.out.println("thanhlv onActivityDestroyed");
     }
 
     /**
@@ -210,9 +207,9 @@ public class App extends Application
 //            System.out.println("thanhlv Ad was removed 222");
             return;
         }
-        if (isPickFromGallery){
+        if (ignoreOpenAd){
 //            System.out.println("thanhlv Ad was isPickFromGallery ==== true 222");
-            isPickFromGallery = false;
+            ignoreOpenAd = false;
             return;
         }
         appOpenAdManager.showAdIfAvailable(activity, onShowAdCompleteListener);

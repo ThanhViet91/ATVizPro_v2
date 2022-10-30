@@ -35,6 +35,11 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         this.list = list;
     }
 
+    @Override
+    public long getItemId(int position) {
+        return super.getItemId(position);
+    }
+
     public void setVideoProjectsListener(VideoProjectsListener listener) {
         this.listener = listener;
     }

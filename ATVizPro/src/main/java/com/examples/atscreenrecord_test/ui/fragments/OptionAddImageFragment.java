@@ -21,7 +21,7 @@ import com.examples.atscreenrecord_test.adapter.BasicAdapter;
 import com.examples.atscreenrecord_test.adapter.StickerAdapter;
 import com.examples.atscreenrecord_test.model.PhotoModel;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
-import com.examples.atscreenrecord_test.utils.VideoUtil;
+import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -187,7 +187,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
         dismiss();
         mCallback.onClickDone();
-        VideoUtil.getInstance().addImage(getActivity(), video_path, image_path, posSelected,  new VideoUtil.ITranscoding() {
+        FFmpegUtil.getInstance().addImage(video_path, image_path, posSelected,  new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
 

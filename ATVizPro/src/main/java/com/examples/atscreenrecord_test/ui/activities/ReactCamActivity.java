@@ -4,6 +4,7 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PA
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_NEGATIVE;
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_POSITIVE;
 import static com.examples.atscreenrecord_test.ui.fragments.PopupConfirm.KEY_TITLE;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_REACT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.animation.ObjectAnimator;
@@ -507,11 +508,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void startExecuteService() {
-        VideoProfileExecute videoProfile = new VideoProfileExecute(MyUtils.TYPE_REACT_VIDEO, videoFile, cameraCahePath,
+        VideoProfileExecute videoProfile = new VideoProfileExecute(videoFile, cameraCahePath,
                 startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("package_video_profile", videoProfile);
+        bundle.putSerializable(MyUtils.KEY_SEND_PACKAGE_VIDEO, videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
+        intent.setAction(ACTION_FOR_REACT);
         intent.putExtras(bundle);
         intent.putExtra("bundle_video_execute_time", (long) ((endTime + videoDuration) / 2.5));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -519,7 +521,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         } else {
             startService(intent);
         }
-//        startService(intent);
     }
 
 

@@ -48,6 +48,7 @@ public class AdsUtil {
     private ViewGroup mAdViewRoot;
     private AdView adView;
     private boolean isLoaded = false;
+    private AdRequest adRequest;
 
     public AdView getAdView() {
         return this.adView;
@@ -55,11 +56,19 @@ public class AdsUtil {
     public void loadBanner() {
         if (SettingManager2.isProApp(mContext)) {
             mAdViewRoot.setVisibility(View.GONE);
-            return;
-        }
-        if (isLoaded) return;
+        } else
         mAdViewRoot.setVisibility(View.VISIBLE);
-        AdRequest adRequest = new AdRequest.Builder().build();
+    }
+
+
+    public void initialAdView (Context context) {
+        if (SettingManager2.isProApp(mContext)) return;
+        if (isLoaded) return;
+        adView = new AdView(context);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId(BuildConfig.DEBUG ? AD_BANNER_ID_DEV : AD_BANNER_ID);
+        mAdViewRoot.addView(adView);
+        adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         adView.setAdListener(new AdListener() {
             @Override
@@ -68,14 +77,6 @@ public class AdsUtil {
                 isLoaded = true;
             }
         });
-    }
-
-
-    public void initialAdView (Context context) {
-        adView = new AdView(context);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId(BuildConfig.DEBUG ? AD_BANNER_ID_DEV : AD_BANNER_ID);
-        mAdViewRoot.addView(adView);
     }
 
     private InterstitialAd mInterstitialAdAdmob = null;

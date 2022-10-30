@@ -1,6 +1,8 @@
 package com.examples.atscreenrecord_test.ui.services.recording;
 
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
+import static com.examples.atscreenrecord_test.ui.services.ExecuteService.ACTION_STOP_SERVICE;
+import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.DEBUG;
 
 import android.content.ContentResolver;
@@ -20,13 +22,14 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 
+import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaAudioEncoder;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaEncoder;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaMuxerWrapper;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaScreenEncoderHard;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.controllers.settings.VideoSetting2;
-import com.examples.atscreenrecord_test.ui.activities.ResultVideoFinishActivity;
+import com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity;
 import com.examples.atscreenrecord_test.ui.services.BaseService;
 import com.examples.atscreenrecord_test.ui.services.ControllerService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
@@ -194,14 +197,21 @@ public class RecordingService extends BaseService {
     }
 
     public void showResultActivity(String finalVideoCachePath) {
-        Intent intent = new Intent(getApplicationContext(), ResultVideoFinishActivity.class);
-        intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-        intent.setAction(MyUtils.ACTION_END_RECORD);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        System.out.println("thanhlv showResultActivity " + finalVideoCachePath);
-        startActivity(intent);
+//        fff
+//        Intent intent = new Intent(getApplicationContext(), ResultVideoFinishActivity.class);
+//        intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
+//        intent.setAction(MyUtils.ACTION_END_RECORD);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
 
-        Intent intent2 = new Intent(getApplicationContext(), ControllerService.class);
+        App.ignoreOpenAd = true;
+        Intent myIntent = new Intent(RecordingService.this, PopUpResultVideoTranslucentActivity.class);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        myIntent.setAction(ACTION_STOP_SERVICE);
+        myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);
+        startActivity(myIntent);
+
+        Intent intent2 = new Intent(RecordingService.this, ControllerService.class);
         intent2.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
         intent2.setAction(MyUtils.ACTION_END_RECORD);
     }

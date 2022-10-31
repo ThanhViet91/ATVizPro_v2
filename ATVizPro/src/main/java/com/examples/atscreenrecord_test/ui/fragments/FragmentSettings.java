@@ -5,9 +5,11 @@ import static com.examples.atscreenrecord_test.ui.utils.MyUtils.getAvailableSize
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.getBaseStorageDirectory;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -99,7 +101,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Override
     public void onResume() {
         super.onResume();
-//        System.out.println("thanhlv upgrade_to_pro onResumeonResumeonResumeonResume");
         RelativeLayout mAdView = mViewRoot.findViewById(R.id.adView);
         new AdsUtil(getContext(), mAdView).loadBanner();
         if (adapter != null) adapter.notifyDataSetChanged();
@@ -197,12 +198,44 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         if (code.equals(getString(R.string.support_us_by_rating_our_app))) {
             System.out.println("thanhlv support_us_by_rating_our_app");
-            String url = "https://play.google.com/store/apps/developer?id=Zzic&hl=vi&gl=US";
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
+//            String url = "https://play.google.com/store/apps/developer?id=Zzic&hl=vi&gl=US";
+//            Intent i = new Intent(Intent.ACTION_VIEW);
+//            i.setData(Uri.parse(url));
+//            startActivity(i);
+            rateApp();
         }
 
 
+    }
+
+    public void rateApp()
+    {
+        try
+        {
+            Intent rateIntent = rateIntentForUrl("market://details");
+            startActivity(rateIntent);
+        }
+        catch (ActivityNotFoundException e)
+        {
+            Intent rateIntent = rateIntentForUrl("https://play.google.com/store/apps/details");
+            startActivity(rateIntent);
+        }
+    }
+
+    private Intent rateIntentForUrl(String url)
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("%s?id=%s", url, requireContext().getPackageName())));
+        int flags = Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
+        if (Build.VERSION.SDK_INT >= 21)
+        {
+            flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
+        }
+        else
+        {
+            //noinspection deprecation
+            flags |= Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
+        }
+        intent.addFlags(flags);
+        return intent;
     }
 }

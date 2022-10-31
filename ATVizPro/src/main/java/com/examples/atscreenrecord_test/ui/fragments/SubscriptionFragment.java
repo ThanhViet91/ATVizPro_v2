@@ -46,7 +46,18 @@ public class SubscriptionFragment extends Fragment {
     private Activity mParentActivity = null;
     private FragmentManager mFragmentManager;
 
+    public interface SubscriptionListener {
+
+        void onBuySuccess();
+    }
+
+    private SubscriptionListener mCallBack;
+
     public SubscriptionFragment() {
+    }
+
+    public SubscriptionFragment(SubscriptionListener callBack) {
+        this.mCallBack = callBack;
     }
 
     @Override
@@ -89,6 +100,7 @@ public class SubscriptionFragment extends Fragment {
                     if (purchase.getProducts().get(0).contains(subs.get(selected).getKeyID())) {
                         SettingManager2.setProApp(requireContext(), true);
                         System.out.println("thanhlv buyyyyyyyyyyyyyy OKKKKKKK");
+                        mCallBack.onBuySuccess();
                         mFragmentManager.popBackStack();
                     }
                 }
@@ -124,7 +136,6 @@ public class SubscriptionFragment extends Fragment {
 
                     mProductDetailsList = new ArrayList<>();
                     mProductDetailsList.addAll(prodDetailsList);
-                    System.out.println("thanhlv mProductDetailsList  === " + mProductDetailsList.size());
                     updateSubs();
                 }
         );
@@ -138,8 +149,6 @@ public class SubscriptionFragment extends Fragment {
         for (int i = 0; i < 3; i++) {
             String id = mProductDetailsList.get(i).getProductId();
             String price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
-
-            System.out.println("thanhlv mProductDetailsList  hhhhhhh === " + id + " / " + price);
             requireActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -278,7 +287,6 @@ public class SubscriptionFragment extends Fragment {
         tvTermsOfService.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-//                System.out.println("thanhlv getTermsURL");
                 String url = AppConfigs.getInstance().getConfigModel().getTermsURL();
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
@@ -288,7 +296,6 @@ public class SubscriptionFragment extends Fragment {
         tvPrivacyNotice.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-//                System.out.println("thanhlv getPrivacyPolicyURL");
                 String url = AppConfigs.getInstance().getConfigModel().getPrivacyPolicyURL();
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));

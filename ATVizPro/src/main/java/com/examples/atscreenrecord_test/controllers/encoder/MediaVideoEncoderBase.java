@@ -52,7 +52,6 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 		super(muxer, listener);
 		mWidth = width;
 		mHeight = height;
-//		System.out.println("thanhlv dddddd" + width + " llll "+height);
 	}
 
 	/**

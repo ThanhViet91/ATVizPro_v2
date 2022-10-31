@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -72,6 +73,7 @@ import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Date;
 
@@ -124,7 +126,6 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        System.out.println("thanhlv onNewIntent Mainnnnnnnnnnn ");
         if (intent != null)
             handleIncomingRequest(intent);
     }
@@ -168,7 +169,6 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("thanhlv onCreate Mainnnnnnnnnnn ");
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
@@ -185,7 +185,6 @@ public class MainActivity extends BaseFragmentActivity {
         super.onResume();
         pulsator.start();
         updateService();
-
         checkShowAd();
     }
 
@@ -223,7 +222,6 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void checkShowAd() {
         mAdManager.loadBanner();
-        mAdManager.createInterstitialAdmob();
     }
 
     private void handleIncomingRequest(Intent intent) {
@@ -235,7 +233,7 @@ public class MainActivity extends BaseFragmentActivity {
                 case "from_notification":
                     break;
                 case ACTION_GO_TO_EDIT:
-                    showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT, ACTION_GO_TO_EDIT, intent.getStringExtra(KEY_PATH_VIDEO));
+                    showMyRecordings(REQUEST_VIDEO_FOR_VIDEO_EDIT, ACTION_GO_TO_EDIT, intent.getStringExtra(KEY_PATH_VIDEO));
                     break;
                 case ACTION_GO_TO_PLAY:
                     showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT, ACTION_GO_TO_PLAY, intent.getStringExtra(KEY_PATH_VIDEO));
@@ -269,6 +267,7 @@ public class MainActivity extends BaseFragmentActivity {
     private void initViews() {
         RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
+        mAdManager.createInterstitialAdmob();
         pulsator = findViewById(R.id.pulsator);
         pulsator.start();
         initVideoSettings();
@@ -367,7 +366,6 @@ public class MainActivity extends BaseFragmentActivity {
                     Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE}, 666);  // Comment 26
-            System.out.println("thanhlv go to requestPermissions");
         }
         return false;
     }
@@ -380,8 +378,7 @@ public class MainActivity extends BaseFragmentActivity {
         } else {
             requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.READ_EXTERNAL_STORAGE}, 888);  // Comment 26
-            System.out.println("thanhlv go to requestPermissions Commentary");
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, 888);
         }
         return false;
     }
@@ -491,7 +488,7 @@ public class MainActivity extends BaseFragmentActivity {
         }, bundle).show(getSupportFragmentManager(), "");
     }
 
-    private void showMyRecordings(int from_code) {
+    private void showMyRecordings(int fromFunction) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -500,11 +497,11 @@ public class MainActivity extends BaseFragmentActivity {
             }
         }
         Intent intent = new Intent(this, ProjectsActivity.class);
-        intent.putExtra(KEY_FROM_FUNCTION, from_code);
+        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
         startActivity(intent);
     }
 
-    private void showMyRecordings(int from_code, String navigate, String videoPath) {
+    private void showMyRecordings(int fromFunction, String navigate, String videoPath) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -514,6 +511,7 @@ public class MainActivity extends BaseFragmentActivity {
         }
         Intent intent = new Intent(this, ProjectsActivity.class);
         intent.setAction(navigate);
+        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);
         startActivity(intent);
     }
@@ -536,21 +534,22 @@ public class MainActivity extends BaseFragmentActivity {
             AdsUtil.lastTime = (new Date()).getTime();
             if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
-                return;
+//                return;
             }
 
             if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
                 showDialogPickVideo(fromFunction);
-                return;
+//                return;
             }
             if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
                 showDialogPickVideo(fromFunction);
-                return;
+//                return;
             }
 
             if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
                 showDialogPickVideo(fromFunction);
             }
+            mAdManager.createInterstitialAdmob();
         }
 
         @Override
@@ -800,31 +799,33 @@ public class MainActivity extends BaseFragmentActivity {
         return mScreenCaptureIntent != null;// || mScreenCaptureResultCode == MyUtils.RESULT_CODE_FAILED;
     }
 
-    public long getDurationMs(String path) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(this, Uri.parse(path));
-        String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        retriever.release();
-        long timeInMs = Long.parseLong(time);
-        return timeInMs;
-    }
-
+    String pathVideo = "";
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         App.ignoreOpenAd = true;
         if (requestCode == REQUEST_VIDEO_FOR_REACT_CAM && resultCode == RESULT_OK) {
             final Uri selectedUri = data != null ? data.getData() : null;
             if (selectedUri != null) {
-                String pathVideo = "";
                 try {
                     pathVideo = PathUtil.getPath(this, selectedUri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+                if (!new File(pathVideo).exists()) {
+                    Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     runOnUiThread(() -> getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                                @Override
+                                public void onBuySuccess() {
+                                    Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
+                                    intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                    startActivity(intent);
+                                }
+                            }))
                             .addToBackStack("")
                             .commitAllowingStateLoss());
 
@@ -832,7 +833,6 @@ public class MainActivity extends BaseFragmentActivity {
                 }
 
                 Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
-//                intent.setAction(MyUtils.ACTION_FOR_REACT);
                 intent.putExtra(KEY_PATH_VIDEO, pathVideo);
                 startActivity(intent);
             }
@@ -842,18 +842,28 @@ public class MainActivity extends BaseFragmentActivity {
             final Uri selectedUri = data != null ? data.getData() : null;
 
             if (selectedUri != null) {
-                String pathVideo = "";
-
                 try {
                     pathVideo = PathUtil.getPath(this, selectedUri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
 
-                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+                if (!new File(pathVideo).exists()) {
+                    Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                                @Override
+                                public void onBuySuccess() {
+                                    Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                                    intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                    startActivity(intent);
+                                }
+                            }))
                             .addToBackStack("")
                             .commitAllowingStateLoss();
                     return;
@@ -868,17 +878,29 @@ public class MainActivity extends BaseFragmentActivity {
             final Uri selectedUri = data != null ? data.getData() : null;
 
             if (selectedUri != null) {
-                String pathVideo = "";
-
                 try {
                     pathVideo = PathUtil.getPath(this, selectedUri);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-                if (getDurationMs(pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
+
+                if (!new File(pathVideo).exists()) {
+                    Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                                @Override
+                                public void onBuySuccess() {
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(VIDEO_PATH_KEY, pathVideo);
+                                    Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
+                                    intent.putExtras(bundle);
+                                    startActivity(intent);
+                                }
+                            }))
                             .addToBackStack("")
                             .commitAllowingStateLoss();
                     return;

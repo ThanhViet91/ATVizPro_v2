@@ -55,24 +55,27 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
         btn_go_home.setOnClickListener(this);
         handleIntent();
         addVideoView();
+
+        mAdManager = new AdsUtil(this, mAdView);
     }
 
     private String preName = "";
+
     private void handleIntent() {
-        if (getIntent() != null){
+        if (getIntent() != null) {
             videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
-            if (getIntent().getAction().equals(MyUtils.ACTION_END_REACT)){
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_REACT)) {
                 Intent intent = new Intent(this, ExecuteService.class);
                 stopService(intent);
                 preName = "React";
                 title.setText(getString(R.string.react_cam));
             }
-            if (getIntent().getAction().equals(MyUtils.ACTION_END_RECORD)){
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_RECORD)) {
                 title.setText(getString(R.string.record_screen));
                 preName = "Record";
             }
 
-            if (getIntent().getAction().equals(MyUtils.ACTION_END_COMMENTARY)){
+            if (getIntent().getAction().equals(MyUtils.ACTION_END_COMMENTARY)) {
                 Intent intent = new Intent(this, ExecuteService.class);
                 stopService(intent);
                 title.setText(getString(R.string.commentary));
@@ -84,17 +87,17 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
     @Override
     protected void onResume() {
         super.onResume();
-        mAdManager = new AdsUtil(this, mAdView);
         mAdManager.loadBanner();
-        mAdManager.getAdView().setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    checkHasChangeVideoCamView();
+        if (mAdManager.getAdView() != null)
+            mAdManager.getAdView().setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    if (mediaPlayer != null) {
+                        checkHasChangeVideoCamView();
+                    }
                 }
-            }
-        });
+            });
     }
 
     MediaPlayer mediaPlayer;
@@ -131,6 +134,7 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
     }
 
     private RelativeLayout screenVideo;
+
     private void videoPrepared(MediaPlayer mp) {
         ViewGroup.LayoutParams lpVideo = videoView.getLayoutParams();
         int videoWidth = mp.getVideoWidth();
@@ -161,7 +165,8 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
     }
 
     String finalVideoSaved = "";
-    public void saveVideo(String videoFile){
+
+    public void saveVideo(String videoFile) {
         if (!isSaved) {
             try {
                 finalVideoSaved = FFmpegUtil.generateFileOutput(preName);
@@ -177,12 +182,13 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
             Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
     }
 
-    private void goHome(){
+    private void goHome() {
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setAction(MyUtils.ACTION_GO_HOME);
         startActivity(intent);
     }
+
     public void onClick(View v) {
         if (v == findViewById(R.id.img_btn_save)) {
             saveVideo(videoFile);
@@ -207,7 +213,7 @@ public class ResultVideoFinishActivity extends AppCompatActivity implements View
                         goHome();
                         finish();
                     })
-                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
                         goHome();
                         finish();
                     })

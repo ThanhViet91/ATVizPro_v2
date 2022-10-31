@@ -61,7 +61,6 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onConnected() {
-        System.out.println("thanhlv onConnected callback");
         isConnected = true;
         notifyStreamingCallback(NOTIFY_MSG_CONNECTED);
         MyUtils.toast(getApplicationContext(), "Connection success!", Toast.LENGTH_LONG);
@@ -69,7 +68,7 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onStopped() {
-        if (DEBUG) Log.i(TAG, "onStopped live");
+//        if (DEBUG) Log.i(TAG, "onStopped live");
         isConnected = false;
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
     }
@@ -100,7 +99,7 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onSentVideoData(int result, int timestamp) {
-        Log.i(TAG, "Sent video data at " + timestamp + " - result: " + result);
+//        Log.i(TAG, "Sent video data at " + timestamp + " - result: " + result);
     }
 
     public class StreamingBinder extends Binder {
@@ -114,11 +113,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     }
 
     void notifyStreamingCallback(String notify_msg) {
-        if (DEBUG) Log.i(TAG, "sent notify stream " + notify_msg);
-//        Intent intent = new Intent();
-//        intent.setAction(MyUtils.ACTION_NOTIFY_FROM_STREAM_SERVICE);
-//        intent.putExtra(KEY_MESSAGE, notify_msg);
-//        sendBroadcast(intent);
+//        if (DEBUG) Log.i(TAG, "sent notify stream " + notify_msg);
         MyUtils.sendBroadCastMessageFromService(this, notify_msg);
 
     }
@@ -126,9 +121,7 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.out.println("thanhlv ------------- onDestroy");
         closeStreaming();
-//        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
     }
 
     @Override
@@ -199,7 +192,6 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void openPerformService() {
-        System.out.println("thanhlv openPerformService ....");
         prepareConnection();
     }
 
@@ -220,9 +212,8 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void closePerformService() {
-        if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
+//        if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
         notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP + " " + mUrl);
-        System.out.println("thanhlv -------------- closePerformService");
         closeStreaming();
     }
 
@@ -282,7 +273,6 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void closeStreaming() {
 //        SettingManager2.setLiveStreamType(getApplicationContext(), 0);
         if (mPublisher != null && mPublisher.isPublishing()) {
-            System.out.println("thanhlv ------------- closeStreaming");
             mPublisher.closePublishing();
         }
     }

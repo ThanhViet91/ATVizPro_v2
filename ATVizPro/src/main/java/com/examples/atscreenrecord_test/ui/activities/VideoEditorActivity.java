@@ -63,15 +63,14 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
 
+        mAdManager = new AdsUtil(this, null);
+        mAdManager.createInterstitialAdmob();
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        mAdManager = new AdsUtil(this, null);
-        mAdManager.createInterstitialAdmob();
-
         videoEditorView.showOrHideAdBanner();
     }
 
@@ -160,6 +159,8 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
             AdsUtil.lastTime = (new Date()).getTime();
             Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
+            mAdManager.createInterstitialAdmob();
+
             finish();
         }
 

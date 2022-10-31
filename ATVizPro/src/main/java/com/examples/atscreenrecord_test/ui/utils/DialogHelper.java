@@ -109,7 +109,7 @@ public class DialogHelper {
             // File was not successfully renamed
             throw new Exception("Cannot rename this video. This video file might not available.");
         } else {
-            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
+//            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
         }
     }
 }

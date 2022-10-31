@@ -178,8 +178,6 @@ public class RecordingService extends BaseService {
 
         synchronized (sSync) {
             if (mMuxer != null) {
-
-                System.out.println("thanhlv if (mMuxer != null)if (mMuxer != null)if (mMuxer != null)");
                 outputFile = mMuxer.getOutputPath();
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
@@ -187,7 +185,6 @@ public class RecordingService extends BaseService {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("thanhlv showResultActivity(outputFile);showResultActivity(outputFile);");
                         showResultActivity(outputFile);
                     }
                 }, 1000);

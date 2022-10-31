@@ -149,7 +149,6 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
         try {
             outStream = new FileOutputStream(file);
             listStickerPath.add(file.getAbsolutePath());
-            System.out.println("thanhlv copyResourceToFile "+file.getAbsolutePath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

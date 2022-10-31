@@ -53,7 +53,7 @@ public class ExecuteService extends Service {
             if (intent.getAction() != null) {
 
                 if (MyUtils.ACTION_CANCEL_PROCESSING.equals(intent.getAction())) {
-                    countDownTimer.cancel();
+                    if (countDownTimer != null) countDownTimer.cancel();
                     FFmpegUtil.getInstance().cancelProcess();
                     stopService();
                     return START_NOT_STICKY;
@@ -111,7 +111,7 @@ public class ExecuteService extends Service {
             public void onTick(long l) {
                 if (!finishExecute) {
                     progress = generateProgress(100 - (int) (100 * l / expectTime));
-                    System.out.println("thanhlv progressssssssss == " + progress);
+                    System.out.println("thanhlv progress == " + progress);
                     notificationBuilder.setProgress(100, progress, false);
                     notificationBuilder.setContentText("In progress: " + progress + "%");
                     startForeground(NOTIFICATION_ID, notification);

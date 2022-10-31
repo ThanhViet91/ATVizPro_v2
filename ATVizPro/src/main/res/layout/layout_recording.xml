@@ -21,11 +21,28 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
+
+        <TextView
+            android:id="@+id/tvTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="11sp"
+            android:text="00:16"
+            android:textColor="@color/black"
+            android:textFontWeight="400"
+            android:background="@drawable/shape_circle_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
+
         <ImageView
             android:id="@+id/imgCapture"
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
-            android:padding="3dp"
+            android:padding="4dp"
             android:src="@drawable/ic_capture_disable"
             app:layout_constraintCircle="@+id/imgRec"
             app:layout_constraintCircleAngle="90"
@@ -37,7 +54,7 @@
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
             android:src="@drawable/ic_start_service"
-            android:padding="3dp"
+            android:padding="4dp"
             app:layout_constraintCircle="@+id/imgRec"
             app:layout_constraintCircleAngle="270"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"
@@ -61,7 +78,7 @@
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
             android:src="@drawable/ic_close_service"
-            android:padding="3dp"
+            android:padding="4dp"
             app:layout_constraintCircle="@+id/imgRec"
             app:layout_constraintCircleAngle="180"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"
@@ -72,7 +89,7 @@
             android:layout_width="@dimen/recording_icon_square"
             android:layout_height="@dimen/recording_icon_square"
             android:src="@drawable/ic_home_service"
-            android:padding="3dp"
+            android:padding="4dp"
             app:layout_constraintCircle="@+id/imgRec"
             app:layout_constraintCircleAngle="360"
             app:layout_constraintCircleRadius="@dimen/recording_button_distance"

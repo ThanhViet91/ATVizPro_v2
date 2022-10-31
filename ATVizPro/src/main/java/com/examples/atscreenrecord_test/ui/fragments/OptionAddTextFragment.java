@@ -89,7 +89,6 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         seekBarOfSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                System.out.println("thanhlv seekBarOfSize.setOnSeekBarChangeListener " + i);
                 sizeOfText = i;
             }
 

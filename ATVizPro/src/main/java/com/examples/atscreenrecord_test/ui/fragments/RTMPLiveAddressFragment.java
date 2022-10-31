@@ -125,33 +125,17 @@ public class RTMPLiveAddressFragment extends Fragment {
             hideSoftInput(requireActivity());
             if (!SettingManager2.isProApp(requireContext())) {
                 mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
+                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                            @Override
+                            public void onBuySuccess() {
+                                doStartAlready();
+                            }
+                        }))
                         .addToBackStack("")
                         .commit();
                 return;
             }
-            mParentActivity.mMode = MyUtils.MODE_STREAMING;
-            mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
-            if (isMyServiceRunning(requireContext(), RecordingService.class)) {
-                MyUtils.showSnackBarNotification(view, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
-                return;
-            }
-            mParentActivity.mMode = MyUtils.MODE_STREAMING;
-            StreamProfile mStreamProfile = new StreamProfile("", mUrl, "");
-            mParentActivity.setStreamProfile(mStreamProfile);
-
-            if (isMyServiceRunning(requireContext(), ControllerService.class)) {
-                if (!isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
-                    saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
-                    mParentActivity.notifyUpdateStreamProfile(mUrl);
-                } else {
-                    MyUtils.showSnackBarNotification(view, String.format("Livestream on %s is running!",
-                            parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
-                }
-            } else {
-                saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
-                mParentActivity.shouldStartControllerService();
-            }
+            doStartAlready();
         });
 
         tvPasteStreamKey.setOnClickListener(v -> {
@@ -254,6 +238,30 @@ public class RTMPLiveAddressFragment extends Fragment {
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
         RelativeLayout mAdview = view.findViewById(R.id.adView);
         new AdsUtil(getContext(), mAdview).loadBanner();
+    }
+
+    public void doStartAlready() {
+        mParentActivity.mMode = MyUtils.MODE_STREAMING;
+        mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
+        if (isMyServiceRunning(requireContext(), RecordingService.class)) {
+            MyUtils.showSnackBarNotification(edtRTMPAddress, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
+            return;
+        }
+        StreamProfile mStreamProfile = new StreamProfile("", mUrl, "");
+        mParentActivity.setStreamProfile(mStreamProfile);
+
+        if (isMyServiceRunning(requireContext(), ControllerService.class)) {
+            if (!isConnected && SettingManager2.getLiveStreamType(requireContext()) == type) {
+                saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
+                mParentActivity.notifyUpdateStreamProfile(mUrl);
+            } else {
+                MyUtils.showSnackBarNotification(edtRTMPAddress, String.format("Livestream on %s is running!",
+                        parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
+            }
+        } else {
+            saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
+            mParentActivity.shouldStartControllerService();
+        }
     }
 
     private String parseType(int type) {

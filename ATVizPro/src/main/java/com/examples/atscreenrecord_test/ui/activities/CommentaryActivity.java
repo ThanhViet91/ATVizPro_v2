@@ -97,27 +97,27 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
         prepareAudioRecorder();
-
         addVideoView();
+
+        RelativeLayout mAdview = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(this, mAdview);
+        if (mAdManager.getAdView() != null)
+            mAdManager.getAdView().setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    if (mediaPlayer != null) {
+                        checkHasChangeVideoCamView();
+                    }
+                }
+            });
+        mAdManager.createInterstitialAdmob();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        RelativeLayout mAdview = findViewById(R.id.adView);
-        mAdManager = new AdsUtil(this, mAdview);
         mAdManager.loadBanner();
-        mAdManager.getAdView().setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    checkHasChangeVideoCamView();
-                }
-            }
-        });
-
-        mAdManager.createInterstitialAdmob();
     }
 
     @Override
@@ -373,6 +373,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         public void onAdDismissedFullScreenContent() {
 
             AdsUtil.lastTime = (new Date()).getTime();
+            mAdManager.createInterstitialAdmob();
+
             startExecuteService();
         }
 

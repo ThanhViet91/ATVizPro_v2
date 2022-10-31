@@ -22,6 +22,7 @@ import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -114,12 +115,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         switch (action) {
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
-//                System.out.println("thanhlv ------------- ACTION_DISCONNECT_LIVE_FROM_HOME");
                 onClickClose(false);
                 break;
             case MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE:
                 onClickStop();
-//                System.out.println("thanhlv ------------- ACTION_DISCONNECT_WHEN_STOP_LIVE");
                 onClickClose(true);
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:
@@ -325,11 +324,15 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         camWidth = camViewSize[camSize];  // ~270px
         camHeight = camWidth * 4 / 3f;
-        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight/3));
 
         if (SettingManager2.isEnableCamView(getApplicationContext())) {
             toggleView(mCameraLayout, View.VISIBLE);
-        } else toggleView(mCameraLayout, View.GONE);
+            mImgCapture.setImageResource(R.drawable.ic_capture_disable);
+        } else {
+            toggleView(mCameraLayout, View.GONE);
+            mImgCapture.setImageResource(R.drawable.ic_capture_enable);
+        }
 
         final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
 
@@ -437,6 +440,27 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
+    private long timer = 0;
+    private Handler handlerTimer = new Handler();
+    private Runnable runnable;
+    private void startCountTime() {
+        timer = 0;
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tvTimer.setText(MyUtils.parseLongToTime(timer*1000));
+                    timer++;
+                    handlerTimer.postDelayed(this, 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        handlerTimer.postDelayed(runnable, 0);
+    }
+
+    TextView tvTimer;
     @SuppressLint("InflateParams")
     private void initializeViews() {
 //        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeViews()");
@@ -459,12 +483,14 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         toggleView(mCountdownLayout, View.GONE);
 
         mImgRec = mViewRoot.findViewById(R.id.imgRec);
+        tvTimer = mViewRoot.findViewById(R.id.tvTimer);
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
         mImgClose = mViewRoot.findViewById(R.id.imgClose);
         mImgStart = mViewRoot.findViewById(R.id.imgStart);
         mImgHome = mViewRoot.findViewById(R.id.imgHome);
         mImgStop = mViewRoot.findViewById(R.id.imgStop);
         toggleView(mImgStop, View.GONE);
+        toggleView(tvTimer, View.GONE);
         toggleNavigationButton(View.GONE);
 
 
@@ -515,16 +541,19 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                         public void onFinish() {
                             toggleView(mCountdownLayout, View.GONE);
+                            toggleView(tvTimer, View.VISIBLE);
+//                            toggleView(mImgRec, View.GONE);
                             toggleView(mViewRoot, View.VISIBLE);
                             mRecordingStarted = true;
 
+                            startCountTime();
                             if (mMode == MyUtils.MODE_RECORDING) {
                                 mService.startPerformService();
-                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
+//                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
                             } else {
                                 if (isConnected) {
                                     mService.startPerformService();
-                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
+//                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
                                 } else {
                                     mRecordingStarted = false;
                                     MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
@@ -537,7 +566,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 } else {
                     mRecordingStarted = false;
                     MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
-                    Log.e(TAG, "Recording Service connection has not been established");
+//                    Log.e(TAG, "Recording Service connection has not been established");
                     stopService();
                 }
             }
@@ -652,6 +681,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
     private void onClickStop() {
         toggleNavigationButton(View.GONE);
+        toggleView(tvTimer, View.GONE);
+        handlerTimer.removeCallbacks(runnable);
         clickStop = true;
         if (mRecordingServiceBound) {
             //Todo: stop and save recording

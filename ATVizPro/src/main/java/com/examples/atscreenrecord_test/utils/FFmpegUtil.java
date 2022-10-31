@@ -148,7 +148,6 @@ public class FFmpegUtil {
         canvas.drawText(text, 0, baseline, paint);
         String extStorageDirectory = App.getAppContext().getExternalFilesDir(Environment.DIRECTORY_DCIM).toString();
         overlayImagePath = new File(extStorageDirectory, "text.png");
-        System.out.println("thanhlv textAsBitmap "+overlayImagePath.getAbsolutePath());
         FileOutputStream outStream = null;
         try {
             outStream = new FileOutputStream(overlayImagePath);
@@ -217,10 +216,11 @@ public class FFmpegUtil {
             transcodingAsyncTask.cancel(true);
         }
 
-        if (!outputVideoPath.equals("")) {
-            if (new File(outputVideoPath).delete()) {
-                System.out.println("thanhlv doooooo deleteeeeeeeeee "+ outputVideoPath);
+        if (!outputVideoPath.equals("") && new File(outputVideoPath).exists()) {
+            if ( new File(outputVideoPath).delete()) {
+                System.out.println("thanhlv do delete file ok "+ outputVideoPath);
             }
+            outputVideoPath = "";
         }
     }
     public String parseSecond2Ms(long second) {

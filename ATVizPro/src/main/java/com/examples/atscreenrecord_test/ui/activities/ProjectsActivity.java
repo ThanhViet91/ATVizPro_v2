@@ -7,6 +7,7 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
+import static com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity.afterDelete;
 import static com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity.finishEdit;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
@@ -74,7 +75,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     if (!requireSubscription(videoPath)) gotoEditVideo(videoPath);
                 }
                 if (ACTION_GO_TO_PLAY.equals(getIntent().getAction())) {
-                    gotoPlayVideoDetail(this, videoPath);
+                    gotoPlayVideoDetail(this, videoPath, ACTION_GO_TO_PLAY);
                 }
             }
 
@@ -87,7 +88,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     @Override
     public void onResume() {
         super.onResume();
-        if (finishEdit) fetchData();
+        if (finishEdit || afterDelete) {
+            fetchData();
+            finishEdit = false;
+            afterDelete = false;
+        }
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
         } else {
@@ -131,6 +136,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             toggleView(tv_cancel, View.VISIBLE);
             toggleView(btn_back, View.GONE);
             toggleView(tv_select, View.GONE);
+        }
+        if (ACTION_GO_TO_PLAY.equals(getIntent().getAction())) {
+            toggleView(tv_cancel, View.GONE);
+            toggleView(btn_back, View.VISIBLE);
         }
         tv_cancel.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -235,9 +244,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 toggleView(tv_cancel, View.GONE);
                 toggleView(btn_back, View.VISIBLE);
                 toggleView(tv_select, View.GONE);
-                toggleView(findViewById(R.id.option), View.GONE);
                 toggleView(tv_noData, View.VISIBLE);
             }
+            toggleView(findViewById(R.id.option), View.GONE);
         });
     }
 
@@ -353,21 +362,24 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
     }
 
+    String selectedVideoPath = "";
+
     @Override
     public void onSelected(VideoModel video) {
-        if (video == null) {
-            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
-                mAdapter.setSelectable(true);
-            } else {
-                return;
-            }
-        }
+//        if (video == null) {
+//            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+//                mAdapter.setSelectable(true);
+//            } else {
+//                return;
+//            }
+//        }
         if (mAdapter.getSelectable()) {
             checkNumberSelected();
             return;
         }
 
         if (video != null) {
+            selectedVideoPath = video.getPath();
             if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT && requireSubscription(video.getPath()))
                 return;
             switch (fromFunction) {
@@ -382,7 +394,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     break;
                 case REQUEST_SHOW_PROJECTS_DEFAULT:
                 default:
-                    gotoPlayVideoDetail(this, video.getPath());
+                    gotoPlayVideoDetail(this, video.getPath(), "");
             }
         }
     }
@@ -391,12 +403,32 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (!SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.frame_layout_fragment, new SubscriptionFragment())
+                    .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                        @Override
+                        public void onBuySuccess() {
+                            continueTask();
+                        }
+                    }))
                     .addToBackStack("")
                     .commit();
             return true;
         }
         return false;
+    }
+
+    private void continueTask() {
+        if (selectedVideoPath.equals("")) return;
+        switch (fromFunction) {
+            case REQUEST_VIDEO_FOR_REACT_CAM:
+                gotoPrepareVideo(selectedVideoPath, ACTION_FOR_REACT);
+                break;
+            case REQUEST_VIDEO_FOR_VIDEO_EDIT:
+                gotoEditVideo(selectedVideoPath);
+                break;
+            case REQUEST_VIDEO_FOR_COMMENTARY:
+                gotoPrepareVideo(selectedVideoPath, ACTION_FOR_COMMENTARY);
+                break;
+        }
     }
 
     public void gotoEditVideo(String path) {
@@ -413,12 +445,14 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         startActivity(intent);
     }
 
-    public static void gotoPlayVideoDetail(Context context, String path) {
+    public static void gotoPlayVideoDetail(Context context, String path, String action) {
         if (path.equals("")) return;
         String name = new File(path).getName().replace(".mp4", "");
         Intent intent = new Intent(context, PlayVideoDetailActivity.class);
+        intent.setAction(action);
         intent.putExtra(KEY_PATH_VIDEO, path);
         intent.putExtra(KEY_VIDEO_NAME, name);
+
         context.startActivity(intent);
     }
 

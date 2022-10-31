@@ -88,7 +88,7 @@ public class App extends Application
                             (billingResult1, list) -> {
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
                                     SettingManager2.setProApp(context, list.size() > 0);
-                                    System.out.println("thanhlv Apppppppp get subs: "+list.size());
+                                    System.out.println("thanhlv App get subs: "+list.size());
                                     if (list.size() == 0) {
                                         MobileAds.initialize(context, initializationStatus -> initialAds = true);
                                     }
@@ -143,7 +143,6 @@ public class App extends Application
         // Show the ad (if available) when the app moves to foreground.
 
         if (SettingManager2.isProApp(App.getAppContext())) {
-            System.out.println("thanhlv Ad was removed");
             return;
         }
         if (ignoreOpenAd){
@@ -189,7 +188,6 @@ public class App extends Application
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-//        System.out.println("thanhlv onActivityDestroyed");
     }
 
     /**
@@ -204,11 +202,9 @@ public class App extends Application
         // We wrap the showAdIfAvailable to enforce that other classes only interact with MyApplication
         // class.
         if (SettingManager2.isProApp(App.getAppContext())) {
-//            System.out.println("thanhlv Ad was removed 222");
             return;
         }
         if (ignoreOpenAd){
-//            System.out.println("thanhlv Ad was isPickFromGallery ==== true 222");
             ignoreOpenAd = false;
             return;
         }
@@ -226,10 +222,9 @@ public class App extends Application
     /**
      * Inner class that loads and shows app open ads.
      */
-    private class AppOpenAdManager {
+    private static class AppOpenAdManager {
 
         private static final String LOG_TAG = "AppOpenAdManager";
-        private static final String AD_UNIT_ID = "ca-app-pub-3940256099942544/3419835294";
 
         private AppOpenAd appOpenAd = null;
         private boolean isLoadingAd = false;
@@ -271,7 +266,7 @@ public class App extends Application
                          * @param ad the loaded app open ad.
                          */
                         @Override
-                        public void onAdLoaded(AppOpenAd ad) {
+                        public void onAdLoaded(@NonNull AppOpenAd ad) {
                             appOpenAd = ad;
                             isLoadingAd = false;
                             loadTime = (new Date()).getTime();
@@ -283,7 +278,7 @@ public class App extends Application
                          * @param loadAdError the error.
                          */
                         @Override
-                        public void onAdFailedToLoad(LoadAdError loadAdError) {
+                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                             isLoadingAd = false;
                         }
                     });
@@ -316,11 +311,8 @@ public class App extends Application
         private void showAdIfAvailable(@NonNull final Activity activity) {
             showAdIfAvailable(
                     activity,
-                    new OnShowAdCompleteListener() {
-                        @Override
-                        public void onShowAdComplete() {
-                            // Empty because the user will go back to the activity that shows the ad.
-                        }
+                    () -> {
+                        // Empty because the user will go back to the activity that shows the ad.
                     });
         }
 
@@ -365,7 +357,7 @@ public class App extends Application
 
                         /** Called when fullscreen content failed to show. */
                         @Override
-                        public void onAdFailedToShowFullScreenContent(AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                             appOpenAd = null;
                             isShowingAd = false;
                             Log.d(LOG_TAG, "onAdFailedToShowFullScreenContent: " + adError.getMessage());

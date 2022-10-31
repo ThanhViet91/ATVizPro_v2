@@ -82,8 +82,11 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         listPos.add("1.0x");
         listPos.add("1.25x");
         listPos.add("1.5x");
-        listPos.add("1.75x");
         listPos.add("2.0x");
+        listPos.add("2.5x");
+        listPos.add("3.0x");
+        listPos.add("4.0x");
+        listPos.add("5.0x");
 
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_position);
         BasicAdapter basicAdapter = new BasicAdapter(getContext(), listPos, this);
@@ -138,7 +141,6 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
 
     @Override
     public void onClickBasicItem(String text) {
-
         speed_selected = text.substring(0, text.length()-1);
     }
 }

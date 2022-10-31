@@ -1,5 +1,7 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
+
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,12 +38,14 @@ public class TranslucentActivity extends AppCompatActivity{
     }
 
     private void stopProcessing() {
-        Intent controller = new Intent(this, ExecuteService.class);
-        controller.setAction(MyUtils.ACTION_CANCEL_PROCESSING);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(controller);
-        } else {
-            startService(controller);
+        if (isMyServiceRunning(this, ExecuteService.class)) {
+            Intent controller = new Intent(this, ExecuteService.class);
+            controller.setAction(MyUtils.ACTION_CANCEL_PROCESSING);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
         }
     }
 

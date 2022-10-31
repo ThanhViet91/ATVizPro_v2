@@ -74,8 +74,9 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         if (selectable) {
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.checkBox.setChecked(video.isSelected());
-        } else
+        } else {
             holder.checkBox.setVisibility(View.GONE);
+        }
 
         holder.duration.setText(video.getDuration());
         holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
@@ -99,13 +100,6 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
             list.get(position).setSelected(holder.checkBox.isChecked());
             listener.onSelected(list.get(position));
         }});
-        holder.itemView.setOnLongClickListener(view -> {
-            if (!selectable) {
-                list.get(position).setSelected(true);
-                listener.onSelected(null);
-            }
-            return false;
-        });
     }
 
     @Override

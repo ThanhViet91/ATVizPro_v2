@@ -36,7 +36,6 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 //        GeneralUtils.copyLicenseFromAssetsToSDIfNeeded(context, workFolder);
 //        GeneralUtils.copyDemoVideoFromAssetsToSDIfNeeded(context, demoVideoFolder);
         int rc = GeneralUtils.isLicenseValid(App.getAppContext(), workFolder);
-        System.out.println("thanhlv isLicenseValid ====== " + rc);
     }
 
 
@@ -44,12 +43,10 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPreExecute() {
         if (mCallback != null) mCallback.onStartTranscoding(outputPath);
-        System.out.println("thanhlv isLicenseValid ====== onPreExecute");
     }
 
     protected Integer doInBackground(String... paths) {
-        Log.i(Prefs.TAG, "doInBackground started...");
-        System.out.println("thanhlv isLicenseValid ======  doInBackground");
+//        Log.i(Prefs.TAG, "doInBackground started...");
 
         // delete previous log
         boolean isDeleted = GeneralUtils.deleteFileUtil(workFolder + "/vk.log");
@@ -64,15 +61,15 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 
         LoadJNI vk = new LoadJNI();
         try {
-            System.out.println("thanhlv commandStr ====== " + commandStr);
+//            System.out.println("thanhlv commandStr ====== " + commandStr);
             vk.run(GeneralUtils.utilConvertToComplex(commandStr), workFolder, App.getAppContext());
         } catch (CommandValidationException e) {
-            Log.e(Prefs.TAG, "vk run exeption.", e);
+//            Log.e(Prefs.TAG, "vk run exeption.", e);
             System.out.println("thanhlv isLicenseValid ======  CommandValidationException");
             commandValidationFailedFlag = true;
             return 0;
         } catch (Throwable e) {
-            Log.e(Prefs.TAG, "vk run exeption.", e);
+//            Log.e(Prefs.TAG, "vk run exeption.", e);
             System.out.println("thanhlv isLicenseValid ======  Throwable");
             return 0;
         }
@@ -83,7 +80,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 //                Log.i(Prefs.TAG, "Wake lock is already released, doing nothing");
 //            }
 //        }
-        Log.i(Prefs.TAG, "doInBackground finished");
+//        Log.i(Prefs.TAG, "doInBackground finished");
         return 0;
     }
 
@@ -92,7 +89,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
 
     @Override
     protected void onCancelled() {
-        Log.i(Prefs.TAG, "onCancelled");
+//        Log.i(Prefs.TAG, "onCancelled");
         if (mCallback != null) mCallback.onFinishTranscoding(ERROR_CODE);
         super.onCancelled();
     }
@@ -101,7 +98,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
     @Override
     protected void onPostExecute(Integer result) {
         System.out.println("thanhlv isLicenseValid ======  onPostExecute");
-        Log.i(Prefs.TAG, "onPostExecute");
+//        Log.i(Prefs.TAG, "onPostExecute");
 
         if (mCallback != null) mCallback.onFinishTranscoding(outputPath);
         super.onPostExecute(result);
@@ -113,15 +110,7 @@ public class TranscodingAsyncTask extends AsyncTask<String, Integer, Integer> {
             rc = GeneralUtils.getReturnCodeFromLog(vkLogPath);
         }
         final String status = rc;
-        System.out.println("thanhlv dddddddddddddddd === "+commandStr +" "+status);
-//        activity.runOnUiThread(new Runnable() {
-//            public void run() {
-//                Toast.makeText(activity, status, Toast.LENGTH_LONG).show();
-//                if (status.equals("Transcoding Status: Failed")) {
-//                    Toast.makeText(activity, "Check: " + vkLogPath + " for more information.", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
+        System.out.println("thanhlv done execute === "+commandStr +" "+status);
     }
 
 }

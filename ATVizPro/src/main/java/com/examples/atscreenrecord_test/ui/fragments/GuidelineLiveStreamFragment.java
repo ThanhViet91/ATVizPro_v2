@@ -184,9 +184,9 @@ public class GuidelineLiveStreamFragment extends Fragment {
     public List<PhotoModel> getListPhoto(){
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_1));
-        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_2));
-        mListPhoto.add(new PhotoModel(R.drawable.bg_howto_livestream_step_3));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_livestream_1));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_livestream_2));
+        mListPhoto.add(new PhotoModel(R.drawable.how_to_livestream_3));
         return mListPhoto;
     }
 }

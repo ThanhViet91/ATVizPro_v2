@@ -153,9 +153,10 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
     private AdsUtil mAdManager;
     public void showOrHideAdBanner(){
+        mAdview = findViewById(R.id.adView);
         mAdManager = new AdsUtil(mContext, mAdview);
         mAdManager.loadBanner();
-        mAdManager.getAdView().setAdListener(new AdListener() {
+        if (mAdManager.getAdView() != null) mAdManager.getAdView().setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();

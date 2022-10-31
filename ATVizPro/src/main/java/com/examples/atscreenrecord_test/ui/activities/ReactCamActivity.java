@@ -111,25 +111,27 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         number_countdown = findViewById(R.id.tv_number_countdown);
 
         addVideoView();
+
+        RelativeLayout mAdview = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(this, mAdview);
+        if (mAdManager.getAdView() != null)
+            mAdManager.getAdView().setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    if (mediaPlayer != null) {
+                        checkHasChangeVideoCamView();
+                    }
+                }
+            });
+
+        mAdManager.createInterstitialAdmob();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        RelativeLayout mAdview = findViewById(R.id.adView);
-        mAdManager = new AdsUtil(this, mAdview);
         mAdManager.loadBanner();
-        mAdManager.getAdView().setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    checkHasChangeVideoCamView();
-                }
-            }
-        });
-
-        mAdManager.createInterstitialAdmob();
     }
 
     @Override
@@ -246,11 +248,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         camHeight = camWidth * 4 / 3f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         mCameraLayout.post(() -> {
-//            System.out.println("thanhlv updateCamview gggg");
-
             float newY = (mCameraLayout.getY() - yTopOld) * scale + yTop;
             float newX = (mCameraLayout.getX() - xLeftOld) * scale + xLeft;
-
             mCameraLayout.setX(newX);
             mCameraLayout.setY(newY);
         });
@@ -371,7 +370,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         @SuppressLint({"DefaultLocale"})
         public void onTick(long millisUntilFinished) {
             layoutCountdown.setVisibility(View.VISIBLE);
-            number_countdown.setText(String.format("%d" , millisUntilFinished / 1000 + 1));
+            number_countdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
         }
 
         public void onFinish() {
@@ -391,7 +390,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
 
         if (v == findViewById(R.id.img_btn_discard)) {
-            showPopupConfirm("Retake this video?", "Start over","Cancel",  false);
+            showPopupConfirm("Retake this video?", "Start over", "Cancel", false);
         }
 
         if (v == findViewById(R.id.tv_next_react_cam)) {
@@ -426,10 +425,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (v == findViewById(R.id.img_btn_back_header)) {
             if (!rtmpCamera.isRecording()) {
                 if (hasCamVideo) {
-                    showPopupConfirm("Discard the last clip?","Discard", "Cancel",  false);
+                    showPopupConfirm("Discard the last clip?", "Discard", "Cancel", false);
                 } else finish();
             } else {
-                showPopupConfirm("Do you want to cancel processing?","Yes", "No",  false);
+                showPopupConfirm("Do you want to cancel processing?", "Yes", "No", false);
             }
         }
     }
@@ -439,10 +438,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 //        super.onBackPressed();
         if (!rtmpCamera.isRecording()) {
             if (hasCamVideo) {
-                showPopupConfirm("Discard the last clip?","Discard", "Cancel",  false);
+                showPopupConfirm("Discard the last clip?", "Discard", "Cancel", false);
             } else finish();
         } else {
-            showPopupConfirm("Do you want to cancel processing?","Yes", "No",  false);
+            showPopupConfirm("Do you want to cancel processing?", "Yes", "No", false);
         }
     }
 
@@ -482,6 +481,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         public void onAdDismissedFullScreenContent() {
 
             AdsUtil.lastTime = (new Date()).getTime();
+            mAdManager.createInterstitialAdmob();
+
             startExecuteService();
         }
 
@@ -528,7 +529,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private final Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
-            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter/1000)));
+            runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter / 1000)));
             timeCounter = timeCounter + 50;
             mCounterUpdateHandler.postDelayed(this, 50);
         }
@@ -539,7 +540,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         bundle.putString(KEY_TITLE, title);
         bundle.putString(KEY_POSITIVE, pos);
         bundle.putString(KEY_NEGATIVE, neg);
-        PopupConfirm.newInstance(new IConfirmPopupListener(){
+        PopupConfirm.newInstance(new IConfirmPopupListener() {
             @Override
             public void onClickPositiveButton() {
                 if (requiredFinish) {
@@ -549,6 +550,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     doPositiveButton(pos);
                 }
             }
+
             @Override
             public void onClickNegativeButton() {
             }
@@ -577,6 +579,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     boolean hasEndReact = true;
+
     private void getEndReactCam() {
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697

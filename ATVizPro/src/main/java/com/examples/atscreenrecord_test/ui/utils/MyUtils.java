@@ -177,6 +177,7 @@ public class MyUtils {
 
     public static long getDurationMs(Context context, String path) {
         if (path.equals("")) return 0;
+        if (!new File(path).exists()) return 0;
         long timeInMs = 0;
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(context, Uri.parse(path));

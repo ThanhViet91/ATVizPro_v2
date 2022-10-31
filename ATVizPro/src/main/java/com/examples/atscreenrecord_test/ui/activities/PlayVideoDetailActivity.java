@@ -2,6 +2,8 @@ package com.examples.atscreenrecord_test.ui.activities;
 
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_VIDEO_NAME;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.getBaseStorageDirectory;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.media.MediaPlayer;
@@ -21,9 +23,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
+import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.FullScreenContentCallback;
 
 import java.io.File;
+import java.util.Date;
 
 public class PlayVideoDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private RelativeLayout mAdView;
@@ -45,37 +50,79 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         btn_back.setOnClickListener(this);
         handleIntent();
         addVideoView();
+        mAdManager = new AdsUtil(this, mAdView);
+        mAdManager.createInterstitialAdmob();
+        if (mAdManager.getAdView() != null)
+            mAdManager.getAdView().setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    super.onAdLoaded();
+                    if (mediaPlayer != null) {
+                        checkHasChangeVideoCamView();
+                    }
+                }
+            });
     }
+
+    String action = "";
 
     private void handleIntent() {
         if (getIntent() != null) {
             videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
             videoName = getIntent().getStringExtra(KEY_VIDEO_NAME);
             title.setText(videoName);
+            if (getIntent().getAction() != null) action = getIntent().getAction();
         }
     }
 
     private AdsUtil mAdManager;
+
     @Override
     protected void onResume() {
         super.onResume();
-        mAdManager = new AdsUtil(this, mAdView);
+
         mAdManager.loadBanner();
-        mAdManager.getAdView().setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    checkHasChangeVideoCamView();
-                }
-            }
-        });
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         videoView.stopPlayback();
+    }
+
+    public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+        @Override
+        public void onAdClicked() {
+        }
+
+        @Override
+        public void onAdDismissedFullScreenContent() {
+            AdsUtil.lastTime = (new Date()).getTime();
+            mAdManager.createInterstitialAdmob();
+            finish();
+        }
+
+        @Override
+        public void onAdFailedToShowFullScreenContent(AdError adError) {
+            finish();
+        }
+
+        @Override
+        public void onAdImpression() {
+        }
+
+        @Override
+        public void onAdShowedFullScreenContent() {
+        }
+    };
+
+    public void showInterstitialAd() {
+        if (mAdManager.interstitialAdAlready()) {
+            mAdManager.showInterstitialAd(fullScreenContentCallback);
+        } else {
+            finish();
+        }
     }
 
     MediaPlayer mediaPlayer;
@@ -148,13 +195,15 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
                 .setTitle("Delete Video")
                 .setMessage("Do you want to delete video?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(videoFile))
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideo(videoFile))
                 .show();
     }
 
-    private void deleteVideos(String filePath) {
+    public static boolean afterDelete = false;
+    private void deleteVideo(String filePath) {
         if (new File(filePath).delete()) {
             Toast.makeText(this, "Delete success!", Toast.LENGTH_SHORT).show();
+            afterDelete = true;
             finish();
         } else {
             Toast.makeText(this, "Delete failed, have some problem.", Toast.LENGTH_SHORT).show();
@@ -177,6 +226,17 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
 //            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 //            startActivity(Intent.createChooser(intent, "Share File"));
         }
-        if (v == findViewById(R.id.img_btn_back_header)) finish();
+        if (v == findViewById(R.id.img_btn_back_header)) {
+            videoView.stopPlayback();
+            if (action.equals(ACTION_GO_TO_PLAY)) showInterstitialAd();
+            else finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        videoView.stopPlayback();
+        if (action.equals(ACTION_GO_TO_PLAY)) showInterstitialAd();
+        else finish();
     }
 }

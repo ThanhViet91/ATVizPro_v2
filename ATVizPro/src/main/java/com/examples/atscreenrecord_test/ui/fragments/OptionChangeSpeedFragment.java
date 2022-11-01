@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.BasicAdapter;
+import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
@@ -70,7 +72,7 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         btn_done.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                processingAddText();
+                processingChangeSpeed();
             }
         });
 
@@ -98,9 +100,14 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
 
     String speed_selected = "1.0";
 
-    private void processingAddText() {
-        dismiss();
+    private void processingChangeSpeed() {
+        if (MyUtils.getDurationMs(requireContext(), video_path)/Float.parseFloat(speed_selected) < 500) {
+            Toast.makeText(requireContext(), "Video is too short!", Toast.LENGTH_SHORT).show();
+            dismiss();
+            return;
+        }
         mCallback.onClickDone();
+        dismiss();
         FFmpegUtil.getInstance().changeSpeed(video_path, speed_selected,  new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {

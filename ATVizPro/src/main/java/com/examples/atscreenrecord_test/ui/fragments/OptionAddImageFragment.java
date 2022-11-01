@@ -63,9 +63,11 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
 
     String video_path, image_path;
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         video_path = getArguments() != null ? getArguments().getString("video_path", "") : "";
 
         ImageView btn_close = view.findViewById(R.id.iv_close);

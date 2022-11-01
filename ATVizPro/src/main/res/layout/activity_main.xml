@@ -335,6 +335,7 @@
                 <ImageView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:padding="1dp"
                     android:src="@drawable/ic_react_cam_svg" />
 
                 <TextView
@@ -373,7 +374,8 @@
                 <ImageView
                     android:layout_width="48dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/ic_video_editor_svg" />
+                    android:padding="4dp"
+                    android:src="@drawable/ic_edit_video" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -474,7 +476,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="4dp"
                     android:fontFamily="@font/roboto_regular"
-                    android:text="@string/projects"
+                    android:text="@string/my_recordings"
                     android:textColor="@color/white"
                     android:textFontWeight="600"
                     android:textSize="14sp"

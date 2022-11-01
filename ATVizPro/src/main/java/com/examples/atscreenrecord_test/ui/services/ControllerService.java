@@ -56,6 +56,7 @@ import com.examples.atscreenrecord_test.ui.utils.CameraPreview;
 import com.examples.atscreenrecord_test.ui.utils.CustomOnScaleDetector;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.ui.utils.NotificationHelper;
+import com.examples.atscreenrecord_test.utils.DisplayUtil;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
@@ -307,7 +308,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         paramCam.gravity = cameraProfile.getParamGravity();
         paramCam.x = 0;
-        paramCam.y = 0;
+        paramCam.y = DisplayUtil.getDeviceHeight()/3;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -324,7 +325,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         camWidth = camViewSize[camSize];  // ~270px
         camHeight = camWidth * 4 / 3f;
-        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight/3));
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
 
         if (SettingManager2.isEnableCamView(getApplicationContext())) {
             toggleView(mCameraLayout, View.VISIBLE);
@@ -368,7 +369,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                     case MotionEvent.ACTION_MOVE:
                         if (event.getPointerCount() < 2 && !hasZoom) {
                             paramCam.x = xx - (int) (event.getRawX() - x);
-                            paramCam.y = yy - (int) (event.getRawY() - y);
+                            paramCam.y = yy + (int) (event.getRawY() - y);
 
                             mWindowManager.updateViewLayout(mCameraLayout, paramCam);
                         }

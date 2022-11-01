@@ -316,6 +316,7 @@ public class SubscriptionFragment extends Fragment {
                 break;
             }
         }
+        if (productDetails == null) return;
         ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
                 ImmutableList.of(
                         BillingFlowParams.ProductDetailsParams.newBuilder()

@@ -97,7 +97,7 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
                     des.setText(R.string.react_to_videos_from_camera_roll);
                     break;
                 case REQUEST_VIDEO_FOR_VIDEO_EDIT:
-                    ava.setImageResource(R.drawable.ic_video_editor_svg);
+                    ava.setImageResource(R.drawable.ic_edit_video);
                     title.setText(R.string.video_editor);
                     des.setText(R.string.edit_video_from_my_recordings_or_camera_roll);
                     break;

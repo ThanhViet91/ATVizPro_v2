@@ -55,7 +55,7 @@
     <string name="default_setting_countdown">3</string>
     <string name="default_setting_orientation">Auto</string>
     <string name="default_camera_mode">Front</string>
-    <string name="default_camera_position">Bottom Right</string>
+    <string name="default_camera_position">Top Right</string>
     <string name="default_camera_size">Medium</string>
     <string name="default_audio_source">Microphone</string>
     <string name="video_resolution">Video Resolution</string>
@@ -91,7 +91,7 @@
     <string name="start_livestreming">Start Livestreaming</string>
     <string name="enter_key">Please enter stream key here.</string>
     <string name="share">Share</string>
-    <string name="my_recordings">My Recordings</string>
+    <string name="my_recordings">My Projects</string>
     <string name="screen_recorder">Screen Recorder</string>
     <string name="tap_to_start_nrecording_screen">Tap to start\nrecording screen</string>
     <string name="no_video">No Videos\nLet\'s make a new video! </string>
@@ -157,7 +157,7 @@
     <string name="camera_site_can_zoom_and_move_before_start">Camera site can zoom and move before start!!</string>
     <string name="step_1">Step 1:....</string>
     <string name="todo">TODO</string>
-    <string name="_1_item_selected">1 item selected</string>
+    <string name="_1_item_selected">1 video selected</string>
     <string name="ok">OK</string>
     <string name="stream_key">Stream key</string>
     <string name="_01_30">01:30</string>

@@ -1,6 +1,9 @@
 package com.examples.atscreenrecord_test.ui.fragments;
 
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.parseLongToTime;
+
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -9,11 +12,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.examples.atscreenrecord_test.R;
+import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.examples.atscreenrecord_test.utils.FFmpegUtil;
 
@@ -35,12 +41,14 @@ public class OptionTrimFragment extends DialogFragmentBase {
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
+
     public IOptionFragmentListener callback = null;
 
     public OptionTrimFragment(IOptionFragmentListener callback) {
-        this.callback =  callback;
+        this.callback = callback;
 
     }
+
     @Override
     public int getLayout() {
         return R.layout.option_trim_fragment;
@@ -57,6 +65,11 @@ public class OptionTrimFragment extends DialogFragmentBase {
     TextView tvStartTime, tvEndTime;
     String video_path;
 
+    int oldLeft, oldRight;
+    boolean isMinRange = false;
+    boolean isChangeLeft = false;
+    boolean isChangeRight = false;
+    ImageView btn_done;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -65,12 +78,12 @@ public class OptionTrimFragment extends DialogFragmentBase {
         video_path = getArguments() != null ? getArguments().getString("video_path", "") : "";
 
         ImageView btn_close = view.findViewById(R.id.iv_close);
-        ImageView btn_done = view.findViewById(R.id.iv_done);
+        btn_done = view.findViewById(R.id.iv_done);
         tvStartTime = view.findViewById(R.id.actvStartTime);
         tvEndTime = view.findViewById(R.id.actvEndTime);
 
-        tvStartTime.setText(secToTime(0));
-        tvEndTime.setText(secToTime(videoDuration));
+        tvStartTime.setText(parseLongToTime(0));
+        tvEndTime.setText(parseLongToTime(videoDuration));
         btn_close.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -88,24 +101,68 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
         rangeSlider.setMax((int) videoDuration);
         rangeSlider.setProgress(0, (int) videoDuration);
+        oldLeft = 0;
+        oldRight = (int) videoDuration;
         rangeSlider.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
+
             @Override
             public void onProgressChanged(RangeSeekBar rangeSeekBar, int i, int i1, boolean b) {
-                if (i1 - i < 3000) return;
-                tvStartTime.setText(secToTime((long)i));
-                tvEndTime.setText(secToTime((long)i1));
-                startTime = i;
-                endTime = i1;
+                if (i != oldLeft) {  // change left
+                    isChangeLeft = true;
+                    isChangeRight = false;
+                    if (i1 - i < 1000) {
+                        rangeSeekBar.setPressed(false);
+                        oldLeft = oldRight - 1000;
+                        isMinRange = true;
+                    } else {
+                        rangeSeekBar.setPressed(true);
+                        oldLeft = i;
+                        isMinRange = false;
+                    }
+                }
+                if (i1 != oldRight) {  // change right
+                    isChangeLeft = false;
+                    isChangeRight = true;
+                    if (i1 - i < 1000) {
+                        rangeSeekBar.setPressed(false);
+                        oldRight = oldLeft + 1000;
+                        isMinRange = true;
+                    } else {
+                        rangeSeekBar.setPressed(true);
+                        oldRight = i1;
+                        isMinRange = false;
+                    }
+                }
+
+                tvStartTime.setText(parseLongToTime((long) i));
+                tvEndTime.setText(parseLongToTime((long) i1));
+
             }
 
             @Override
             public void onStartTrackingTouch(RangeSeekBar rangeSeekBar) {
-
+                isChangeLeft = false;
+                isChangeRight = false;
+                isMinRange = false;
             }
 
             @Override
             public void onStopTrackingTouch(RangeSeekBar rangeSeekBar) {
-
+                if (isMinRange) {
+                    if (isChangeLeft) {
+                        oldRight = rangeSeekBar.getProgressEnd();
+                        oldLeft = oldRight - 1000;
+                    }
+                    if (isChangeRight) {
+                        oldLeft = rangeSeekBar.getProgressStart();
+                        oldRight = oldLeft + 1000;
+                    }
+                }
+                tvStartTime.setText(parseLongToTime((long) oldLeft));
+                tvEndTime.setText(parseLongToTime((long) oldRight));
+                startTime = oldLeft;
+                endTime = oldRight;
+                rangeSeekBar.setProgress(oldLeft, oldRight);
             }
         });
 
@@ -113,9 +170,8 @@ public class OptionTrimFragment extends DialogFragmentBase {
     }
 
     private void processingTrimming() {
-
         callback.onClickDone();
-
+        dismiss();
         FFmpegUtil.getInstance().trimVideo(video_path, startTime, endTime, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
@@ -123,23 +179,10 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
             @Override
             public void onFinishTranscoding(String code) {
-                dismiss();
-                callback.onFinishProcess(code);
+                if (!code.equals("")) callback.onFinishProcess(code);
             }
         });
 
-    }
-
-
-    @SuppressLint("DefaultLocale")
-    public String secToTime(long totalSeconds) {
-        return String.format(
-                "%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(totalSeconds),
-                TimeUnit.MILLISECONDS.toMinutes(totalSeconds) -
-                        TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(totalSeconds)), // The change is in this line
-                TimeUnit.MILLISECONDS.toSeconds(totalSeconds) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(totalSeconds))
-        );
     }
 
     @Override

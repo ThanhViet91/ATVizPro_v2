@@ -26,7 +26,7 @@
             android:layout_marginStart="@dimen/normal_margin"
             android:padding="8dp"
             android:text="@string/cancel"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/img_btn_back_header"
@@ -66,7 +66,7 @@
             android:maxLines="1"
             android:padding="8dp"
             android:text="@string/select"
-            android:textSize="17sp"
+            android:textSize="16sp"
             tools:ignore="RelativeOverlap"
             tools:targetApi="o" />
 
@@ -76,7 +76,7 @@
         android:id="@+id/list_videos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/option"
+        android:layout_above="@id/adView"
         android:layout_below="@id/header"
         android:layout_marginTop="@dimen/medium_margin"
         android:layout_marginBottom="@dimen/small_margin"
@@ -95,10 +95,13 @@
         android:textColor="@color/white" />
 
     <RelativeLayout
-        android:visibility="gone"
         android:id="@+id/option"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="@dimen/medium_margin"
+        android:layout_marginEnd="@dimen/medium_margin"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="68dp"
+        android:background="@drawable/shape_round_black_50"
         android:layout_above="@id/adView">
 
         <TextView
@@ -107,7 +110,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
+            android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/normal_margin"
             android:padding="4dp"
             android:text="@string/_1_item_selected"
@@ -121,9 +124,9 @@
             android:layout_height="36dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/lager_margin"
+            android:layout_marginEnd="@dimen/normal_margin"
             android:contentDescription="@string/todo"
-            android:padding="@dimen/small_padding"
+            android:padding="4dp"
             android:src="@drawable/ic_delete" />
 
         <ImageView
@@ -131,11 +134,11 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="@dimen/header_top_margin"
+            android:layout_marginEnd="@dimen/lager_margin"
             android:layout_toStartOf="@id/img_btn_delete"
             android:contentDescription="@string/todo"
-            android:padding="@dimen/small_padding"
-            android:src="@drawable/ic_rename_2" />
+            android:padding="6dp"
+            android:src="@drawable/ic_edit_rename" />
 
     </RelativeLayout>
 

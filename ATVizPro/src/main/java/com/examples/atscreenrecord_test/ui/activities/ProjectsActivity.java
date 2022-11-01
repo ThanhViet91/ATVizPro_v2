@@ -8,7 +8,6 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 import static com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity.afterDelete;
-import static com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity.finishEdit;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_REACT;
@@ -384,13 +383,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 return;
             switch (fromFunction) {
                 case REQUEST_VIDEO_FOR_REACT_CAM:
-                    gotoPrepareVideo(video.getPath(), ACTION_FOR_REACT);
+                    gotoReactCam(video.getPath());
                     break;
                 case REQUEST_VIDEO_FOR_VIDEO_EDIT:
                     gotoEditVideo(video.getPath());
                     break;
                 case REQUEST_VIDEO_FOR_COMMENTARY:
-                    gotoPrepareVideo(video.getPath(), ACTION_FOR_COMMENTARY);
+                    gotoCommentary(video.getPath());
                     break;
                 case REQUEST_SHOW_PROJECTS_DEFAULT:
                 default:
@@ -420,13 +419,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (selectedVideoPath.equals("")) return;
         switch (fromFunction) {
             case REQUEST_VIDEO_FOR_REACT_CAM:
-                gotoPrepareVideo(selectedVideoPath, ACTION_FOR_REACT);
+                gotoReactCam(selectedVideoPath);
                 break;
             case REQUEST_VIDEO_FOR_VIDEO_EDIT:
                 gotoEditVideo(selectedVideoPath);
                 break;
             case REQUEST_VIDEO_FOR_COMMENTARY:
-                gotoPrepareVideo(selectedVideoPath, ACTION_FOR_COMMENTARY);
+                gotoCommentary(selectedVideoPath);
                 break;
         }
     }
@@ -434,14 +433,19 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     public void gotoEditVideo(String path) {
         Intent intent = new Intent(this, VideoEditorActivity.class);
         intent.setAction(MyUtils.ACTION_FOR_EDIT);
-        intent.putExtra(VIDEO_PATH_KEY, path);
+        intent.putExtra(KEY_PATH_VIDEO, path);
         startActivity(intent);
     }
 
-    public void gotoPrepareVideo(String path, String action) {
-        Intent intent = new Intent(this, PrepareVideoActivity.class);
-        intent.setAction(action);
-        intent.putExtra(VIDEO_PATH_KEY, path);
+    private void gotoCommentary(String path) {
+        Intent intent = new Intent(this, CommentaryActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, path);
+        startActivity(intent);
+    }
+
+    private void gotoReactCam(String path) {
+        Intent intent = new Intent(this, ReactCamActivity.class);
+        intent.putExtra(KEY_PATH_VIDEO, path);
         startActivity(intent);
     }
 

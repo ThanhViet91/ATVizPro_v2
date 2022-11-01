@@ -1,14 +1,15 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
+import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,7 +41,6 @@ import java.util.Date;
 public class VideoEditorActivity extends AppCompatActivity implements IOptionFragmentListener,
         IVideoStreamView, VideoEditorView.VideoEditorListener {
 
-    static final String VIDEO_PATH_KEY = "video-file-path";
     private VideoEditorView videoEditorView;
     private String pathOriginalVideo = "";
 
@@ -55,7 +55,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         videoEditorView = findViewById(R.id.trimmer_view);
         Intent intent = getIntent();
         if (intent != null) {
-            pathOriginalVideo = intent.getStringExtra(VIDEO_PATH_KEY);
+            pathOriginalVideo = intent.getStringExtra(KEY_PATH_VIDEO);
         }
         videoEditorView.setOnEditVideoListener(this);
         videoEditorView.initVideoByURI(Uri.parse(pathOriginalVideo));
@@ -85,11 +85,6 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     protected void onDestroy() {
         super.onDestroy();
         videoEditorView.onDestroy();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 
 
@@ -165,7 +160,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         }
 
         @Override
-        public void onAdFailedToShowFullScreenContent(AdError adError) {
+        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
             Toast.makeText(getApplicationContext(), "Video is saved.", Toast.LENGTH_SHORT).show();
             finish();
 
@@ -213,6 +208,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         videoEditorView.onPressSave();
         videoEditorView.initVideoByURI(Uri.parse(outPath));
         enableSave = true;
+        isStartCompress = false;
     }
 
 
@@ -319,6 +315,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     @Override
     public void onClickVideoOption(String opt) {
         if (!opt.equals("")) {
+            if (!isStartCompress)
             showOptionFragment(opt);
         }
     }

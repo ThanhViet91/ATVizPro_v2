@@ -275,9 +275,16 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
             }
         }
         mVideoView.setLayoutParams(lpVideo);
+
     }
     private void videoPrepared(MediaPlayer mp) {
         updateVideoView(mp);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mVideoView.setAlpha(1);
+            }
+        }, 1000);
         mDuration = mVideoView.getDuration();
         if (getRestoreState()) {
             setRestoreState(false);

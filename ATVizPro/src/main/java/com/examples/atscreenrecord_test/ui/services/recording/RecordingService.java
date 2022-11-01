@@ -204,7 +204,7 @@ public class RecordingService extends BaseService {
 
         App.ignoreOpenAd = true;
         Intent myIntent = new Intent(getApplicationContext(), PopUpResultVideoTranslucentActivity.class);
-        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         myIntent.setAction(ACTION_STOP_SERVICE);
         myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);

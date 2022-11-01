@@ -97,6 +97,7 @@ public class OptionRotateFragment extends DialogFragmentBase implements Sticker2
 
 
     private void processingRotate(int pos) {
+
         dismiss();
         mCallback.onClickDone();
         if (pos == 0)
@@ -108,6 +109,7 @@ public class OptionRotateFragment extends DialogFragmentBase implements Sticker2
 
             @Override
             public void onFinishTranscoding(String code) {
+
                 if (!code.equals(""))
                     mCallback.onFinishProcess(code);
             }

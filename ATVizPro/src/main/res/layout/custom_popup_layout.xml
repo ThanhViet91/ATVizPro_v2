@@ -1,33 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="272dp"
+    android:layout_width="@dimen/_200sdp"
     android:layout_gravity="center"
     android:background="@drawable/bg_popup"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/icon_popup"
-        android:visibility="gone"
-        android:src="@drawable/ic_home_new"
-        android:layout_centerHorizontal="true"
-        android:layout_width="48dp"
-        android:layout_height="48dp"/>
-
     <TextView
         android:id="@+id/title_popup"
         style="@style/Title_Box_Black"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/icon_popup"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_margin="16dp"
         android:ellipsize="none"
         android:maxLines="5"
         android:minHeight="50dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
         android:text="Title" />
 
     <View
@@ -46,7 +34,7 @@
         android:padding="8dp"
         android:text="OK"
         android:layout_width="match_parent"
-        android:layout_height="56dp"/>
+        android:layout_height="50dp"/>
 
     <LinearLayout
         android:id="@+id/ln_action_dual_mode"

@@ -204,6 +204,12 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         }
         videoView.setLayoutParams(lpVideo);
         videoView.seekTo(100);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                videoView.setAlpha(1);
+            }
+        }, 1000);
     }
 
     ImageView btn_back;

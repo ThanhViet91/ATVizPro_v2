@@ -1,7 +1,6 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
 import static com.examples.atscreenrecord_test.Core.isConnected;
-import static com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity.VIDEO_PATH_KEY;
 import static com.examples.atscreenrecord_test.ui.fragments.DialogSelectVideoSource.ARG_PARAM1;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
@@ -895,7 +894,7 @@ public class MainActivity extends BaseFragmentActivity {
                                 @Override
                                 public void onBuySuccess() {
                                     Bundle bundle = new Bundle();
-                                    bundle.putString(VIDEO_PATH_KEY, pathVideo);
+                                    bundle.putString(KEY_PATH_VIDEO, pathVideo);
                                     Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
                                     intent.putExtras(bundle);
                                     startActivity(intent);
@@ -906,7 +905,7 @@ public class MainActivity extends BaseFragmentActivity {
                     return;
                 }
                 Bundle bundle = new Bundle();
-                bundle.putString(VIDEO_PATH_KEY, pathVideo);
+                bundle.putString(KEY_PATH_VIDEO, pathVideo);
                 Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);

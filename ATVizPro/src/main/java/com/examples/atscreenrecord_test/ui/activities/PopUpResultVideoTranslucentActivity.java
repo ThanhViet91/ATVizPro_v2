@@ -101,6 +101,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
                     StorageUtil.deleteFile(videoPath);
                     onBackPressed();
                 } )
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
                 .show();
     }
 

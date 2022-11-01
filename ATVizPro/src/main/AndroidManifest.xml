@@ -64,22 +64,10 @@
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.ResultVideoFinishActivity"
-            android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
             android:name="com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
-            tools:ignore="LockedOrientationActivity" />
-
-        <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.PrepareVideoActivity"
-            android:configChanges="keyboard|keyboardHidden|screenSize"
-            android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
         <activity

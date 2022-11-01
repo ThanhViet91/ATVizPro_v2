@@ -41,7 +41,7 @@ public class AdsUtil {
         mAdViewRoot = adViewRoot;
         mContext = context;
         if (mAdViewRoot != null)
-        initialAdView(mContext);
+            initialAdView(mContext);
     }
 
     private Context mContext;
@@ -53,15 +53,16 @@ public class AdsUtil {
     public AdView getAdView() {
         return this.adView;
     }
+
     public void loadBanner() {
         if (SettingManager2.isProApp(mContext)) {
             mAdViewRoot.setVisibility(View.GONE);
         } else
-        mAdViewRoot.setVisibility(View.VISIBLE);
+            mAdViewRoot.setVisibility(View.VISIBLE);
     }
 
 
-    public void initialAdView (Context context) {
+    public void initialAdView(Context context) {
         if (SettingManager2.isProApp(mContext)) return;
         if (isLoaded) return;
         adView = new AdView(context);
@@ -80,16 +81,20 @@ public class AdsUtil {
     }
 
     private InterstitialAd mInterstitialAdAdmob = null;
+
     public InterstitialAd getInterstitialAdAdmob() {
         return this.mInterstitialAdAdmob;
     }
 
     public static long lastTime = 0;
+
     public boolean interstitialAdAlready() {
-        return this.mInterstitialAdAdmob != null
+        return !SettingManager2.isProApp(mContext)
+                && this.mInterstitialAdAdmob != null
                 && MyUtils.checkRandomPercentInterstitial()
-                && ((new Date()).getTime() - lastTime) > AppConfigs.getInstance().getConfigModel().getFrequencyCapping()*1000L;
+                && ((new Date()).getTime() - lastTime) > AppConfigs.getInstance().getConfigModel().getFrequencyCapping() * 1000L;
     }
+
     public void createInterstitialAdmob() {
         if (SettingManager2.isProApp(mContext)) {
             mInterstitialAdAdmob = null;
@@ -114,7 +119,7 @@ public class AdsUtil {
     }
 
     public void showInterstitialAd(FullScreenContentCallback fullScreenContentCallback) {
-            mInterstitialAdAdmob.show((Activity) mContext);
-            mInterstitialAdAdmob.setFullScreenContentCallback(fullScreenContentCallback);
+        mInterstitialAdAdmob.show((Activity) mContext);
+        mInterstitialAdAdmob.setFullScreenContentCallback(fullScreenContentCallback);
     }
 }

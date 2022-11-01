@@ -140,8 +140,8 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
             Toast.makeText(requireContext(), "Text is empty!", Toast.LENGTH_SHORT).show();
             return;
         }
-        dismiss();
         mCallback.onClickDone();
+        dismiss();
         FFmpegUtil.getInstance().addText(video_path, inputText.getText().toString(), Color.WHITE, sizeOfText, posSelected, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {

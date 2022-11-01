@@ -200,6 +200,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
         videoView.setLayoutParams(lpVideo);
         videoView.seekTo(100);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                videoView.setAlpha(1);
+            }
+        }, 1000);
 
         if (hasChangeViewPos) {
             xLeftOld = xLeft;
@@ -276,6 +282,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         root = findViewById(R.id.root_container);
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
+        mCameraLayout.setAlpha(0);
         if (cameraPreview != null && cameraView.getParent() != null) {
             ((ViewGroup) cameraView.getParent()).removeView(cameraView); // <- fix
         }
@@ -298,6 +305,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         mCameraLayout.post(() -> {
             mCameraLayout.setX(xRight - camWidth);
             mCameraLayout.setY(yBottom - camHeight);
+            mCameraLayout.setAlpha(1);
         });
         root.addView(mCameraLayout);
         final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);

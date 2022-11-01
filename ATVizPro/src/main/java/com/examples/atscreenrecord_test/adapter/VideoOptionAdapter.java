@@ -46,7 +46,7 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
         holder.name.setText(videoOpt);
         switch (videoOpt) {
             case "Trim":
-                holder.img.setImageResource(R.drawable.video_trimming_24);
+                holder.img.setImageResource(R.drawable.ic_cut);
                 break;
             case "Rotate":
                 holder.img.setImageResource(R.drawable.ic_rotate);
@@ -60,10 +60,10 @@ public class VideoOptionAdapter extends RecyclerView.Adapter<VideoOptionAdapter.
             case "Image":
                 holder.img.setImageResource(R.drawable.sticker_24);
                 break;
-
-            case "Merge":
-                holder.img.setImageResource(R.drawable.merge_vertical_24);
-                break;
+//
+//            case "Merge":
+//                holder.img.setImageResource(R.drawable.merge_vertical_24);
+//                break;
         }
 
         holder.itemView.setOnClickListener(new OnSingleClickListener() {

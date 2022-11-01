@@ -8,6 +8,7 @@ import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -39,13 +40,11 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video_detail);
         hideStatusBar(this);
-        ImageView btn_delete_video = findViewById(R.id.img_btn_delete);
         title = findViewById(R.id.title_video);
-        ImageView btn_share_video = findViewById(R.id.img_btn_share);
+        TextView btn_share_video = findViewById(R.id.img_btn_share);
         mAdView = findViewById(R.id.adView);
         videoView = findViewById(R.id.video_main);
         btn_share_video.setOnClickListener(this);
-        btn_delete_video.setOnClickListener(this);
         ImageView btn_back = findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(this);
         handleIntent();
@@ -182,7 +181,13 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
             }
         }
         videoView.setLayoutParams(lpVideo);
-        videoView.start();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                videoView.setAlpha(1);
+                videoView.start();
+            }
+        }, 1000);
     }
 
     @Override
@@ -211,9 +216,9 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
     }
 
     public void onClick(View v) {
-        if (v == findViewById(R.id.img_btn_delete)) {
-            handleDeleteButton();
-        }
+//        if (v == findViewById(R.id.img_btn_delete)) {
+//            handleDeleteButton();
+//        }
 
         if (v == findViewById(R.id.img_btn_share)) {
             MyUtils.shareVideo(this, videoFile);

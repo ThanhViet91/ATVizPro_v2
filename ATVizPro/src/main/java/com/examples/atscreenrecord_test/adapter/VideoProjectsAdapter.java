@@ -85,18 +85,18 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
                 .thumbnail(0.1f)
                 .into(holder.img);
         holder.name.setText(video.getName());
-        holder.itemView.setOnClickListener(new OnSingleClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View view) {
             if (selectable) {
                 holder.checkBox.setChecked(!holder.checkBox.isChecked());
                 list.get(position).setSelected(holder.checkBox.isChecked());
             }
             listener.onSelected(list.get(position));
         }});
-        holder.checkBox.setOnClickListener(new OnSingleClickListener() {
+        holder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSingleClick(View v) {
+            public void onClick(View view) {
             list.get(position).setSelected(holder.checkBox.isChecked());
             listener.onSelected(list.get(position));
         }});

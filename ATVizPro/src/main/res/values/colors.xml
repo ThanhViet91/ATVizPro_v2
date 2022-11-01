@@ -26,6 +26,7 @@
     <color name="black_10">#1A000000</color>
     <color name="black_30">#4D000000</color>
     <color name="black_80">#CC000000</color>
+    <color name="black_50">#80000000</color>
     <color name="black_60">#99000000</color>
     <color name="transparent">#00000000</color>
     <color name="orange_check_radio">#FF7474</color>

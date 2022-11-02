@@ -12,18 +12,18 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.File;
 import java.io.IOException;
 
-public class DialogHelper {
+public class RenameDialogHelper {
 
-    private static DialogHelper mInstance = null;
+    private static RenameDialogHelper mInstance = null;
 
-    private DialogHelper(IDialogHelper callback) {
+    private RenameDialogHelper(IDialogHelper callback) {
         this.mCallback = callback;
     }
 
-    public static DialogHelper getInstance(IDialogHelper callback){
+    public static RenameDialogHelper getInstance(IDialogHelper callback){
         if (mInstance == null) {
-            synchronized (DialogHelper.class) {
-                mInstance = new DialogHelper(callback);
+            synchronized (RenameDialogHelper.class) {
+                mInstance = new RenameDialogHelper(callback);
             }
         }
         return mInstance;
@@ -92,13 +92,16 @@ public class DialogHelper {
     }
 
     public void renameFile(final String videoPath, final String newName) throws Exception {
-        if (MyUtils.isValidFilenameSynctax(newName))
+        if (MyUtils.isValidFilenameSynctax(newName)){
+            System.out.println("thanhlv A filename cannot contain any of the following character:");
             throw new Exception("A filename cannot contain any of the following character: \\/\":*<>| is not n");
+        }
 
         File file = new File(videoPath);
 
         final File fileWithNewName = new File(file.getParentFile(), newName + ".mp4");
         if (fileWithNewName.exists()) {
+            System.out.println("thanhlv This filename is exists. Please choose another name");
             throw new IOException("This filename is exists. Please choose another name");
         }
 
@@ -109,7 +112,7 @@ public class DialogHelper {
             // File was not successfully renamed
             throw new Exception("Cannot rename this video. This video file might not available.");
         } else {
-//            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
+            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
         }
     }
 }

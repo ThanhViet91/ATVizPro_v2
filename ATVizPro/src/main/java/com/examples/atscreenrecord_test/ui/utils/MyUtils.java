@@ -257,7 +257,10 @@ public class MyUtils {
         for(int i = 0; i< filename.length(); i++){
             char c = filename.charAt(i);
             if(c == '/' || c =='\\' || c=='"' || c == ':' || c=='*'||c=='<'|| c =='>' || c == '|')
+            {
+                System.out.println("thanhlv isValidFilenameSynctax");
                 return true;
+            }
         }
         return false;
     }

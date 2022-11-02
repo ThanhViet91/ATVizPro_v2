@@ -61,6 +61,7 @@ import com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment;
 import com.examples.atscreenrecord_test.ui.fragments.SubscriptionFragment;
 import com.examples.atscreenrecord_test.ui.services.ControllerService;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
+import com.examples.atscreenrecord_test.ui.services.recording.RecordingService;
 import com.examples.atscreenrecord_test.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
@@ -318,6 +319,11 @@ public class MainActivity extends BaseFragmentActivity {
 
         LinearLayout react_cam = findViewById(R.id.ln_react_cam);
         react_cam.setOnClickListener(view -> {
+
+            if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+                MyUtils.showSnackBarNotification(mImgRec, "Camera is busy. Please stop screen recording before use this function!", Snackbar.LENGTH_LONG);
+                return;
+            }
             if (checkExecuteServiceBusy()) return;
 //            if (hasAllPermissionForReact())
             showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);

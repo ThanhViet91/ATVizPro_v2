@@ -16,12 +16,13 @@ import com.examples.atscreenrecord_test.model.VideoModel;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdapter.ViewHolder> {
 
-    private final Context context;
-    private List<VideoModel> list;
+    private Context context;
+    private ArrayList<VideoModel> list;
     private boolean selectable = false;
 
     public interface VideoProjectsListener {
@@ -30,9 +31,9 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
 
     private VideoProjectsListener listener;
 
-    public VideoProjectsAdapter(Context context, List<VideoModel> list) {
+    public VideoProjectsAdapter(Context context, ArrayList<VideoModel> list2) {
         this.context = context;
-        this.list = list;
+        this.list = list2;
     }
 
     @Override
@@ -40,15 +41,35 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         return super.getItemId(position);
     }
 
-    public void setVideoProjectsListener(VideoProjectsListener listener) {
-        this.listener = listener;
+
+    public void setVideoProjectsListener(VideoProjectsListener listener2) {
+        this.listener = listener2;
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateData(List<VideoModel> listNew) {
+    public void updateData(Context context, ArrayList<VideoModel> listNew) {
+//        this.list.clear();
         this.list = listNew;
+        this.context = context;
         notifyDataSetChanged();
+//        notifyItemRangeChanged(0, getItemCount());
+        System.out.println("thanhlv handleRenameButton NotifyDataSetChanged");
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateDataItem(VideoModel videoNew, int pos) {
+//        this.list.clear();
+//        this.list = listNew;
+//        notifyItemChanged(pos);
+//        notifyItemRangeChanged(pos -1 ,pos+1);
+        list.set(0, videoNew);
+        notifyItemRemoved(0);
+        list.add(0, videoNew);
+        notifyItemInserted(0);
+
+        System.out.println("thanhlv handleRenameButton NotifyDataSetChanged");
+    }
+
 
     @SuppressLint("NotifyDataSetChanged")
     public void setSelectable(boolean selectable) {
@@ -79,11 +100,11 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         }
 
         holder.duration.setText(video.getDuration());
-        holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
-        Glide.with(context)
-                .load(video.getPath())
-                .thumbnail(0.1f)
-                .into(holder.img);
+//        holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
+//        Glide.with(context)
+//                .load(video.getPath())
+//                .thumbnail(0.1f)
+//                .into(holder.img);
         holder.name.setText(video.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

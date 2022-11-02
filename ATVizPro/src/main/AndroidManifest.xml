@@ -106,6 +106,7 @@
             android:name="com.examples.atscreenrecord_test.ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:ignore="LockedOrientationActivity" />

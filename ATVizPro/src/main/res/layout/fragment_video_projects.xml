@@ -82,8 +82,6 @@
         android:layout_marginBottom="@dimen/small_margin"
         android:paddingStart="@dimen/normal_padding"
         android:paddingEnd="@dimen/normal_padding"
-        android:divider="@null"
-        android:dividerHeight="0dp"
         android:orientation="vertical" />
     <TextView
         android:id="@+id/tvEmpty"

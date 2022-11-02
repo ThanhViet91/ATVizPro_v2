@@ -35,7 +35,7 @@ import com.examples.atscreenrecord_test.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.model.VideoModel;
 import com.examples.atscreenrecord_test.ui.fragments.SubscriptionFragment;
-import com.examples.atscreenrecord_test.ui.utils.DialogHelper;
+import com.examples.atscreenrecord_test.ui.utils.RenameDialogHelper;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.DisplayUtil;
@@ -52,7 +52,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private ImageView btn_back;
     private ImageView btn_rename;
     private VideoProjectsAdapter mAdapter;
-    private final ArrayList<VideoModel> videoList = new ArrayList<>();
+    private ArrayList<VideoModel> videoList = new ArrayList<>();
     private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int fromFunction = 0;
     private String navigateTo = "";
@@ -112,10 +112,12 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
     }
 
+    RecyclerView recyclerView;
+
     private void initViews() {
         RelativeLayout mAdView = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdView);
-        RecyclerView recyclerView = findViewById(R.id.list_videos);
+        recyclerView = findViewById(R.id.list_videos);
         tv_cancel = findViewById(R.id.tv_btn_cancel_projects);
         tv_noData = findViewById(R.id.tvEmpty);
         tv_select = findViewById(R.id.tv_btn_select);
@@ -143,7 +145,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onSingleClick(View v) {
                 if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
-                    for (VideoModel video : videoList) video.setSelected(false);
+//                    for (VideoModel video : videoList) video.setSelected(false);
                     mAdapter.setSelectable(false);
                     toggleView(btn_back, View.VISIBLE);
                     toggleView(tv_cancel, View.GONE);
@@ -158,6 +160,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onSingleClick(View v) {
                 onBackPressed();
+//                finish();
             }
         });
         tv_select.setOnClickListener(v -> {
@@ -173,7 +176,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         btn_rename.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                handleRenameButton(getVideoListSelected().get(0));
+                VideoModel videoRename = getVideoListSelected().get(0);
+                System.out.println("thanhlv onSingleClick rename " + videoRename.getPath());
+                handleRenameButton(videoRename);
             }
         });
 
@@ -193,27 +198,54 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private VideoModel videoModelOld;
+    String oldPath, oldName;
 
     private void handleRenameButton(VideoModel oldVideo) {
-        videoModelOld = new VideoModel();
-        videoModelOld.setPath(oldVideo.getPath());
-        videoModelOld.setName(oldVideo.getName());
-        videoModelOld.setSelected(oldVideo.isSelected());
-        videoModelOld.setDuration(oldVideo.getDuration());
-        String oldPath = videoModelOld.getPath();
-        String oldName = videoModelOld.getName();
-        DialogHelper.getInstance(new DialogHelper.IDialogHelper() {
+        System.out.println("thanhlv handleRenameButton VideoModel oldVideo " + oldVideo.getPath());
+        videoModelOld = oldVideo;
+        System.out.println("thanhlv handleRenameButton VideoModel videoModelOld " + videoModelOld.getPath());
+//        videoModelOld.setPath(oldVideo.getPath());
+//        videoModelOld.setName(oldVideo.getName());
+//        videoModelOld.setSelected(oldVideo.isSelected());
+//        videoModelOld.setDuration(oldVideo.getDuration());
+
+        RenameDialogHelper.getInstance(new RenameDialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
-                new Handler().postDelayed(() -> {
-                    for (VideoModel videoModel : videoList)
-                        if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
-                            videoModel.setPath(oldPath.replace(oldName, result));
-                            videoModel.setName(result);
-                            mAdapter.updateData(videoList);
-                            break;
-                        }
-                }, 200);
+                oldPath = videoModelOld.getPath();
+                oldName = videoModelOld.getName();
+                System.out.println("thanhlv handleRenameButton onClickOK oldPath " + oldPath);
+                System.out.println("thanhlv handleRenameButton onClickOK result " + result);
+                videoModelOld.setName("thanh1");
+                mAdapter.updateDataItem(videoModelOld, 0);
+//                for (int i = 0; i < videoList.size(); i++) {
+//                    VideoModel videoModel = videoList.get(i);
+//                    if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
+//                        videoList_temp.clear();
+//                        videoList_temp = new ArrayList<>(videoList);
+//
+//                        videoList_temp.remove(videoModel);
+//                        videoModel.setPath(oldPath.replace(oldName, result));
+//                        videoModel.setName(result);
+//                        videoList_temp.add(i, videoModel);
+//
+//                        videoList.clear();
+//
+//                        videoList.addAll(videoList_temp);
+//
+//                        System.out.println("thanhlv handleRenameButton videoList.add(i, videoModel); " + videoList.get(i).getPath());
+//
+////                                videoList_temp.clear();
+////                                videoList_temp = new ArrayList<>(videoList);
+//
+//
+//                                mAdapter.updateDataItem(videoList, i);
+//
+//                        System.out.println("thanhlv handleRenameButton " + videoModel.getPath());
+//                        break;
+//                    }
+//                }
+
 
             }
 
@@ -229,7 +261,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 .setMessage(String.format("Do you want to delete %s", countVideoSelected == 1 ? "video?" : "videos?"))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(getVideoListSelected()))
-                .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {
+                })
                 .show();
     }
 
@@ -238,7 +271,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
         }
         runOnUiThread(() -> {
-            if (mAdapter != null) mAdapter.updateData(videoList);
+            if (mAdapter != null) mAdapter.updateData(this, videoList);
             if (videoList.size() == 0) {
                 toggleView(tv_cancel, View.GONE);
                 toggleView(btn_back, View.VISIBLE);
@@ -251,15 +284,17 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     private int countVideoSelected = 0;
 
+    ArrayList<VideoModel> listSelected = new ArrayList<>();
+
     private ArrayList<VideoModel> getVideoListSelected() {
         countVideoSelected = 0;
-        ArrayList<VideoModel> list = new ArrayList<>();
+        listSelected.clear();
         for (VideoModel item : videoList)
             if (item.isSelected()) {
-                list.add(0, item);
+                listSelected.add(0, item);
                 countVideoSelected++;
             }
-        return list;
+        return listSelected;
     }
 
     private int modeSelect = 0;
@@ -273,12 +308,12 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         if (modeSelect == 2) {
             for (VideoModel video : videoList) video.setSelected(true);
-            mAdapter.updateData(videoList);
+            mAdapter.updateData(this, videoList);
             tv_select.setText(getString(R.string.deselect_all));
         }
         if (modeSelect == 3) {
             for (VideoModel video : videoList) video.setSelected(false);
-            mAdapter.updateData(videoList);
+            mAdapter.updateData(this, videoList);
             tv_select.setText(getString(R.string.select_all));
             modeSelect = 1;
         }
@@ -315,7 +350,17 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         videoList.clear();
         readData();
         processingData();
-        if (mAdapter != null) mAdapter.updateData(videoList);
+//        mAdapter = new VideoProjectsAdapter(this, videoList);
+//        mAdapter.setVideoProjectsListener(this);
+//        mAdapter.setHasStableIds(true);
+//
+//        if (recyclerView != null) {
+//            recyclerView.setAdapter(mAdapter);
+//            GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
+//            recyclerView.setLayoutManager(gridLayoutManager);
+//        }
+
+        if (mAdapter != null) mAdapter.updateData(this, videoList);
     }
 
     private void processingData() {

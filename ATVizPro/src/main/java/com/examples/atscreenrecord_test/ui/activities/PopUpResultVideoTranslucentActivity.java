@@ -25,6 +25,7 @@ import com.examples.atscreenrecord_test.utils.StorageUtil;
 public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
 
     private String videoPath;
+    public static boolean afterAdd = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
             videoPath = intent.getStringExtra(KEY_VIDEO_PATH);
         }
 
-        showBanner();
+        initBanner();
 
         ImageView btnClose = findViewById(R.id.btn_close_popup);
         btnClose.setOnClickListener(new View.OnClickListener() {
@@ -85,13 +86,19 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
 
     }
 
+    @Override
+    public void onBackPressed() {
+        afterAdd = true;
+        super.onBackPressed();
+    }
 
     private AdsUtil mAdManager;
-    private void showBanner() {
+    private void initBanner() {
         RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
     }
 
+    public static boolean afterDelete = false;
     private void gotoDeleteVideo() {
         new AlertDialog.Builder(this)
                 .setTitle("Delete Video")
@@ -99,7 +106,8 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     StorageUtil.deleteFile(videoPath);
-                    onBackPressed();
+                    afterDelete = true;
+                    finish();
                 } )
                 .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
                 .show();
@@ -122,6 +130,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
         intent.setAction(ACTION_GO_TO_EDIT);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);
         startActivity(intent);
+        finish();
     }
 
     private void gotoShareVideo() {

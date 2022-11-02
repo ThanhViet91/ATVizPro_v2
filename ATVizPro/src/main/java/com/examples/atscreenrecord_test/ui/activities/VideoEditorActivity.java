@@ -39,7 +39,7 @@ import java.nio.channels.FileChannel;
 import java.util.Date;
 
 public class VideoEditorActivity extends AppCompatActivity implements IOptionFragmentListener,
-        IVideoStreamView, VideoEditorView.VideoEditorListener {
+        IVideoStreamView, VideoEditorView.VideoEditorListener, OptionTrimFragment.SeekbarCallback {
 
     private VideoEditorView videoEditorView;
     private String pathOriginalVideo = "";
@@ -95,7 +95,9 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         bundle.putString("video_path", pathOriginalVideo);
         switch (opt) {
             case "Trim":
-                OptionTrimFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
+                OptionTrimFragment.newInstance(this, this, bundle)
+                        .show(getSupportFragmentManager(), "");
+
                 break;
             case "Text":
                 OptionAddTextFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
@@ -240,6 +242,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        finishEdit = true;
                         finish();
                     })
                     .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
@@ -283,6 +286,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        finishEdit = true;
                         finish();
                     })
                     .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
@@ -318,5 +322,10 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
             if (!isStartCompress)
             showOptionFragment(opt);
         }
+    }
+
+    @Override
+    public void onSeekTo(long ms) {
+        videoEditorView.seekTo(ms);
     }
 }

@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider;
 
 import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.AppConfigs;
+import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.android.material.snackbar.Snackbar;
 import com.serenegiant.utils.UIThreadHelper;
@@ -98,8 +99,10 @@ public class MyUtils {
     }
 
     @NonNull
-    public static String createFileName(@NonNull String ext) {
-        return "Record_" +getTimeStamp()+ ext;
+    public static String createFileName(Context context, @NonNull String ext) {
+//        return "Record_" +getTimeStamp()+ ext;
+        SettingManager2.setNumberRecordingFile(context, SettingManager2.getNumberRecordingFile(context) + 1);
+        return "Recording-" + SettingManager2.getNumberRecordingFile(context) + ext;
     }
 
     public static long getCurrentTimeStamp() {
@@ -295,46 +298,46 @@ public class MyUtils {
         return hex.toString();
     }
 
-    public static void shootPicture(ByteBuffer buf, int mWidth, int mHeight) {
-
-        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-
-        File captureFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(".jpg"));
-
-        if (!captureFile.getParentFile().exists()) {
-            captureFile.getParentFile().mkdirs();
-        }
-
-        if (captureFile.toString().endsWith(".jpg")) {
-            compressFormat = Bitmap.CompressFormat.JPEG;
-        }
-        BufferedOutputStream os = null;
-        try {
-            try {
-                os = new BufferedOutputStream(new FileOutputStream(captureFile));
-                final Bitmap bmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-                buf.clear();
-                bmp.copyPixelsFromBuffer(buf);
-                bmp.compress(compressFormat, 100, os);
-
-                //Log
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                bmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-                byte[] byteArray = byteArrayOutputStream .toByteArray();
-
-                String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-                Log.i(TAG, "shootPicture: "+encoded);
-                //endlog
-
-                bmp.recycle();
-                os.flush();
-            } finally {
-                if (os != null) os.close();
-            }
-        } catch (final IOException e) {
-            Log.w(TAG, "failed to save file", e);
-        }
-    }
+//    public static void shootPicture(ByteBuffer buf, int mWidth, int mHeight) {
+//
+//        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
+//
+//        File captureFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(".jpg"));
+//
+//        if (!captureFile.getParentFile().exists()) {
+//            captureFile.getParentFile().mkdirs();
+//        }
+//
+//        if (captureFile.toString().endsWith(".jpg")) {
+//            compressFormat = Bitmap.CompressFormat.JPEG;
+//        }
+//        BufferedOutputStream os = null;
+//        try {
+//            try {
+//                os = new BufferedOutputStream(new FileOutputStream(captureFile));
+//                final Bitmap bmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+//                buf.clear();
+//                bmp.copyPixelsFromBuffer(buf);
+//                bmp.compress(compressFormat, 100, os);
+//
+//                //Log
+//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//                bmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+//                byte[] byteArray = byteArrayOutputStream .toByteArray();
+//
+//                String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+//                Log.i(TAG, "shootPicture: "+encoded);
+//                //endlog
+//
+//                bmp.recycle();
+//                os.flush();
+//            } finally {
+//                if (os != null) os.close();
+//            }
+//        } catch (final IOException e) {
+//            Log.w(TAG, "failed to save file", e);
+//        }
+//    }
 
     public static final String IP_ADDRESS_PATTERN =
             "^rtmp://"+

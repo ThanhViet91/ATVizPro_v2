@@ -47,7 +47,6 @@ public class SubscriptionFragment extends Fragment {
     private FragmentManager mFragmentManager;
 
     public interface SubscriptionListener {
-
         void onBuySuccess();
     }
 

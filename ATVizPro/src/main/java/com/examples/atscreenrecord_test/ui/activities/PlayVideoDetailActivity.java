@@ -195,41 +195,9 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
         super.onPause();
     }
 
-    private void handleDeleteButton() {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete Video")
-                .setMessage("Do you want to delete video?")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideo(videoFile))
-                .show();
-    }
-
-    public static boolean afterDelete = false;
-    private void deleteVideo(String filePath) {
-        if (new File(filePath).delete()) {
-            Toast.makeText(this, "Delete success!", Toast.LENGTH_SHORT).show();
-            afterDelete = true;
-            finish();
-        } else {
-            Toast.makeText(this, "Delete failed, have some problem.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void onClick(View v) {
-//        if (v == findViewById(R.id.img_btn_delete)) {
-//            handleDeleteButton();
-//        }
-
         if (v == findViewById(R.id.img_btn_share)) {
             MyUtils.shareVideo(this, videoFile);
-//            File file = new File(videoFile);
-//            Uri uri = FileProvider.getUriForFile(getApplicationContext(), "com.examples.atscreenrecord_test.provider", file);
-//            Intent intent = new Intent(Intent.ACTION_SEND);
-//            intent.putExtra(Intent.EXTRA_SUBJECT, String.format("Share of %s", file.getName()));
-//            intent.setType(URLConnection.guessContentTypeFromName(file.getName()));
-//            intent.putExtra(Intent.EXTRA_STREAM, uri);
-//            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//            startActivity(Intent.createChooser(intent, "Share File"));
         }
         if (v == findViewById(R.id.img_btn_back_header)) {
             videoView.stopPlayback();

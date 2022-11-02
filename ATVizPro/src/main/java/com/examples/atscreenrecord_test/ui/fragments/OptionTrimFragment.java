@@ -36,17 +36,23 @@ public class OptionTrimFragment extends DialogFragmentBase {
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = OptionTrimFragment.class.getSimpleName();
 
-    public static OptionTrimFragment newInstance(IOptionFragmentListener callback, Bundle args) {
-        OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback);
+    public static OptionTrimFragment newInstance(IOptionFragmentListener callback, SeekbarCallback callback2, Bundle args) {
+        OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback, callback2);
         dialogSelectVideoSource.setArguments(args);
         return dialogSelectVideoSource;
     }
 
-    public IOptionFragmentListener callback = null;
+    public IOptionFragmentListener callback;
 
-    public OptionTrimFragment(IOptionFragmentListener callback) {
+    public interface SeekbarCallback {
+        void onSeekTo(long ms);
+    }
+
+    private SeekbarCallback seekbarCallback;
+
+    public OptionTrimFragment(IOptionFragmentListener callback, SeekbarCallback callback2) {
         this.callback = callback;
-
+        this.seekbarCallback = callback2;
     }
 
     @Override
@@ -70,6 +76,7 @@ public class OptionTrimFragment extends DialogFragmentBase {
     boolean isChangeLeft = false;
     boolean isChangeRight = false;
     ImageView btn_done;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -119,6 +126,8 @@ public class OptionTrimFragment extends DialogFragmentBase {
                         oldLeft = i;
                         isMinRange = false;
                     }
+
+                    seekbarCallback.onSeekTo((long) i);
                 }
                 if (i1 != oldRight) {  // change right
                     isChangeLeft = false;
@@ -132,10 +141,12 @@ public class OptionTrimFragment extends DialogFragmentBase {
                         oldRight = i1;
                         isMinRange = false;
                     }
+                    seekbarCallback.onSeekTo((long) i1);
                 }
 
                 tvStartTime.setText(parseLongToTime((long) i));
                 tvEndTime.setText(parseLongToTime((long) i1));
+
 
             }
 
@@ -148,16 +159,22 @@ public class OptionTrimFragment extends DialogFragmentBase {
 
             @Override
             public void onStopTrackingTouch(RangeSeekBar rangeSeekBar) {
-                if (isMinRange) {
-                    if (isChangeLeft) {
+
+                if (isChangeLeft) {
+                    if (isMinRange) {
                         oldRight = rangeSeekBar.getProgressEnd();
                         oldLeft = oldRight - 1000;
                     }
-                    if (isChangeRight) {
+                    seekbarCallback.onSeekTo((long) oldLeft);
+                }
+                if (isChangeRight) {
+                    if (isMinRange) {
                         oldLeft = rangeSeekBar.getProgressStart();
                         oldRight = oldLeft + 1000;
                     }
+                    seekbarCallback.onSeekTo((long) oldRight);
                 }
+
                 tvStartTime.setText(parseLongToTime((long) oldLeft));
                 tvEndTime.setText(parseLongToTime((long) oldRight));
                 startTime = oldLeft;

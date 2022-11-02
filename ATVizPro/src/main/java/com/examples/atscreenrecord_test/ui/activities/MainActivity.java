@@ -85,8 +85,6 @@ public class MainActivity extends BaseFragmentActivity {
     public static final int REQUEST_SHOW_PROJECTS_DEFAULT = 105;
     private static final String THE_FIRST_TIME_SCREEN_RECORD = "action_first_record";
     private static final String THE_FIRST_TIME_LIVESTREAM = "action_first_livestream";
-    private static final int CHOOSE_MY_RECORD = 222;
-    private static final int CHOOSE_GALLERY = 333;
     public static boolean active = false;
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
@@ -95,7 +93,6 @@ public class MainActivity extends BaseFragmentActivity {
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
     public static final String KEY_FROM_FUNCTION = "key_from_code";
-    public static final String KEY_NAVIGATE_TO = "key_navigate_to";
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -107,12 +104,6 @@ public class MainActivity extends BaseFragmentActivity {
     private Intent mScreenCaptureIntent = null;
     private int mScreenCaptureResultCode = MyUtils.RESULT_CODE_FAILED;
     private StreamProfile mStreamProfile;
-
-//    @Override
-//    protected void onSaveInstanceState(@NonNull Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putInt(MyUtils.KEY_CONTROLlER_MODE, mMode);
-//    }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -223,6 +214,8 @@ public class MainActivity extends BaseFragmentActivity {
         mAdManager.loadBanner();
     }
 
+    String navigate_to, video_input;
+    int show_project_for;
     private void handleIncomingRequest(Intent intent) {
         if (intent.getAction() != null) {
             switch (intent.getAction()) {
@@ -232,9 +225,15 @@ public class MainActivity extends BaseFragmentActivity {
                 case "from_notification":
                     break;
                 case ACTION_GO_TO_EDIT:
+                    navigate_to = ACTION_GO_TO_EDIT;
+                    fromFunction = REQUEST_VIDEO_FOR_VIDEO_EDIT;
+                    video_input = intent.getStringExtra(KEY_PATH_VIDEO);
                     showMyRecordings(REQUEST_VIDEO_FOR_VIDEO_EDIT, ACTION_GO_TO_EDIT, intent.getStringExtra(KEY_PATH_VIDEO));
                     break;
                 case ACTION_GO_TO_PLAY:
+                    navigate_to = ACTION_GO_TO_PLAY;
+                    fromFunction = REQUEST_SHOW_PROJECTS_DEFAULT;
+                    video_input = intent.getStringExtra(KEY_PATH_VIDEO);
                     showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT, ACTION_GO_TO_PLAY, intent.getStringExtra(KEY_PATH_VIDEO));
                     break;
                 case ACTION_GO_HOME:
@@ -358,10 +357,16 @@ public class MainActivity extends BaseFragmentActivity {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && Settings.canDrawOverlays(this)) {
             return true;
         } else {
-            requestPermissions(new String[]{Manifest.permission.CAMERA,
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
+            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
                     Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE}, 666);  // Comment 26
@@ -372,10 +377,16 @@ public class MainActivity extends BaseFragmentActivity {
     public boolean hasAllPermissionForCommentary() {
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && Settings.canDrawOverlays(this)) {
             return true;
         } else {
-            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO,
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
+            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.READ_EXTERNAL_STORAGE}, 888);
         }
@@ -482,6 +493,7 @@ public class MainActivity extends BaseFragmentActivity {
 
             @Override
             public void onClickMyRecordings() {
+//                show_project_for = requestVideoFor;
                 showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
@@ -521,7 +533,7 @@ public class MainActivity extends BaseFragmentActivity {
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
     }
 
-    private int videoSource, fromFunction;
+    private int fromFunction;
     public FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
         @Override
         public void onAdClicked() {
@@ -533,16 +545,13 @@ public class MainActivity extends BaseFragmentActivity {
             AdsUtil.lastTime = (new Date()).getTime();
             if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
-//                return;
             }
 
             if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
                 showDialogPickVideo(fromFunction);
-//                return;
             }
             if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
                 showDialogPickVideo(fromFunction);
-//                return;
             }
 
             if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
@@ -583,6 +592,7 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void showInterstitialAd(int from_code) {
         fromFunction = from_code;
+//        show_project_for = from_code;
         if (mAdManager.interstitialAdAlready()) {
             mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
@@ -799,6 +809,7 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     String pathVideo = "";
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         App.ignoreOpenAd = true;
@@ -820,9 +831,16 @@ public class MainActivity extends BaseFragmentActivity {
                             .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
                                 @Override
                                 public void onBuySuccess() {
-                                    Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
-                                    intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                    startActivity(intent);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mAdManager != null) mAdManager.loadBanner();
+                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_REACT_CAM");
+                                            Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
+                                            intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                            startActivity(intent);
+                                        }
+                                    });
                                 }
                             }))
                             .addToBackStack("")
@@ -858,9 +876,16 @@ public class MainActivity extends BaseFragmentActivity {
                             .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
                                 @Override
                                 public void onBuySuccess() {
-                                    Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
-                                    intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                    startActivity(intent);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mAdManager != null) mAdManager.loadBanner();
+                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_COMMENTARY");
+                                            Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                                            intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                            startActivity(intent);
+                                        }
+                                    });
                                 }
                             }))
                             .addToBackStack("")
@@ -893,11 +918,18 @@ public class MainActivity extends BaseFragmentActivity {
                             .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
                                 @Override
                                 public void onBuySuccess() {
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString(KEY_PATH_VIDEO, pathVideo);
-                                    Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (mAdManager != null) mAdManager.loadBanner();
+                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_VIDEO_EDIT");
+                                            Bundle bundle = new Bundle();
+                                            bundle.putString(KEY_PATH_VIDEO, pathVideo);
+                                            Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
+                                            intent.putExtras(bundle);
+                                            startActivity(intent);
+                                        }
+                                    });
                                 }
                             }))
                             .addToBackStack("")
@@ -918,14 +950,14 @@ public class MainActivity extends BaseFragmentActivity {
                 if (!Environment.isExternalStorageManager()) { //Permission is not available
                     MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
                 } else {
-                    showMyRecordings(fromFunction);
+                    showMyRecordings(fromFunction, navigate_to, video_input);
                 }
             }
         }
 
         if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
             //Check if the permission is granted or not.
-            if (resultCode != RESULT_OK) { //Permission is not available
+            if (!Settings.canDrawOverlays(this)) { //Permission is not available
                 MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);
             }
         } else if (requestCode == PERMISSION_RECORD_DISPLAY) {

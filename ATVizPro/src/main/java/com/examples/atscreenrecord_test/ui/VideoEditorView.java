@@ -351,8 +351,9 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
 
 
-    private void seekTo(long msec) {
-        mVideoView.seekTo((int) msec);
+    public void seekTo(long msec) {
+        if (mVideoView != null)
+            mVideoView.seekTo((int) msec);
         Log.d(TAG, "seekTo = " + msec);
     }
 

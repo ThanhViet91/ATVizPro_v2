@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.os.Handler;
 
 import com.examples.atscreenrecord_test.App;
+import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 
 import java.io.File;
@@ -52,7 +53,10 @@ public class FFmpegUtil {
     public static String generateFileOutput() {
         String filePath = "";
         try {
-            File outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(".mp4"));
+            File outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(INSTANCE.context, ".mp4"));
+            while (outputFile.exists()) {
+                outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(INSTANCE.context, ".mp4"));
+            }
             if (!outputFile.getParentFile().exists()) {
                 outputFile.getParentFile().mkdirs();
             }
@@ -63,11 +67,29 @@ public class FFmpegUtil {
         return filePath;
     }
 
+    public int getNumberFile(Context context, String prefix) {
+        if (prefix.equals("React")) {
+            SettingManager2.setNumberReactFile(context, SettingManager2.getNumberReactFile(context) + 1);
+            return SettingManager2.getNumberReactFile(context);
+        }
+        if (prefix.equals("Commentary")) {
+            SettingManager2.setNumberCommentaryFile(context, SettingManager2.getNumberCommentaryFile(context) + 1);
+            return SettingManager2.getNumberCommentaryFile(context);
+        }
+        if (prefix.equals("Edit")) {
+            SettingManager2.setNumberEditFile(context, SettingManager2.getNumberEditFile(context) + 1);
+            return SettingManager2.getNumberEditFile(context);
+        }
+        return 0;
+    }
     public static String generateFileOutput(String prefix) {
         if (prefix.equals("")) return generateFileOutput();
         String filePath = "";
         try {
-            File outputFile = new File(MyUtils.getBaseStorageDirectory(), prefix + "_" + MyUtils.getTimeStamp() + ".mp4");
+            File outputFile = new File(MyUtils.getBaseStorageDirectory(), prefix + "-" + getInstance().getNumberFile(INSTANCE.context, prefix) + ".mp4");
+            while (outputFile.exists()) {
+                outputFile = new File(MyUtils.getBaseStorageDirectory(), prefix + "-" + getInstance().getNumberFile(INSTANCE.context, prefix) + ".mp4");
+            }
             if (!outputFile.getParentFile().exists()) {
                 outputFile.getParentFile().mkdirs();
             }

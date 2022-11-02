@@ -95,6 +95,7 @@
         android:textColor="@color/white" />
 
     <RelativeLayout
+        android:visibility="gone"
         android:id="@+id/option"
         android:layout_marginBottom="20dp"
         android:layout_marginStart="@dimen/medium_margin"
@@ -137,7 +138,7 @@
             android:layout_marginEnd="@dimen/lager_margin"
             android:layout_toStartOf="@id/img_btn_delete"
             android:contentDescription="@string/todo"
-            android:padding="6dp"
+            android:padding="7dp"
             android:src="@drawable/ic_edit_rename" />
 
     </RelativeLayout>

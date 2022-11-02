@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="10dp">
+    android:paddingTop="10dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp">
 
     <ImageView
         android:layout_alignParentTop="true"
@@ -26,10 +28,30 @@
 
         <CheckBox
             android:id="@+id/checkbox"
-            android:buttonTint="@color/white"
-            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="7dp"
+            android:layout_marginBottom="6dp"
+            android:button="@drawable/checkbox_selector" />
+
+        <TextView
+            android:id="@+id/tv_video_size"
+            style="@style/Body_List_Item_Black_16_400"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="7dp"
+            android:background="@drawable/shape_round_text_white"
+            android:gravity="center"
+            android:paddingStart="3dp"
+            android:paddingEnd="3dp"
+            android:textFontWeight="250"
+            android:textSize="11sp"
+            tools:targetApi="p" />
 
     </RelativeLayout>
 
@@ -42,12 +64,12 @@
         android:layout_centerHorizontal="true"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxWidth="130dp"
+        android:maxWidth="110dp"
         android:maxLines="1"
         android:textSize="14sp"/>
 
     <TextView
-        android:id="@+id/tv_video_size"
+        android:id="@+id/tv_video_duration"
         style="@style/Body_List_Item_White_16_200"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,25 +79,7 @@
         android:gravity="center"
         android:maxWidth="130dp"
         android:maxLines="1"
-        android:text="25.8 MB"
-        android:textColor="@color/white_60"
+        android:textColor="@color/white_80"
         android:textSize="13sp" />
-
-    <TextView
-        style="@style/Body_List_Item_White_16_400"
-        android:textSize="12sp"
-        android:textFontWeight="300"
-        android:background="@drawable/shape_round_text"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="9dp"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/tv_video_duration"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/_01_30"
-        tools:targetApi="p" />
 
 </RelativeLayout>

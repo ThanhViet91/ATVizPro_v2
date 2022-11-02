@@ -33,6 +33,10 @@
     <string name="setting_livestream_type">setting_livestream_type</string>
     <string name="setting_interstitial_percent">setting_interstitial_percent</string>
     <string name="setting_enable_camera_view">setting_enable_camera_view</string>
+    <string name="setting_recording_number">setting_recording_number</string>
+    <string name="setting_react_number">setting_react_number</string>
+    <string name="setting_commentary_number">setting_commentary_number</string>
+    <string name="setting_edit_number">setting_edit_number</string>
 
     <!--Camera settings-->
     <string name="setting_camera_mode">setting_camera_mode</string>

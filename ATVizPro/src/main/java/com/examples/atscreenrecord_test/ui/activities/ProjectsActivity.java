@@ -7,10 +7,9 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_COMMENTARY;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
-import static com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity.afterDelete;
+import static com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity.afterAdd;
+import static com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity.afterDelete;
 import static com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity.finishEdit;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_COMMENTARY;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_FOR_REACT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
@@ -57,7 +56,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int fromFunction = 0;
     private String navigateTo = "";
-    String videoPath, videoName;
+    private AdsUtil mAdManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,12 +68,12 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             fromFunction = getIntent().getIntExtra(KEY_FROM_FUNCTION, 0);
 
             if (getIntent().getAction() != null) {
-                videoPath = getIntent().getStringExtra(KEY_PATH_VIDEO);
+                selectedVideoPath = getIntent().getStringExtra(KEY_PATH_VIDEO);
                 if (ACTION_GO_TO_EDIT.equals(getIntent().getAction())) {
-                    if (!requireSubscription(videoPath)) gotoEditVideo(videoPath);
+                    if (!requireSubscription(selectedVideoPath)) gotoEditVideo(selectedVideoPath);
                 }
                 if (ACTION_GO_TO_PLAY.equals(getIntent().getAction())) {
-                    gotoPlayVideoDetail(this, videoPath, ACTION_GO_TO_PLAY);
+                    gotoPlayVideoDetail(this, selectedVideoPath, ACTION_GO_TO_PLAY);
                 }
             }
 
@@ -87,10 +86,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     @Override
     public void onResume() {
         super.onResume();
-        if (finishEdit || afterDelete) {
+        if (finishEdit || afterDelete || afterAdd) {
             fetchData();
             finishEdit = false;
             afterDelete = false;
+            afterAdd = false;
         }
         if (videoList.size() == 0) {
             toggleView(tv_noData, View.VISIBLE);
@@ -100,9 +100,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (videoList.size() == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
             toggleView(tv_select, View.GONE);
         }
-
-        RelativeLayout mAdView = findViewById(R.id.adView);
-        AdsUtil mAdManager = new AdsUtil(this, mAdView);
         mAdManager.loadBanner();
         if (mAdapter != null && mAdapter.getSelectable()) {
             checkNumberSelected();
@@ -116,6 +113,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private void initViews() {
+        RelativeLayout mAdView = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(this, mAdView);
         RecyclerView recyclerView = findViewById(R.id.list_videos);
         tv_cancel = findViewById(R.id.tv_btn_cancel_projects);
         tv_noData = findViewById(R.id.tvEmpty);
@@ -230,6 +229,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 .setMessage(String.format("Do you want to delete %s", countVideoSelected == 1 ? "video?" : "videos?"))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> deleteVideos(getVideoListSelected()))
+                .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
                 .show();
     }
 
@@ -365,13 +365,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     @Override
     public void onSelected(VideoModel video) {
-//        if (video == null) {
-//            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
-//                mAdapter.setSelectable(true);
-//            } else {
-//                return;
-//            }
-//        }
         if (mAdapter.getSelectable()) {
             checkNumberSelected();
             return;
@@ -405,7 +398,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
                         @Override
                         public void onBuySuccess() {
-                            continueTask();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    System.out.println("thanhlv continueTask in Projects");
+                                    continueTask();
+                                }
+                            });
                         }
                     }))
                     .addToBackStack("")
@@ -416,6 +415,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     private void continueTask() {
+        if (mAdManager != null) mAdManager.loadBanner();
         if (selectedVideoPath.equals("")) return;
         switch (fromFunction) {
             case REQUEST_VIDEO_FOR_REACT_CAM:

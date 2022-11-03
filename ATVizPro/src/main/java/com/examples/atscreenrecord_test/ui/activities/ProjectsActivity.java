@@ -345,14 +345,15 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             if (fileEntry.isDirectory()) {
                 listFilesForFolder(fileEntry);
             } else {
-                if (fileEntry.getName().contains(".mp4"))
+                if (fileEntry.getName().contains(".mp4")) {
                     videoList.add(0,
                             new VideoModel(fileEntry.getName().replace(".mp4", ""),
                                     fileEntry.getAbsolutePath(),
                                     MyUtils.getDurationTime(this, fileEntry.getAbsolutePath()),
                                     fileEntry.lastModified())
                     );
-                totalVideos++;
+                    totalVideos++;
+                }
             }
         }
         if (totalVideos == 0 && fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {

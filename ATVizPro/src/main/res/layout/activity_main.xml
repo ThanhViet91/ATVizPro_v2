@@ -265,8 +265,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/item_func_row1"
-        android:layout_marginStart="@dimen/normal_margin_left"
-        android:layout_marginEnd="@dimen/normal_margin_right"
+        android:layout_marginStart="@dimen/normal_margin"
+        android:layout_marginEnd="@dimen/normal_margin"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp">
 

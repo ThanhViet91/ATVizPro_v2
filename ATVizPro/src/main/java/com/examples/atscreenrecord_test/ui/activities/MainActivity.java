@@ -215,8 +215,8 @@ public class MainActivity extends BaseFragmentActivity {
         mAdManager.loadBanner();
     }
 
-    String navigate_to, video_input;
-    int show_project_for;
+    String navigate_to, video_input = "";
+
     private void handleIncomingRequest(Intent intent) {
         if (intent.getAction() != null) {
             switch (intent.getAction()) {
@@ -380,6 +380,25 @@ public class MainActivity extends BaseFragmentActivity {
         return false;
     }
 
+    public boolean hasAllPermissionForEdit() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                return false;
+            } else return true;
+        } else {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 777);
+            }
+        }
+        return false;
+    }
+
     public boolean hasAllPermissionForCommentary() {
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
@@ -491,6 +510,7 @@ public class MainActivity extends BaseFragmentActivity {
     private void showDialogPickVideo(int requestVideoFor) {
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_PARAM1, requestVideoFor);
+        System.out.println("thanhlv showDialogPickVideo");
         DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
             @Override
             public void onClickCameraRoll() {
@@ -560,7 +580,7 @@ public class MainActivity extends BaseFragmentActivity {
                 showDialogPickVideo(fromFunction);
             }
 
-            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
                 showDialogPickVideo(fromFunction);
             }
             mAdManager.createInterstitialAdmob();
@@ -582,7 +602,7 @@ public class MainActivity extends BaseFragmentActivity {
                 return;
             }
 
-            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
                 showDialogPickVideo(fromFunction);
             }
         }
@@ -616,7 +636,7 @@ public class MainActivity extends BaseFragmentActivity {
                 return;
             }
 
-            if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT) {
+            if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
                 showDialogPickVideo(from_code);
             }
         }
@@ -745,9 +765,9 @@ public class MainActivity extends BaseFragmentActivity {
                         && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
                     showDialogPickVideo(fromFunction);
-                } else if (!shouldShowRequestPermissionRationale(permissions[1])
-                        || !shouldShowRequestPermissionRationale(permissions[2])
-                        || !shouldShowRequestPermissionRationale(permissions[3])) {
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                        || !shouldShowRequestPermissionRationale(permissions[1])
+                        || !shouldShowRequestPermissionRationale(permissions[2])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
                     alertDialogBuilder.setTitle("Change Permissions in Settings");
@@ -771,6 +791,63 @@ public class MainActivity extends BaseFragmentActivity {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                        alertDialogBuilder.setTitle("Second Chance");
+                        alertDialogBuilder
+                                .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
+                                .setCancelable(true)
+                                .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
+                                        Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(i);
+                                    }
+                                })
+                                .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+//                                        finish();
+                                        dialog.cancel();
+                                    }
+                                });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                    }
+                }
+                break;
+
+            case 777: // Allowed was selected so Permission granted for React
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    // do your work here
+                    showDialogPickVideo(fromFunction);
+                } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                        || !shouldShowRequestPermissionRationale(permissions[1])) {
+                    // User selected the Never Ask Again Option Change settings in app settings manually
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+                    alertDialogBuilder.setTitle("Change Permissions in Settings");
+                    alertDialogBuilder
+                            .setMessage("" +
+                                    "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
+                            .setCancelable(true)
+                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                    intent.setData(uri);
+                                    startActivityForResult(intent, 1000);     // Comment 3.
+                                }
+                            });
+
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+
+                } else {
+                    // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
+                    if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
 
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -956,7 +1033,12 @@ public class MainActivity extends BaseFragmentActivity {
                 if (!Environment.isExternalStorageManager()) { //Permission is not available
                     MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
                 } else {
-                    showMyRecordings(fromFunction, navigate_to, video_input);
+                    if (video_input.equals("")) {
+                        showDialogPickVideo(fromFunction);
+                    }else {
+                        showMyRecordings(fromFunction, navigate_to, video_input);
+                        video_input = "";
+                    }
                 }
             }
         }

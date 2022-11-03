@@ -115,7 +115,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                 OptionRotateFragment.newInstance(this, bundle).show(getSupportFragmentManager(), "");
                 break;
             default:
-                MyUtils.showSnackBarNotification(videoEditorView, "This fun is coming soon!!", Snackbar.LENGTH_SHORT);
+                MyUtils.showSnackBarNotification(videoEditorView, "This func is coming soon!!", Snackbar.LENGTH_SHORT);
         }
 
     }

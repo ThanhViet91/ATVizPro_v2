@@ -12,6 +12,8 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.examples.atscreenrecord_test.R;
 
@@ -90,6 +92,17 @@ public class DialogFragmentBase extends DialogFragment {
                     return false; // pass on to be processed as normal
             }
         });
+    }
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        try {
+            FragmentTransaction ft = manager.beginTransaction();
+            ft.add(this, tag);
+            ft.commitAllowingStateLoss();
+        } catch (IllegalStateException e) {
+            Log.d("ABSDIALOGFRAG", "Exception", e);
+        }
     }
 
     public static void handleException(Exception e) {

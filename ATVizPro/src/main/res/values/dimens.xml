@@ -11,6 +11,7 @@
     <dimen name="header_top_margin">@dimen/_30sdp</dimen>
     <dimen name="medium_margin">@dimen/_12sdp</dimen>
     <dimen name="normal_margin">@dimen/_16sdp</dimen>
+    <dimen name="normal_margin_18">@dimen/_18sdp</dimen>
     <dimen name="normal_margin_left">@dimen/_20sdp</dimen>
     <dimen name="normal_margin_right">@dimen/_20sdp</dimen>
 

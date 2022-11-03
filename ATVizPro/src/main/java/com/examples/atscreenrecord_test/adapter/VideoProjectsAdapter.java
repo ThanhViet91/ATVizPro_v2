@@ -48,14 +48,8 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
 
     @SuppressLint("NotifyDataSetChanged")
     public void updateData(ArrayList<VideoModel> listNew) {
-//        this.list.clear();
-        this.list = new ArrayList<>(listNew);
-        System.out.println("thanhlv handleRenameButton list " + listNew.size());
-        for (VideoModel videoModel : listNew) {
-            System.out.println("thanhlv updateData " + videoModel.getPath());
-        }
-        this.notifyDataSetChanged();
-        System.out.println("thanhlv handleRenameButton NotifyDataSetChanged");
+        this.list = listNew;
+        notifyDataSetChanged();
     }
 
     @SuppressLint("NotifyDataSetChanged")

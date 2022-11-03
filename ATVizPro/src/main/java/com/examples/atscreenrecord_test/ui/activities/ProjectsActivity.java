@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -55,7 +54,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     public ArrayList<VideoModel> videoList = new ArrayList<>();
     public ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int fromFunction = 0;
-    private String navigateTo = "";
     private AdsUtil mAdManager;
 
     @Override
@@ -76,7 +74,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     gotoPlayVideoDetail(this, selectedVideoPath, ACTION_GO_TO_PLAY);
                 }
             }
-
         }
 
         fetchData();
@@ -160,7 +157,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onSingleClick(View v) {
                 onBackPressed();
-//                finish();
             }
         });
         tv_select.setOnClickListener(v -> {
@@ -177,16 +173,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onSingleClick(View v) {
                 VideoModel videoRename = getVideoListSelected().get(0);
-                System.out.println("thanhlv onSingleClick rename " + videoRename.getPath());
                 handleRenameButton(videoRename);
             }
         });
 
-
         mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
         mAdapter.setHasStableIds(true);
-
         recyclerView.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -197,48 +190,22 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         return (int) screenWidth / 180 + 1;
     }
 
-    public VideoModel videoModelOld;
-    String oldPath, oldName;
+    private VideoModel videoModelOld;
+    private String oldPath;
+    private String oldName;
 
     private void handleRenameButton(VideoModel oldVideo) {
-        System.out.println("thanhlv handleRenameButton VideoModel oldVideo " + oldVideo.getPath());
         videoModelOld = oldVideo;
-        System.out.println("thanhlv handleRenameButton VideoModel videoModelOld " + videoModelOld.getPath());
-
-        RenameDialogHelper.getInstance(new RenameDialogHelper.IDialogHelper() {
+        new RenameDialogHelper(new RenameDialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
                 oldPath = videoModelOld.getPath();
                 oldName = videoModelOld.getName();
-                System.out.println("thanhlv handleRenameButton onClickOK oldPath " + oldPath);
-                System.out.println("thanhlv handleRenameButton onClickOK result " + result);
-                System.out.println("thanhlv handleRenameButton onClickOK videoList.size() " + videoList.size());
-                videoList_temp.clear();
-                videoList_temp = new ArrayList<>();
-                videoList_temp = (ArrayList<VideoModel>) videoList.clone();
-                for (int i = 0; i < videoList_temp.size(); i++) {
-                    VideoModel videoModel = videoList_temp.get(i);
+                for (VideoModel videoModel : videoList) {
                     if (videoModel.getPath().equals(videoModelOld.getPath())) {
-                        videoList_temp.remove(videoModel);
                         videoModel.setPath(oldPath.replace(oldName, result));
                         videoModel.setName(result);
-                        videoList_temp.add(i, videoModel);
-                        videoList.clear();
-                        videoList.addAll(videoList_temp);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fetchData();
-                                    }
-                                });
-                            }
-
-
-                        }, 2000);
-
+                        mAdapter.updateData(videoList);
                         break;
                     }
                 }
@@ -264,20 +231,18 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void deleteVideos(ArrayList<VideoModel> listSelected) {
         for (VideoModel video : listSelected) {
             if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
-            System.out.println("thanhlv lissssssssss "+ videoList.size());
         }
 
-            if (mAdapter != null) {
-                System.out.println("thanhlv handleRenameButton videoList.size deleteVideos " + videoList.size());
-                mAdapter.updateData(videoList);
-            }
-            if (videoList.size() == 0) {
-                toggleView(tv_cancel, View.GONE);
-                toggleView(btn_back, View.VISIBLE);
-                toggleView(tv_select, View.GONE);
-                toggleView(tv_noData, View.VISIBLE);
-            }
-            toggleView(findViewById(R.id.option), View.GONE);
+        if (mAdapter != null) {
+            mAdapter.updateData(videoList);
+        }
+        if (videoList.size() == 0) {
+            toggleView(tv_cancel, View.GONE);
+            toggleView(btn_back, View.VISIBLE);
+            toggleView(tv_select, View.GONE);
+            toggleView(tv_noData, View.VISIBLE);
+        }
+        toggleView(findViewById(R.id.option), View.GONE);
 
     }
 
@@ -307,13 +272,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         if (modeSelect == 2) {
             for (VideoModel video : videoList) video.setSelected(true);
-            System.out.println("thanhlv handleRenameButton videoList.size if (modeSelect == 2) { " + videoList.size());
             mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.deselect_all));
         }
         if (modeSelect == 3) {
             for (VideoModel video : videoList) video.setSelected(false);
-            System.out.println("thanhlv handleRenameButton videoList.size if (modeSelect == 3) {" + videoList.size());
             mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.select_all));
             modeSelect = 1;
@@ -352,7 +315,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         readData();
         processingData();
         if (mAdapter != null) {
-            System.out.println("thanhlv handleRenameButton videoList.size fetchData " + videoList.size());
             mAdapter.updateData(videoList);
         }
     }
@@ -360,7 +322,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void processingData() {
         for (VideoModel videoOld : videoList_temp) {
             for (VideoModel videoNew : videoList) {
-                if (videoOld.getCompare().equals(videoNew.getCompare())) {
+                if (videoOld.getPath().equals(videoNew.getPath())) {
                     videoNew.setSelected(videoOld.isSelected());
                     break;
                 }
@@ -434,18 +396,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         if (!SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000) {
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-                        @Override
-                        public void onBuySuccess() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    System.out.println("thanhlv continueTask in Projects");
-                                    continueTask();
-                                }
-                            });
-                        }
-                    }))
+                    .add(R.id.frame_layout_fragment, new SubscriptionFragment(() -> runOnUiThread(this::continueTask)))
                     .addToBackStack("")
                     .commit();
             return true;
@@ -495,7 +446,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         intent.setAction(action);
         intent.putExtra(KEY_PATH_VIDEO, path);
         intent.putExtra(KEY_VIDEO_NAME, name);
-
         context.startActivity(intent);
     }
 

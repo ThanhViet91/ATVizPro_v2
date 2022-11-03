@@ -14,19 +14,8 @@ import java.io.IOException;
 
 public class RenameDialogHelper {
 
-    private static RenameDialogHelper mInstance = null;
-
-    private RenameDialogHelper(IDialogHelper callback) {
+    public RenameDialogHelper(IDialogHelper callback) {
         this.mCallback = callback;
-    }
-
-    public static RenameDialogHelper getInstance(IDialogHelper callback){
-        if (mInstance == null) {
-            synchronized (RenameDialogHelper.class) {
-                mInstance = new RenameDialogHelper(callback);
-            }
-        }
-        return mInstance;
     }
 
     public interface IDialogHelper {
@@ -40,7 +29,7 @@ public class RenameDialogHelper {
 
             final Dialog dialog = new Dialog(context);
             dialog.setContentView(R.layout.layout_rename);
-            dialog.setTitle("Properties");
+            dialog.setTitle("Rename");
             final TextInputLayout tilEdittext = dialog.findViewById(R.id.tilRename);
 
             final EditText editText = dialog.findViewById(R.id.edRename);

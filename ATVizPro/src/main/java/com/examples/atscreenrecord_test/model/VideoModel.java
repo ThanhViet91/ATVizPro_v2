@@ -30,10 +30,6 @@ public class VideoModel {
         this.lastModified = lastModified;
     }
 
-    public String getCompare() {
-        return name + path + duration;
-    }
-
     public String getDuration() {
         return duration;
     }

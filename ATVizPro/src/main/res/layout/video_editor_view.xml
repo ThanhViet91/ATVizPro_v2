@@ -62,7 +62,8 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/black">
+            android:background="@color/black"
+            tools:ignore="UselessParent">
 
             <VideoView
                 android:alpha="0"
@@ -81,13 +82,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/recycler_view_position"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="16dp">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp">
+            tools:ignore="UselessParent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/video_frames_recyclerView"
@@ -136,11 +137,13 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_position"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/adView"
-        android:layout_marginBottom="6dp"
-        android:paddingStart="10dp" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:paddingStart="10dp"
+        tools:ignore="RtlSymmetry" />
 
     <RelativeLayout
         android:id="@+id/adView"

@@ -204,10 +204,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         System.out.println("thanhlv handleRenameButton VideoModel oldVideo " + oldVideo.getPath());
         videoModelOld = oldVideo;
         System.out.println("thanhlv handleRenameButton VideoModel videoModelOld " + videoModelOld.getPath());
-//        videoModelOld.setPath(oldVideo.getPath());
-//        videoModelOld.setName(oldVideo.getName());
-//        videoModelOld.setSelected(oldVideo.isSelected());
-//        videoModelOld.setDuration(oldVideo.getDuration());
 
         RenameDialogHelper.getInstance(new RenameDialogHelper.IDialogHelper() {
             @Override

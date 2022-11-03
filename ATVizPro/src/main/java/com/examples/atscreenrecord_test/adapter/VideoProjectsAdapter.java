@@ -47,29 +47,16 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void updateData(Context context, ArrayList<VideoModel> listNew) {
+    public void updateData(ArrayList<VideoModel> listNew) {
 //        this.list.clear();
-        this.list = listNew;
-        this.context = context;
-        notifyDataSetChanged();
-//        notifyItemRangeChanged(0, getItemCount());
+        this.list = new ArrayList<>(listNew);
+        System.out.println("thanhlv handleRenameButton list " + listNew.size());
+        for (VideoModel videoModel : listNew) {
+            System.out.println("thanhlv updateData " + videoModel.getPath());
+        }
+        this.notifyDataSetChanged();
         System.out.println("thanhlv handleRenameButton NotifyDataSetChanged");
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    public void updateDataItem(VideoModel videoNew, int pos) {
-//        this.list.clear();
-//        this.list = listNew;
-//        notifyItemChanged(pos);
-//        notifyItemRangeChanged(pos -1 ,pos+1);
-        list.set(0, videoNew);
-        notifyItemRemoved(0);
-        list.add(0, videoNew);
-        notifyItemInserted(0);
-
-        System.out.println("thanhlv handleRenameButton NotifyDataSetChanged");
-    }
-
 
     @SuppressLint("NotifyDataSetChanged")
     public void setSelectable(boolean selectable) {
@@ -91,7 +78,7 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
     @SuppressLint({"NotifyDataSetChanged", "DefaultLocale"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        VideoModel video = list.get(position);
+        VideoModel video = this.list.get(position);
         if (selectable) {
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.checkBox.setChecked(video.isSelected());
@@ -100,11 +87,11 @@ public class VideoProjectsAdapter extends RecyclerView.Adapter<VideoProjectsAdap
         }
 
         holder.duration.setText(video.getDuration());
-//        holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
-//        Glide.with(context)
-//                .load(video.getPath())
-//                .thumbnail(0.1f)
-//                .into(holder.img);
+        holder.size.setText(String.format("%.1f MB", MyUtils.fileSize(new File(video.getPath()))));
+        Glide.with(context)
+                .load(video.getPath())
+                .thumbnail(0.1f)
+                .into(holder.img);
         holder.name.setText(video.getName());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

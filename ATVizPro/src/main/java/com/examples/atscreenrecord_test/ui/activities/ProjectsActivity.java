@@ -51,9 +51,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private TextView tv_cancel, tv_noData, tv_select, tv_selected;
     private ImageView btn_back;
     private ImageView btn_rename;
-    private VideoProjectsAdapter mAdapter;
-    private ArrayList<VideoModel> videoList = new ArrayList<>();
-    private ArrayList<VideoModel> videoList_temp = new ArrayList<>();
+    public VideoProjectsAdapter mAdapter;
+    public ArrayList<VideoModel> videoList = new ArrayList<>();
+    public ArrayList<VideoModel> videoList_temp = new ArrayList<>();
     private int fromFunction = 0;
     private String navigateTo = "";
     private AdsUtil mAdManager;
@@ -145,7 +145,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onSingleClick(View v) {
                 if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
-//                    for (VideoModel video : videoList) video.setSelected(false);
+                    for (VideoModel video : videoList) video.setSelected(false);
                     mAdapter.setSelectable(false);
                     toggleView(btn_back, View.VISIBLE);
                     toggleView(tv_cancel, View.GONE);
@@ -197,7 +197,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         return (int) screenWidth / 180 + 1;
     }
 
-    private VideoModel videoModelOld;
+    public VideoModel videoModelOld;
     String oldPath, oldName;
 
     private void handleRenameButton(VideoModel oldVideo) {
@@ -216,35 +216,39 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 oldName = videoModelOld.getName();
                 System.out.println("thanhlv handleRenameButton onClickOK oldPath " + oldPath);
                 System.out.println("thanhlv handleRenameButton onClickOK result " + result);
-                videoModelOld.setName("thanh1");
-                mAdapter.updateDataItem(videoModelOld, 0);
-//                for (int i = 0; i < videoList.size(); i++) {
-//                    VideoModel videoModel = videoList.get(i);
-//                    if (videoModel.getCompare().equals(videoModelOld.getCompare())) {
-//                        videoList_temp.clear();
-//                        videoList_temp = new ArrayList<>(videoList);
-//
-//                        videoList_temp.remove(videoModel);
-//                        videoModel.setPath(oldPath.replace(oldName, result));
-//                        videoModel.setName(result);
-//                        videoList_temp.add(i, videoModel);
-//
-//                        videoList.clear();
-//
-//                        videoList.addAll(videoList_temp);
-//
-//                        System.out.println("thanhlv handleRenameButton videoList.add(i, videoModel); " + videoList.get(i).getPath());
-//
-////                                videoList_temp.clear();
-////                                videoList_temp = new ArrayList<>(videoList);
-//
-//
-//                                mAdapter.updateDataItem(videoList, i);
-//
-//                        System.out.println("thanhlv handleRenameButton " + videoModel.getPath());
-//                        break;
-//                    }
-//                }
+                System.out.println("thanhlv handleRenameButton onClickOK videoList.size() " + videoList.size());
+                videoList_temp.clear();
+                videoList_temp = new ArrayList<>();
+                videoList_temp = (ArrayList<VideoModel>) videoList.clone();
+                for (int i = 0; i < videoList_temp.size(); i++) {
+                    VideoModel videoModel = videoList_temp.get(i);
+                    if (videoModel.getPath().equals(videoModelOld.getPath())) {
+                        videoList_temp.remove(videoModel);
+                        videoModel.setPath(oldPath.replace(oldName, result));
+                        videoModel.setName(result);
+                        videoList_temp.add(i, videoModel);
+
+                        videoList.clear();
+                        videoList.addAll(videoList_temp);
+
+                        System.out.println("thanhlv handleRenameButton videoList.add(i, videoModel); " + videoList.size());
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fetchData();
+                                    }
+                                });
+                            }
+                        }, 2000);
+
+                        System.out.println("thanhlv handleRenameButton " + videoModel.getPath());
+                        break;
+                    }
+                }
 
 
             }
@@ -269,9 +273,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     private void deleteVideos(ArrayList<VideoModel> listSelected) {
         for (VideoModel video : listSelected) {
             if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
+            System.out.println("thanhlv lissssssssss "+ videoList.size());
         }
-        runOnUiThread(() -> {
-            if (mAdapter != null) mAdapter.updateData(this, videoList);
+
+            if (mAdapter != null) {
+                System.out.println("thanhlv handleRenameButton videoList.size deleteVideos " + videoList.size());
+                mAdapter.updateData(videoList);
+            }
             if (videoList.size() == 0) {
                 toggleView(tv_cancel, View.GONE);
                 toggleView(btn_back, View.VISIBLE);
@@ -279,7 +287,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 toggleView(tv_noData, View.VISIBLE);
             }
             toggleView(findViewById(R.id.option), View.GONE);
-        });
+
     }
 
     private int countVideoSelected = 0;
@@ -308,12 +316,14 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
         if (modeSelect == 2) {
             for (VideoModel video : videoList) video.setSelected(true);
-            mAdapter.updateData(this, videoList);
+            System.out.println("thanhlv handleRenameButton videoList.size if (modeSelect == 2) { " + videoList.size());
+            mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.deselect_all));
         }
         if (modeSelect == 3) {
             for (VideoModel video : videoList) video.setSelected(false);
-            mAdapter.updateData(this, videoList);
+            System.out.println("thanhlv handleRenameButton videoList.size if (modeSelect == 3) {" + videoList.size());
+            mAdapter.updateData(videoList);
             tv_select.setText(getString(R.string.select_all));
             modeSelect = 1;
         }
@@ -350,17 +360,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         videoList.clear();
         readData();
         processingData();
-//        mAdapter = new VideoProjectsAdapter(this, videoList);
-//        mAdapter.setVideoProjectsListener(this);
-//        mAdapter.setHasStableIds(true);
-//
-//        if (recyclerView != null) {
-//            recyclerView.setAdapter(mAdapter);
-//            GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
-//            recyclerView.setLayoutManager(gridLayoutManager);
-//        }
-
-        if (mAdapter != null) mAdapter.updateData(this, videoList);
+        if (mAdapter != null) {
+            System.out.println("thanhlv handleRenameButton videoList.size fetchData " + videoList.size());
+            mAdapter.updateData(videoList);
+        }
     }
 
     private void processingData() {

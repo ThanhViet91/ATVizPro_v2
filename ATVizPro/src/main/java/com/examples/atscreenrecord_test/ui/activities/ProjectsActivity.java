@@ -223,12 +223,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                         videoModel.setPath(oldPath.replace(oldName, result));
                         videoModel.setName(result);
                         videoList_temp.add(i, videoModel);
-
                         videoList.clear();
                         videoList.addAll(videoList_temp);
-
-                        System.out.println("thanhlv handleRenameButton videoList.add(i, videoModel); " + videoList.size());
-
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -243,12 +239,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
                         }, 2000);
 
-                        System.out.println("thanhlv handleRenameButton " + videoModel.getPath());
                         break;
                     }
                 }
-
-
             }
 
             @Override

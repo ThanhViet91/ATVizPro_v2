@@ -361,9 +361,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             toggleView(tv_select, View.GONE);
         }
     }
-
     String selectedVideoPath = "";
-
     @Override
     public void onSelected(VideoModel video) {
         if (mAdapter.getSelectable()) {

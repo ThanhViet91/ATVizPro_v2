@@ -239,6 +239,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                                     }
                                 });
                             }
+
+
                         }, 2000);
 
                         System.out.println("thanhlv handleRenameButton " + videoModel.getPath());

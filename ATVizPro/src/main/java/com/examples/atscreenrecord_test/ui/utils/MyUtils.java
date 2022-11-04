@@ -53,6 +53,8 @@ public class MyUtils {
     public static final int RESULT_CODE_FAILED = -999999;
     public static final String SCREEN_CAPTURE_INTENT_RESULT_CODE = "SCREEN_CAPTURE_INTENT_RESULT_CODE";
     public static final String ACTION_GO_HOME = "ACTION_GO_HOME";
+    public static final String ACTION_SHOW_POPUP_RESULT = "ACTION_SHOW_POPUP_RESULT";
+    public static final String ACTION_CLOSE_POPUP = "ACTION_CLOSE_POPUP";
     public static final String ACTION_OPEN_SETTING_ACTIVITY = "ACTION_OPEN_SETTING_ACTIVITY";
     public static final String ACTION_SHOW_POPUP_GO_HOME = "ACTION_SHOW_POPUP_GO_HOME";
     public static final String ACTION_UPDATE_SETTING = "ACTION_UPDATE_SETTING";
@@ -105,6 +107,26 @@ public class MyUtils {
         return "Recording-" + SettingManager2.getNumberRecordingFile(context) + ext;
     }
 
+    public static boolean isVideo(Context context, String path) {
+
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        try {
+            retriever.setDataSource(context, Uri.fromFile(new File(path)));
+            String hasVideo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO);
+            retriever.release();
+            if (hasVideo != null && hasVideo.equals("yes")) { // neu la file video
+                return true;
+            }
+
+        } catch (Exception ignored) {
+            toast(context, "This file is error!", Toast.LENGTH_SHORT);
+            retriever.release();
+            return false;
+        }
+        toast(context, "This file is error!", Toast.LENGTH_SHORT);
+        return false;
+    }
+
     public static long getCurrentTimeStamp() {
         return (new Date()).getTime();
     }
@@ -118,11 +140,11 @@ public class MyUtils {
         long size = 0;
         File[] files = new File(StorageUtil.getCacheDir()).listFiles();
         assert files != null;
-        for (File f:files) {
-            size = size+f.length();
+        for (File f : files) {
+            size = size + f.length();
         }
 
-        return (double) size/(1024*1024);
+        return (double) size / (1024 * 1024);
     }
 
     public static long dirSize(File dir) {
@@ -145,10 +167,11 @@ public class MyUtils {
         }
         return 0;
     }
+
     public static float fileSize(File file) {
 
         if (file.exists()) {
-            return file.length()*1f/(1024*1024); // return the file size MB
+            return file.length() * 1f / (1024 * 1024); // return the file size MB
         }
         return 0;
     }
@@ -156,7 +179,7 @@ public class MyUtils {
     public static double getAvailableSizeExternal() {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getAbsolutePath());
         long blockSize = statFs.getBlockSize();
-        return (double) statFs.getAvailableBlocks()*blockSize/(1024*1024*1024);
+        return (double) statFs.getAvailableBlocks() * blockSize / (1024 * 1024 * 1024);
 
     }
 
@@ -230,6 +253,7 @@ public class MyUtils {
             setFullscreen(activity);
         }
     }
+
     @SuppressLint("WrongConstant")
     public static void setFullscreen(Activity activity) {
 
@@ -246,7 +270,7 @@ public class MyUtils {
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             activity.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_LAYOUT_STABLE |View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
     }
@@ -256,10 +280,9 @@ public class MyUtils {
     }
 
     public static boolean isValidFilenameSynctax(String filename) {
-        for(int i = 0; i< filename.length(); i++){
+        for (int i = 0; i < filename.length(); i++) {
             char c = filename.charAt(i);
-            if(c == '/' || c =='\\' || c=='"' || c == ':' || c=='*'||c=='<'|| c =='>' || c == '|')
-            {
+            if (c == '/' || c == '\\' || c == '"' || c == ':' || c == '*' || c == '<' || c == '>' || c == '|') {
                 System.out.println("thanhlv isValidFilenameSynctax");
                 return true;
             }
@@ -272,11 +295,11 @@ public class MyUtils {
     }
 
     public static void logBytes(String msg, byte[] bytes) {
-        StringBuilder str = new StringBuilder(msg + ": "+bytes.length+"\n");
+        StringBuilder str = new StringBuilder(msg + ": " + bytes.length + "\n");
 
-        if(bytes == null || bytes.length < 1)
+        if (bytes == null || bytes.length < 1)
             str.append("bytes is null or length < 1");
-        else{
+        else {
 
             String base64Encoded = Base64.encodeToString(bytes, Base64.DEFAULT);
             str.append("\nbase64: ").append(base64Encoded);//.append("\nbytes: ");
@@ -291,12 +314,13 @@ public class MyUtils {
     }
 
     static final String HEXES = "0123456789ABCDEF";
-    public static String getHex( byte [] raw ) {
-        if ( raw == null ) {
+
+    public static String getHex(byte[] raw) {
+        if (raw == null) {
             return null;
         }
-        final StringBuilder hex = new StringBuilder( 2 * raw.length );
-        for ( final byte b : raw ) {
+        final StringBuilder hex = new StringBuilder(2 * raw.length);
+        for (final byte b : raw) {
             hex.append(HEXES.charAt((b & 0xF0) >> 4))
                     .append(HEXES.charAt((b & 0x0F))).append(' ');
         }
@@ -345,13 +369,13 @@ public class MyUtils {
 //    }
 
     public static final String IP_ADDRESS_PATTERN =
-            "^rtmp://"+
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])" +
-            "/\\S" +
-            "/\\S$";
+            "^rtmp://" +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                    "([01]?\\d\\d?|2[0-4]\\d|25[0-5])" +
+                    "/\\S" +
+                    "/\\S$";
     static String DOMAIN_PATTERN = "^rtmps?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]/[a-zA-Z0-9_.]*[a-zA-Z0-9_.]";
 
     public static final Pattern ipPattern = Pattern.compile(IP_ADDRESS_PATTERN);
@@ -387,6 +411,7 @@ public class MyUtils {
     public static void hideSoftInput(@NonNull final Activity activity) {
         hideSoftInput(activity.getWindow());
     }
+
     public static void hideSoftInput(@NonNull final Window window) {
         View view = window.getCurrentFocus();
         if (view == null) {
@@ -403,6 +428,7 @@ public class MyUtils {
         }
         hideSoftInput(view);
     }
+
     public static void hideSoftInput(@NonNull final View view) {
         InputMethodManager imm =
                 (InputMethodManager) App.getAppContext().getSystemService(Context.INPUT_METHOD_SERVICE);

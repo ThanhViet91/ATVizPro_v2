@@ -345,11 +345,14 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         });
     }
 
+    public void toggleSaveButton(boolean status) {
+        findViewById(R.id.tv_btn_done).setEnabled(status);
+    }
+
     private void onDoneClicked() {
         if (IVideoStreamView != null)
         IVideoStreamView.onClickNext();
     }
-
 
     public void seekTo(long msec) {
         if (mVideoView != null)

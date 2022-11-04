@@ -592,11 +592,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
         endTime = timeCounter;
-        new Handler().postDelayed(() -> {
+        if (rtmpCamera != null) {
             rtmpCamera.stopRecord();
             rtmpCamera.stopPreview();
             hasCamVideo = true;
-        }, 100);
+        }
         progressBar.clearAnimation();
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();

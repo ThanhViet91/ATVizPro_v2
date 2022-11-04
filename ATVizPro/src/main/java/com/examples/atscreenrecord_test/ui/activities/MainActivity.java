@@ -5,10 +5,14 @@ import static com.examples.atscreenrecord_test.ui.fragments.DialogSelectVideoSou
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.examples.atscreenrecord_test.ui.services.ExecuteService.ACTION_STOP_SERVICE;
+import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
 import static com.examples.atscreenrecord_test.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_CLOSE_POPUP;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_HOME;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_SHOW_POPUP_RESULT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
@@ -94,6 +98,7 @@ public class MainActivity extends BaseFragmentActivity {
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
     public static final String KEY_FROM_FUNCTION = "key_from_code";
+    public static final String KEY_FROM_VIDEO_SOURCE = "KEY_FROM_VIDEO_SOURCE";
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -117,6 +122,7 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        System.out.println("thanhlv from onNewIntentonNewIntent");
         if (intent != null)
             handleIncomingRequest(intent);
     }
@@ -166,6 +172,7 @@ public class MainActivity extends BaseFragmentActivity {
 
         initViews();
         Intent intent = getIntent();
+        System.out.println("thanhlv from onCreateonCreateonCreate");
         if (intent != null)
             handleIncomingRequest(intent);
     }
@@ -239,6 +246,18 @@ public class MainActivity extends BaseFragmentActivity {
                     break;
                 case ACTION_GO_HOME:
                     removeAllFragment();
+                    break;
+
+                case ACTION_CLOSE_POPUP:
+                    System.out.println("thanhlv ACTION_CLOSE_POPUPACTION_CLOSE_POPUPACTION_CLOSE_POPUP");
+                    finish();
+
+//        Intent myIntent = new Intent(this, PopUpResultVideoTranslucentActivity.class);
+////        myIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+////        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        myIntent.setAction(ACTION_STOP_SERVICE);
+//        myIntent.putExtra(KEY_VIDEO_PATH, intent.getStringExtra(KEY_VIDEO_PATH));
+//        startActivity(myIntent);
                     break;
             }
         }
@@ -665,6 +684,7 @@ public class MainActivity extends BaseFragmentActivity {
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        App.ignoreOpenAd = true;
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0) {
@@ -904,6 +924,7 @@ public class MainActivity extends BaseFragmentActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
+                if (!MyUtils.isVideo(this, pathVideo)) return;
                 if (!new File(pathVideo).exists()) {
                     Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
                     return;
@@ -947,7 +968,7 @@ public class MainActivity extends BaseFragmentActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-
+                if (!MyUtils.isVideo(this, pathVideo)) return;
                 if (!new File(pathVideo).exists()) {
                     Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
                     return;
@@ -990,7 +1011,7 @@ public class MainActivity extends BaseFragmentActivity {
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
-
+                if (!MyUtils.isVideo(this, pathVideo)) return;
                 if (!new File(pathVideo).exists()) {
                     Toast.makeText(this, "File not found.", Toast.LENGTH_SHORT).show();
                     return;
@@ -1033,11 +1054,10 @@ public class MainActivity extends BaseFragmentActivity {
                 if (!Environment.isExternalStorageManager()) { //Permission is not available
                     MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
                 } else {
-                    if (video_input.equals("")) {
+                    if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && !video_input.contains(".")) {
                         showDialogPickVideo(fromFunction);
                     }else {
                         showMyRecordings(fromFunction, navigate_to, video_input);
-                        video_input = "";
                     }
                 }
             }

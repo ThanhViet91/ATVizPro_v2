@@ -110,6 +110,8 @@ public class OptionTrimFragment extends DialogFragmentBase {
         rangeSlider.setProgress(0, (int) videoDuration);
         oldLeft = 0;
         oldRight = (int) videoDuration;
+        startTime = oldLeft;
+        endTime = oldRight;
         rangeSlider.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener() {
 
             @Override

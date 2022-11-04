@@ -1,6 +1,7 @@
 package com.examples.atscreenrecord_test.ui.services;
 
 import static com.examples.atscreenrecord_test.App.CHANNEL_ID;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_SHOW_POPUP_RESULT;
 import static com.examples.atscreenrecord_test.utils.TranscodingAsyncTask.ERROR_CODE;
 
 import android.annotation.SuppressLint;
@@ -19,6 +20,7 @@ import androidx.annotation.RequiresApi;
 import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.model.VideoProfileExecute;
+import com.examples.atscreenrecord_test.ui.activities.MainActivity;
 import com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity;
 import com.examples.atscreenrecord_test.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
@@ -133,8 +135,8 @@ public class ExecuteService extends Service {
     public void showPopUpResult(String path) {
         App.ignoreOpenAd = true;
         Intent myIntent = new Intent(ExecuteService.this, PopUpResultVideoTranslucentActivity.class);
+        myIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        myIntent.setAction(ACTION_STOP_SERVICE);
         myIntent.putExtra(KEY_VIDEO_PATH, path);
         startActivity(myIntent);
     }

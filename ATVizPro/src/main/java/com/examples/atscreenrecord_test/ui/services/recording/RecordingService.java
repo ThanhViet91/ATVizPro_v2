@@ -1,8 +1,10 @@
 package com.examples.atscreenrecord_test.ui.services.recording;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.services.ExecuteService.ACTION_STOP_SERVICE;
 import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_SHOW_POPUP_RESULT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.DEBUG;
 
 import android.content.ContentResolver;
@@ -22,6 +24,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 
+import androidx.core.content.IntentCompat;
+
 import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaAudioEncoder;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaEncoder;
@@ -29,9 +33,11 @@ import com.examples.atscreenrecord_test.controllers.encoder.MediaMuxerWrapper;
 import com.examples.atscreenrecord_test.controllers.encoder.MediaScreenEncoderHard;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.controllers.settings.VideoSetting2;
+import com.examples.atscreenrecord_test.ui.activities.MainActivity;
 import com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity;
 import com.examples.atscreenrecord_test.ui.services.BaseService;
 import com.examples.atscreenrecord_test.ui.services.ControllerService;
+import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 
 import java.io.IOException;
@@ -170,50 +176,42 @@ public class RecordingService extends BaseService {
     }
 
     String outputFile;
+
     //Return output file
     public VideoSetting2 stopRecording() {
         if (DEBUG) Log.v(TAG, "stopStreaming:mMuxer=" + mMuxer);
 
         outputFile = "";
-
         synchronized (sSync) {
             if (mMuxer != null) {
                 outputFile = mMuxer.getOutputPath();
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
                 mMuxer = null;
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showResultActivity(outputFile);
-                    }
-                }, 1000);
-                // you should not wait here
+                System.out.println("thanhlv stopRecording 1" + outputFile);
+                try {
+                    sSync.wait(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("thanhlv stopRecording 2" + outputFile);
+                showResultActivity(outputFile);
+
             }
         }
         return mCurrentVideoSetting;
     }
 
     public void showResultActivity(String finalVideoCachePath) {
-//        fff
-//        Intent intent = new Intent(getApplicationContext(), ResultVideoFinishActivity.class);
-//        intent.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-//        intent.setAction(MyUtils.ACTION_END_RECORD);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(intent);
 
         App.ignoreOpenAd = true;
         Intent myIntent = new Intent(getApplicationContext(), PopUpResultVideoTranslucentActivity.class);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         myIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        myIntent.setAction(ACTION_STOP_SERVICE);
         myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);
         startActivity(myIntent);
 
-        Intent intent2 = new Intent(getApplicationContext(), ControllerService.class);
-        intent2.putExtra(KEY_PATH_VIDEO, finalVideoCachePath);
-        intent2.setAction(MyUtils.ACTION_END_RECORD);
     }
 
     public void insertVideoToGallery() {

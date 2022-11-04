@@ -81,7 +81,6 @@ public class OptionChangeSpeedFragment extends DialogFragmentBase implements Bas
         listPos.add("0.25x");
         listPos.add("0.5x");
         listPos.add("0.75x");
-        listPos.add("1.0x");
         listPos.add("1.25x");
         listPos.add("1.5x");
         listPos.add("2.0x");

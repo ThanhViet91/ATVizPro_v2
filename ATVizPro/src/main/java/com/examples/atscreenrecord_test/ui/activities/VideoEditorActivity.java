@@ -130,6 +130,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         isStartCompress = true;
         animationView.setVisibility(View.VISIBLE);
         animationView.playAnimation();
+        videoEditorView.toggleSaveButton(false);
     }
 
     boolean enableSave = false;
@@ -211,6 +212,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
         videoEditorView.initVideoByURI(Uri.parse(outPath));
         enableSave = true;
         isStartCompress = false;
+        videoEditorView.toggleSaveButton(true);
     }
 
 

@@ -713,7 +713,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             SettingManager2.setLiveStreamType(getApplicationContext(), 0);
         }
         clickStop = false;
-        MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
+        if (mMode == MyUtils.MODE_STREAMING)
+            MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
 
     }
 

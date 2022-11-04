@@ -152,6 +152,7 @@ public class App extends Application
         appOpenAdManager.showAdIfAvailable(currentActivity);
     }
 
+
     /**
      * ActivityLifecycleCallback methods.
      */

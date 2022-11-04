@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.multidex.BuildConfig;
 
 import com.examples.atscreenrecord_test.App;
@@ -166,6 +167,26 @@ public class StorageUtil {
     return file.exists();
   }
 
+
+  @NonNull
+  public static String getExtensionFile (String path) {
+    if (TextUtils.isEmpty(path)) return "";
+    String ext = "";
+    ext = path.substring(path.lastIndexOf("."));
+    return ext;
+  }
+
+  @NonNull
+  public static String getFileNameWithoutExtension (String path) {
+    if (TextUtils.isEmpty(path)) return "";
+    String ext = "";
+
+    ext = path.substring(path.lastIndexOf("."));
+    String name = "";
+    File file = new File(path);
+    name = file.getName().replace(ext, "");
+    return name;
+  }
   /**
    * @param path 路径
    * @return 是否删除成功

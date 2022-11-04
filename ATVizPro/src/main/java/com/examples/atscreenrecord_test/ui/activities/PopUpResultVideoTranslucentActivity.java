@@ -2,6 +2,7 @@ package com.examples.atscreenrecord_test.ui.activities;
 
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_CLOSE_POPUP;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
@@ -9,7 +10,11 @@ import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunni
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -36,6 +41,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
         if (intent != null) {
             stopExecuteService();
             videoPath = intent.getStringExtra(KEY_VIDEO_PATH);
+            System.out.println("thanhlv PopUpResultVideoTranslucentActivity onCreate "+ videoPath);
         }
 
         initBanner();
@@ -89,7 +95,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         afterAdd = true;
-        super.onBackPressed();
+        finishAndRemoveTask();
     }
 
     private AdsUtil mAdManager;
@@ -107,7 +113,7 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
                 .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                     StorageUtil.deleteFile(videoPath);
                     afterDelete = true;
-                    finish();
+                    onBackPressed();
                 } )
                 .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
                 .show();
@@ -117,7 +123,6 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     private void gotoPlayVideo() {
 
         // open home >>> my recording >>> play video
-//        ProjectsActivity.gotoPlayVideoDetail(this, videoPath, videoName);
         Intent intent = new Intent(this, MainActivity.class);
         intent.setAction(ACTION_GO_TO_PLAY);
         intent.putExtra(KEY_PATH_VIDEO, videoPath);

@@ -79,9 +79,9 @@
     <string name="contact_us">Contact us</string>
     <string name="next">Next</string>
     <string name="select_video_source">Select Video Source</string>
-    <string name="react_to_videos_from_camera_roll">React to videos from my recordings\n or Camera Roll</string>
-    <string name="edit_video_from_my_recordings_or_camera_roll">Edit videos from my recordings\n or Camera Roll</string>
-    <string name="add_commentary_to_video_from_my_recordings_or_camera_roll">Add commentary to video from\n my recordings or Camera Roll</string>
+    <string name="react_to_videos_from_camera_roll">React to videos from my projects\n or Camera Roll</string>
+    <string name="edit_video_from_my_recordings_or_camera_roll">Edit videos from my projects\n or Camera Roll</string>
+    <string name="add_commentary_to_video_from_my_recordings_or_camera_roll">Add commentary to video from\n my projects or Camera Roll</string>
     <string name="camera_roll">Camera Roll</string>
     <string name="react_cam">React Cam</string>
     <string name="video_editor">Video Editor</string>

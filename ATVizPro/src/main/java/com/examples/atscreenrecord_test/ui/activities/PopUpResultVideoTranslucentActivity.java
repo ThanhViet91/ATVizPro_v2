@@ -2,7 +2,6 @@ package com.examples.atscreenrecord_test.ui.activities;
 
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_CLOSE_POPUP;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
@@ -10,11 +9,7 @@ import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunni
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -25,6 +20,7 @@ import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
+import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 
 public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
@@ -36,44 +32,37 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.popup_result_video_layout);
-
         Intent intent = getIntent();
         if (intent != null) {
             stopExecuteService();
             videoPath = intent.getStringExtra(KEY_VIDEO_PATH);
-            System.out.println("thanhlv PopUpResultVideoTranslucentActivity onCreate "+ videoPath);
         }
 
         initBanner();
 
         ImageView btnClose = findViewById(R.id.btn_close_popup);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        btnClose.setOnClickListener(v -> onBackPressed());
 
         ImageView btnShare = findViewById(R.id.btn_share);
-        btnShare.setOnClickListener(new View.OnClickListener() {
+        btnShare.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 gotoShareVideo();
             }
         });
 
         ImageView btnEdit = findViewById(R.id.btn_edit);
-        btnEdit.setOnClickListener(new View.OnClickListener() {
+        btnEdit.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 gotoEditVideo();
             }
         });
 
         ImageView btnDelete = findViewById(R.id.btn_delete);
-        btnDelete.setOnClickListener(new View.OnClickListener() {
+        btnDelete.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 gotoDeleteVideo();
             }
         });
@@ -83,9 +72,9 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
                 .load(videoPath)
                 .thumbnail(0.1f)
                 .into(btnPlayVideo);
-        btnPlayVideo.setOnClickListener(new View.OnClickListener() {
+        btnPlayVideo.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 gotoPlayVideo();
             }
         });

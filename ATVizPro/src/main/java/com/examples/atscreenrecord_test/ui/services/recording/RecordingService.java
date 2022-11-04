@@ -46,6 +46,7 @@ public class RecordingService extends BaseService {
     private final IBinder mIBinder = new RecordingBinder();
 
     private static final String TAG = RecordingService.class.getSimpleName();
+    public static final String NOTIFY_MSG_RECORDING_DONE = "NOTIFY_MSG_RECORDING_DONE";
     private MediaProjectionManager mMediaProjectionManager;
     private MediaProjection mMediaProjection;
     private Intent mScreenCaptureIntent;
@@ -175,13 +176,13 @@ public class RecordingService extends BaseService {
         }
     }
 
-    String outputFile;
+
 
     //Return output file
     public VideoSetting2 stopRecording() {
         if (DEBUG) Log.v(TAG, "stopStreaming:mMuxer=" + mMuxer);
 
-        outputFile = "";
+        String outputFile = "";
         synchronized (sSync) {
             if (mMuxer != null) {
                 outputFile = mMuxer.getOutputPath();
@@ -211,7 +212,7 @@ public class RecordingService extends BaseService {
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);
         startActivity(myIntent);
-
+        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_DONE);
     }
 
     public void insertVideoToGallery() {

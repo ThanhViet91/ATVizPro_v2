@@ -36,11 +36,12 @@ import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class MediaMuxerWrapper {
     private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
 
-    private String mOutputPath = "";
+    private String mOutputPath;
     private final MediaMuxer mMediaMuxer;    // API >= 18
     private int mEncoderCount, mStatredCount;
     private boolean mIsStarted;
@@ -55,13 +56,13 @@ public class MediaMuxerWrapper {
      */
     public MediaMuxerWrapper(final Context context, final String _ext) throws IOException {
         String ext = _ext;
-        if (TextUtils.isEmpty(ext)) ext = ".mp4";
+        if (TextUtils.isEmpty(_ext)) ext = ".mp4";
         try {
-            File outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(context, _ext));
+            File outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(context, ext));
             while (outputFile.exists()) {
-                outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(context, _ext));
+                outputFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(context, ext));
             }
-            if (!outputFile.getParentFile().exists()) {
+            if (!Objects.requireNonNull(outputFile.getParentFile()).exists()) {
                 outputFile.getParentFile().mkdirs();
             }
             mOutputPath = outputFile.getAbsolutePath();

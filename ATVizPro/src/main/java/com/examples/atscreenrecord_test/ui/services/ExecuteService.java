@@ -1,7 +1,7 @@
 package com.examples.atscreenrecord_test.ui.services;
 
 import static com.examples.atscreenrecord_test.App.CHANNEL_ID;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_SHOW_POPUP_RESULT;
+import static com.examples.atscreenrecord_test.ui.services.recording.RecordingService.NOTIFY_MSG_RECORDING_DONE;
 import static com.examples.atscreenrecord_test.utils.TranscodingAsyncTask.ERROR_CODE;
 
 import android.annotation.SuppressLint;
@@ -20,7 +20,6 @@ import androidx.annotation.RequiresApi;
 import com.examples.atscreenrecord_test.App;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.model.VideoProfileExecute;
-import com.examples.atscreenrecord_test.ui.activities.MainActivity;
 import com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity;
 import com.examples.atscreenrecord_test.ui.activities.TranslucentActivity;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
@@ -31,7 +30,7 @@ import java.util.Random;
 
 public class ExecuteService extends Service {
 
-    private static int NOTIFICATION_ID = 1509;
+    private static final int NOTIFICATION_ID = 1509;
     public static final String ACTION_STOP_SERVICE = "ACTION_STOP_SERVICE";
     public static final String KEY_VIDEO_PATH = "KEY_VIDEO_PATH";
 
@@ -75,7 +74,7 @@ public class ExecuteService extends Service {
     private void handleData(Intent intent) {
         expectTime = intent.getLongExtra("bundle_video_execute_time", 0);
         Bundle bundle = intent.getExtras();
-        VideoProfileExecute videoProfileExecute = null;
+        VideoProfileExecute videoProfileExecute;
         if (bundle != null) {
             videoProfileExecute = (VideoProfileExecute) bundle.get(MyUtils.KEY_SEND_PACKAGE_VIDEO);
             originalVideoPath = videoProfileExecute.getOriginalVideoPath();
@@ -139,6 +138,7 @@ public class ExecuteService extends Service {
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         myIntent.putExtra(KEY_VIDEO_PATH, path);
         startActivity(myIntent);
+        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_DONE);
     }
 
 
@@ -163,8 +163,8 @@ public class ExecuteService extends Service {
 
     }
 
-    private void flipCamera(String cameraCahePath) {
-        FFmpegUtil.getInstance().flipHorizontal(cameraCahePath, new FFmpegUtil.ITranscoding() {
+    private void flipCamera(String cameraCachePath) {
+        FFmpegUtil.getInstance().flipHorizontal(cameraCachePath, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outputCachePath) {
             }

@@ -5,14 +5,11 @@ import static com.examples.atscreenrecord_test.ui.fragments.DialogSelectVideoSou
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.examples.atscreenrecord_test.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-import static com.examples.atscreenrecord_test.ui.services.ExecuteService.ACTION_STOP_SERVICE;
-import static com.examples.atscreenrecord_test.ui.services.ExecuteService.KEY_VIDEO_PATH;
 import static com.examples.atscreenrecord_test.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_CLOSE_POPUP;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_HOME;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_SHOW_POPUP_RESULT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
@@ -21,11 +18,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.media.MediaMetadataRetriever;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
@@ -98,7 +93,6 @@ public class MainActivity extends BaseFragmentActivity {
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
     public static final String KEY_FROM_FUNCTION = "key_from_code";
-    public static final String KEY_FROM_VIDEO_SOURCE = "KEY_FROM_VIDEO_SOURCE";
 
     private static final String[] mPermission = new String[]{
             Manifest.permission.CAMERA,
@@ -122,7 +116,6 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        System.out.println("thanhlv from onNewIntentonNewIntent");
         if (intent != null)
             handleIncomingRequest(intent);
     }
@@ -172,7 +165,6 @@ public class MainActivity extends BaseFragmentActivity {
 
         initViews();
         Intent intent = getIntent();
-        System.out.println("thanhlv from onCreateonCreateonCreate");
         if (intent != null)
             handleIncomingRequest(intent);
     }
@@ -249,7 +241,6 @@ public class MainActivity extends BaseFragmentActivity {
                     break;
 
                 case ACTION_CLOSE_POPUP:
-                    System.out.println("thanhlv ACTION_CLOSE_POPUPACTION_CLOSE_POPUPACTION_CLOSE_POPUP");
                     finish();
 
 //        Intent myIntent = new Intent(this, PopUpResultVideoTranslucentActivity.class);
@@ -264,13 +255,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void requestScreenCaptureIntent() {
-        if (mScreenCaptureIntent == null) {
-            MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-            startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
-        }
-    }
-
-    private void requestAccessAllFiles() {
         if (mScreenCaptureIntent == null) {
             MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
@@ -529,7 +513,6 @@ public class MainActivity extends BaseFragmentActivity {
     private void showDialogPickVideo(int requestVideoFor) {
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_PARAM1, requestVideoFor);
-        System.out.println("thanhlv showDialogPickVideo");
         DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
             @Override
             public void onClickCameraRoll() {
@@ -637,7 +620,6 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void showInterstitialAd(int from_code) {
         fromFunction = from_code;
-//        show_project_for = from_code;
         if (mAdManager.interstitialAdAlready()) {
             mAdManager.showInterstitialAd(fullScreenContentCallback);
         } else {
@@ -698,13 +680,11 @@ public class MainActivity extends BaseFragmentActivity {
                                     .setMessage("" +
                                             "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
                                     .setCancelable(true)
-                                    .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int id) {
-                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                            Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                            intent.setData(uri);
-                                            startActivityForResult(intent, 1000);     // Comment 3.
-                                        }
+                                    .setPositiveButton("SETTINGS", (dialog, id) -> {
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                        intent.setData(uri);
+                                        startActivityForResult(intent, 1000);     // Comment 3.
                                     });
 
                             AlertDialog alertDialog = alertDialogBuilder.create();
@@ -734,13 +714,11 @@ public class MainActivity extends BaseFragmentActivity {
                             .setMessage("" +
                                     "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
                             .setCancelable(true)
-                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                    intent.setData(uri);
-                                    startActivityForResult(intent, 1000);     // Comment 3.
-                                }
+                            .setPositiveButton("SETTINGS", (dialog, id) -> {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivityForResult(intent, 1000);     // Comment 3.
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -758,19 +736,15 @@ public class MainActivity extends BaseFragmentActivity {
                         alertDialogBuilder
                                 .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
                                 .setCancelable(true)
-                                .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                        Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(i);
-                                    }
+                                .setPositiveButton("RETRY", (dialog, id) -> {
+                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
+                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
                                 })
-                                .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                                .setNegativeButton("EXIT", (dialog, id) -> {
 //                                        finish();
-                                        dialog.cancel();
-                                    }
+                                    dialog.cancel();
                                 });
                         AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
@@ -795,13 +769,11 @@ public class MainActivity extends BaseFragmentActivity {
                             .setMessage("" +
                                     "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
                             .setCancelable(true)
-                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                    intent.setData(uri);
-                                    startActivityForResult(intent, 1000);     // Comment 3.
-                                }
+                            .setPositiveButton("SETTINGS", (dialog, id) -> {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivityForResult(intent, 1000);     // Comment 3.
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -818,19 +790,15 @@ public class MainActivity extends BaseFragmentActivity {
                         alertDialogBuilder
                                 .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
                                 .setCancelable(true)
-                                .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                        Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(i);
-                                    }
+                                .setPositiveButton("RETRY", (dialog, id) -> {
+                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
+                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
                                 })
-                                .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                                .setNegativeButton("EXIT", (dialog, id) -> {
 //                                        finish();
-                                        dialog.cancel();
-                                    }
+                                    dialog.cancel();
                                 });
                         AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
@@ -853,13 +821,11 @@ public class MainActivity extends BaseFragmentActivity {
                             .setMessage("" +
                                     "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
                             .setCancelable(true)
-                            .setPositiveButton("SETTINGS", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                    intent.setData(uri);
-                                    startActivityForResult(intent, 1000);     // Comment 3.
-                                }
+                            .setPositiveButton("SETTINGS", (dialog, id) -> {
+                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivityForResult(intent, 1000);     // Comment 3.
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -875,19 +841,15 @@ public class MainActivity extends BaseFragmentActivity {
                         alertDialogBuilder
                                 .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
                                 .setCancelable(true)
-                                .setPositiveButton("RETRY", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                        Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        startActivity(i);
-                                    }
+                                .setPositiveButton("RETRY", (dialog, id) -> {
+                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
+                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
+                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(i);
                                 })
-                                .setNegativeButton("EXIT", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
+                                .setNegativeButton("EXIT", (dialog, id) -> {
 //                                        finish();
-                                        dialog.cancel();
-                                    }
+                                    dialog.cancel();
                                 });
                         AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
@@ -932,21 +894,13 @@ public class MainActivity extends BaseFragmentActivity {
                 if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     runOnUiThread(() -> getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-                                @Override
-                                public void onBuySuccess() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (mAdManager != null) mAdManager.loadBanner();
-                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_REACT_CAM");
-                                            Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
-                                            intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                            startActivity(intent);
-                                        }
-                                    });
-                                }
-                            }))
+                            .add(R.id.frame_layout_fragment,
+                                    new SubscriptionFragment(() -> runOnUiThread(() -> {
+                                if (mAdManager != null) mAdManager.loadBanner();
+                                Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
+                                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                startActivity(intent);
+                            })))
                             .addToBackStack("")
                             .commitAllowingStateLoss());
 
@@ -977,21 +931,13 @@ public class MainActivity extends BaseFragmentActivity {
                 if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-                                @Override
-                                public void onBuySuccess() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (mAdManager != null) mAdManager.loadBanner();
-                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_COMMENTARY");
-                                            Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
-                                            intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                            startActivity(intent);
-                                        }
-                                    });
-                                }
-                            }))
+                            .add(R.id.frame_layout_fragment,
+                                    new SubscriptionFragment(() -> runOnUiThread(() -> {
+                                if (mAdManager != null) mAdManager.loadBanner();
+                                Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                startActivity(intent);
+                            })))
                             .addToBackStack("")
                             .commitAllowingStateLoss();
                     return;
@@ -1019,23 +965,15 @@ public class MainActivity extends BaseFragmentActivity {
                 if (MyUtils.getDurationMs(this, pathVideo) > 60000 && !SettingManager2.isProApp(this)) {
                     getSupportFragmentManager()
                             .beginTransaction()
-                            .add(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-                                @Override
-                                public void onBuySuccess() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (mAdManager != null) mAdManager.loadBanner();
-                                            System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_VIDEO_EDIT");
-                                            Bundle bundle = new Bundle();
-                                            bundle.putString(KEY_PATH_VIDEO, pathVideo);
-                                            Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
-                                            intent.putExtras(bundle);
-                                            startActivity(intent);
-                                        }
-                                    });
-                                }
-                            }))
+                            .add(R.id.frame_layout_fragment,
+                                    new SubscriptionFragment(() -> runOnUiThread(() -> {
+                                        if (mAdManager != null) mAdManager.loadBanner();
+                                        Bundle bundle = new Bundle();
+                                        bundle.putString(KEY_PATH_VIDEO, pathVideo);
+                                        Intent intent = new Intent(MainActivity.this, VideoEditorActivity.class);
+                                        intent.putExtras(bundle);
+                                        startActivity(intent);
+                                    })))
                             .addToBackStack("")
                             .commitAllowingStateLoss();
                     return;

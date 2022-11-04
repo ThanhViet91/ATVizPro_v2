@@ -21,7 +21,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/normal_margin"
             android:contentDescription="@string/todo"
-            android:padding="4dp"
+            android:padding="6dp"
             android:src="@drawable/ic_dismiss_subscription" />
 
         <TextView

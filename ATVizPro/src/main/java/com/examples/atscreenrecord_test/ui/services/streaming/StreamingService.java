@@ -24,30 +24,23 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 public class StreamingService extends BaseService implements PublisherListener {
     private static final boolean DEBUG = MyUtils.DEBUG;    // TODO set false on release
-    public static final String KEY_NOTIFY_MSG = "stream service notify";
 
     public static final String NOTIFY_MSG_CONNECTION_FAILED = "Stream connection failed";
     public static final String NOTIFY_MSG_CONNECTION_STARTED = "Stream started";
     public static final String NOTIFY_MSG_CONNECTED = "Stream connected";
     public static final String NOTIFY_MSG_ERROR = "Stream connection error!";
-    public static final String NOTIFY_MSG_UPDATED_STREAM_PROFILE = "Updated stream profile";
-    public static final String NOTIFY_MSG_CONNECTION_DISCONNECTED = "Connection disconnected!";
     public static final String NOTIFY_MSG_STREAM_STOPPED = "Stream stopped";
     public static final String NOTIFY_MSG_REQUEST_START = "Request start stream";
     public static final String NOTIFY_MSG_REQUEST_STOP = "Request stop stream";
 
     private final IBinder mIBinder = new StreamingBinder();
 
-    private static final String TAG = "StreamService_chienpm";
+    private static final String TAG = "StreamService";
     private MediaProjectionManager mMediaProjectionManager;
     private MediaProjection mMediaProjection;
-    private Intent mScreenCaptureIntent;
-    private int mScreenCaptureResultCode;
     private int mScreenWidth, mScreenHeight, mScreenDensity;
     private Publisher mPublisher;
     private static final Object sSync = new Object();
-
-    private StreamProfile mStreamProfile;
 
     private String mUrl = MyUtils.SAMPLE_RMPT_URL;
 
@@ -134,38 +127,37 @@ public class StreamingService extends BaseService implements PublisherListener {
     private void getScreenSize() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mScreenDensity = metrics.densityDpi;
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
-        if (width > height) {
-            final float scale_x = width / 1920f;
-            final float scale_y = height / 1080f;
-            final float scale = Math.max(scale_x, scale_y);
-            width = (int) (width / scale);
-            height = (int) (height / scale);
-        } else {
-            final float scale_x = width / 1080f;
-            final float scale_y = height / 1920f;
-            final float scale = Math.max(scale_x, scale_y);
-            width = (int) (width / scale);
-            height = (int) (height / scale);
-        }
-        //just support portrait
-        if (width < height) {
-            mScreenWidth = width;
-            mScreenHeight = height;
-        } else {
-            mScreenWidth = height;
-            mScreenHeight = width;
-        }
+//        int width = metrics.widthPixels;
+//        int height = metrics.heightPixels;
+//        if (width > height) {
+//            final float scale_x = width / 1920f;
+//            final float scale_y = height / 1080f;
+//            final float scale = Math.max(scale_x, scale_y);
+//            width = (int) (width / scale);
+//            height = (int) (height / scale);
+//        } else {
+//            final float scale_x = width / 1080f;
+//            final float scale_y = height / 1920f;
+//            final float scale = Math.max(scale_x, scale_y);
+//            width = (int) (width / scale);
+//            height = (int) (height / scale);
+//        }//       //just support portrait
+//        if (width < height) {
+//            mScreenWidth = width;
+//            mScreenHeight = height;
+//        } else {
+//            mScreenWidth = height;
+//            mScreenHeight = width;
+//        }
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         if (DEBUG) Log.i(TAG, "RecordingService: onBind()");
-        mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
-        mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
+        Intent mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+        int mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
 
-        mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
+        StreamProfile mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
 
         if (mStreamProfile == null)
             throw new RuntimeException("Stream Profile is null");
@@ -186,7 +178,7 @@ public class StreamingService extends BaseService implements PublisherListener {
         }
 
         if (DEBUG) Log.d(TAG, "onBindStream: " + mScreenCaptureIntent);
-        if (DEBUG) Log.d(TAG, "onBindStream: " + mStreamProfile.toString());
+        if (DEBUG) Log.d(TAG, "onBindStream: " + mStreamProfile);
         return mIBinder;
     }
 
@@ -255,14 +247,14 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     }
 
-    public void updateStreamProfile(StreamProfile profile) {
-        mStreamProfile = profile;
-        if (!mUrl.equals(profile.getStreamUrl())) {
-            mUrl = profile.getStreamUrl();
-//            if (mPublisher != null) mPublisher.set
-//            notifyStreamingCallback(NOTIFY_MSG_UPDATED_STREAM_PROFILE);
-        }
-    }
+//    public void updateStreamProfile(StreamProfile profile) {
+//        mStreamProfile = profile;
+//        if (!mUrl.equals(profile.getStreamUrl())) {
+//            mUrl = profile.getStreamUrl();
+////            if (mPublisher != null) mPublisher.set
+////            notifyStreamingCallback(NOTIFY_MSG_UPDATED_STREAM_PROFILE);
+//        }
+//    }
 
     public void stopStreaming() {
         if (mPublisher != null && mPublisher.isPublishing()) {

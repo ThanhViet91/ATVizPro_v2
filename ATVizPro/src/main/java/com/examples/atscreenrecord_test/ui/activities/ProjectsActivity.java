@@ -1,7 +1,6 @@
 package com.examples.atscreenrecord_test.ui.activities;
 
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_FROM_FUNCTION;
-import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_FROM_VIDEO_SOURCE;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_PATH_VIDEO;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.KEY_VIDEO_NAME;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUEST_SHOW_PROJECTS_DEFAULT;
@@ -11,37 +10,41 @@ import static com.examples.atscreenrecord_test.ui.activities.MainActivity.REQUES
 import static com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity.afterAdd;
 import static com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity.afterDelete;
 import static com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity.finishEdit;
+import static com.examples.atscreenrecord_test.ui.services.recording.RecordingService.NOTIFY_MSG_RECORDING_DONE;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.KEY_MESSAGE;
 import static com.examples.atscreenrecord_test.ui.utils.MyUtils.hideStatusBar;
-import static com.examples.atscreenrecord_test.ui.utils.MyUtils.toast;
+import static com.examples.atscreenrecord_test.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.examples.atscreenrecord_test.AppConfigs;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.adapter.VideoProjectsAdapter;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.model.VideoModel;
 import com.examples.atscreenrecord_test.ui.fragments.SubscriptionFragment;
-import com.examples.atscreenrecord_test.ui.utils.RenameDialogHelper;
+import com.examples.atscreenrecord_test.ui.services.recording.RecordingService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
+import com.examples.atscreenrecord_test.ui.utils.RenameDialogHelper;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.DisplayUtil;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
@@ -83,6 +86,41 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
         fetchData();
         initViews();
+    }
+
+
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String action = intent.getAction();
+            if (!TextUtils.isEmpty(action) && MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
+                String notify_msg = intent.getStringExtra(KEY_MESSAGE);
+                if (TextUtils.isEmpty(notify_msg))
+                    return;
+                if (NOTIFY_MSG_RECORDING_DONE.equals(notify_msg)) {
+                    fetchData();
+                }
+            }
+        }
+    };
+
+    private void registerSyncServiceReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
+        registerReceiver(mMessageReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerSyncServiceReceiver();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(mMessageReceiver);
     }
 
     @Override
@@ -321,6 +359,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         videoList_temp.clear();
         videoList_temp = new ArrayList<>(videoList);
         videoList.clear();
+        isRecording = isMyServiceRunning(getApplicationContext(), RecordingService.class);
         readData();
         processingData();
         if (mAdapter != null) {
@@ -351,14 +390,19 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         }
     }
 
+    Boolean isRecording = false;
     MediaMetadataRetriever retriever;
     public boolean isVideo(String path) {
         try {
+
             retriever.setDataSource(this, Uri.fromFile(new File(path)));
             String hasVideo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO);
 
             if (hasVideo == null) {
                 // file video loi thi xoa
+                if (isRecording) {
+                    return false;
+                }
                 StorageUtil.deleteFile(path);
             } else {
                 if (hasVideo.equals("yes")) { // neu la file video
@@ -426,7 +470,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     }
 
     public boolean requireSubscription(String path) {
-        System.out.println("thanhlv  if  MyUtils.getDurationMs(this, path) > 60000)");
         if (!SettingManager2.isProApp(this) && MyUtils.getDurationMs(this, path) > 60000) {
             getSupportFragmentManager()
                     .beginTransaction()

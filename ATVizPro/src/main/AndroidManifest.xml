@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.examples.atscreenrecord_test"
+    package="com.atsoft.screenrecord"
     android:installLocation="internalOnly"
-    android:versionCode="103"
-    android:versionName="1.0.3">
+    android:versionCode="100"
+    android:versionName="1.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<!--    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -17,24 +17,23 @@
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission." />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.front"
-        android:required="false" />
+<!--    <uses-feature-->
+<!--        android:name="android.hardware.camera"-->
+<!--        android:required="false" />-->
+<!--    <uses-feature-->
+<!--        android:name="android.hardware.camera.autofocus"-->
+<!--        android:required="false" />-->
+<!--    <uses-feature-->
+<!--        android:name="android.hardware.camera.front"-->
+<!--        android:required="false" />-->
 
     <application
-        android:name="com.examples.atscreenrecord_test.App"
+        android:name="com.atsoft.screenrecord.App"
         android:allowBackup="true"
         android:extractNativeLibs="true"
         android:hardwareAccelerated="true"
@@ -56,40 +55,40 @@
         </provider>
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.ReactCamActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.ReactCamActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.PlayVideoDetailActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.PlayVideoDetailActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.CommentaryActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.CommentaryActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.VideoEditorActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.VideoEditorActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.ProjectsActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.ProjectsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.SplashActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.SplashActivity"
             android:exported="true"
             android:noHistory="true"
             android:screenOrientation="portrait"
@@ -102,7 +101,7 @@
         </activity>
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.MainActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -111,34 +110,34 @@
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.TranslucentActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.TranslucentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent"
             tools:ignore="LockedOrientationActivity" />
 
         <activity
-            android:name="com.examples.atscreenrecord_test.ui.activities.PopUpResultVideoTranslucentActivity"
+            android:name="com.atsoft.screenrecord.ui.activities.PopUpResultVideoTranslucentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent"
             tools:ignore="LockedOrientationActivity" />
 
         <service
-            android:name="com.examples.atscreenrecord_test.ui.services.BaseService"
+            android:name="com.atsoft.screenrecord.ui.services.BaseService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="mediaProjection|location|camera|microphone" />
 
         <service
-            android:name="com.examples.atscreenrecord_test.ui.services.recording.RecordingService"
+            android:name="com.atsoft.screenrecord.ui.services.recording.RecordingService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="mediaProjection|location|camera|microphone"
             android:stopWithTask="true" />
 
-        <service android:name="com.examples.atscreenrecord_test.ui.services.streaming.StreamingService" />
+        <service android:name="com.atsoft.screenrecord.ui.services.streaming.StreamingService" />
 
         <service
-            android:name="com.examples.atscreenrecord_test.ui.services.ControllerService"
+            android:name="com.atsoft.screenrecord.ui.services.ControllerService"
             android:foregroundServiceType="mediaProjection|location|camera|microphone" />
 
         <meta-data
@@ -146,7 +145,7 @@
             android:value="@string/admob_sdk_id" />
 
         <service
-            android:name="com.examples.atscreenrecord_test.ui.services.ExecuteService"
+            android:name="com.atsoft.screenrecord.ui.services.ExecuteService"
             android:foregroundServiceType="mediaProjection|location|camera|microphone" />
 
     </application>

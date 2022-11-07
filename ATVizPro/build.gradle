@@ -6,7 +6,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('D:\\ATSoft\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
+            storeFile file('D:\\Repo v2\\ATVizPro_v3\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
             storePassword 'recorder'
             keyAlias 'recorder'
             keyPassword 'recorder'
@@ -14,7 +14,7 @@ android {
     }
     compileSdkVersion 31
     defaultConfig {
-        applicationId "com.examples.atscreenrecord_test"
+        applicationId "com.atsoft.screenrecord"
         minSdkVersion 23
         targetSdkVersion 31
 //        ndk {

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-//import com.examples.ffmpeg4android_demo_native.R;
+//import com.atsoft.ffmpeg4android_demo_native.R;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -346,10 +346,10 @@ public class GeneralUtils {
 					timeStr = line.substring(i1 + 5, i2 - 1);
 					Log.d(Prefs.TAG, "Found timeStr: " + timeStr);
 				}
-				else if (line.startsWith("atscreenrecord_test: 0")) {
+				else if (line.startsWith("screenrecord: 0")) {
 					timeStr = "exit";
 				}
-				else if (line.startsWith("atscreenrecord_test: 1") ) {
+				else if (line.startsWith("screenrecord: 1") ) {
 						Log.w(Prefs.TAG, "error line: " + line);
 						Log.w(Prefs.TAG, "Looks like error in the log");
 						timeStr = "error";

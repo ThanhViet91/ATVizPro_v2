@@ -35,7 +35,7 @@
     <TextView
         android:id="@+id/tv_decs"
         style="@style/Text_Description_White_15_400"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="12dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:text="@string/description_fb_live"
@@ -78,13 +78,13 @@
         android:textSize="20dp"
         android:textStyle="bold"
         android:background="@drawable/custom_btn"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="@dimen/normal_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <RelativeLayout
         android:id="@+id/adView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center_horizontal"
         android:layout_gravity="center_horizontal"
         android:visibility="gone"/>

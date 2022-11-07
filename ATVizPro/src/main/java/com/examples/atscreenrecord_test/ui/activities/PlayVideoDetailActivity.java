@@ -21,12 +21,15 @@ import android.widget.VideoView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
+import com.examples.atscreenrecord_test.utils.FirebaseUtils;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.util.Date;
@@ -34,12 +37,15 @@ import java.util.Date;
 public class PlayVideoDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private RelativeLayout mAdView;
     private TextView title;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_video_detail);
         hideStatusBar(this);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         title = findViewById(R.id.title_video);
         TextView btn_share_video = findViewById(R.id.img_btn_share);
         mAdView = findViewById(R.id.adView);
@@ -113,6 +119,11 @@ public class PlayVideoDetailActivity extends AppCompatActivity implements View.O
 
         @Override
         public void onAdShowedFullScreenContent() {
+            if (Core.countAdsShown == 5) {
+                FirebaseUtils.logEventShowInterstitialAd(mFirebaseAnalytics, "Play Video");
+                Core.countAdsShown = 0;
+            }
+            Core.countAdsShown++;
         }
     };
 

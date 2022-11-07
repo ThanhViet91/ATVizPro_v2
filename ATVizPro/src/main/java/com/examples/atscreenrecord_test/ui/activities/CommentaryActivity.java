@@ -30,6 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.model.VideoProfileExecute;
 import com.examples.atscreenrecord_test.ui.fragments.IConfirmPopupListener;
@@ -37,10 +38,12 @@ import com.examples.atscreenrecord_test.ui.fragments.PopupConfirm;
 import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
+import com.examples.atscreenrecord_test.utils.FirebaseUtils;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,12 +64,15 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     private boolean hasAudioFile = false;
     private int endTime = 0;
     private AdsUtil mAdManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_react_cam);
         hideStatusBar(this);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
 
@@ -395,6 +401,12 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
         @Override
         public void onAdShowedFullScreenContent() {
+
+            if (Core.countAdsShown == 5) {
+                FirebaseUtils.logEventShowInterstitialAd(mFirebaseAnalytics, "Commentary");
+                Core.countAdsShown = 0;
+            }
+            Core.countAdsShown++;
         }
     };
 

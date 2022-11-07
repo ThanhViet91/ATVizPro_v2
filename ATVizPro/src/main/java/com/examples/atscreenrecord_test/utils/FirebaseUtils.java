@@ -1,5 +1,8 @@
 package com.examples.atscreenrecord_test.utils;
 
+import android.os.Bundle;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -13,26 +16,11 @@ public class FirebaseUtils {
         mFirebaseRemoteConfig.setConfigSettingsAsync(configSettings);
     }
 
-//    private static AppConfigs _instance;
-//    private FirebaseRemoteConfig config;
-//
-//    private AppConfigs(){
-//
-//    }
-//
-//    public FirebaseRemoteConfig getConfig(){
-//        return this.config;
-//    }
-//
-//    public void setConfig(FirebaseRemoteConfig config){
-//        this.config = config;
-//    }
-//
-//    public static AppConfigs getInstance(){
-//        if(_instance==null){
-//            _instance = new AppConfigs();
-//        }
-//        return _instance;
-//    }
+    public static void logEventShowInterstitialAd(FirebaseAnalytics firebaseAnalytics, String action) {
+        Bundle bundle = new Bundle();
+        bundle.putString("action", action);
+        firebaseAnalytics.logEvent("show_interstitial_5_times", bundle);
+        System.out.println("thanhlv logEventShowInterstitialAd " + action);
+    }
 
 }

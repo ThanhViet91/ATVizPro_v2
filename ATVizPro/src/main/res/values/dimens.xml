@@ -4,7 +4,7 @@
     <dimen name="recording_icon_square">36dp</dimen>
     <dimen name="recording_button_distance">48dp</dimen>
     <dimen name="fab_margin">@dimen/_16sdp</dimen>
-    <dimen name="adview_margin">@dimen/_10sdp</dimen>
+    <dimen name="adview_margin">10dp</dimen>
     <dimen name="small_margin">@dimen/_6sdp</dimen>
     <dimen name="lager_margin">@dimen/_24sdp</dimen>
     <dimen name="huge_margin">@dimen/_40sdp</dimen>

@@ -37,6 +37,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
+import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.model.VideoProfileExecute;
 import com.examples.atscreenrecord_test.ui.fragments.IConfirmPopupListener;
@@ -45,10 +46,12 @@ import com.examples.atscreenrecord_test.ui.services.ExecuteService;
 import com.examples.atscreenrecord_test.ui.utils.CustomOnScaleDetector;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
+import com.examples.atscreenrecord_test.utils.FirebaseUtils;
 import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.pedro.rtplibrary.rtmp.RtmpLiveStream;
 
 import java.io.File;
@@ -77,6 +80,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private LinearLayout layoutCountdown;
     private ImageView toggleReactCam, btnInformation, thumbVideo;
     private AdsUtil mAdManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_video_react_cam);
         hideStatusBar(this);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
@@ -505,6 +510,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         @Override
         public void onAdShowedFullScreenContent() {
+            if (Core.countAdsShown == 5) {
+                FirebaseUtils.logEventShowInterstitialAd(mFirebaseAnalytics, "React Cam");
+                Core.countAdsShown = 0;
+            }
+            Core.countAdsShown++;
         }
     };
 

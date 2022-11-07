@@ -1,9 +1,11 @@
 package com.examples.atscreenrecord_test;
 
+import static com.examples.atscreenrecord_test.Core.productDetails;
 import static com.examples.atscreenrecord_test.ui.activities.MainActivity.initialAds;
 import static com.examples.atscreenrecord_test.utils.AdsUtil.AD_OPEN_APP_ID;
 import static com.examples.atscreenrecord_test.utils.AdsUtil.AD_OPEN_APP_ID_DEV;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
@@ -24,6 +26,8 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.google.android.gms.ads.AdError;
@@ -33,9 +37,12 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.appopen.AppOpenAd.AppOpenAdLoadCallback;
+import com.google.common.collect.ImmutableList;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -49,7 +56,7 @@ public class App extends Application
     private static final String TAG = "MyApplication";
     public static final String CHANNEL_ID = "com.examples.atscreenrecord_test";
     private static Application context;
-
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static Application getAppContext() {
         return App.context;
@@ -63,20 +70,23 @@ public class App extends Application
         // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         appOpenAdManager = new AppOpenAdManager();
         App.context = this;
-        getPurchase();
+        getPurchaseHistory();
         configs();
         createChannelNotification();
     }
 
     private BillingClient billingClient;
-    private void getPurchase() {
+    private ArrayList<ProductDetails> mProductDetailsList;
+
+    private void getPurchaseHistory() {
         billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                getPurchase();
+                getPurchaseHistory();
             }
 
             @Override
@@ -91,12 +101,65 @@ public class App extends Application
                                     System.out.println("thanhlv App get subs: "+list.size());
                                     if (list.size() == 0) {
                                         MobileAds.initialize(context, initializationStatus -> initialAds = true);
+                                        connectGooglePlayBilling();
                                     }
                                 }
                             });
                 }
             }
         });
+    }
+
+    private void showProducts() {
+        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(getString(R.string.product_id_week))
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(getString(R.string.product_id_month))
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(getString(R.string.product_id_year))
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+        );
+
+        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                .setProductList(productList)
+                .build();
+
+        billingClient.queryProductDetailsAsync(
+                params,
+                (billingResult, prodDetailsList) -> {
+                    // Process the result
+
+                    mProductDetailsList = new ArrayList<>();
+                    mProductDetailsList.addAll(prodDetailsList);
+                    Core.productDetails = new ArrayList<>(mProductDetailsList);
+                }
+        );
+    }
+
+    private void connectGooglePlayBilling() {
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    // The BillingClient is ready. You can query purchases here.
+                    showProducts();
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to
+                // Google Play by calling the startConnection() method.
+                connectGooglePlayBilling();
+            }
+        });
+
     }
 
     private void configs() {

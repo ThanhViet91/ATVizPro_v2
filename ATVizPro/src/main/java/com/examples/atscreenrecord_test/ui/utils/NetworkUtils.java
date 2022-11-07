@@ -45,5 +45,12 @@ public class NetworkUtils {
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
         return (networkInfo!=null && networkInfo.isConnected());
     }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }
 

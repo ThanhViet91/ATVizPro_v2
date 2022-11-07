@@ -17,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -31,15 +32,19 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.examples.atscreenrecord_test.AppConfigs;
+import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.controllers.settings.SettingManager2;
 import com.examples.atscreenrecord_test.model.SubscriptionsItemModel;
+import com.examples.atscreenrecord_test.ui.utils.NetworkUtils;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
+import com.examples.atscreenrecord_test.utils.StorageUtil;
 import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class SubscriptionFragment extends Fragment {
 
@@ -63,9 +68,6 @@ public class SubscriptionFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mFragmentManager = getParentFragmentManager();
-        WEEK_SUBS_ID = requireContext().getString(R.string.product_id_week);
-        MONTH_SUBS_ID = requireContext().getString(R.string.product_id_month);
-        YEAR_SUBS_ID = requireContext().getString(R.string.product_id_year);
 
     }
 
@@ -135,14 +137,11 @@ public class SubscriptionFragment extends Fragment {
 
                     mProductDetailsList = new ArrayList<>();
                     mProductDetailsList.addAll(prodDetailsList);
+                    Core.productDetails = new ArrayList<>(mProductDetailsList);
                     updateSubs();
                 }
         );
     }
-
-    private String WEEK_SUBS_ID;
-    private String MONTH_SUBS_ID;
-    private String YEAR_SUBS_ID;
     @SuppressLint("SetTextI18n")
     public void updateSubs(){
         for (int i = 0; i < 3; i++) {
@@ -151,19 +150,38 @@ public class SubscriptionFragment extends Fragment {
             requireActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (id.equals(WEEK_SUBS_ID)) {
+                    if (id.equals(subs.get(0).getKeyID())) {
                         tvName1.setText(price + "/ " + subs.get(0).getName());
                     } else
-                    if (id.equals(MONTH_SUBS_ID)) {
+                    if (id.equals(subs.get(1).getKeyID())) {
                         tvName2.setText(price + "/ " + subs.get(1).getName());
                     } else
-                    if (id.equals(YEAR_SUBS_ID)) {
+                    if (id.equals(subs.get(2).getKeyID())) {
                         tvName3.setText(price + "/ " + subs.get(2).getName());
                     }
+
+                    lnHideSubs.setVisibility(View.GONE);
+                    btnBuy.setAlpha(1f);
+                    btnBuy.setEnabled(true);
                 }
             });
 
+        }
+    }
 
+    @SuppressLint("SetTextI18n")
+    public void fillSubscription() {
+        for (int i = 0; i < 3; i++) {
+            for (ProductDetails product : Core.productDetails) {
+                String id = product.getProductId();
+                String price = product.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+                if (id.equals(subs.get(i).getKeyID())) {
+                    if (i == 0) tvName1.setText(price + "/ " + subs.get(0).getName());
+                    if (i == 1) tvName2.setText(price + "/ " + subs.get(1).getName());
+                    if (i == 2) tvName3.setText(price + "/ " + subs.get(2).getName());
+                    break;
+                }
+            }
         }
     }
 
@@ -187,28 +205,52 @@ public class SubscriptionFragment extends Fragment {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
 
         subs = new ArrayList<SubscriptionsItemModel>(AppConfigs.getInstance().getSubsModel());
-        billingClient = BillingClient.newBuilder(requireContext())
-                .setListener(purchasesUpdatedListener)
-                .enablePendingPurchases()
-                .build();
-        connectGooglePlayBilling();
+        subs.sort(new Comparator<SubscriptionsItemModel>() {
+            @Override
+            public int compare(SubscriptionsItemModel t, SubscriptionsItemModel t1) {
+                return t.getSort() < t1.getSort() ? 1 : 0;
+            }
+        });
+
         return mViewRoot;
+    }
+
+    private void checkInternetConnect() {
+        if (!NetworkUtils.isConnected(requireContext())) {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Internet unavailable.")
+                    .setMessage("Please connect to network to purchase service.")
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    } )
+                    .setNegativeButton(android.R.string.no, (dialog, which) -> {} )
+                    .show();
+        }
     }
 
     ArrayList<SubscriptionsItemModel> subs;
     int selected = 0;
     TextView tvName1, tvName2, tvName3;
+    ImageView btnBuy;
+    LinearLayout lnHideSubs;
 
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        lnHideSubs = view.findViewById(R.id.hide_sub);
+//        if (NetworkUtils.isConnected(requireContext())) {
+//            lnHideSubs.setVisibility(View.GONE);
+//        } else
+//            lnHideSubs.setVisibility(View.VISIBLE);
+
         tvName1 = view.findViewById(R.id.name_sub_1);
         TextView tvDes1 = view.findViewById(R.id.des_sub_1);
         tvName2 = view.findViewById(R.id.name_sub_2);
@@ -219,6 +261,7 @@ public class SubscriptionFragment extends Fragment {
         tvDes1.setText(subs.get(0).getDescription());
         tvDes2.setText(subs.get(1).getDescription());
         tvDes3.setText(subs.get(2).getDescription());
+
 
         ImageView btn_check_1 = view.findViewById(R.id.img_check_sub_1);
         ImageView btn_check_2 = view.findViewById(R.id.img_check_sub_2);
@@ -264,13 +307,30 @@ public class SubscriptionFragment extends Fragment {
             }
         });
 
-        ImageView btnBuy = view.findViewById(R.id.btn_start_plan);
+        btnBuy = view.findViewById(R.id.btn_start_plan);
         btnBuy.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                checkInternetConnect();
                 launchPurchaseFlow(selected);
             }
         });
+
+        if (Core.productDetails.size() > 0) {
+            lnHideSubs.setVisibility(View.GONE);
+            btnBuy.setAlpha(1f);
+            btnBuy.setEnabled(true);
+            fillSubscription();
+        } else {
+            lnHideSubs.setVisibility(View.VISIBLE);
+            btnBuy.setAlpha(0.5f);
+            btnBuy.setEnabled(false);
+            billingClient = BillingClient.newBuilder(requireContext())
+                    .setListener(purchasesUpdatedListener)
+                    .enablePendingPurchases()
+                    .build();
+            connectGooglePlayBilling();
+        }
 
         ImageView btn_dismiss = view.findViewById(R.id.img_btn_back_header);
         btn_dismiss.setOnClickListener(new OnSingleClickListener() {
@@ -339,6 +399,7 @@ public class SubscriptionFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
+        if (billingClient != null)
         billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
                 (billingResult, list) -> {
@@ -351,5 +412,6 @@ public class SubscriptionFragment extends Fragment {
                     }
                 }
         );
+
     }
 }

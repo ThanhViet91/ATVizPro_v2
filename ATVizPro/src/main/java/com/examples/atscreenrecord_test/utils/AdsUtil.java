@@ -122,4 +122,5 @@ public class AdsUtil {
         mInterstitialAdAdmob.show((Activity) mContext);
         mInterstitialAdAdmob.setFullScreenContentCallback(fullScreenContentCallback);
     }
+
 }

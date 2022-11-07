@@ -65,11 +65,13 @@ import com.examples.atscreenrecord_test.ui.services.streaming.StreamingService;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.DisplayUtil;
+import com.examples.atscreenrecord_test.utils.FirebaseUtils;
 import com.examples.atscreenrecord_test.utils.OnSingleClickListener;
 import com.examples.atscreenrecord_test.utils.PathUtil;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 import java.io.File;
@@ -211,6 +213,7 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void checkShowAd() {
+//        SettingManager2.setProApp(this, true);
         mAdManager.loadBanner();
     }
 
@@ -265,8 +268,10 @@ public class MainActivity extends BaseFragmentActivity {
     private PulsatorLayout pulsator;
     private TextView liveStreaming;
     private AdsUtil mAdManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private void initViews() {
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
         mAdManager.createInterstitialAdmob();
@@ -615,6 +620,25 @@ public class MainActivity extends BaseFragmentActivity {
 
         @Override
         public void onAdShowedFullScreenContent() {
+            if (Core.countAdsShown == 5) {
+                String action = "";
+                switch (fromFunction) {
+                    case REQUEST_VIDEO_FOR_COMMENTARY:
+                        action = "Commentary";
+                        break;
+                    case REQUEST_VIDEO_FOR_REACT_CAM:
+                        action = "React Cam";
+                        break;
+                    case REQUEST_VIDEO_FOR_VIDEO_EDIT:
+                        action = "Video Editor";
+                        break;
+                    default:
+                        action = "My Project";
+                }
+                FirebaseUtils.logEventShowInterstitialAd(mFirebaseAnalytics, action);
+                Core.countAdsShown = 0;
+            }
+            Core.countAdsShown++;
         }
     };
 

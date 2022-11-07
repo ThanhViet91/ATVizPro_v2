@@ -38,6 +38,8 @@
     <string name="setting_commentary_number">setting_commentary_number</string>
     <string name="setting_edit_number">setting_edit_number</string>
 
+    <string name="setting_available_subs">setting_available_subs</string>
+
     <!--Camera settings-->
     <string name="setting_camera_mode">setting_camera_mode</string>
     <string name="setting_camera_position">setting_camera_position</string>
@@ -139,7 +141,7 @@
     <string name="guideline_record_step_5">Step 5: Wait 3s and the screen starts recording</string>
     <!--    guideline_live-->
     <string name="guideline_live_step_1">Step 1: Tap the button "Livestream" in home screen</string>
-    <string name="guideline_live_step_2">Step 2: Tap to choose social go to live</string>
+    <string name="guideline_live_step_2">Step 2: Tap to choose type of social go to live</string>
     <string name="guideline_live_step_3">Step 3: Fill RTMP address and Stream key to start</string>
 
     <!--    ConfirmExecute-->

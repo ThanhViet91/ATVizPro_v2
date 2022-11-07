@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.examples.atscreenrecord_test.Core;
 import com.examples.atscreenrecord_test.R;
 import com.examples.atscreenrecord_test.ui.IVideoStreamView;
 import com.examples.atscreenrecord_test.ui.VideoEditorView;
@@ -27,9 +28,11 @@ import com.examples.atscreenrecord_test.ui.fragments.OptionTrimFragment;
 import com.examples.atscreenrecord_test.ui.utils.MyUtils;
 import com.examples.atscreenrecord_test.utils.AdsUtil;
 import com.examples.atscreenrecord_test.utils.FFmpegUtil;
+import com.examples.atscreenrecord_test.utils.FirebaseUtils;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,12 +49,15 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
     private LottieAnimationView animationView;
     private AdsUtil mAdManager;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_editor);
         hideStatusBar(this);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         videoEditorView = findViewById(R.id.trimmer_view);
         Intent intent = getIntent();
         if (intent != null) {
@@ -175,6 +181,11 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
 
         @Override
         public void onAdShowedFullScreenContent() {
+            if (Core.countAdsShown == 5) {
+                FirebaseUtils.logEventShowInterstitialAd(mFirebaseAnalytics, "Video Editor");
+                Core.countAdsShown = 0;
+            }
+            Core.countAdsShown++;
         }
     };
 

@@ -58,7 +58,7 @@
         android:layout_below="@id/header"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="@dimen/lager_margin"
-        android:layout_marginTop="@dimen/lager_margin"
+        android:layout_marginTop="@dimen/normal_margin"
         android:layout_marginRight="@dimen/normal_margin"
         android:gravity="center"
         android:text="@string/step_1" />
@@ -109,10 +109,9 @@
     <RelativeLayout
         android:id="@+id/adView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_above="@id/bottom_line"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"/>
+        android:layout_centerHorizontal="true"/>
 
     <View
         android:id="@+id/bottom_line"

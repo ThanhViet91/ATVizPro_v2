@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -44,7 +43,6 @@ import com.google.common.collect.ImmutableList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class SubscriptionFragment extends Fragment {
 
@@ -108,7 +106,7 @@ public class SubscriptionFragment extends Fragment {
                     //Setting setIsRemoveAd to true
                     if (purchase.getProducts().get(0).contains(subs.get(selected).getKeyID())) {
                         SettingManager2.setProApp(requireContext(), true);
-                        System.out.println("thanhlv buyyyyyyyyyyyyyy OKKKKKKK");
+                        System.out.println("thanhlv buy OK");
                         mCallBack.onBuySuccess();
                         mFragmentManager.popBackStack();
                     }
@@ -154,32 +152,30 @@ public class SubscriptionFragment extends Fragment {
     public void updateSubs(){
         for (int i = 0; i < 3; i++) {
             String id = mProductDetailsList.get(i).getProductId();
-            String price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
-            requireActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (id.equals(subs.get(0).getKeyID())) {
-                        tvName1.setText(price + "/ " + subs.get(0).getName());
-                    } else
-                    if (id.equals(subs.get(1).getKeyID())) {
-                        tvName2.setText(price + "/ " + subs.get(1).getName());
-                    } else
-                    if (id.equals(subs.get(2).getKeyID())) {
-                        tvName3.setText(price + "/ " + subs.get(2).getName());
-                    }
-
-
+            String price = "";
+            if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
+                price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+            String finalPrice = price;
+            requireActivity().runOnUiThread(() -> {
+                if (id.equals(subs.get(0).getKeyID())) {
+                    tvName1.setText(finalPrice + "/ " + subs.get(0).getName());
+                } else
+                if (id.equals(subs.get(1).getKeyID())) {
+                    tvName2.setText(finalPrice + "/ " + subs.get(1).getName());
+                } else
+                if (id.equals(subs.get(2).getKeyID())) {
+                    tvName3.setText(finalPrice + "/ " + subs.get(2).getName());
                 }
+
+
             });
         }
 
-        requireActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                lnHideSubs.setVisibility(View.GONE);
-                btnBuy.setAlpha(1f);
-                btnBuy.setEnabled(true);
-            }});
+        requireActivity().runOnUiThread(() -> {
+            lnHideSubs.setVisibility(View.GONE);
+            btnBuy.setAlpha(1f);
+            btnBuy.setEnabled(true);
+        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -187,7 +183,9 @@ public class SubscriptionFragment extends Fragment {
         for (int i = 0; i < 3; i++) {
             for (ProductDetails product : Core.productDetails) {
                 String id = product.getProductId();
-                String price = product.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+                String price = "";
+                if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
+                    price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
                 if (id.equals(subs.get(i).getKeyID())) {
                     if (i == 0) tvName1.setText(price + "/ " + subs.get(0).getName());
                     if (i == 1) tvName2.setText(price + "/ " + subs.get(1).getName());
@@ -252,11 +250,6 @@ public class SubscriptionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         lnHideSubs = view.findViewById(R.id.hide_sub);
-//        if (NetworkUtils.isConnected(requireContext())) {
-//            lnHideSubs.setVisibility(View.GONE);
-//        } else
-//            lnHideSubs.setVisibility(View.VISIBLE);
-
         tvName1 = view.findViewById(R.id.name_sub_1);
         TextView tvDes1 = view.findViewById(R.id.des_sub_1);
         tvName2 = view.findViewById(R.id.name_sub_2);
@@ -268,7 +261,6 @@ public class SubscriptionFragment extends Fragment {
         tvDes2.setText(subs.get(1).getDescription());
         tvDes3.setText(subs.get(2).getDescription());
 
-
         ImageView btn_check_1 = view.findViewById(R.id.img_check_sub_1);
         ImageView btn_check_2 = view.findViewById(R.id.img_check_sub_2);
         ImageView btn_check_3 = view.findViewById(R.id.img_check_sub_3);
@@ -276,41 +268,32 @@ public class SubscriptionFragment extends Fragment {
         LinearLayout ln_sub_2 = view.findViewById(R.id.check2);
         LinearLayout ln_sub_3 = view.findViewById(R.id.check3);
 
-        ln_sub_1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_checked);
-                btn_check_1.setBackgroundResource(R.drawable.ic_select_sub);
-                ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_2.setBackgroundResource(R.drawable.ic_non_select_sub);
-                ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_3.setBackgroundResource(R.drawable.ic_non_select_sub);
-                selected = 0;
-            }
+        ln_sub_1.setOnClickListener(view1 -> {
+            ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_checked);
+            btn_check_1.setBackgroundResource(R.drawable.ic_select_sub);
+            ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_2.setBackgroundResource(R.drawable.ic_non_select_sub);
+            ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_3.setBackgroundResource(R.drawable.ic_non_select_sub);
+            selected = 0;
         });
-        ln_sub_2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_checked);
-                btn_check_2.setBackgroundResource(R.drawable.ic_select_sub);
-                ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_1.setBackgroundResource(R.drawable.ic_non_select_sub);
-                ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_3.setBackgroundResource(R.drawable.ic_non_select_sub);
-                selected = 1;
-            }
+        ln_sub_2.setOnClickListener(view12 -> {
+            ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_checked);
+            btn_check_2.setBackgroundResource(R.drawable.ic_select_sub);
+            ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_1.setBackgroundResource(R.drawable.ic_non_select_sub);
+            ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_3.setBackgroundResource(R.drawable.ic_non_select_sub);
+            selected = 1;
         });
-        ln_sub_3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_checked);
-                btn_check_3.setBackgroundResource(R.drawable.ic_select_sub);
-                ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_1.setBackgroundResource(R.drawable.ic_non_select_sub);
-                ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_check);
-                btn_check_2.setBackgroundResource(R.drawable.ic_non_select_sub);
-                selected = 2;
-            }
+        ln_sub_3.setOnClickListener(view13 -> {
+            ln_sub_3.setBackgroundResource(R.drawable.shape_round_ss_checked);
+            btn_check_3.setBackgroundResource(R.drawable.ic_select_sub);
+            ln_sub_1.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_1.setBackgroundResource(R.drawable.ic_non_select_sub);
+            ln_sub_2.setBackgroundResource(R.drawable.shape_round_ss_check);
+            btn_check_2.setBackgroundResource(R.drawable.ic_non_select_sub);
+            selected = 2;
         });
 
         btnBuy = view.findViewById(R.id.btn_start_plan);

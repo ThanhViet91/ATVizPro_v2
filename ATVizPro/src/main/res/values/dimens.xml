@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_margin">@dimen/_16sdp</dimen>
-    <dimen name="recording_icon_square">36dp</dimen>
-    <dimen name="recording_button_distance">48dp</dimen>
+    <dimen name="fab_icon_square">38dp</dimen>
+    <dimen name="recording_icon_square">40dp</dimen>
+    <dimen name="recording_button_distance">56dp</dimen>
     <dimen name="fab_margin">@dimen/_16sdp</dimen>
     <dimen name="adview_margin">10dp</dimen>
     <dimen name="small_margin">@dimen/_6sdp</dimen>

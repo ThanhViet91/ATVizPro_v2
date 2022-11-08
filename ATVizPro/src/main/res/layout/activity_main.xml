@@ -22,12 +22,12 @@
     <LinearLayout
         android:id="@+id/box_settings"
         android:layout_width="match_parent"
-        android:layout_marginStart="@dimen/normal_margin"
-        android:layout_marginEnd="@dimen/normal_margin"
         android:layout_height="60dp"
         android:layout_below="@id/title_app"
         android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/normal_margin"
         android:layout_marginTop="12dp"
+        android:layout_marginEnd="@dimen/normal_margin"
         android:orientation="horizontal"
         android:weightSum="4">
 
@@ -63,10 +63,10 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
-                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
+                    android:layout_marginTop="-5dp"
                     android:gravity="center">
 
                     <TextView
@@ -116,10 +116,10 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
-                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
+                    android:layout_marginTop="-5dp"
                     android:gravity="center">
 
                     <TextView
@@ -169,10 +169,10 @@
                     tools:targetApi="p" />
 
                 <LinearLayout
-                    android:layout_marginTop="-5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
+                    android:layout_marginTop="-5dp"
                     android:gravity="center">
 
                     <TextView
@@ -198,9 +198,9 @@
 
         <LinearLayout
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="4dp"
-            android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:gravity="center">
 
@@ -218,7 +218,7 @@
     <TextView
         android:id="@+id/title_direction"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_below="@id/box_settings"
         android:layout_marginTop="6dp"
         android:fontFamily="@font/roboto_regular"
@@ -229,35 +229,66 @@
         android:textSize="22sp"
         tools:targetApi="p" />
 
-    <pl.bclogic.pulsator4droid.library.PulsatorLayout
-        android:id="@+id/pulsator"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/tv_timer_home"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:layout_below="@id/box_settings"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/roboto_regular"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:text="00:15"
+        android:textColor="@color/white"
+        android:textFontWeight="600"
+        android:textSize="22sp"
+        tools:targetApi="p" />
+
+    <RelativeLayout
+
         android:layout_above="@id/fl_live"
-        android:layout_below="@id/title_direction"
+        android:layout_below="@id/box_settings"
+        android:layout_marginTop="50dp"
         android:layout_centerInParent="true"
-        app:pulse_color="#FFFFFF"
-        app:pulse_count="4"
-        app:pulse_duration="3000"
-        app:pulse_interpolator="Linear"
-        app:pulse_repeat="0"
-        app:pulse_startFromScratch="true">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <pl.bclogic.pulsator4droid.library.PulsatorLayout
+            android:id="@+id/pulsator_main"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerInParent="true"
+            app:pulse_color="#FFFFFF"
+            app:pulse_count="4"
+            app:pulse_duration="3000"
+            app:pulse_interpolator="Linear"
+            app:pulse_repeat="0"
+            app:pulse_startFromScratch="true"/>
 
         <ImageView
             android:id="@+id/img_record"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_centerInParent="true"
-            android:padding="36dp"
-            android:src="@drawable/img_button_record_home" />
+            android:src="@drawable/ic_start_record_home" />
+
+        <TextView
+            android:id="@+id/tv_start_stop"
+            style="@style/Title_Box_White"
+            android:text="START"
+            android:textSize="20sp"
+            android:textFontWeight="700"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:targetApi="p" />
 
         <ImageView
             android:id="@+id/img_live_type"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true" />
-
-    </pl.bclogic.pulsator4droid.library.PulsatorLayout>
+    </RelativeLayout>
 
 
     <FrameLayout
@@ -265,33 +296,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/item_func_row1"
+        android:layout_centerHorizontal="true"
         android:layout_marginStart="@dimen/normal_margin"
         android:layout_marginEnd="@dimen/normal_margin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp">
+        android:layout_marginBottom="8dp">
 
         <ImageView
             android:id="@+id/img_live"
             android:layout_width="match_parent"
-            android:layout_gravity="center_vertical"
             android:layout_height="78dp"
+            android:layout_gravity="center_vertical"
             android:layout_marginEnd="6dp"
             android:background="@drawable/bg_live_home" />
+
         <ImageView
-            android:layout_gravity="center_vertical"
             android:layout_width="90dp"
             android:layout_height="90dp"
+            android:layout_gravity="center_vertical"
             android:background="@drawable/ava_live" />
 
         <TextView
             android:id="@+id/tv_live_streaming"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_gravity="center"
             android:layout_marginStart="30dp"
             android:autoSizeTextType="uniform"
             android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
             android:maxLines="1"
             android:text="@string/livestreaming"
             android:textColor="@color/white"
@@ -442,7 +474,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="@dimen/normal_margin"
         android:layout_marginEnd="@dimen/normal_margin"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
         android:weightSum="2">
 
         <FrameLayout

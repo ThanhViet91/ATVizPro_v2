@@ -5,12 +5,16 @@ import static com.atsoft.screenrecord.ui.fragments.DialogSelectVideoSource.ARG_P
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STARTED;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STOPPED;
+import static com.atsoft.screenrecord.ui.services.ControllerService.mRecordingStarted;
 import static com.atsoft.screenrecord.ui.services.streaming.StreamingService.NOTIFY_MSG_CONNECTION_FAILED;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_CLOSE_POPUP;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_HOME;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.KEY_MESSAGE;
+import static com.atsoft.screenrecord.ui.utils.MyUtils.KEY_VALUE;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
@@ -26,6 +30,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -145,7 +150,7 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        pulsator.stop();
+//        pulsator.stop();
     }
 
     @Override
@@ -164,7 +169,6 @@ public class MainActivity extends BaseFragmentActivity {
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
-
         initViews();
         Intent intent = getIntent();
         if (intent != null)
@@ -175,9 +179,31 @@ public class MainActivity extends BaseFragmentActivity {
 
     protected void onResume() {
         super.onResume();
-        pulsator.start();
+//        pulsator.start();
         updateService();
         checkShowAd();
+    }
+
+
+    private long timer = 0;
+    private Handler handlerTimer = new Handler();
+    private Runnable runnable;
+
+    private void startCountTime() {
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    tvTimer.setText(MyUtils.parseLongToTime(timer * 1000));
+                    timer++;
+                    System.out.println("thanhlv startCountTime " + timer);
+                    handlerTimer.postDelayed(this, 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        handlerTimer.postDelayed(runnable, 0);
     }
 
     public void updateService() {
@@ -264,9 +290,30 @@ public class MainActivity extends BaseFragmentActivity {
         }
     }
 
+//    private long timer = 0;
+//    private Handler handlerTimer = new Handler();
+//    private Runnable runnable;
+//    TextView tvCounter;
+//    private void startCountTime() {
+//        timer = 0;
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    tvCounter.setText(MyUtils.parseLongToTime(timer*1000));
+//                    timer++;
+//                    handlerTimer.postDelayed(this, 1000);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+//        handlerTimer.postDelayed(runnable, 0);
+//    }
+
     private ImageView mImgRec, imgLiveType;
     private PulsatorLayout pulsator;
-    private TextView liveStreaming;
+    private TextView liveStreaming, tvStartStop, tvTimer, tvDes;
     private AdsUtil mAdManager;
     private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -275,8 +322,14 @@ public class MainActivity extends BaseFragmentActivity {
         RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
         mAdManager.createInterstitialAdmob();
-        pulsator = findViewById(R.id.pulsator);
-        pulsator.start();
+        tvStartStop = findViewById(R.id.tv_start_stop);
+        tvDes = findViewById(R.id.title_direction);
+        tvTimer = findViewById(R.id.tv_timer_home);
+//        pulsator = findViewById(R.id.pulsator);
+
+        getTimerFromService();
+
+//        pulsator.start();
         initVideoSettings();
         updateUISettings();
 
@@ -431,12 +484,31 @@ public class MainActivity extends BaseFragmentActivity {
             MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_LONG);
             return;
         }
-        if (isMyServiceRunning(getApplicationContext(), ControllerService.class)) {
-            MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
+        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            System.out.println("thanhlv openRecordService  " + mRecordingStarted);
+            if (mRecordingStarted) {
+                stopRecordFromHome();
+            } else
+                MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
             return;
         }
         mMode = MyUtils.MODE_RECORDING;
+        System.out.println("thanhlv openRecordService  " + mRecordingStarted);
         shouldStartControllerService();
+    }
+
+    private void stopRecordFromHome() {
+        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+
+            controller.setAction(MyUtils.ACTION_STOP_RECORDING_FROM_HOME);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
     }
 
     public void showLiveStreamFragment() {
@@ -920,11 +992,11 @@ public class MainActivity extends BaseFragmentActivity {
                             .beginTransaction()
                             .add(R.id.frame_layout_fragment,
                                     new SubscriptionFragment(() -> runOnUiThread(() -> {
-                                if (mAdManager != null) mAdManager.loadBanner();
-                                Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
-                                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                startActivity(intent);
-                            })))
+                                        if (mAdManager != null) mAdManager.loadBanner();
+                                        Intent intent = new Intent(MainActivity.this, ReactCamActivity.class);
+                                        intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                        startActivity(intent);
+                                    })))
                             .addToBackStack("")
                             .commitAllowingStateLoss());
 
@@ -957,11 +1029,11 @@ public class MainActivity extends BaseFragmentActivity {
                             .beginTransaction()
                             .add(R.id.frame_layout_fragment,
                                     new SubscriptionFragment(() -> runOnUiThread(() -> {
-                                if (mAdManager != null) mAdManager.loadBanner();
-                                Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
-                                intent.putExtra(KEY_PATH_VIDEO, pathVideo);
-                                startActivity(intent);
-                            })))
+                                        if (mAdManager != null) mAdManager.loadBanner();
+                                        Intent intent = new Intent(MainActivity.this, CommentaryActivity.class);
+                                        intent.putExtra(KEY_PATH_VIDEO, pathVideo);
+                                        startActivity(intent);
+                                    })))
                             .addToBackStack("")
                             .commitAllowingStateLoss();
                     return;
@@ -1018,7 +1090,7 @@ public class MainActivity extends BaseFragmentActivity {
                 } else {
                     if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && !video_input.contains(".")) {
                         showDialogPickVideo(fromFunction);
-                    }else {
+                    } else {
                         showMyRecordings(fromFunction, navigate_to, video_input);
                     }
                 }
@@ -1098,6 +1170,25 @@ public class MainActivity extends BaseFragmentActivity {
         } else {
             startService(controller);
         }
+        startRecordingImmediately();
+    }
+
+    private void startRecordingImmediately() {
+
+    }
+
+    public void getTimerFromService() {
+        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+
+            controller.setAction(MyUtils.ACTION_GET_TIMER);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
     }
 
     public void removeAllFragment() {
@@ -1141,6 +1232,9 @@ public class MainActivity extends BaseFragmentActivity {
         }
     }
 
+
+    private boolean isRecording = false;
+
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1155,8 +1249,38 @@ public class MainActivity extends BaseFragmentActivity {
                     liveStreaming.setText(getString(R.string.livestreaming));
                     sendDisconnectToService(true);
                 }
+
+                if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
+                    timer = intent.getLongExtra(KEY_VALUE, 0);
+                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== " + timer);
+                    updateUIRecordingHome(true);
+                }
+
+                if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) {
+//                    pulsator.stop();
+                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STOPPED main ==== ");
+                    updateUIRecordingHome(false);
+                }
             }
         }
     };
+
+    private void updateUIRecordingHome(boolean started) {
+        if (started) {
+            startCountTime();
+            tvStartStop.setText("STOP");
+            tvDes.setVisibility(View.GONE);
+            tvTimer.setVisibility(View.VISIBLE);
+            pulsator = findViewById(R.id.pulsator_main);
+            pulsator.start();
+        } else {
+            handlerTimer.removeCallbacks(runnable);
+            tvStartStop.setText("START");
+            tvDes.setVisibility(View.VISIBLE);
+            tvTimer.setVisibility(View.GONE);
+            pulsator.stop();
+        }
+
+    }
 }
 

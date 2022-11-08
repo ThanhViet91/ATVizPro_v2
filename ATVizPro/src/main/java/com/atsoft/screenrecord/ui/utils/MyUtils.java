@@ -62,6 +62,7 @@ public class MyUtils {
     public static final String ACTION_INIT_CONTROLLER = "ACTION INIT CONTROLLER";
     public static final String SAMPLE_RMPT_URL = "rtmp://live.skysoft.us/live/thanh";
     public static final String KEY_MESSAGE = "KEY_MESSAGE";
+    public static final String KEY_VALUE = "KEY_VALUE";
     public static final String KEY_SEND_PACKAGE_VIDEO = "key_send_package_video";
     public static final String ACTION_UPDATE_STREAM_PROFILE = "ACTION_UPDATE_STREAM_PROFILE";
     public static final String ACTION_UPDATE_TYPE_LIVE = "ACTION_UPDATE_TYPE_LIVE";
@@ -70,6 +71,8 @@ public class MyUtils {
     public static final String ACTION_END_REACT = "ACTION_END_REACT";
     public static final String ACTION_END_RECORD = "ACTION_END_RECORD";
     public static final String ACTION_END_COMMENTARY = "ACTION_END_COMMENTARY";
+    public static final String ACTION_GET_TIMER = "ACTION_GET_TIMER";
+    public static final String ACTION_STOP_RECORDING_FROM_HOME = "ACTION_STOP_RECORDING_FROM_HOME";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 
     private static final String TAG = "my_utils";
@@ -89,6 +92,12 @@ public class MyUtils {
     public static void sendBroadCastMessageFromService(Context context, String message) {
         Intent intent = new Intent(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
         intent.putExtra(KEY_MESSAGE, message);
+        context.sendBroadcast(intent);
+    }
+    public static void sendBroadCastMessageFromService(Context context, String message, long value) {
+        Intent intent = new Intent(MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE);
+        intent.putExtra(KEY_MESSAGE, message);
+        intent.putExtra(KEY_VALUE, value);
         context.sendBroadcast(intent);
     }
 

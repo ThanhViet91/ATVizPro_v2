@@ -6,6 +6,8 @@ import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -25,6 +27,10 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.transition.TransitionValues;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,6 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.CameraSetting;
@@ -62,18 +69,22 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
+    public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
+    public static final String NOTIFY_MSG_RECORDING_STOPPED = "NOTIFY_MSG_RECORDING_STARTED";
     //    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;
     private View mViewRoot;
     private View mCameraLayout;
+    private View mViewBlur;
     private WindowManager mWindowManager;
     WindowManager.LayoutParams paramViewRoot;
     WindowManager.LayoutParams paramCam;
     WindowManager.LayoutParams paramCountdown;
+    WindowManager.LayoutParams paramBlur;
     private Intent mScreenCaptureIntent = null;
     private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgCapture, mImgHome;
-    private Boolean mRecordingStarted = false;
+    public static Boolean mRecordingStarted = false;
     private Camera mCamera;
     private LinearLayout cameraPreview;
     private int mScreenWidth, mScreenHeight;
@@ -104,7 +115,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             if (type == SOCIAL_TYPE_FACEBOOK) mImgRec.setBackgroundResource(R.drawable.ic_facebook);
             if (type == SOCIAL_TYPE_TWITCH) mImgRec.setBackgroundResource(R.drawable.ic_twitch);
         } else {
-            mImgRec.setBackgroundResource(R.drawable.icon_app);
+            mImgRec.setBackgroundResource(R.drawable.ic_fab_expand);
         }
     }
 
@@ -114,6 +125,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             return;
 
         switch (action) {
+            case MyUtils.ACTION_STOP_RECORDING_FROM_HOME:
+                onClickStop();
+                break;
+            case MyUtils.ACTION_GET_TIMER:
+                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STARTED, timer);
+                break;
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
                 onClickClose(false);
@@ -140,8 +157,17 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //                    if (DEBUG) Log.i(TAG, "before run bindStreamService()" + action);
                     bindStreamingService();
                 }
+                toggleView(mViewRoot, View.GONE);
 
                 updateUI();
+
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleStartStopRecording();
+                    }
+                }, 1000);
                 break;
 
 //            case MyUtils.ACTION_UPDATE_SETTING:
@@ -280,6 +306,21 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
+
+        paramBlur = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                LAYOUT_FLAG,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION,
+                PixelFormat.TRANSLUCENT
+        );
+
     }
 
     private void updateScreenSize() {
@@ -329,10 +370,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         if (SettingManager2.isEnableCamView(getApplicationContext())) {
             toggleView(mCameraLayout, View.VISIBLE);
-            mImgCapture.setImageResource(R.drawable.ic_capture_disable);
+            mImgCapture.setImageResource(R.drawable.ic_hide_cam_fab);
         } else {
             toggleView(mCameraLayout, View.GONE);
-            mImgCapture.setImageResource(R.drawable.ic_capture_enable);
+            mImgCapture.setImageResource(R.drawable.ic_show_cam_fab);
         }
 
         final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
@@ -452,6 +493,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 try {
                     tvTimer.setText(MyUtils.parseLongToTime(timer*1000));
                     timer++;
+                    System.out.println("thanhlv startCountTime service" + timer);
                     handlerTimer.postDelayed(this, 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -459,6 +501,31 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             }
         };
         handlerTimer.postDelayed(runnable, 0);
+        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STARTED, timer);
+    }
+
+    private long timerHideFAB = 0;
+    private Handler handlerTimerFAB = new Handler();
+    private Runnable runnableFAB;
+    private void startCountTimeFAB() {
+        timerHideFAB = 0;
+        runnableFAB = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (timerHideFAB == 4) {
+                        toggleNavigationButton(View.GONE);
+                        return;
+                    }
+                    timerHideFAB++;
+                    System.out.println("thanhlv startCountTimeFAB " + timerHideFAB);
+                    handlerTimerFAB.postDelayed(this, 1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        handlerTimerFAB.postDelayed(runnableFAB, 0);
     }
 
     TextView tvTimer;
@@ -469,14 +536,19 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mViewRoot = LayoutInflater.from(this).inflate(R.layout.layout_recording, null);
 
         View mViewCountdown = LayoutInflater.from(this).inflate(R.layout.layout_countdown, null);
+        mViewBlur = LayoutInflater.from(this).inflate(R.layout.layout_bg_fab, null);
 
         paramViewRoot.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
         paramViewRoot.x = 0;
         paramViewRoot.y = 0;
 
+        paramBlur.x = 0;
+        paramBlur.y = 0;
+
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mViewCountdown, paramCountdown);
         mWindowManager.addView(mViewRoot, paramViewRoot);
+        mWindowManager.addView(mViewBlur, paramBlur);
 
         mCountdownLayout = mViewCountdown.findViewById(R.id.countdown_container);
         mTvCountdown = mViewCountdown.findViewById(R.id.tvCountDown);
@@ -503,11 +575,11 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 toggleNavigationButton(View.GONE);
                 if (mCameraLayout.getVisibility() == View.GONE) {
                     toggleView(mCameraLayout, View.VISIBLE);
-                    mImgCapture.setImageResource(R.drawable.ic_capture_disable);
+                    mImgCapture.setImageResource(R.drawable.ic_hide_cam_fab);
                     SettingManager2.setEnableCamView(getApplicationContext(), true);
                 } else {
                     toggleView(mCameraLayout, View.GONE);
-                    mImgCapture.setImageResource(R.drawable.ic_capture_enable);
+                    mImgCapture.setImageResource(R.drawable.ic_show_cam_fab);
                     SettingManager2.setEnableCamView(getApplicationContext(), false);
                 }
             }
@@ -523,53 +595,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgStart.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                toggleNavigationButton(View.GONE);
-                clickStart = true;
-                clickStop = false;
-                if (mRecordingServiceBound) {
-
-                    toggleView(mCountdownLayout, View.VISIBLE);
-
-                    int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
-
-                    new CountDownTimer(countdown, 1000) {
-
-                        @SuppressLint("DefaultLocale")
-                        public void onTick(long millisUntilFinished) {
-                            toggleView(mViewRoot, View.GONE);
-                            mTvCountdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
-                        }
-
-                        public void onFinish() {
-                            toggleView(mCountdownLayout, View.GONE);
-                            toggleView(tvTimer, View.VISIBLE);
-//                            toggleView(mImgRec, View.GONE);
-                            toggleView(mViewRoot, View.VISIBLE);
-                            mRecordingStarted = true;
-
-                            startCountTime();
-                            if (mMode == MyUtils.MODE_RECORDING) {
-                                mService.startPerformService();
-//                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
-                            } else {
-                                if (isConnected) {
-                                    mService.startPerformService();
-//                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
-                                } else {
-                                    mRecordingStarted = false;
-                                    MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
-                                }
-                            }
-
-                        }
-                    }.start();
-
-                } else {
-                    mRecordingStarted = false;
-                    MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
-//                    Log.e(TAG, "Recording Service connection has not been established");
-                    stopService();
-                }
+                handleStartStopRecording();
             }
         });
 
@@ -598,7 +624,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-
+                        mViewRoot.setX(0);
                         //remember the initial position.
                         initialX = paramViewRoot.x;
                         initialY = paramViewRoot.y;
@@ -615,6 +641,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         }
                         paramViewRoot.y = initialY + (int) (event.getRawY() - initialTouchY);
 
+                        if (event.getRawY() > mScreenHeight - 40) {
+                            paramViewRoot.y = initialY + (int) (mScreenHeight - 40 - initialTouchY);
+                        }
+
                         //Update the layout with new X & Y coordinate
                         mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
 
@@ -624,11 +654,21 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                         //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
                         //So that is click event.
-                        if (Xdiff < 20 && Ydiff < 20) {
+                        if (Xdiff < 10 && Ydiff < 10) {
                             if (isViewCollapsed()) {
                                 //When user clicks on the image view of the collapsed layout,
                                 //visibility of the collapsed layout will be changed to "View.GONE"
                                 //and expanded view will become visible.
+
+//                                overlayAnimation(mViewRoot, paramViewRoot.x, paramViewRoot.x+200);
+//                                new Handler().postDelayed(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//
+//                                        toggleNavigationButton(View.VISIBLE);
+//                                    }
+//                                }, 1000);
+                                startCountTimeFAB();
                                 toggleNavigationButton(View.VISIBLE);
                             } else {
                                 toggleNavigationButton(View.GONE);
@@ -648,6 +688,21 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 return false;
             }
         });
+
+        mViewBlur.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                            if (!isViewCollapsed()) {
+                                toggleNavigationButton(View.GONE);
+                            }
+                        return true;
+                }
+                return false;
+            }
+        });
+
         mViewRoot.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -655,6 +710,83 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                     toggleNavigationButton(View.GONE);
             }
         });
+    }
+
+    private void handleStartStopRecording() {
+        toggleNavigationButton(View.GONE);
+        clickStart = true;
+        clickStop = false;
+        if (mRecordingServiceBound) {
+
+            toggleView(mCountdownLayout, View.VISIBLE);
+
+            int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
+
+            new CountDownTimer(countdown, 1000) {
+
+                @SuppressLint("DefaultLocale")
+                public void onTick(long millisUntilFinished) {
+                    toggleView(mViewRoot, View.GONE);
+                    mTvCountdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
+                }
+
+                public void onFinish() {
+                    toggleView(mCountdownLayout, View.GONE);
+                    toggleView(tvTimer, View.VISIBLE);
+                    mImgRec.setImageResource(R.drawable.ic_fab_with_time);
+                    toggleView(mViewRoot, View.VISIBLE);
+                    mRecordingStarted = true;
+
+                    startCountTime();
+                    if (mMode == MyUtils.MODE_RECORDING) {
+                        mService.startPerformService();
+//                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
+                    } else {
+                        if (isConnected) {
+                            mService.startPerformService();
+//                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
+                        } else {
+                            mRecordingStarted = false;
+                            MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
+                        }
+                    }
+
+                }
+            }.start();
+
+        } else {
+            mRecordingStarted = false;
+            MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
+//                    Log.e(TAG, "Recording Service connection has not been established");
+            stopService();
+        }
+    }
+
+    public void updateViewLayout(View view, Integer x, Integer y, Integer w, Integer h) {
+        if (view != null) {
+            WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
+
+            if (x != null) lp.x = x;
+            if (y != null) lp.y = y;
+            if (w != null && w > 0) lp.width = w;
+            if (h != null && h > 0) lp.height = h;
+
+            mWindowManager.updateViewLayout(view, lp);
+        }
+    }
+
+    public void overlayAnimation(final View view2animate, int viewX, int endX) {
+        ValueAnimator translateLeft = ValueAnimator.ofInt(viewX, endX);
+        translateLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                updateViewLayout(view2animate, val, null, null, null);
+
+            }
+        });
+        translateLeft.setDuration(1000);
+        translateLeft.start();
     }
 
     public void gotoMain() {
@@ -684,6 +816,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         toggleNavigationButton(View.GONE);
         toggleView(tvTimer, View.GONE);
         handlerTimer.removeCallbacks(runnable);
+        mImgRec.setImageResource(R.drawable.ic_fab_expand);
+        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
+
         clickStop = true;
         if (mRecordingServiceBound) {
             //Todo: stop and save recording
@@ -801,7 +936,25 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 mImgStop.setVisibility(View.GONE);
             }
         }
-        mViewRoot.setPadding(32, 32, 32, 32);
+
+        if (viewMode == View.VISIBLE) {
+            mViewRoot.setPadding(40, 40, 40, 40);
+        } else {
+            mViewRoot.setPadding(0, 0, 0, 0);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (paramViewRoot.x == 0) mViewRoot.setX(-36);
+                    if (paramViewRoot.x == mScreenWidth) mViewRoot.setX(36);
+                    System.out.println("thanhlv mViewRoot.updateViewLayout= " + paramViewRoot.x);
+                }
+            }, 1500);
+            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
+
+            timerHideFAB = 0;
+            handlerTimerFAB.removeCallbacks(runnableFAB);
+        }
+        mViewBlur.setVisibility(viewMode);
     }
 
     private void releaseCamera() {

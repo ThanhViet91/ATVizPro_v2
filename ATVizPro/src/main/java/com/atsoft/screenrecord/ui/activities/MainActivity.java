@@ -176,10 +176,17 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public static boolean initialAds = false;
+    private boolean hasTimer = false;
 
     protected void onResume() {
         super.onResume();
 //        pulsator.start();
+
+        if (isRecording && !hasTimer) {
+            getTimerFromService();
+            updateUIRecordingHome(true);
+            hasTimer = true;
+        }
         updateService();
         checkShowAd();
     }
@@ -493,7 +500,7 @@ public class MainActivity extends BaseFragmentActivity {
             return;
         }
         mMode = MyUtils.MODE_RECORDING;
-        System.out.println("thanhlv openRecordService  " + mRecordingStarted);
+        System.out.println("thanhlv openRecordService 22 " + mRecordingStarted);
         shouldStartControllerService();
     }
 
@@ -1252,6 +1259,7 @@ public class MainActivity extends BaseFragmentActivity {
 
                 if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
                     timer = intent.getLongExtra(KEY_VALUE, 0);
+                    hasTimer = true;
                     System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== " + timer);
                     updateUIRecordingHome(true);
                 }

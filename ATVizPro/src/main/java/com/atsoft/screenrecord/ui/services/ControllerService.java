@@ -70,7 +70,7 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
-    public static final String NOTIFY_MSG_RECORDING_STOPPED = "NOTIFY_MSG_RECORDING_STARTED";
+    public static final String NOTIFY_MSG_RECORDING_STOPPED = "NOTIFY_MSG_RECORDING_STOPPED";
     //    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;

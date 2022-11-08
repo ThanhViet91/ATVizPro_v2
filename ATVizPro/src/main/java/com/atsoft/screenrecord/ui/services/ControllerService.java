@@ -70,6 +70,7 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
+    public static final String NOTIFY_MSG_GET_TIMER = "NOTIFY_MSG_GET_TIMER";
     public static final String NOTIFY_MSG_RECORDING_STOPPED = "NOTIFY_MSG_RECORDING_STOPPED";
     //    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
@@ -129,7 +130,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 onClickStop();
                 break;
             case MyUtils.ACTION_GET_TIMER:
-                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STARTED, timer);
+                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_GET_TIMER, timer);
                 break;
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();

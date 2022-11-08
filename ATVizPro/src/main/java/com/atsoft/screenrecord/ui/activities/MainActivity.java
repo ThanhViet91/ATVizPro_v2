@@ -5,6 +5,7 @@ import static com.atsoft.screenrecord.ui.fragments.DialogSelectVideoSource.ARG_P
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_GET_TIMER;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STARTED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STOPPED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.mRecordingStarted;
@@ -182,7 +183,7 @@ public class MainActivity extends BaseFragmentActivity {
         super.onResume();
 //        pulsator.start();
 
-        if (isRecording && !hasTimer) {
+        if (mRecordingStarted && !hasTimer) {
             getTimerFromService();
             updateUIRecordingHome(true);
             hasTimer = true;
@@ -491,13 +492,16 @@ public class MainActivity extends BaseFragmentActivity {
             MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_LONG);
             return;
         }
-        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-            System.out.println("thanhlv openRecordService  " + mRecordingStarted);
-            if (mRecordingStarted) {
-                stopRecordFromHome();
-            } else
-                MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
-            return;
+//        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+//            System.out.println("thanhlv openRecordService  " + mRecordingStarted);
+//            if (mRecordingStarted) {
+//                stopRecordFromHome();
+//            } else
+//                MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
+//            return;
+//        }
+        if (mRecordingStarted) {
+            stopRecordFromHome();
         }
         mMode = MyUtils.MODE_RECORDING;
         System.out.println("thanhlv openRecordService 22 " + mRecordingStarted);
@@ -1240,7 +1244,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
 
-    private boolean isRecording = false;
 
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
@@ -1257,18 +1260,23 @@ public class MainActivity extends BaseFragmentActivity {
                     sendDisconnectToService(true);
                 }
 
-                if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
-                    timer = intent.getLongExtra(KEY_VALUE, 0);
-                    hasTimer = true;
-                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== " + timer);
-                    updateUIRecordingHome(true);
-                }
 
                 if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) {
 //                    pulsator.stop();
                     System.out.println("thanhlv NOTIFY_MSG_RECORDING_STOPPED main ==== ");
                     updateUIRecordingHome(false);
                 }
+                if (NOTIFY_MSG_GET_TIMER.equals(notify_msg)) {
+                    timer = intent.getLongExtra(KEY_VALUE, 0);
+                    hasTimer = true;
+                    System.out.println("thanhlv NOTIFY_MSG_GET_TIMER main ==== " + timer);
+                }
+                if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
+
+                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== ");
+                    updateUIRecordingHome(true);
+                }
+
             }
         }
     };

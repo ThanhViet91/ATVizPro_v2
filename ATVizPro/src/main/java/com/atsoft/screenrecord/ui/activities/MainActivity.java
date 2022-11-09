@@ -5,7 +5,12 @@ import static com.atsoft.screenrecord.ui.fragments.DialogSelectVideoSource.ARG_P
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_GET_TIMER;
+import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_NEGATIVE;
+import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_POSITIVE;
+import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_TITLE;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_LIVESTREAM_STARTED;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_LIVESTREAM_STOPPED;
+import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_CLOSED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STARTED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_STOPPED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.mRecordingStarted;
@@ -15,7 +20,7 @@ import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_HOME;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_TO_EDIT;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.KEY_MESSAGE;
-import static com.atsoft.screenrecord.ui.utils.MyUtils.KEY_VALUE;
+import static com.atsoft.screenrecord.ui.utils.MyUtils.MESSAGE_DISCONNECT_LIVE;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
@@ -62,7 +67,9 @@ import com.atsoft.screenrecord.ui.fragments.FragmentFAQ;
 import com.atsoft.screenrecord.ui.fragments.FragmentSettings;
 import com.atsoft.screenrecord.ui.fragments.GuidelineLiveStreamFragment;
 import com.atsoft.screenrecord.ui.fragments.GuidelineScreenRecordFragment;
+import com.atsoft.screenrecord.ui.fragments.IConfirmPopupListener;
 import com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment;
+import com.atsoft.screenrecord.ui.fragments.PopupConfirm;
 import com.atsoft.screenrecord.ui.fragments.SubscriptionFragment;
 import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.services.ExecuteService;
@@ -70,6 +77,7 @@ import com.atsoft.screenrecord.ui.services.recording.RecordingService;
 import com.atsoft.screenrecord.ui.services.streaming.StreamingService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.utils.AdsUtil;
+import com.atsoft.screenrecord.utils.CounterUtil;
 import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.FirebaseUtils;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
@@ -178,16 +186,13 @@ public class MainActivity extends BaseFragmentActivity {
 
     public static boolean initialAds = false;
     private boolean hasTimer = false;
+    private boolean isStarted = false;
 
     protected void onResume() {
         super.onResume();
 //        pulsator.start();
 
-        if (mRecordingStarted && !hasTimer) {
-            getTimerFromService();
-            updateUIRecordingHome(true);
-            hasTimer = true;
-        }
+        System.out.println("thanhlv onResume mainnnnnn");
         updateService();
         checkShowAd();
     }
@@ -217,32 +222,61 @@ public class MainActivity extends BaseFragmentActivity {
     public void updateService() {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             int type = SettingManager2.getLiveStreamType(this);
+
+
             if (isConnected) {
+
+                imgStartLive.setVisibility(View.VISIBLE);
+                tvStartStop.setVisibility(View.GONE);
+
                 if (DisplayUtil.getDeviceWidthDpi() > 500) {
                     liveStreaming.setText(getString(R.string.disconnect_livestream));
                 } else {
                     liveStreaming.setText(getString(R.string.disconnect_live__));
                 }
-            } else
+                if (!mRecordingStarted) {
+                    updateUILivestreamHome(false);
+
+                    System.out.println("thanhlv tvDes.setText(sendDisconnectToService");
+                } else
+                    updateUILivestreamHome(true);
+            } else {
+
+                imgStartLive.setVisibility(View.GONE);
+                tvStartStop.setVisibility(View.VISIBLE);
                 liveStreaming.setText(getString(R.string.livestreaming));
-            if (type == 0) {
-                imgLiveType.setVisibility(View.GONE);
-                return;
             }
-            imgLiveType.setVisibility(View.VISIBLE);
+            if (type == 0) {
+                imgStartLive.setVisibility(View.GONE);
+            }
             if (type == SOCIAL_TYPE_YOUTUBE) {
-                imgLiveType.setBackgroundResource(R.drawable.ic_youtube);
-                return;
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
             }
             if (type == SOCIAL_TYPE_FACEBOOK) {
-                imgLiveType.setBackgroundResource(R.drawable.ic_facebook);
-                return;
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
             }
             if (type == SOCIAL_TYPE_TWITCH)
-                imgLiveType.setBackgroundResource(R.drawable.ic_twitch);
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+
         } else {
             liveStreaming.setText(getString(R.string.livestreaming));
-            imgLiveType.setVisibility(View.GONE);
+            imgStartLive.setVisibility(View.GONE);
+            if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+
+                if (!mRecordingStarted) {
+                    updateUIRecordingHome(false);
+                } else if (!isStarted)
+                    updateUIRecordingHome(true);
+
+            } else {
+                mStartRec.setVisibility(View.GONE);
+                mStopRec.setVisibility(View.GONE);
+                mImgRec.setVisibility(View.VISIBLE);
+                tvDes.setVisibility(View.VISIBLE);
+                tvTimer.setVisibility(View.GONE);
+                tvStartStop.setText("START");
+                pulsator.stop();
+            }
         }
     }
 
@@ -319,7 +353,7 @@ public class MainActivity extends BaseFragmentActivity {
 //        handlerTimer.postDelayed(runnable, 0);
 //    }
 
-    private ImageView mImgRec, imgLiveType;
+    private ImageView mImgRec, mStartRec, mStopRec, imgStartLive;
     private PulsatorLayout pulsator;
     private TextView liveStreaming, tvStartStop, tvTimer, tvDes;
     private AdsUtil mAdManager;
@@ -333,11 +367,8 @@ public class MainActivity extends BaseFragmentActivity {
         tvStartStop = findViewById(R.id.tv_start_stop);
         tvDes = findViewById(R.id.title_direction);
         tvTimer = findViewById(R.id.tv_timer_home);
-//        pulsator = findViewById(R.id.pulsator);
 
-        getTimerFromService();
-
-//        pulsator.start();
+        pulsator = findViewById(R.id.pulsator_main);
         initVideoSettings();
         updateUISettings();
 
@@ -361,7 +392,22 @@ public class MainActivity extends BaseFragmentActivity {
             openRecordService();
         });
 
-        imgLiveType = findViewById(R.id.img_live_type);
+        mStartRec = findViewById(R.id.img_start_record);
+        mStartRec.setOnClickListener(view -> {
+            startRecordFromHome();
+        });
+
+
+        mStopRec = findViewById(R.id.img_stop_record);
+        mStopRec.setOnClickListener(view -> {
+            stopRecordFromHome();
+        });
+
+        imgStartLive = findViewById(R.id.img_start_live_home);
+        imgStartLive.setOnClickListener(view -> {
+            toggleLiveStreamFromHome();
+        });
+
         liveStreaming = findViewById(R.id.tv_live_streaming);
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
@@ -428,6 +474,55 @@ public class MainActivity extends BaseFragmentActivity {
         });
     }
 
+    private boolean isLiveStarted = false;
+    private void toggleLiveStreamFromHome() {
+        System.out.println("thanhlv press toggleLiveStreamFromHome");
+        if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+             //
+            if (!isLiveStarted) {
+                //request start live
+                sendActionToService(MyUtils.ACTION_START_LIVESTREAM_FROM_HOME);
+                isLiveStarted = true;
+            } else {
+                // show popup choose pause/stop
+//                showPopupPauseStopLive("", "Stop", "Pause");
+                sendActionToService(MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME);
+                isLiveStarted = false;
+            }
+        }
+
+    }
+
+
+    private void showPopupPauseStopLive(String title, String pos, String neg) {
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_TITLE, title);
+        bundle.putString(KEY_POSITIVE, pos);
+        bundle.putString(KEY_NEGATIVE, neg);
+        PopupConfirm.newInstance(new IConfirmPopupListener() {
+            @Override
+            public void onClickPositiveButton() {
+                sendActionToService(MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME);
+            }
+
+            @Override
+            public void onClickNegativeButton() {
+                sendActionToService(MyUtils.ACTION_PAUSE_LIVESTREAM_FROM_HOME);
+            }
+        }, bundle).show(getSupportFragmentManager(), "");
+
+    }
+
+    public void sendActionToService(String action) {
+        Intent controller = new Intent(MainActivity.this, ControllerService.class);
+        controller.setAction(action);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(controller);
+        } else {
+            startService(controller);
+        }
+    }
+
     public boolean hasAllPermissionForReact() {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
@@ -492,27 +587,36 @@ public class MainActivity extends BaseFragmentActivity {
             MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_LONG);
             return;
         }
-//        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-//            System.out.println("thanhlv openRecordService  " + mRecordingStarted);
-//            if (mRecordingStarted) {
-//                stopRecordFromHome();
-//            } else
-//                MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
-//            return;
-//        }
-        if (mRecordingStarted) {
-            stopRecordFromHome();
+        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
+            return;
         }
+
         mMode = MyUtils.MODE_RECORDING;
-        System.out.println("thanhlv openRecordService 22 " + mRecordingStarted);
         shouldStartControllerService();
     }
 
     private void stopRecordFromHome() {
+        System.out.println("thanhlv press stopRecordFromHome");
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
 
             controller.setAction(MyUtils.ACTION_STOP_RECORDING_FROM_HOME);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
+    }
+
+    private void startRecordFromHome() {
+        System.out.println("thanhlv press startRecordFromHome");
+        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+
+            controller.setAction(MyUtils.ACTION_START_RECORDING_FROM_HOME);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
@@ -1132,6 +1236,7 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void sendDisconnectToService(boolean keepRunningService) {
+
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
             if (keepRunningService) {
@@ -1145,6 +1250,7 @@ public class MainActivity extends BaseFragmentActivity {
                 startService(controller);
             }
         }
+
     }
 
     public void updateIconService() {
@@ -1254,27 +1360,53 @@ public class MainActivity extends BaseFragmentActivity {
                 String notify_msg = intent.getStringExtra(KEY_MESSAGE);
                 if (TextUtils.isEmpty(notify_msg))
                     return;
-                updateService();
                 if (NOTIFY_MSG_CONNECTION_FAILED.equals(notify_msg)) {
+
                     liveStreaming.setText(getString(R.string.livestreaming));
                     sendDisconnectToService(true);
+
+                    updateService();
                 }
 
+                if (MESSAGE_DISCONNECT_LIVE.equals(notify_msg)) {
+                    mImgRec.setVisibility(View.VISIBLE);
+                    imgStartLive.setVisibility(View.GONE);
+                    tvDes.setVisibility(View.VISIBLE);
+                    tvDes.setText("Tap to start \n record screen");
+                    isConnected = false;
+
+                    updateService();
+                }
 
                 if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) {
-//                    pulsator.stop();
                     System.out.println("thanhlv NOTIFY_MSG_RECORDING_STOPPED main ==== ");
                     updateUIRecordingHome(false);
                 }
-                if (NOTIFY_MSG_GET_TIMER.equals(notify_msg)) {
-                    timer = intent.getLongExtra(KEY_VALUE, 0);
-                    hasTimer = true;
-                    System.out.println("thanhlv NOTIFY_MSG_GET_TIMER main ==== " + timer);
-                }
                 if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
-
                     System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== ");
                     updateUIRecordingHome(true);
+                }
+
+                if (NOTIFY_MSG_LIVESTREAM_STARTED.equals(notify_msg)) {
+                    System.out.println("thanhlv NOTIFY_MSG_LIVESTREAM_STARTED main ==== ");
+                    updateUILivestreamHome(true);
+                }
+                if (NOTIFY_MSG_LIVESTREAM_STOPPED.equals(notify_msg)) {
+                    System.out.println("thanhlv NOTIFY_MSG_LIVESTREAM_STOPPED main ==== ");
+                    updateUILivestreamHome(false);
+                }
+
+                if (NOTIFY_MSG_RECORDING_CLOSED.equals(notify_msg)) {
+                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_CLOSED main ==== ");
+
+                    mImgRec.setVisibility(View.VISIBLE);
+                    mStartRec.setVisibility(View.GONE);
+                    mStopRec.setVisibility(View.GONE);
+                    tvStartStop.setText("START");
+                    tvDes.setVisibility(View.VISIBLE);
+                    tvTimer.setVisibility(View.GONE);
+                    pulsator.stop();
+                    isStarted = false;
                 }
 
             }
@@ -1282,19 +1414,77 @@ public class MainActivity extends BaseFragmentActivity {
     };
 
     private void updateUIRecordingHome(boolean started) {
+
+        if (!MyUtils.isMyServiceRunning(MainActivity.this, RecordingService.class)) return;
         if (started) {
-            startCountTime();
+            CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
+                @Override
+                public void onTickString(String sec) {
+                    tvTimer.setText(sec);
+                }});
+            mImgRec.setVisibility(View.GONE);
+            mStartRec.setVisibility(View.GONE);
+            mStopRec.setVisibility(View.VISIBLE);
             tvStartStop.setText("STOP");
             tvDes.setVisibility(View.GONE);
             tvTimer.setVisibility(View.VISIBLE);
-            pulsator = findViewById(R.id.pulsator_main);
             pulsator.start();
+            isStarted = true;
         } else {
-            handlerTimer.removeCallbacks(runnable);
+            mStartRec.setVisibility(View.VISIBLE);
+            mStopRec.setVisibility(View.GONE);
             tvStartStop.setText("START");
             tvDes.setVisibility(View.VISIBLE);
             tvTimer.setVisibility(View.GONE);
             pulsator.stop();
+            isStarted = false;
+        }
+
+    }
+
+    int typeLive;
+    public void updateUILivestreamHome(boolean started) {
+        if (!MyUtils.isMyServiceRunning(MainActivity.this, StreamingService.class)) return;
+        typeLive = SettingManager2.getLiveStreamType(this);
+        if (started) {
+            pulsator.start();
+            CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
+                @Override
+                public void onTickString(String sec) {
+                    tvTimer.setText(sec);
+                }});
+            tvDes.setVisibility(View.GONE);
+            tvTimer.setVisibility(View.VISIBLE);
+            if (typeLive == SOCIAL_TYPE_YOUTUBE) {
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
+            }
+            if (typeLive == SOCIAL_TYPE_FACEBOOK) {
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
+            }
+            if (typeLive == SOCIAL_TYPE_TWITCH)
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
+            isStarted = true;
+            isLiveStarted = true;
+        } else {
+            mImgRec.setVisibility(View.GONE);
+            mStartRec.setVisibility(View.GONE);
+            mStopRec.setVisibility(View.GONE);
+            imgStartLive.setVisibility(View.VISIBLE);
+            if (typeLive == SOCIAL_TYPE_YOUTUBE) {
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+            }
+            if (typeLive == SOCIAL_TYPE_FACEBOOK) {
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+            }
+            if (typeLive == SOCIAL_TYPE_TWITCH)
+                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+            tvDes.setVisibility(View.VISIBLE);
+            tvDes.setText("Tap to start \nlivestream");
+            System.out.println("thanhlv tvDes.setText(ffffffffffffff");
+            tvTimer.setVisibility(View.GONE);
+            pulsator.stop();
+            isStarted = false;
+            isLiveStarted = false;
         }
 
     }

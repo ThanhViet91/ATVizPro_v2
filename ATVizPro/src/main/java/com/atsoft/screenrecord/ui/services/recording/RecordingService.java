@@ -93,6 +93,7 @@ public class RecordingService extends BaseService {
         mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
         Log.i(TAG, "onBind: " + mScreenCaptureIntent);
+
         return mIBinder;
     }
 
@@ -179,13 +180,13 @@ public class RecordingService extends BaseService {
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
                 mMuxer = null;
-                System.out.println("thanhlv stopRecording 1" + outputFile);
+//                System.out.println("thanhlv stopRecording 1" + outputFile);
                 try {
                     sSync.wait(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                System.out.println("thanhlv stopRecording 2" + outputFile);
+//                System.out.println("thanhlv stopRecording 2" + outputFile);
                 showResultActivity(outputFile);
 
             }

@@ -18,6 +18,7 @@ import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.atsoft.screenrecord.controllers.settings.VideoSetting2;
 import com.atsoft.screenrecord.ui.services.BaseService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
+import com.atsoft.screenrecord.utils.CounterUtil;
 import com.takusemba.rtmppublisher.Publisher;
 import com.takusemba.rtmppublisher.PublisherListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -49,12 +50,15 @@ public class StreamingService extends BaseService implements PublisherListener {
     public void onStarted() {
         isConnected = false;
         hasNotice = false;
+
+        System.out.println("thanhlv fffffffffff onStarted " + isConnected);
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_STARTED);
     }
 
     @Override
     public void onConnected() {
         isConnected = true;
+        System.out.println("thanhlv fffffffffff onConnected " + isConnected);
         notifyStreamingCallback(NOTIFY_MSG_CONNECTED);
         MyUtils.toast(getApplicationContext(), "Connection success!", Toast.LENGTH_LONG);
     }
@@ -62,13 +66,17 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onStopped() {
 //        if (DEBUG) Log.i(TAG, "onStopped live");
-        isConnected = false;
+//        isConnected = false;
         notifyStreamingCallback(NOTIFY_MSG_STREAM_STOPPED);
+
+        System.out.println("thanhlv fffffffffff onStopped " + isConnected);
     }
 
     @Override
     public void onDisconnected() {
         isConnected = false;
+        System.out.println("thanhlv fffffffffff onDisconnected " + isConnected);
+        CounterUtil.getInstance().stopCounter();
         if (DEBUG) Log.i(TAG, "onDisconnected");
 //        notifyStreamingCallback(NOTIFY_MSG_CONNECTION_DISCONNECTED);
     }
@@ -78,6 +86,9 @@ public class StreamingService extends BaseService implements PublisherListener {
     @Override
     public void onFailedToConnect(String reason) {
         isConnected = false;
+
+        System.out.println("thanhlv fffffffffff onFailedToConnect " + isConnected);
+        CounterUtil.getInstance().stopCounter();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
         if (DEBUG) Log.i(TAG, "onFailedToConnect");
 
@@ -200,6 +211,7 @@ public class StreamingService extends BaseService implements PublisherListener {
         if (DEBUG) Log.i(TAG, "stopPerformService: from StreamingService");
         notifyStreamingCallback(NOTIFY_MSG_REQUEST_STOP + " " + mUrl);
         stopStreaming();
+//        closeStreaming();
     }
 
     @Override

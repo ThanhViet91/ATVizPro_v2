@@ -2,11 +2,7 @@ package com.atsoft.screenrecord.ui.services;
 
 import static com.atsoft.screenrecord.Core.isConnected;
 import static com.atsoft.screenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
-import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
-import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
-import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
 
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -27,10 +23,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
-import android.transition.Slide;
-import android.transition.Transition;
-import android.transition.TransitionManager;
-import android.transition.TransitionValues;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -47,7 +39,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
-import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.CameraSetting;
@@ -63,6 +54,7 @@ import com.atsoft.screenrecord.ui.utils.CameraPreview;
 import com.atsoft.screenrecord.ui.utils.CustomOnScaleDetector;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.ui.utils.NotificationHelper;
+import com.atsoft.screenrecord.utils.CounterUtil;
 import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
@@ -70,8 +62,11 @@ import com.takusemba.rtmppublisher.helper.StreamProfile;
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
-    public static final String NOTIFY_MSG_GET_TIMER = "NOTIFY_MSG_GET_TIMER";
+    public static final String NOTIFY_MSG_RECORDING_CLOSED = "NOTIFY_MSG_RECORDING_CLOSED";
+    public static final String NOTIFY_MSG_LIVESTREAM_STARTED = "NOTIFY_MSG_LIVESTREAM_STARTED";
+    public static final String NOTIFY_MSG_LIVESTREAM_CLOSED = "NOTIFY_MSG_LIVESTREAM_CLOSED";
     public static final String NOTIFY_MSG_RECORDING_STOPPED = "NOTIFY_MSG_RECORDING_STOPPED";
+    public static final String NOTIFY_MSG_LIVESTREAM_STOPPED = "NOTIFY_MSG_LIVESTREAM_STOPPED";
     //    private final boolean DEBUG = MyUtils.DEBUG;
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;
@@ -109,16 +104,16 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void updateUI() {
-        if (mMode == MyUtils.MODE_STREAMING) {
-            int type = SettingManager2.getLiveStreamType(this);
-            if (type == SOCIAL_TYPE_YOUTUBE) mImgRec.setBackgroundResource(R.drawable.ic_youtube);
-            if (type == SOCIAL_TYPE_FACEBOOK) mImgRec.setBackgroundResource(R.drawable.ic_facebook);
-            if (type == SOCIAL_TYPE_TWITCH) mImgRec.setBackgroundResource(R.drawable.ic_twitch);
-        } else {
-            mImgRec.setBackgroundResource(R.drawable.ic_fab_expand);
-        }
-    }
+//    private void updateUI() {
+//        if (mMode == MyUtils.MODE_STREAMING) {
+////            int type = SettingManager2.getLiveStreamType(this);
+////            if (type == SOCIAL_TYPE_YOUTUBE) mImgRec.setBackgroundResource(R.drawable.ic_youtube);
+////            if (type == SOCIAL_TYPE_FACEBOOK) mImgRec.setBackgroundResource(R.drawable.ic_facebook);
+////            if (type == SOCIAL_TYPE_TWITCH) mImgRec.setBackgroundResource(R.drawable.ic_twitch);
+//        } else {
+//            mImgRec.setBackgroundResource(R.drawable.ic_fab_expand);
+//        }
+//    }
 
     private void handleIncomeAction(Intent intent) {
         String action = intent.getAction();
@@ -126,11 +121,19 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             return;
 
         switch (action) {
+
+            case MyUtils.ACTION_START_LIVESTREAM_FROM_HOME:
+                System.out.println("thanhlv case MyUtils.ACTION_START_LIVESTREAM_FROM_HOME");
+                handleStartRecording();
+                break;
+            case MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME:
             case MyUtils.ACTION_STOP_RECORDING_FROM_HOME:
+                System.out.println("thanhlv case MyUtils.ACTION_STOP_RECORDING_FROM_HOME ACTION_STOP_LIVESTREAM_FROM_HOME");
                 onClickStop();
                 break;
-            case MyUtils.ACTION_GET_TIMER:
-                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_GET_TIMER, timer);
+            case MyUtils.ACTION_START_RECORDING_FROM_HOME:
+                System.out.println("thanhlv case MyUtils.ACTION_START_RECORDING_FROM_HOME");
+                handleStartRecording();
                 break;
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
@@ -140,7 +143,11 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 onClickStop();
                 onClickClose(true);
                 break;
+            case MyUtils.ACTION_EXIT_SERVICE:
+                stopService();
+                break;
             case MyUtils.ACTION_INIT_CONTROLLER:
+                System.out.println("thanhlv case MyUtils.ACTION_INIT_CONTROLLER:");
                 mMode = intent.getIntExtra(MyUtils.KEY_CONTROLlER_MODE, MyUtils.MODE_RECORDING);
                 mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
                 if (mMode == MyUtils.MODE_STREAMING)
@@ -158,28 +165,29 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //                    if (DEBUG) Log.i(TAG, "before run bindStreamService()" + action);
                     bindStreamingService();
                 }
-                toggleView(mViewRoot, View.GONE);
+//                updateUI();
+                if (mMode == MyUtils.MODE_RECORDING) {
+                    toggleView(mViewRoot, View.GONE);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
 
-                updateUI();
-
-
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        handleStartStopRecording();
-                    }
-                }, 1000);
+                            System.out.println("thanhlv case MyUtils.ACTION_INIT_CONTROLLER: ---> handleStartRecording");
+                            handleStartRecording();
+                        }
+                    }, 600);
+                }
                 break;
 
 //            case MyUtils.ACTION_UPDATE_SETTING:
 //                handleUpdateSetting(intent);
 //                break;
-            case MyUtils.ACTION_UPDATE_TYPE_LIVE:
-                updateUI();
-                break;
-            case MyUtils.ACTION_END_RECORD:
-                videoFileEndRecord = intent.getStringExtra(KEY_PATH_VIDEO);
-                break;
+//            case MyUtils.ACTION_UPDATE_TYPE_LIVE:
+//                updateUI();
+//                break;
+//            case MyUtils.ACTION_END_RECORD:
+//                videoFileEndRecord = intent.getStringExtra(KEY_PATH_VIDEO);
+//                break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
                     String url = intent.getStringExtra(MyUtils.NEW_URL);
@@ -483,28 +491,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
-    private long timer = 0;
-    private Handler handlerTimer = new Handler();
-    private Runnable runnable;
-    private void startCountTime() {
-        timer = 0;
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    tvTimer.setText(MyUtils.parseLongToTime(timer*1000));
-                    timer++;
-                    System.out.println("thanhlv startCountTime service" + timer);
-                    handlerTimer.postDelayed(this, 1000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        handlerTimer.postDelayed(runnable, 0);
-        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STARTED, timer);
-    }
-
     private long timerHideFAB = 0;
     private Handler handlerTimerFAB = new Handler();
     private Runnable runnableFAB;
@@ -519,7 +505,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         return;
                     }
                     timerHideFAB++;
-                    System.out.println("thanhlv startCountTimeFAB " + timerHideFAB);
+//                    System.out.println("thanhlv startCountTimeFAB " + timerHideFAB);
                     handlerTimerFAB.postDelayed(this, 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -596,7 +582,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgStart.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                handleStartStopRecording();
+                handleStartRecording();
             }
         });
 
@@ -713,7 +699,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         });
     }
 
-    private void handleStartStopRecording() {
+    private void handleStartRecording() {
         toggleNavigationButton(View.GONE);
         clickStart = true;
         clickStop = false;
@@ -733,19 +719,38 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                 public void onFinish() {
                     toggleView(mCountdownLayout, View.GONE);
-                    toggleView(tvTimer, View.VISIBLE);
-                    mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                     toggleView(mViewRoot, View.VISIBLE);
                     mRecordingStarted = true;
 
-                    startCountTime();
-                    if (mMode == MyUtils.MODE_RECORDING) {
+//                    startCountTime();
+
+                    if (mMode == MyUtils.MODE_RECORDING) { //mode Recording
                         mService.startPerformService();
-//                                MyUtils.toast(getApplicationContext(), "Recording started", Toast.LENGTH_SHORT);
-                    } else {
+                        mImgRec.setImageResource(R.drawable.ic_fab_with_time);
+                        toggleView(tvTimer, View.VISIBLE);
+                        MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_RECORDING_STARTED);
+                        CounterUtil counterUtil = CounterUtil.getInstance();
+                        counterUtil.setCallback(new CounterUtil.ICounterUtil() {
+                            @Override
+                            public void onTickString(String sec) {
+                                tvTimer.setText(sec);
+                            }
+                        });
+                        counterUtil.startCounter();
+                    } else { //mode livestream
                         if (isConnected) {
                             mService.startPerformService();
-//                                    MyUtils.toast(getApplicationContext(), "LiveStreaming started", Toast.LENGTH_SHORT);
+                            mImgRec.setImageResource(R.drawable.ic_fab_with_time);
+                            toggleView(tvTimer, View.VISIBLE);
+                            MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_LIVESTREAM_STARTED);
+                            CounterUtil counterUtil = CounterUtil.getInstance();
+                            counterUtil.setCallback(new CounterUtil.ICounterUtil() {
+                                @Override
+                                public void onTickString(String sec) {
+                                    tvTimer.setText(sec);
+                                }
+                            });
+                            counterUtil.startCounter();
                         } else {
                             mRecordingStarted = false;
                             MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
@@ -815,22 +820,24 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
     private void onClickStop() {
         toggleNavigationButton(View.GONE);
-        toggleView(tvTimer, View.GONE);
-        handlerTimer.removeCallbacks(runnable);
-        mImgRec.setImageResource(R.drawable.ic_fab_expand);
-        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
+//        handlerTimer.removeCallbacks(runnable);
 
         clickStop = true;
         if (mRecordingServiceBound) {
             //Todo: stop and save recording
             mRecordingStarted = false;
-
             mService.stopPerformService();
+            toggleView(tvTimer, View.GONE);
+            CounterUtil.getInstance().stopCounter();
+            mImgRec.setImageResource(R.drawable.ic_fab_expand);
 
             if (mMode == MyUtils.MODE_RECORDING) {
 //                        ((RecordingService)mService).insertVideoToGallery();
+                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
                 if (clickStart)
                     MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
+            } else {
+                MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_LIVESTREAM_STOPPED);
             }
         } else {
             mRecordingStarted = true;
@@ -844,14 +851,17 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
         if (!clickStop) onClickStop();
         mService.closePerformService();
-        if (!keepRunningService) {
-            stopService();
-            SettingManager2.setLiveStreamType(getApplicationContext(), 0);
-        }
         clickStop = false;
         if (mMode == MyUtils.MODE_STREAMING)
             MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
 
+        if (mMode == MyUtils.MODE_RECORDING)
+            MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_CLOSED);
+
+        if (!keepRunningService) {
+            stopService();
+            SettingManager2.setLiveStreamType(getApplicationContext(), 0);
+        }
     }
 
     private void stopService() {
@@ -905,8 +915,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             } else {
                 binder = (RecordingBinder) service;
                 mService = ((RecordingBinder) binder).getService();
-
-                MyUtils.toast(getApplicationContext(), "Recording service connected", Toast.LENGTH_SHORT);
+//                handleStartRecording();
+//                MyUtils.toast(getApplicationContext(), "Recording service connected", Toast.LENGTH_SHORT);
             }
             mRecordingServiceBound = true;
         }
@@ -947,10 +957,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 public void run() {
                     if (paramViewRoot.x == 0) mViewRoot.setX(-36);
                     if (paramViewRoot.x == mScreenWidth) mViewRoot.setX(36);
-                    System.out.println("thanhlv mViewRoot.updateViewLayout= " + paramViewRoot.x);
+//                    System.out.println("thanhlv mViewRoot.updateViewLayout= " + paramViewRoot.x);
                 }
             }, 1500);
-            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
+//            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
 
             timerHideFAB = 0;
             handlerTimerFAB.removeCallbacks(runnableFAB);

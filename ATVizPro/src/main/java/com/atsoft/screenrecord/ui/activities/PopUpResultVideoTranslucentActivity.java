@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.bumptech.glide.Glide;
 import com.atsoft.screenrecord.App;
 import com.atsoft.screenrecord.R;
@@ -135,6 +137,16 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     private void stopExecuteService() {
         if (isMyServiceRunning(this, ExecuteService.class)) {
             Intent controller = new Intent(this, ExecuteService.class);
+            controller.setAction(MyUtils.ACTION_EXIT_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
+
+        if (isMyServiceRunning(this, ControllerService.class)) {
+            Intent controller = new Intent(this, ControllerService.class);
             controller.setAction(MyUtils.ACTION_EXIT_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);

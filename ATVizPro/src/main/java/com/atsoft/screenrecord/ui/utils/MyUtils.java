@@ -73,6 +73,11 @@ public class MyUtils {
     public static final String ACTION_END_COMMENTARY = "ACTION_END_COMMENTARY";
     public static final String ACTION_GET_TIMER = "ACTION_GET_TIMER";
     public static final String ACTION_STOP_RECORDING_FROM_HOME = "ACTION_STOP_RECORDING_FROM_HOME";
+    public static final String ACTION_START_RECORDING_FROM_HOME = "ACTION_START_RECORDING_FROM_HOME";
+    public static final String ACTION_START_LIVESTREAM_FROM_HOME = "ACTION_START_LIVESTREAM_FROM_HOME";
+    public static final String ACTION_STOP_LIVESTREAM_FROM_HOME = "ACTION_STOP_LIVESTREAM_FROM_HOME";
+    public static final String ACTION_PAUSE_LIVESTREAM_FROM_HOME = "ACTION_STOP_LIVESTREAM_FROM_HOME";
+    public static final String ACTION_RECORDING_ALREADY = "ACTION_RECORDING_ALREADY";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 
     private static final String TAG = "my_utils";

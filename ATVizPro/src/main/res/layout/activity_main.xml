@@ -239,7 +239,7 @@
         android:fontFamily="@font/roboto_regular"
         android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:text="00:15"
+        android:text="00:00"
         android:textColor="@color/white"
         android:textFontWeight="600"
         android:textSize="22sp"
@@ -259,7 +259,7 @@
             android:layout_height="250dp"
             android:layout_centerInParent="true"
             app:pulse_color="#FFFFFF"
-            app:pulse_count="4"
+            app:pulse_count="5"
             app:pulse_duration="3000"
             app:pulse_interpolator="Linear"
             app:pulse_repeat="0"
@@ -267,8 +267,23 @@
 
         <ImageView
             android:id="@+id/img_record"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_start_record_home" />
+
+        <ImageView
+            android:id="@+id/img_stop_record"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_rec_home_stop" />
+        <ImageView
+            android:id="@+id/img_start_record"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_start_record_home" />
 
@@ -284,9 +299,9 @@
             tools:targetApi="p" />
 
         <ImageView
-            android:id="@+id/img_live_type"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/img_start_live_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerInParent="true" />
     </RelativeLayout>
 

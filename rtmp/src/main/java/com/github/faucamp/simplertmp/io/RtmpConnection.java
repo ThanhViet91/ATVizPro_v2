@@ -476,6 +476,7 @@ public class RtmpConnection implements RtmpPublisher {
         || !connected
         || currentStreamId == 0
         || !publishPermitted) {
+//      System.out.println("thanhlv publishVideoData nullllllllllllllll " + data.length);
       return;
     }
     Video video = new Video();

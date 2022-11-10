@@ -3,6 +3,7 @@ package com.takusemba.rtmppublisher;
 import android.media.MediaCodec;
 import android.media.projection.MediaProjection;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -104,7 +105,7 @@ class Streamer implements AudioHandler.OnAudioEncoderStateListener, VideoHandler
     }
 
     void disconnectStreaming() {
-        new Handler().postDelayed(new Runnable() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
                 srsFlvMuxer.stop();

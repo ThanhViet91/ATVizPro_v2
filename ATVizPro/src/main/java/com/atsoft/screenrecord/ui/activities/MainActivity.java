@@ -52,6 +52,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 
 import com.atsoft.screenrecord.App;
 import com.atsoft.screenrecord.BuildConfig;
@@ -196,30 +197,23 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void updateService() {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-            if (isConnected) {
-                if (DisplayUtil.getDeviceWidthDpi() > 500) {
-                    liveStreaming.setText(getString(R.string.disconnect_livestream));
-                } else {
-                    liveStreaming.setText(getString(R.string.disconnect_live__));
-                }
-                if (!mRecordingStarted) {
-                    updateUILivestreamHome(false);
-                } else
-                    updateUILivestreamHome(true);
+            if (DisplayUtil.getDeviceWidthDpi() > 500) {
+                liveStreaming.setText(getString(R.string.disconnect_livestream));
             } else {
-                showUIDefaultRecord();
+                liveStreaming.setText(getString(R.string.disconnect_live__));
             }
+            if (!mRecordingStarted) {
+                updateUILivestreamHome(false);
+            } else
+                updateUILivestreamHome(true);
+        } else if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+            if (!mRecordingStarted) {
+                updateUIRecordingHome(false);
+            } else if (!isStarted)
+                updateUIRecordingHome(true);
 
         } else {
-            if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-                if (!mRecordingStarted) {
-                    updateUIRecordingHome(false);
-                } else if (!isStarted)
-                    updateUIRecordingHome(true);
-
-            } else {
-                showUIDefaultRecord();
-            }
+            showUIDefaultRecord();
         }
     }
 
@@ -269,13 +263,6 @@ public class MainActivity extends BaseFragmentActivity {
 
                 case ACTION_CLOSE_POPUP:
                     finish();
-
-//        Intent myIntent = new Intent(this, PopUpResultVideoTranslucentActivity.class);
-////        myIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-////        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        myIntent.setAction(ACTION_STOP_SERVICE);
-//        myIntent.putExtra(KEY_VIDEO_PATH, intent.getStringExtra(KEY_VIDEO_PATH));
-//        startActivity(myIntent);
                     break;
             }
         }
@@ -287,27 +274,6 @@ public class MainActivity extends BaseFragmentActivity {
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
         }
     }
-
-//    private long timer = 0;
-//    private Handler handlerTimer = new Handler();
-//    private Runnable runnable;
-//    TextView tvCounter;
-//    private void startCountTime() {
-//        timer = 0;
-//        runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    tvCounter.setText(MyUtils.parseLongToTime(timer*1000));
-//                    timer++;
-//                    handlerTimer.postDelayed(this, 1000);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        };
-//        handlerTimer.postDelayed(runnable, 0);
-//    }
 
     private ImageView mImgRec, mStartRec, mStopRec, imgStartLive;
     private PulsatorLayout pulsator;
@@ -369,21 +335,21 @@ public class MainActivity extends BaseFragmentActivity {
         btn_live.setOnClickListener(view -> {
             if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-                if (isConnected) {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Disconnect livestream!")
-                            .setMessage("Do you want to disconnect livestream?")
-                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                                // Continue with delete operation
-                                sendDisconnectToService(false);
-                            })
-                            .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
 
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-                    return;
-                }
+                new AlertDialog.Builder(this)
+                        .setTitle("Disconnect livestream!")
+                        .setMessage("Do you want to disconnect livestream?")
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            // Continue with delete operation
+                            sendDisconnectToService();
+                        })
+                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+                return;
+
             }
             showLiveStreamFragment();
         });
@@ -396,7 +362,6 @@ public class MainActivity extends BaseFragmentActivity {
                 return;
             }
             if (checkExecuteServiceBusy()) return;
-//            if (hasAllPermissionForReact())
             showInterstitialAd(REQUEST_VIDEO_FOR_REACT_CAM);
 
         });
@@ -410,7 +375,6 @@ public class MainActivity extends BaseFragmentActivity {
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
         btn_commentary.setOnClickListener(view -> {
             if (checkExecuteServiceBusy()) return;
-//            if (hasAllPermissionForReact())
             showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
         });
         LinearLayout btn_projects = findViewById(R.id.ln_btn_projects);
@@ -431,41 +395,19 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private boolean isLiveStarted = false;
+
     private void toggleLiveStreamFromHome() {
         System.out.println("thanhlv press toggleLiveStreamFromHome");
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-             //
+            //
             if (!isLiveStarted) {
-                //request start live
                 sendActionToService(MyUtils.ACTION_START_LIVESTREAM_FROM_HOME);
                 isLiveStarted = true;
             } else {
-                // show popup choose pause/stop
-//                showPopupPauseStopLive("", "Stop", "Pause");
                 sendActionToService(MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME);
                 isLiveStarted = false;
             }
         }
-
-    }
-
-
-    private void showPopupPauseStopLive(String title, String pos, String neg) {
-        Bundle bundle = new Bundle();
-        bundle.putString(KEY_TITLE, title);
-        bundle.putString(KEY_POSITIVE, pos);
-        bundle.putString(KEY_NEGATIVE, neg);
-        PopupConfirm.newInstance(new IConfirmPopupListener() {
-            @Override
-            public void onClickPositiveButton() {
-                sendActionToService(MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME);
-            }
-
-            @Override
-            public void onClickNegativeButton() {
-                sendActionToService(MyUtils.ACTION_PAUSE_LIVESTREAM_FROM_HOME);
-            }
-        }, bundle).show(getSupportFragmentManager(), "");
 
     }
 
@@ -1194,15 +1136,12 @@ public class MainActivity extends BaseFragmentActivity {
         }
     }
 
-    public void sendDisconnectToService(boolean keepRunningService) {
+    public void sendDisconnectToService() {
 
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-            if (keepRunningService) {
-                controller.setAction(MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE);
-            } else {
-                controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
-            }
+
+            controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
             } else {
@@ -1268,9 +1207,14 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void removeAllFragment() {
-        for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); ++i) {
-            getSupportFragmentManager().popBackStack();
-        }
+
+        FragmentManager fm = getSupportFragmentManager();
+        if (!fm.isStateSaved())
+            for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                getSupportFragmentManager().popBackStack();
+            }
+
+
     }
 
     /**
@@ -1309,7 +1253,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
 
-
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1320,36 +1263,31 @@ public class MainActivity extends BaseFragmentActivity {
                 if (TextUtils.isEmpty(notify_msg))
                     return;
                 if (NOTIFY_MSG_CONNECTION_FAILED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_CONNECTION_FAILED main ==== ");
                     updateService();
+                    showUIDefaultRecord();
+                    isStarted = false;
                 }
 
                 if (MESSAGE_DISCONNECT_LIVE.equals(notify_msg)) {
-                    System.out.println("thanhlv MESSAGE_DISCONNECT_LIVE main ==== ");
                     isConnected = false;
                     updateService();
                 }
 
                 if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STOPPED main ==== ");
                     updateUIRecordingHome(false);
                 }
                 if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_STARTED main ==== ");
                     updateUIRecordingHome(true);
                 }
 
                 if (NOTIFY_MSG_LIVESTREAM_STARTED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_LIVESTREAM_STARTED main ==== ");
                     updateUILivestreamHome(true);
                 }
                 if (NOTIFY_MSG_LIVESTREAM_STOPPED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_LIVESTREAM_STOPPED main ==== ");
                     updateUILivestreamHome(false);
                 }
 
                 if (NOTIFY_MSG_RECORDING_CLOSED.equals(notify_msg)) {
-                    System.out.println("thanhlv NOTIFY_MSG_RECORDING_CLOSED main ==== ");
                     showUIDefaultRecord();
                     isStarted = false;
                 }
@@ -1368,7 +1306,8 @@ public class MainActivity extends BaseFragmentActivity {
                 @Override
                 public void onTickString(String sec) {
                     tvTimer.setText(sec);
-                }});
+                }
+            });
             mImgRec.setVisibility(View.GONE);
             mStartRec.setVisibility(View.GONE);
             mStopRec.setVisibility(View.VISIBLE);
@@ -1390,6 +1329,7 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     int typeLive;
+
     public void updateUILivestreamHome(boolean started) {
         if (!MyUtils.isMyServiceRunning(MainActivity.this, StreamingService.class)) return;
         typeLive = SettingManager2.getLiveStreamType(this);
@@ -1409,7 +1349,8 @@ public class MainActivity extends BaseFragmentActivity {
                 @Override
                 public void onTickString(String sec) {
                     tvTimer.setText(sec);
-                }});
+                }
+            });
 
             if (typeLive == SOCIAL_TYPE_YOUTUBE) {
                 imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home_load);

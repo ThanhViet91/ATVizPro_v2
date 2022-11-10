@@ -31,7 +31,7 @@ public class TranslucentActivity extends AppCompatActivity{
                         .setMessage("Do you want to disconnect livestream?")
                         .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                             // Continue with delete operation
-                            sendDisconnectToService(false);
+                            sendDisconnectToService();
                         })
                         .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
                             finishAndRemoveTask();
@@ -63,15 +63,13 @@ public class TranslucentActivity extends AppCompatActivity{
 
     }
 
-    public void sendDisconnectToService(boolean keepRunningService) {
+    public void sendDisconnectToService() {
 
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             Intent controller = new Intent(TranslucentActivity.this, ControllerService.class);
-            if (keepRunningService) {
-                controller.setAction(MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE);
-            } else {
+
                 controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
-            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
             } else {

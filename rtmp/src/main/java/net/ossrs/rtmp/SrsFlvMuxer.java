@@ -63,8 +63,8 @@ public class SrsFlvMuxer {
   private boolean needToFindKeyFrame = true;
   private final SrsAllocator mVideoAllocator = new SrsAllocator(VIDEO_ALLOC_SIZE);
   private final SrsAllocator mAudioAllocator = new SrsAllocator(AUDIO_ALLOC_SIZE);
-  private volatile BlockingQueue<SrsFlvFrame> mFlvVideoTagCache = new LinkedBlockingQueue<>(30);
-  private volatile BlockingQueue<SrsFlvFrame> mFlvAudioTagCache = new LinkedBlockingQueue<>(30);
+  private volatile BlockingQueue<SrsFlvFrame> mFlvVideoTagCache = new LinkedBlockingQueue<>(80);
+  private volatile BlockingQueue<SrsFlvFrame> mFlvAudioTagCache = new LinkedBlockingQueue<>(80);
   private final ConnectCheckerRtmp connectCheckerRtmp;
   private int sampleRate = 0;
   private boolean isPpsSpsSend = false;
@@ -228,6 +228,8 @@ public class SrsFlvMuxer {
   public void reConnect(final long delay) {
     reTries--;
     stop(null);
+
+    System.out.println("thanhlv public void stop()stop(null);; ");
     runnable = new Runnable() {
       @Override
       public void run() {
@@ -291,12 +293,13 @@ public class SrsFlvMuxer {
         connectCheckerRtmp.onConnectionSuccessRtmp();
         while (!Thread.interrupted()) {
           try {
-            SrsFlvFrame frame = mFlvAudioTagCache.poll(1, TimeUnit.MILLISECONDS);
+            SrsFlvFrame frame = mFlvAudioTagCache.poll(10, TimeUnit.MILLISECONDS);
             if (frame != null) {
               sendFlvTag(frame);
             }
 
-            frame = mFlvVideoTagCache.poll(1, TimeUnit.MILLISECONDS);
+            frame = mFlvVideoTagCache.poll(10, TimeUnit.MILLISECONDS);
+//            System.out.println("thanhlv frame = mFlvVideoTagCache.poll " + frame);
             if (frame != null) {
               sendFlvTag(frame);
             }
@@ -311,6 +314,7 @@ public class SrsFlvMuxer {
 
   public void stop() {
     stop(connectCheckerRtmp);
+//    System.out.println("thanhlv public void stop() stop(connectCheckerRtmp); ");
   }
 
   /**

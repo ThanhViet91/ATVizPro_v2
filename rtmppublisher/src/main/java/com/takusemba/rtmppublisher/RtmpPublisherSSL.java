@@ -50,6 +50,15 @@ public class RtmpPublisherSSL implements Publisher {
     @Override
     public void startPublishing() {
         if(DEBUG) Log.i(TAG, "startPublishing: called (clicked)");
+        if (!streamer.isStreaming()) {
+            streamer.open(url, width, height);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    streamer.startStreamingSSL(width, height, audioBitrate, videoBitrate, density);
+                }
+            }, 500);
+        } else
         streamer.startStreamingSSL(width, height, audioBitrate, videoBitrate, density);
     }
 

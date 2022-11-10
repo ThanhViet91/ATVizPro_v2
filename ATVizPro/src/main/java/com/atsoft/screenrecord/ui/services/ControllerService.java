@@ -140,11 +140,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
                 onClickClose(false);
+
                 break;
             case MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE:
-                onClickStop();
-                onClickClose(true);
-                break;
             case MyUtils.ACTION_EXIT_SERVICE:
                 stopService();
                 break;
@@ -737,7 +735,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         });
                         counterUtil.startCounter();
                     } else { //mode livestream
-                        if (isConnected) {
+//                        if (isConnected) {
                             mService.startPerformService();
                             mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                             toggleView(tvTimer, View.VISIBLE);
@@ -750,10 +748,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                                 }
                             });
                             counterUtil.startCounter();
-                        } else {
-                            mRecordingStarted = false;
-                            MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
-                        }
+//                        } else {
+//                            mRecordingStarted = false;
+//                            MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
+//                        }
                     }
 
                 }
@@ -798,17 +796,18 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         if (mRecordingServiceBound) {
             //Todo: stop and save recording
             mRecordingStarted = false;
-            mService.stopPerformService();
             toggleView(tvTimer, View.GONE);
             CounterUtil.getInstance().stopCounter();
             mImgRec.setImageResource(R.drawable.ic_fab_expand);
-
+            mService.stopPerformService();
             if (mMode == MyUtils.MODE_RECORDING) {
 //                        ((RecordingService)mService).insertVideoToGallery();
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
                 if (clickStart)
                     MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
             } else {
+//                System.out.println("thanhlv mService.closePerformService()111111");
+                mService.closePerformService();
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_LIVESTREAM_STOPPED);
             }
         } else {
@@ -822,14 +821,13 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             mImgStop.performClick();
         }
         if (!clickStop) onClickStop();
-        mService.closePerformService();
+        if (mService == null) return;
         clickStop = false;
         if (mMode == MyUtils.MODE_STREAMING)
             MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
-
         if (mMode == MyUtils.MODE_RECORDING)
+            mService.closePerformService();
             MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_CLOSED);
-
         if (!keepRunningService) {
             stopService();
             SettingManager2.setLiveStreamType(getApplicationContext(), 0);

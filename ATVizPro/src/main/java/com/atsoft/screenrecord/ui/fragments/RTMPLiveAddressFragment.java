@@ -19,6 +19,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -33,6 +34,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -62,6 +64,7 @@ public class RTMPLiveAddressFragment extends Fragment {
     private MainActivity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
+    private boolean isGoToHome = false;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -78,6 +81,15 @@ public class RTMPLiveAddressFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         unRegisterSyncServiceReceiver();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isGoToHome) {
+            mParentActivity.removeAllFragment();
+            isGoToHome = false;
+        }
     }
 
     private void unRegisterSyncServiceReceiver() {
@@ -357,9 +369,11 @@ public class RTMPLiveAddressFragment extends Fragment {
         mApplication.registerReceiver(mStreamReceiver, intentFilter);
     }
 
+
     //Receiver
     private class StreamingReceiver extends BroadcastReceiver {
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void onReceive(Context context, Intent intent) {
 
@@ -383,6 +397,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                         break;
                     case NOTIFY_MSG_CONNECTED:
                         if (mProgressDialog != null) mProgressDialog.dismiss();
+                        isGoToHome = true;
                         mParentActivity.removeAllFragment();
 //                        mParentActivity.updateUILivestreamHome(false);
                         mParentActivity.updateService();

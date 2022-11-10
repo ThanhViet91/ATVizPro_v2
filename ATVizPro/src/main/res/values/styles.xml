@@ -134,4 +134,18 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textFontWeight" tools:ignore="NewApi">400</item>
     </style>
+
+
+    <style name="SCBSwitch" parent="Theme.AppCompat">
+        <item name="colorControlActivated">#FF3232</item>
+        <item name="trackColorActive">#44ffffff</item>
+        <!-- inactive thumb color -->
+        <item name="colorSwitchThumbNormal">#FF3232</item>
+<!--        <item name="thumbColor">#FF3232</item>-->
+        <item name="trackColor">#ffffff</item>
+
+        <!-- inactive track color (30% transparency) -->
+<!--        <item name="android:colorForeground">#44ffffff</item>-->
+<!--        <item name="android:colorBackground">#ffffff</item>-->
+    </style>
 </resources>

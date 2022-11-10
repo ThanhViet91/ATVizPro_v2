@@ -5,7 +5,9 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -37,6 +39,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void setListener(SettingsListener listener) {
         this.listener = listener;
     }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -48,6 +51,9 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             case 2:
                 View view2 = inflater.inflate(R.layout.layout_item_settings_up_to_pro, parent, false);
                 return new ViewHolderUpToPro(view2);
+            case 3:
+                View view3 = inflater.inflate(R.layout.layout_item_settings_with_switch_button, parent, false);
+                return new ViewHolderSwitch(view3);
         }
         return new ViewHolderNormal(inflater.inflate(R.layout.layout_item_settings, parent, false));
     }
@@ -57,6 +63,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         // Just as an example, return 0 or 2 depending on position
         // Note that unlike in ListView adapters, types don't have to be contiguous
         if (position == 0) return 2;
+        if (position == 4) return 3;
         return 1;
     }
 
@@ -64,7 +71,7 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         switch (holder.getItemViewType()) {
             case 1:
-                ViewHolderNormal viewHolder1 = (ViewHolderNormal)holder;
+                ViewHolderNormal viewHolder1 = (ViewHolderNormal) holder;
                 SettingsItem item = mSettingList.get(position);
                 if (item.getContent().equals(mContext.getString(R.string.restore_purchase))) {
                     if (SettingManager2.isProApp(mContext)) {
@@ -77,26 +84,45 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 viewHolder1.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if (listener != null) listener.onClickItem(mSettingList.get(position).getContent());
+                        if (listener != null)
+                            listener.onClickItem(mSettingList.get(position).getContent());
                     }
                 });
                 break;
 
             case 2:
-                ViewHolderUpToPro viewHolder2 = (ViewHolderUpToPro)holder;
+                ViewHolderUpToPro viewHolder2 = (ViewHolderUpToPro) holder;
                 if (SettingManager2.isProApp(mContext)) {
                     viewHolder2.itemView.setAlpha(0.5f);
                 } else viewHolder2.itemView.setAlpha(1f);
                 viewHolder2.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if (listener != null && !SettingManager2.isProApp(mContext)) listener.onClickItem(mSettingList.get(position).getContent());
+                        if (listener != null && !SettingManager2.isProApp(mContext))
+                            listener.onClickItem(mSettingList.get(position).getContent());
+                    }
+                });
+                break;
+            case 3:
+                ViewHolderSwitch viewHolder3 = (ViewHolderSwitch) holder;
+                SettingsItem itemSwitch = mSettingList.get(position);
+
+                viewHolder3.content_settings.setText(itemSwitch.getContent());
+                viewHolder3.ava_settings.setBackgroundResource(itemSwitch.getResourceId());
+                viewHolder3.btnSwitch.setChecked(SettingManager2.isEnableFAB(mContext));
+                viewHolder3.btnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        SettingManager2.setEnableFAB(mContext, b);
+
+                        System.out.println("thanhlv floating_button  onCheckedChanged " + b);
+                        if (listener != null)
+                            listener.onClickItem(mSettingList.get(position).getContent());
                     }
                 });
                 break;
         }
     }
-
 
 
     @Override
@@ -120,6 +146,21 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         public ViewHolderUpToPro(View itemView) {
             super(itemView);
+
+        }
+    }
+
+
+    public static class ViewHolderSwitch extends RecyclerView.ViewHolder {
+        public TextView content_settings;
+        public ImageView ava_settings;
+        public Switch btnSwitch;
+
+        public ViewHolderSwitch(View itemView) {
+            super(itemView);
+            content_settings = itemView.findViewById(R.id.tv_content_settings);
+            ava_settings = itemView.findViewById(R.id.iv_ava_settings);
+            btnSwitch = itemView.findViewById(R.id.btn_switch);
 
         }
     }

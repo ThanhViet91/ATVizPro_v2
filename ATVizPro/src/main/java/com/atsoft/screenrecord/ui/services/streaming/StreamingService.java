@@ -6,6 +6,7 @@ import android.hardware.display.DisplayManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -13,10 +14,14 @@ import android.view.Display;
 import android.widget.Toast;
 
 import static com.atsoft.screenrecord.Core.isConnected;
+import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
+
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.atsoft.screenrecord.controllers.settings.VideoSetting2;
+import com.atsoft.screenrecord.ui.activities.MainActivity;
 import com.atsoft.screenrecord.ui.services.BaseService;
+import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.utils.CounterUtil;
 import com.takusemba.rtmppublisher.Publisher;
@@ -85,8 +90,8 @@ public class StreamingService extends BaseService implements PublisherListener {
 
     @Override
     public void onFailedToConnect(String reason) {
-        isConnected = false;
 
+        isConnected = false;
         System.out.println("thanhlv fffffffffff onFailedToConnect " + isConnected);
         CounterUtil.getInstance().stopCounter();
         notifyStreamingCallback(NOTIFY_MSG_CONNECTION_FAILED);
@@ -96,9 +101,26 @@ public class StreamingService extends BaseService implements PublisherListener {
             hasNotice = true;
             if (reason.contains("Error send packet")) {
                 MyUtils.toast(getApplicationContext(), getString(R.string.livestreaming_is_stopped), Toast.LENGTH_LONG);
+//                stopSelf();
+//                stopService(new Intent(StreamingService.this, ControllerService.class));
+                sendDisconnectToService();
             } else
                 MyUtils.toast(getApplicationContext(), "Connection failed, please check stream link again!", Toast.LENGTH_LONG);
         }
+    }
+
+    public void sendDisconnectToService() {
+
+        Intent controller = new Intent(StreamingService.this, ControllerService.class);
+
+        controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(controller);
+        } else {
+            startService(controller);
+        }
+
     }
 
     @Override

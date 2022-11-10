@@ -38,8 +38,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 
+import com.atsoft.screenrecord.App;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.CameraSetting;
 import com.atsoft.screenrecord.controllers.settings.SettingManager;
@@ -145,6 +147,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 break;
             case MyUtils.ACTION_EXIT_SERVICE:
                 stopService();
+                break;
+            case MyUtils.ACTION_UPDATE_SHOW_HIDE_FAB:
+                if (mViewRoot != null)
+                    toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:
                 System.out.println("thanhlv case MyUtils.ACTION_INIT_CONTROLLER:");
@@ -358,7 +364,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         paramCam.gravity = cameraProfile.getParamGravity();
         paramCam.x = 0;
-        paramCam.y = DisplayUtil.getDeviceHeight()/3;
+        paramCam.y = DisplayUtil.getDeviceHeight() / 3;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -494,6 +500,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     private long timerHideFAB = 0;
     private Handler handlerTimerFAB = new Handler();
     private Runnable runnableFAB;
+
     private void startCountTimeFAB() {
         timerHideFAB = 0;
         runnableFAB = new Runnable() {
@@ -516,6 +523,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     TextView tvTimer;
+
     @SuppressLint("InflateParams")
     private void initializeViews() {
 //        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeViews()");
@@ -535,6 +543,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mViewCountdown, paramCountdown);
         mWindowManager.addView(mViewRoot, paramViewRoot);
+        toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
         mWindowManager.addView(mViewBlur, paramBlur);
 
         mCountdownLayout = mViewCountdown.findViewById(R.id.countdown_container);
@@ -552,7 +561,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         toggleView(mImgStop, View.GONE);
         toggleView(tvTimer, View.GONE);
         toggleNavigationButton(View.GONE);
-
 
 
         mImgCapture.setOnClickListener(new OnSingleClickListener() {
@@ -596,7 +604,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgClose.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                onClickClose(false);
+                if (mMode == MyUtils.MODE_STREAMING) {
+                    goShowPopupConfirmClose();
+                } else onClickClose(false);
 
             }
         });
@@ -643,18 +653,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         //So that is click event.
                         if (Xdiff < 10 && Ydiff < 10) {
                             if (isViewCollapsed()) {
-                                //When user clicks on the image view of the collapsed layout,
-                                //visibility of the collapsed layout will be changed to "View.GONE"
-                                //and expanded view will become visible.
-
-//                                overlayAnimation(mViewRoot, paramViewRoot.x, paramViewRoot.x+200);
-//                                new Handler().postDelayed(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//
-//                                        toggleNavigationButton(View.VISIBLE);
-//                                    }
-//                                }, 1000);
                                 startCountTimeFAB();
                                 toggleNavigationButton(View.VISIBLE);
                             } else {
@@ -681,9 +679,9 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                            if (!isViewCollapsed()) {
-                                toggleNavigationButton(View.GONE);
-                            }
+                        if (!isViewCollapsed()) {
+                            toggleNavigationButton(View.GONE);
+                        }
                         return true;
                 }
                 return false;
@@ -719,7 +717,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
                 public void onFinish() {
                     toggleView(mCountdownLayout, View.GONE);
-                    toggleView(mViewRoot, View.VISIBLE);
+
+                    toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                     mRecordingStarted = true;
 
 //                    startCountTime();
@@ -768,33 +767,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
     }
 
-    public void updateViewLayout(View view, Integer x, Integer y, Integer w, Integer h) {
-        if (view != null) {
-            WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
-
-            if (x != null) lp.x = x;
-            if (y != null) lp.y = y;
-            if (w != null && w > 0) lp.width = w;
-            if (h != null && h > 0) lp.height = h;
-
-            mWindowManager.updateViewLayout(view, lp);
-        }
-    }
-
-    public void overlayAnimation(final View view2animate, int viewX, int endX) {
-        ValueAnimator translateLeft = ValueAnimator.ofInt(viewX, endX);
-        translateLeft.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                updateViewLayout(view2animate, val, null, null, null);
-
-            }
-        });
-        translateLeft.setDuration(1000);
-        translateLeft.start();
-    }
-
     public void gotoMain() {
         MyUtils.toast(getApplicationContext(), "Go home!", Toast.LENGTH_SHORT);
         toggleNavigationButton(View.GONE);
@@ -804,15 +776,15 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         startActivity(intent);
     }
 
-    public void gotoTransparent() {
+    public void goShowPopupConfirmClose() {
         toggleNavigationButton(View.GONE);
+        App.ignoreOpenAd = true;
         Intent intent = new Intent(getApplicationContext(), TranslucentActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(KEY_PATH_VIDEO, videoFileEndRecord);
-        intent.setAction(MyUtils.ACTION_SHOW_POPUP_GO_HOME);
+        intent.setAction(MyUtils.ACTION_SHOW_POPUP_CONFIRM);
         startActivity(intent);
     }
-
 
 
     boolean clickStop = false;

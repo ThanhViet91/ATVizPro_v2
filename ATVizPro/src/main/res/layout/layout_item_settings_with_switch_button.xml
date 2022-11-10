@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="66dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="15dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
         android:background="@drawable/shape_round_white_30">
 
         <LinearLayout
+            android:id="@+id/ava"
             android:layout_width="34dp"
             android:layout_height="34dp"
+            android:layout_centerVertical="true"
             android:layout_marginStart="15dp"
-            android:background="@drawable/shape_circle_white"
             android:gravity="center">
 
             <ImageView
@@ -32,13 +32,26 @@
         </LinearLayout>
 
         <TextView
+            android:layout_toEndOf="@id/ava"
             android:id="@+id/tv_content_settings"
             style="@style/Body_List_Item_White_18_600"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15sp"
+            android:layout_centerVertical="true"
+
             android:text="@string/how_to_record_your_screen" />
 
-    </LinearLayout>
+        <Switch
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:id="@+id/btn_switch"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/SCBSwitch"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    </RelativeLayout>
 
 </LinearLayout>

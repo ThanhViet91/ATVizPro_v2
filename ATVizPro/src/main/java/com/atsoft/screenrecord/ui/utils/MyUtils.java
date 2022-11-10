@@ -50,6 +50,7 @@ public class MyUtils {
     public static final String ACTION_SHOW_POPUP_RESULT = "ACTION_SHOW_POPUP_RESULT";
     public static final String ACTION_CLOSE_POPUP = "ACTION_CLOSE_POPUP";
     public static final String ACTION_SHOW_POPUP_GO_HOME = "ACTION_SHOW_POPUP_GO_HOME";
+    public static final String ACTION_SHOW_POPUP_CONFIRM = "ACTION_SHOW_POPUP_CONFIRM";
     public static final String ACTION_UPDATE_SETTING = "ACTION_UPDATE_SETTING";
     public static final String ACTION_GO_TO_EDIT = "ACTION_GO_TO_EDIT";
     public static final String ACTION_GO_TO_PLAY = "ACTION_GO_TO_PLAY";
@@ -77,6 +78,7 @@ public class MyUtils {
     public static final String ACTION_START_LIVESTREAM_FROM_HOME = "ACTION_START_LIVESTREAM_FROM_HOME";
     public static final String ACTION_STOP_LIVESTREAM_FROM_HOME = "ACTION_STOP_LIVESTREAM_FROM_HOME";
     public static final String ACTION_PAUSE_LIVESTREAM_FROM_HOME = "ACTION_STOP_LIVESTREAM_FROM_HOME";
+    public static final String ACTION_UPDATE_SHOW_HIDE_FAB = "ACTION_UPDATE_SHOW_HIDE_FAB";
     public static final String ACTION_RECORDING_ALREADY = "ACTION_RECORDING_ALREADY";
     public static final String MESSAGE_DISCONNECT_LIVE = "MESSAGE_DISCONNECT_LIVE";
 

@@ -159,7 +159,6 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onPause() {
         super.onPause();
-//        pulsator.stop();
     }
 
     @Override
@@ -190,45 +189,14 @@ public class MainActivity extends BaseFragmentActivity {
 
     protected void onResume() {
         super.onResume();
-//        pulsator.start();
-
         System.out.println("thanhlv onResume mainnnnnn");
         updateService();
         checkShowAd();
     }
 
-
-    private long timer = 0;
-    private Handler handlerTimer = new Handler();
-    private Runnable runnable;
-
-    private void startCountTime() {
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    tvTimer.setText(MyUtils.parseLongToTime(timer * 1000));
-                    timer++;
-                    System.out.println("thanhlv startCountTime " + timer);
-                    handlerTimer.postDelayed(this, 1000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        handlerTimer.postDelayed(runnable, 0);
-    }
-
     public void updateService() {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-            int type = SettingManager2.getLiveStreamType(this);
-
-
             if (isConnected) {
-
-                imgStartLive.setVisibility(View.VISIBLE);
-                tvStartStop.setVisibility(View.GONE);
-
                 if (DisplayUtil.getDeviceWidthDpi() > 500) {
                     liveStreaming.setText(getString(R.string.disconnect_livestream));
                 } else {
@@ -236,52 +204,40 @@ public class MainActivity extends BaseFragmentActivity {
                 }
                 if (!mRecordingStarted) {
                     updateUILivestreamHome(false);
-
-                    System.out.println("thanhlv tvDes.setText(sendDisconnectToService");
                 } else
                     updateUILivestreamHome(true);
             } else {
-
-                imgStartLive.setVisibility(View.GONE);
-                tvStartStop.setVisibility(View.VISIBLE);
-                liveStreaming.setText(getString(R.string.livestreaming));
+                showUIDefaultRecord();
             }
-            if (type == 0) {
-                imgStartLive.setVisibility(View.GONE);
-            }
-            if (type == SOCIAL_TYPE_YOUTUBE) {
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
-            }
-            if (type == SOCIAL_TYPE_FACEBOOK) {
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
-            }
-            if (type == SOCIAL_TYPE_TWITCH)
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
 
         } else {
-            liveStreaming.setText(getString(R.string.livestreaming));
-            imgStartLive.setVisibility(View.GONE);
             if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-
                 if (!mRecordingStarted) {
                     updateUIRecordingHome(false);
                 } else if (!isStarted)
                     updateUIRecordingHome(true);
 
             } else {
-                mStartRec.setVisibility(View.GONE);
-                mStopRec.setVisibility(View.GONE);
-                mImgRec.setVisibility(View.VISIBLE);
-                tvDes.setVisibility(View.VISIBLE);
-                tvTimer.setVisibility(View.GONE);
-                tvStartStop.setText("START");
-                pulsator.stop();
+                showUIDefaultRecord();
             }
         }
     }
 
+    public void showUIDefaultRecord() {
+        imgStartLive.setVisibility(View.GONE);
+        tvTimer.setVisibility(View.GONE);
+        tvDes.setVisibility(View.VISIBLE);
+        tvDes.setText(getString(R.string.tap_to_start_nrecording_screen));
+        mImgRec.setVisibility(View.VISIBLE);
+        mStartRec.setVisibility(View.GONE);
+        mStopRec.setVisibility(View.GONE);
+        tvStartStop.setVisibility(View.VISIBLE);
+        tvStartStop.setText("START");
+        liveStreaming.setText(getString(R.string.livestreaming));
+        if (pulsator != null) pulsator.stop();
+    }
+
     public void checkShowAd() {
-//        SettingManager2.setProApp(this, true);
         mAdManager.loadBanner();
     }
 
@@ -514,13 +470,16 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void sendActionToService(String action) {
-        Intent controller = new Intent(MainActivity.this, ControllerService.class);
-        controller.setAction(action);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(controller);
-        } else {
-            startService(controller);
+        if (MyUtils.isMyServiceRunning(MainActivity.this, ControllerService.class)) {
+            Intent controller = new Intent(MainActivity.this, ControllerService.class);
+            controller.setAction(action);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
         }
+
     }
 
     public boolean hasAllPermissionForReact() {
@@ -1361,20 +1320,13 @@ public class MainActivity extends BaseFragmentActivity {
                 if (TextUtils.isEmpty(notify_msg))
                     return;
                 if (NOTIFY_MSG_CONNECTION_FAILED.equals(notify_msg)) {
-
-                    liveStreaming.setText(getString(R.string.livestreaming));
-                    sendDisconnectToService(true);
-
+                    System.out.println("thanhlv NOTIFY_MSG_CONNECTION_FAILED main ==== ");
                     updateService();
                 }
 
                 if (MESSAGE_DISCONNECT_LIVE.equals(notify_msg)) {
-                    mImgRec.setVisibility(View.VISIBLE);
-                    imgStartLive.setVisibility(View.GONE);
-                    tvDes.setVisibility(View.VISIBLE);
-                    tvDes.setText("Tap to start \n record screen");
+                    System.out.println("thanhlv MESSAGE_DISCONNECT_LIVE main ==== ");
                     isConnected = false;
-
                     updateService();
                 }
 
@@ -1398,14 +1350,7 @@ public class MainActivity extends BaseFragmentActivity {
 
                 if (NOTIFY_MSG_RECORDING_CLOSED.equals(notify_msg)) {
                     System.out.println("thanhlv NOTIFY_MSG_RECORDING_CLOSED main ==== ");
-
-                    mImgRec.setVisibility(View.VISIBLE);
-                    mStartRec.setVisibility(View.GONE);
-                    mStopRec.setVisibility(View.GONE);
-                    tvStartStop.setText("START");
-                    tvDes.setVisibility(View.VISIBLE);
-                    tvTimer.setVisibility(View.GONE);
-                    pulsator.stop();
+                    showUIDefaultRecord();
                     isStarted = false;
                 }
 
@@ -1417,6 +1362,8 @@ public class MainActivity extends BaseFragmentActivity {
 
         if (!MyUtils.isMyServiceRunning(MainActivity.this, RecordingService.class)) return;
         if (started) {
+
+            pulsator.start();
             CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
                 @Override
                 public void onTickString(String sec) {
@@ -1428,9 +1375,9 @@ public class MainActivity extends BaseFragmentActivity {
             tvStartStop.setText("STOP");
             tvDes.setVisibility(View.GONE);
             tvTimer.setVisibility(View.VISIBLE);
-            pulsator.start();
             isStarted = true;
         } else {
+            mImgRec.setVisibility(View.GONE);
             mStartRec.setVisibility(View.VISIBLE);
             mStopRec.setVisibility(View.GONE);
             tvStartStop.setText("START");
@@ -1446,44 +1393,45 @@ public class MainActivity extends BaseFragmentActivity {
     public void updateUILivestreamHome(boolean started) {
         if (!MyUtils.isMyServiceRunning(MainActivity.this, StreamingService.class)) return;
         typeLive = SettingManager2.getLiveStreamType(this);
+
+        mImgRec.setVisibility(View.GONE);
+        mStartRec.setVisibility(View.GONE);
+        mStopRec.setVisibility(View.GONE);
+        imgStartLive.setVisibility(View.VISIBLE);
+        tvStartStop.setVisibility(View.GONE);
+        tvDes.setVisibility(View.VISIBLE);
+        tvDes.setText(getString(R.string.tap_to_start_nlivestream));
         if (started) {
             pulsator.start();
+            tvDes.setVisibility(View.GONE);
+            tvTimer.setVisibility(View.VISIBLE);
             CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
                 @Override
                 public void onTickString(String sec) {
                     tvTimer.setText(sec);
                 }});
-            tvDes.setVisibility(View.GONE);
-            tvTimer.setVisibility(View.VISIBLE);
+
             if (typeLive == SOCIAL_TYPE_YOUTUBE) {
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
+                imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home_load);
             }
             if (typeLive == SOCIAL_TYPE_FACEBOOK) {
                 imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
             }
             if (typeLive == SOCIAL_TYPE_TWITCH)
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
-            isStarted = true;
+                imgStartLive.setBackgroundResource(R.drawable.ic_tw_live_home_load);
             isLiveStarted = true;
         } else {
-            mImgRec.setVisibility(View.GONE);
-            mStartRec.setVisibility(View.GONE);
-            mStopRec.setVisibility(View.GONE);
-            imgStartLive.setVisibility(View.VISIBLE);
             if (typeLive == SOCIAL_TYPE_YOUTUBE) {
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+                imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home);
             }
             if (typeLive == SOCIAL_TYPE_FACEBOOK) {
                 imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
             }
             if (typeLive == SOCIAL_TYPE_TWITCH)
-                imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
+                imgStartLive.setBackgroundResource(R.drawable.ic_tw_live_home);
             tvDes.setVisibility(View.VISIBLE);
-            tvDes.setText("Tap to start \nlivestream");
-            System.out.println("thanhlv tvDes.setText(ffffffffffffff");
             tvTimer.setVisibility(View.GONE);
             pulsator.stop();
-            isStarted = false;
             isLiveStarted = false;
         }
 

@@ -11,6 +11,22 @@ import com.atsoft.screenrecord.R;
 
 public class SettingManager2 {
 
+
+    public static void setEnableFAB(Context context, boolean value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_enable_floating_button);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(key, value);
+        editor.apply();
+    }
+
+    public static boolean isEnableFAB(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_enable_floating_button);
+        return preferences.getBoolean(key, true);
+    }
+
+
     public static void setEnableCamView(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_enable_camera_view);

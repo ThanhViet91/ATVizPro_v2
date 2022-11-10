@@ -1,7 +1,9 @@
 package com.atsoft.screenrecord.ui.activities;
 
+import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_SHOW_POPUP_CONFIRM;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,7 +12,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.atsoft.screenrecord.R;
+import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.services.ExecuteService;
+import com.atsoft.screenrecord.ui.services.streaming.StreamingService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 
 public class TranslucentActivity extends AppCompatActivity{
@@ -21,6 +25,26 @@ public class TranslucentActivity extends AppCompatActivity{
         setContentView(R.layout.activity_translucent);
         if (getIntent() != null) {
 
+            if (getIntent().getAction().equals(ACTION_SHOW_POPUP_CONFIRM)) {
+                new AlertDialog.Builder(this)
+                        .setTitle("Disconnect livestream!")
+                        .setMessage("Do you want to disconnect livestream?")
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                            // Continue with delete operation
+                            sendDisconnectToService(false);
+                        })
+                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+                            finishAndRemoveTask();
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialogInterface) {
+                                finishAndRemoveTask();
+                            }
+                        })
+                        .show();
+            } else{
                 new AlertDialog.Builder(this)
                         .setTitle("Notice!")
                         .setMessage(getString(R.string.do_you_want_cancel_the_process))
@@ -33,8 +57,29 @@ public class TranslucentActivity extends AppCompatActivity{
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .show();
 
+            }
+
         }
 
+    }
+
+    public void sendDisconnectToService(boolean keepRunningService) {
+
+        if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
+            Intent controller = new Intent(TranslucentActivity.this, ControllerService.class);
+            if (keepRunningService) {
+                controller.setAction(MyUtils.ACTION_DISCONNECT_WHEN_STOP_LIVE);
+            } else {
+                controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(controller);
+            } else {
+                startService(controller);
+            }
+        }
+
+        finishAndRemoveTask();
     }
 
     private void stopProcessing() {

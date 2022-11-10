@@ -1,5 +1,6 @@
 package com.atsoft.screenrecord.ui.fragments;
 
+import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_UPDATE_SHOW_HIDE_FAB;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.dirSize;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getBaseStorageDirectory;
@@ -48,6 +49,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     RecyclerView recyclerView;
     ArrayList<SettingsItem> settingsItems = new ArrayList<>();
     private FragmentManager mFragmentManager;
+    private MainActivity mActivity;
     private SettingsAdapter adapter;
     View mViewRoot;
 
@@ -60,12 +62,13 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
         settingsItems.add(new SettingsItem(getString(R.string.restore_purchase), R.drawable.ic_restore));
-        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_live));
-        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_recorder_settings));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_record_your_screen), R.drawable.ic_how_to_record));
+        settingsItems.add(new SettingsItem(getString(R.string.how_to_livestream), R.drawable.ic_how_to_live_setting));
+        settingsItems.add(new SettingsItem(getString(R.string.floating_button), R.drawable.ic_fab_settings));
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.share_app_to_friends), R.drawable.ic_share_settings2));
-        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " "+String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
-        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " "+String.format("%.1f MB",dirSize(new File(getBaseStorageDirectory()))*1f/(1024*1024)), R.drawable.ic_recording_cache));
+        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
+        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + String.format("%.1f MB", dirSize(new File(getBaseStorageDirectory())) * 1f / (1024 * 1024)), R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
         return mViewRoot;
@@ -91,10 +94,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         });
 
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mFragmentManager = getParentFragmentManager();
+        mActivity = (MainActivity) getActivity();
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -117,8 +122,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     }
 
     private BillingClient billingClient;
+
     private void getPurchase() {
-        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
+        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {
+        }).build();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
@@ -128,11 +135,11 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
 
-                if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     billingClient.queryPurchasesAsync(
                             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
                             (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     SettingManager2.setProApp(requireContext(), list.size() > 0);
                                 }
                             });
@@ -182,13 +189,20 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                     .commit();
         }
 
+        if (code.equals(getString(R.string.floating_button))) {
+//            boolean ss = SettingManager2.isEnableFAB(requireContext());
+//            SettingManager2.setEnableFAB(requireContext(), !ss);
+            mActivity.sendActionToService(ACTION_UPDATE_SHOW_HIDE_FAB);
+            System.out.println("thanhlv floating_button " + SettingManager2.isEnableFAB(requireContext()));
+        }
+
         if (code.equals(getString(R.string.contact_us))) {
             System.out.println("thanhlv contact_us");
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
-            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{AppConfigs.getInstance().getConfigModel().getFeedbackEmail()});
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{AppConfigs.getInstance().getConfigModel().getFeedbackEmail()});
             intent.putExtra(Intent.EXTRA_SUBJECT, "Hi ATSoft");
-            intent.putExtra(Intent.EXTRA_TEXT   , "Hi ATSoft,\n");
+            intent.putExtra(Intent.EXTRA_TEXT, "Hi ATSoft,\n");
             try {
                 startActivity(Intent.createChooser(intent, "Send mail"));
             } catch (android.content.ActivityNotFoundException e) {
@@ -208,30 +222,22 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
     }
 
-    public void rateApp()
-    {
-        try
-        {
+    public void rateApp() {
+        try {
             Intent rateIntent = rateIntentForUrl("market://details");
             startActivity(rateIntent);
-        }
-        catch (ActivityNotFoundException e)
-        {
+        } catch (ActivityNotFoundException e) {
             Intent rateIntent = rateIntentForUrl("https://play.google.com/store/apps/details");
             startActivity(rateIntent);
         }
     }
 
-    private Intent rateIntentForUrl(String url)
-    {
+    private Intent rateIntentForUrl(String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("%s?id=%s", url, requireContext().getPackageName())));
         int flags = Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
-        if (Build.VERSION.SDK_INT >= 21)
-        {
+        if (Build.VERSION.SDK_INT >= 21) {
             flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
-        }
-        else
-        {
+        } else {
             //noinspection deprecation
             flags |= Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
         }

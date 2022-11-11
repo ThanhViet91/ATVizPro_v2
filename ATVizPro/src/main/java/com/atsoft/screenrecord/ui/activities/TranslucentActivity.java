@@ -47,6 +47,7 @@ public class TranslucentActivity extends AppCompatActivity{
             } else{
                 new AlertDialog.Builder(this)
                         .setTitle("Notice!")
+
                         .setMessage(getString(R.string.do_you_want_cancel_the_process))
                         .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                             stopProcessing();

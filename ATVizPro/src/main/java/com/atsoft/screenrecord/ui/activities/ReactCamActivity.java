@@ -16,12 +16,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -36,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.bumptech.glide.Glide;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
@@ -87,7 +91,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_react_cam);
         hideStatusBar(this);
-
+        updateScreenSize();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         LottieAnimationView animationView = findViewById(R.id.animation_view);
         animationView.setVisibility(View.GONE);
@@ -216,21 +220,21 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             xLeftOld = xLeft;
             yTopOld = yTop;
         }
-        xLeft = (screenWidth - lpVideo.width) / 2f;
-        xRight = xLeft + lpVideo.width;
-        yTop = screenVideo.getY() + (screenHeight + 1 - lpVideo.height) / 2f;
-        yBottom = yTop + lpVideo.height - 1;
+        xLeft = (screenWidth - lpVideo.width) / 2f - 1.5f;
+        xRight = xLeft + lpVideo.width + 3;
+        yTop = screenVideo.getY() + (screenHeight - lpVideo.height)/2f - 3f;
+        yBottom = yTop + lpVideo.height+1;
 
         newVideoWidth = lpVideo.width;
         newVideoHeight = lpVideo.height;
     }
 
     float yTop, yBottom, xLeft, xRight, yTopOld, xLeftOld;
-    LinearLayout cameraPreview;
+    FrameLayout cameraPreview, cameraPreview2;
     SurfaceView cameraView;
-    View mCameraLayout;
+    View mCameraLayout, mCameraLayoutMark;
     ImageView btn_back;
-    float camWidth, camHeight;
+    float camWidth = 300, camHeight;
 
     int[] camOverlaySize = {180, 210, 240, 270, 300, 330, 360};
     int[] camViewSize = new int[7];
@@ -256,7 +260,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
         }
         camWidth = camViewSize[camSize];  // ~240px
-        camHeight = camWidth * 4 / 3f;
+        camHeight = camWidth * 1920 / 1080f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         mCameraLayout.post(() -> {
             float newY = (mCameraLayout.getY() - yTopOld) * scale + yTop;
@@ -283,10 +287,30 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
+    private int mScreenWidth, mScreenHeight;
+
+    private void updateScreenSize() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        mScreenWidth = metrics.widthPixels;
+        mScreenHeight = metrics.heightPixels;
+    }
+
+    private ImageView imgZoom;
     private void initCamView() {
 
         root = findViewById(R.id.root_container);
+
+        if (mCameraLayout != null) root.removeView(mCameraLayout);
+        if (mCameraLayoutMark != null) root.removeView(mCameraLayoutMark);
+
         mCameraLayout = getLayoutInflater().inflate(R.layout.layout_camera_view, root, false);
+        mCameraLayoutMark = getLayoutInflater().inflate(R.layout.layout_camera_view_mark, root, false);
+
+        root.addView(mCameraLayout);
+        root.addView(mCameraLayoutMark);
+
+        mCameraLayoutMark.setVisibility(View.GONE);
+
         mCameraLayout.setAlpha(0);
         if (cameraPreview != null && cameraView.getParent() != null) {
             ((ViewGroup) cameraView.getParent()).removeView(cameraView); // <- fix
@@ -294,27 +318,69 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         cameraView = new SurfaceView(this);
         rtmpCamera = new RtmpLiveStream(cameraView);
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
+        cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
+//        imgZoom = mCameraLayoutMark.findViewById(R.id.img_zoom);
+//        imgZoom.setVisibility(View.GONE);
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
         mHolder.addCallback(this);
 //        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-        for (int i = 6; i >= 0; i--) {
-            camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
-            if (camViewSize[i] >= 300) camSize = i;
-        }
-        camWidth = camViewSize[camSize];  // ~240px
-        camHeight = camWidth * 4 / 3f;
+//        for (int i = 6; i >= 0; i--) {
+//            camViewSize[i] = camOverlaySize[i] * newVideoWidth / videoWidth;
+//            if (camViewSize[i] >= 300) camSize = i;
+//        }
+//        camWidth = camViewSize[camSize];  // ~240px
+        camHeight = camWidth * 1920 / 1080f;
 
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         mCameraLayout.post(() -> {
-            mCameraLayout.setX(xRight - camWidth);
-            mCameraLayout.setY(yBottom - camHeight);
+            mCameraLayout.setX(xLeft);
+            mCameraLayoutMark.setX(xLeft);
+            mCameraLayout.setY(yTop);
+            mCameraLayoutMark.setY(yTop);
             mCameraLayout.setAlpha(1);
         });
-        root.addView(mCameraLayout);
-        final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
-        final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, customOnScaleDetector);
+
+        mCameraLayoutMark.findViewById(R.id.img_zoom).setOnTouchListener(new View.OnTouchListener() {
+            private int x, y;
+            private float ww;
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_UP:
+                        autoHideMark();
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) event.getRawX();
+                        y = (int) event.getRawY();
+                        ww = cameraPreview.getWidth();
+                        cancelAutoHideMark();
+                    case MotionEvent.ACTION_MOVE:
+                        if (event.getRawX() - x > 20 || event.getRawY() - y > 25) {
+                            ww = ww + 10;
+                            x = (int) event.getRawX();
+                            y = (int) event.getRawY();
+                            if (ww <= newVideoWidth / 2f) {
+                                updateCameraPreview(ww);
+                            } else return false;
+                        } else if (event.getRawX() - x < -20 || event.getRawY() - y < -20) {
+                            ww = ww - 10;
+                            x = (int) event.getRawX();
+                            y = (int) event.getRawY();
+                            if (ww >= newVideoWidth / 6f) {
+                                updateCameraPreview(ww);
+                            } else return false;
+                        }
+                    default:
+                        return true;
+                }
+            }
+        });
 
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y;
@@ -323,43 +389,35 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (inRecording) return true;
-                if (event.getPointerCount() > 1) {
-                    int pointerId1 = event.getPointerId(0);
-                    int pointerId2 = event.getPointerId(1);
-                    if (event.getX(pointerId1) < 0 || event.getX(pointerId2) < 0
-                            || event.getX(pointerId1) > v.getWidth() || event.getX(pointerId2) > v.getWidth()
-                            || event.getY(pointerId1) < 0 || event.getY(pointerId2) < 0
-                            || event.getY(pointerId1) > v.getHeight() || event.getY(pointerId2) > v.getHeight()) {
-                        //
-                    } else scaleGestureDetector.onTouchEvent(event);
-                    hasZoom = true;
-                }
-
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         x = (int) (v.getX() - event.getRawX());
                         y = (int) (v.getY() - event.getRawY());
-                        customOnScaleDetector.resetLast();
-                        hasZoom = false;
-                        return true;
+                        autoHideMark();
                     case MotionEvent.ACTION_MOVE:
-                        if (event.getPointerCount() < 2 && !hasZoom) {
-                            v.setX(event.getRawX() + x);
-                            v.setY(event.getRawY() + y);
-                            if (v.getY() < yTop) {
-                                v.setY(yTop);
-                            } else if (v.getY() + camHeight >= yBottom) {
-                                v.setY(yBottom - camHeight);
-                            } else {
-                                v.setY(event.getRawY() + y);
-                            }
-                            if (v.getX() < xLeft) {
-                                v.setX(xLeft);
-                            } else if (v.getX() >= xRight - camWidth) {
-                                v.setX(xRight - camWidth);
-                            } else {
-                                v.setX(event.getRawX() + x);
-                            }
+                        mCameraLayout.setX(event.getRawX() + x);
+                        mCameraLayout.setY(event.getRawY() + y);
+                        mCameraLayoutMark.setX(event.getRawX() + x);
+                        mCameraLayoutMark.setY(event.getRawY() + y);
+                        if (mCameraLayout.getY() < yTop) {
+                            mCameraLayout.setY(yTop);
+                            mCameraLayoutMark.setY(yTop);
+                        } else if (mCameraLayout.getY() + camHeight >= yBottom) {
+                            mCameraLayout.setY(yBottom - camHeight);
+                            mCameraLayoutMark.setY(yBottom - camHeight);
+                        } else {
+                            mCameraLayout.setY(event.getRawY() + y);
+                            mCameraLayoutMark.setY(event.getRawY() + y);
+                        }
+                        if (mCameraLayout.getX() < xLeft) {
+                            mCameraLayout.setX(xLeft);
+                            mCameraLayoutMark.setX(xLeft);
+                        } else if (mCameraLayout.getX() >= xRight - camWidth) {
+                            mCameraLayout.setX(xRight - camWidth);
+                            mCameraLayoutMark.setX(xRight - camWidth);
+                        } else {
+                            mCameraLayout.setX(event.getRawX() + x);
+                            mCameraLayoutMark.setX(event.getRawX() + x);
                         }
                         return true;
                     case MotionEvent.ACTION_UP:
@@ -368,6 +426,116 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+
+        mCameraLayoutMark.setOnTouchListener(new View.OnTouchListener() {
+            private int x, y;
+
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (inRecording) return true;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) (v.getX() - event.getRawX());
+                        y = (int) (v.getY() - event.getRawY());
+                        cancelAutoHideMark();
+                        return false;
+                    case MotionEvent.ACTION_MOVE:
+                        mCameraLayout.setX(event.getRawX() + x);
+                        mCameraLayout.setY(event.getRawY() + y);
+                        mCameraLayoutMark.setX(event.getRawX() + x);
+                        mCameraLayoutMark.setY(event.getRawY() + y);
+                        if (mCameraLayout.getY() < yTop) {
+                            mCameraLayout.setY(yTop);
+                            mCameraLayoutMark.setY(yTop);
+                        } else if (mCameraLayout.getY() + camHeight >= yBottom) {
+                            mCameraLayout.setY(yBottom - camHeight);
+                            mCameraLayoutMark.setY(yBottom - camHeight);
+                        } else {
+                            mCameraLayout.setY(event.getRawY() + y);
+                            mCameraLayoutMark.setY(event.getRawY() + y);
+                        }
+                        if (mCameraLayout.getX() < xLeft) {
+                            mCameraLayout.setX(xLeft);
+                            mCameraLayoutMark.setX(xLeft);
+                        } else if (mCameraLayout.getX() >= xRight - camWidth) {
+                            mCameraLayout.setX(xRight - camWidth);
+                            mCameraLayoutMark.setX(xRight - camWidth);
+                        } else {
+                            mCameraLayout.setX(event.getRawX() + x);
+                            mCameraLayoutMark.setX(event.getRawX() + x);
+                        }
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        autoHideMark();
+                        return false;
+                    default:
+                        return true;
+                }
+            }
+        });
+    }
+
+    private void updateCameraPreview(float nW) {
+        float nH = nW * 16/9f;
+        camWidth = nW;
+        camHeight = nH;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) nW, (int) nH));
+        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) nW, (int) nH));
+
+        if (mCameraLayout.getY() < yTop) {
+            mCameraLayout.setY(yTop);
+            mCameraLayoutMark.setY(yTop);
+        } else if (mCameraLayout.getY() + camHeight >= yBottom) {
+            mCameraLayout.setY(yBottom - camHeight);
+            mCameraLayoutMark.setY(yBottom - camHeight);
+        }
+
+        if (mCameraLayout.getX() < xLeft) {
+            mCameraLayout.setX(xLeft);
+            mCameraLayoutMark.setX(xLeft);
+        } else if (mCameraLayout.getX() >= xRight - camWidth) {
+            mCameraLayout.setX(xRight - camWidth);
+            mCameraLayoutMark.setX(xRight - camWidth);
+        }
+    }
+
+    private CountDownTimer countDownTimerMark;
+
+    private void autoHideMark() {
+        System.out.println("thanhlv autoHideMarkautoHideMark ");
+        if (countDownTimerMark == null) {
+            System.out.println("thanhlv autoHideMarkautoHideMark newwwwww ");
+//            WindowManager mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+//            mWindowManager.removeViewImmediate(mCameraLayoutMark);
+////            mWindowManager.addView(mCameraLayoutMark);
+//            root.removeView(mCameraLayoutMark);
+//            root.addView(mCameraLayoutMark);
+
+            mCameraLayoutMark.setVisibility(View.VISIBLE);
+            countDownTimerMark = new CountDownTimer(3000, 1000) {
+
+                @Override
+                public void onTick(long l) {
+                }
+
+                @Override
+                public void onFinish() {
+                    mCameraLayoutMark.setVisibility(View.GONE);
+
+//                    root.removeView(mCameraLayoutMark);
+                    countDownTimerMark = null;
+                }
+            };
+            countDownTimerMark.start();
+        }
+    }
+
+    private void cancelAutoHideMark() {
+        if (countDownTimerMark != null) {
+            countDownTimerMark.cancel();
+            countDownTimerMark = null;
+        }
     }
 
     boolean hasZoom = false;
@@ -407,7 +575,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (v == findViewById(R.id.tv_next_react_cam)) {
-            showPopupConfirm(getString(R.string.confirm_execute_react_cam), null, null, true);
+            if (SettingManager2.getNumberExecute(this) < 5) {
+                showPopupConfirm(getString(R.string.confirm_execute_react_cam), null, null, true);
+            } else {
+                showInterstitialAd();
+                finish();
+            }
         }
 
         if (v == findViewById(R.id.img_btn_info)) {
@@ -527,8 +700,9 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void startExecuteService() {
+        SettingManager2.setNumberExecute(this, SettingManager2.getNumberExecute(this)+1);
         VideoProfileExecute videoProfile = new VideoProfileExecute(videoFile, cameraCahePath,
-                startTime, endTime, camOverlaySize[camSize], posX, posY, false, false);
+                startTime, endTime, camSizeOverlay, posX, posY, false, false);
         Bundle bundle = new Bundle();
         bundle.putSerializable(MyUtils.KEY_SEND_PACKAGE_VIDEO, videoProfile);
         Intent intent = new Intent(this, ExecuteService.class);
@@ -543,13 +717,14 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-    private final Handler mCounterUpdateHandler = new Handler();
-    private final Runnable mUpdateCounter = new Runnable() {
+    private Handler mCounterUpdateHandler;
+    private Runnable mUpdateCounter = new Runnable() {
         @Override
         public void run() {
             runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter / 1000)));
-            timeCounter = timeCounter + 50;
-            mCounterUpdateHandler.postDelayed(this, 50);
+            timeCounter = timeCounter + 100;
+            System.out.println("thanhlv 12341111111111 =========== " + timeCounter);
+            mCounterUpdateHandler.postDelayed(this, 100);
         }
     };
 
@@ -601,16 +776,24 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private void getEndReactCam() {
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
-        endTime = timeCounter;
-        if (rtmpCamera != null) {
-            rtmpCamera.stopRecord();
-            rtmpCamera.stopPreview();
-            hasCamVideo = true;
-        }
+
+        endTime = timeCounter + 50;
+        if (endTime > videoDuration) endTime = videoDuration;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (rtmpCamera != null) {
+                    rtmpCamera.stopRecord();
+                    rtmpCamera.stopPreview();
+                    hasCamVideo = true;
+                }
+            }
+        }, 50);
         progressBar.clearAnimation();
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
+        mCounterUpdateHandler = null;
         btnInformation.setVisibility(View.GONE);
         btnRetake.setVisibility(View.VISIBLE);
         btnNext.setVisibility(View.VISIBLE);
@@ -620,6 +803,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     int startTime, endTime = 0;
     int posX, posY;
 
+    int camSizeOverlay = 0;
     private void getStartReactCam() throws IOException {
 
         thumbVideo.setVisibility(View.GONE);
@@ -628,9 +812,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         startTime = 0;
         timeCounter = 0;
         animationProgressBar.start();
+        mCounterUpdateHandler = new Handler();
         mCounterUpdateHandler.post(mUpdateCounter);
-        posX = (int) ((mCameraLayout.getX() - xLeft) * videoWidth / newVideoWidth);
-        posY = (int) ((mCameraLayout.getY() - yTop) * videoHeight / newVideoHeight + 1);
+        camSizeOverlay = (int) camWidth * videoWidth / newVideoWidth;
+        posX = (int) ((mCameraLayout.getX()+1.5 - xLeft) * videoWidth / newVideoWidth);
+        posY = (int) ((mCameraLayout.getY()+1.5 - yTop) * videoHeight / newVideoHeight);
         hasCamVideo = false;
         hasEndReact = false;
     }
@@ -671,7 +857,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
         camWidth = camViewSize[camSize];
-        camHeight = camWidth * 4 / 3f;
+        camHeight = camWidth * 1920 / 1080f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         mCameraLayout.setX(mCameraLayout.getX() - (camWidth - camViewSize[camSize - 1]) / 2f);
         mCameraLayout.setY(mCameraLayout.getY() - (camWidth - camViewSize[camSize - 1]) * 2 / 3f);
@@ -698,7 +884,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
         camWidth = camViewSize[camSize];
-        camHeight = camWidth * 4 / 3f;
+        camHeight = camWidth * 1920 / 1080f;
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         mCameraLayout.setX(mCameraLayout.getX() + (camViewSize[camSize + 1] - camWidth) / 2f);
         mCameraLayout.setY(mCameraLayout.getY() + (camViewSize[camSize + 1] - camWidth) * 2 / 3f);

@@ -17,6 +17,7 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -29,6 +30,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -61,6 +63,9 @@ import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
@@ -73,7 +78,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     private BaseService mService;
     private Boolean mRecordingServiceBound = false;
     private View mViewRoot;
-    private View mCameraLayout;
+    private View mCameraLayout, mCameraLayoutMark;
     private View mViewBlur;
     private WindowManager mWindowManager;
     WindowManager.LayoutParams paramViewRoot;
@@ -84,7 +89,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     private ImageView mImgClose, mImgRec, mImgStart, mImgStop, mImgCapture, mImgHome;
     public static Boolean mRecordingStarted = false;
     private Camera mCamera;
-    private LinearLayout cameraPreview;
+    private FrameLayout cameraPreview, cameraPreview2;
     private int mScreenWidth, mScreenHeight;
     private TextView mTvCountdown;
     private View mCountdownLayout;
@@ -105,17 +110,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         }
         return super.onStartCommand(intent, flags, startId);
     }
-
-//    private void updateUI() {
-//        if (mMode == MyUtils.MODE_STREAMING) {
-////            int type = SettingManager2.getLiveStreamType(this);
-////            if (type == SOCIAL_TYPE_YOUTUBE) mImgRec.setBackgroundResource(R.drawable.ic_youtube);
-////            if (type == SOCIAL_TYPE_FACEBOOK) mImgRec.setBackgroundResource(R.drawable.ic_facebook);
-////            if (type == SOCIAL_TYPE_TWITCH) mImgRec.setBackgroundResource(R.drawable.ic_twitch);
-//        } else {
-//            mImgRec.setBackgroundResource(R.drawable.ic_fab_expand);
-//        }
-//    }
 
     private void handleIncomeAction(Intent intent) {
         String action = intent.getAction();
@@ -342,19 +336,24 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mScreenHeight = metrics.heightPixels;
     }
 
+    private float cameraRatio;
+
     @SuppressLint({"ClickableViewAccessibility", "InflateParams"})
     private void initCameraView() {
-//        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeCamera()");
         CameraSetting cameraProfile = SettingManager.getCameraProfile(getApplication());
 
         mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
+        mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
 
         if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_BACK))
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
         else
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
 
+        System.out.println("thanhlv initCameraView");
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
+        cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 
         calculateCameraSize(cameraProfile);
 
@@ -364,22 +363,30 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         paramCam.x = 0;
         paramCam.y = DisplayUtil.getDeviceHeight() / 3;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
+        System.out.println("thanhlv initCameraView 222");
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mCameraLayout, paramCam);
+        mWindowManager.addView(mCameraLayoutMark, paramCam);
         mCamera.startPreview();
 
         //re-inflate controller
         mWindowManager.removeViewImmediate(mViewRoot);
+        mWindowManager.removeViewImmediate(mViewCountdown);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mViewRoot, paramViewRoot);
+        mWindowManager.addView(mViewCountdown, paramCountdown);
+        mCameraLayoutMark.setVisibility(View.GONE);
 
         if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
             toggleView(cameraPreview, View.GONE);
 
         camWidth = camViewSize[camSize];  // ~270px
-        camHeight = camWidth * 4 / 3f;
+        camHeight = (float) (camWidth * cameraRatio);
+
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+
 
         if (SettingManager2.isEnableCamView(getApplicationContext())) {
             toggleView(mCameraLayout, View.VISIBLE);
@@ -389,52 +396,138 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             mImgCapture.setImageResource(R.drawable.ic_show_cam_fab);
         }
 
-        final CustomOnScaleDetector customOnScaleDetector = new CustomOnScaleDetector(this);
-
-        final ScaleGestureDetector scaleGestureDetector = new ScaleGestureDetector(this, customOnScaleDetector);
-
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y, xx, yy;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-                if (event.getPointerCount() > 1) {
-                    int pointerId1 = event.getPointerId(0);
-                    int pointerId2 = event.getPointerId(1);
-
-                    if (event.getX(pointerId1) < 0 || event.getX(pointerId2) < 0
-                            || event.getX(pointerId1) > v.getWidth() || event.getX(pointerId2) > v.getWidth()
-                            || event.getY(pointerId1) < 0 || event.getY(pointerId2) < 0
-                            || event.getY(pointerId1) > v.getHeight() || event.getY(pointerId2) > v.getHeight()) {
-                    } else scaleGestureDetector.onTouchEvent(event);
-                    hasZoom = true;
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) event.getRawX();
+                        y = (int) event.getRawY();
+                        xx = paramCam.x;
+                        yy = paramCam.y;
+                        autoHideMark();
+                        return false;
+                    case MotionEvent.ACTION_MOVE:
+                        paramCam.x = xx + (int) (event.getRawX() - x);
+                        paramCam.y = yy + (int) (event.getRawY() - y);
+                        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        return false;
+                    default:
+                        return true;
                 }
+            }
+        });
+
+        mCameraLayoutMark.findViewById(R.id.img_zoom).setOnTouchListener(new View.OnTouchListener() {
+            private int x, y;
+            private float ww;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+
+                    case MotionEvent.ACTION_UP:
+                        autoHideMark();
+                    case MotionEvent.ACTION_DOWN:
+                        x = (int) event.getRawX();
+                        y = (int) event.getRawY();
+                        ww = cameraPreview.getWidth();
+                        cancelAutoHideMark();
+                    case MotionEvent.ACTION_MOVE:
+                        if (event.getRawX() - x > 20 || event.getRawY() - y > 25) {
+                            ww = ww + 10;
+                            x = (int) event.getRawX();
+                            y = (int) event.getRawY();
+                            if (ww <= mScreenWidth/2.5) {
+                                updateCameraPreview(ww);
+                            } else return false;
+                        } else if (event.getRawX() - x < -20 || event.getRawY() - y < -20) {
+                            ww = ww - 10;
+                            x = (int) event.getRawX();
+                            y = (int) event.getRawY();
+                            if (ww >= mScreenWidth/4f) {
+                                updateCameraPreview(ww);
+                            } else return false;
+                        }
+                    default:
+                        return true;
+                }
+            }
+        });
+
+        mCameraLayoutMark.setOnTouchListener(new View.OnTouchListener() {
+            private int x, y, xx, yy;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
 
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
                         y = (int) event.getRawY();
-                        customOnScaleDetector.resetLast();
-                        hasZoom = false;
                         xx = paramCam.x;
                         yy = paramCam.y;
+                        cancelAutoHideMark();
+                        return false;
                     case MotionEvent.ACTION_MOVE:
-                        if (event.getPointerCount() < 2 && !hasZoom) {
-                            paramCam.x = xx - (int) (event.getRawX() - x);
-                            paramCam.y = yy + (int) (event.getRawY() - y);
+                        paramCam.x = xx + (int) (event.getRawX() - x);
+                        paramCam.y = yy + (int) (event.getRawY() - y);
+                        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
 
-                            mWindowManager.updateViewLayout(mCameraLayout, paramCam);
-                        }
+                        return false;
                     case MotionEvent.ACTION_UP:
+                        autoHideMark();
+                        return false;
                     default:
                         return true;
                 }
-
             }
         });
+    }
 
+    private void updateCameraPreview(float nW) {
+        float nH = nW * cameraRatio;
+        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) nW, (int) nH));
+        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) nW, (int) nH));
+    }
+
+    private CountDownTimer countDownTimerMark;
+
+    private void autoHideMark() {
+        System.out.println("thanhlv autoHideMarkautoHideMark ");
+        if (countDownTimerMark == null) {
+            System.out.println("thanhlv autoHideMarkautoHideMark newwwwww ");
+            mCameraLayoutMark.setVisibility(View.VISIBLE);
+            countDownTimerMark = new CountDownTimer(3000, 1000) {
+
+                @Override
+                public void onTick(long l) {
+                }
+
+                @Override
+                public void onFinish() {
+                    mCameraLayoutMark.setVisibility(View.GONE);
+                    countDownTimerMark = null;
+                }
+            };
+            countDownTimerMark.start();
+        }
+    }
+
+    private void cancelAutoHideMark() {
+        if (countDownTimerMark != null) {
+            countDownTimerMark.cancel();
+            countDownTimerMark = null;
+        }
     }
 
     float camWidth, camHeight;
@@ -510,7 +603,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         return;
                     }
                     timerHideFAB++;
-//                    System.out.println("thanhlv startCountTimeFAB " + timerHideFAB);
                     handlerTimerFAB.postDelayed(this, 1000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -521,6 +613,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     }
 
     TextView tvTimer;
+    View mViewCountdown;
 
     @SuppressLint("InflateParams")
     private void initializeViews() {
@@ -528,7 +621,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
         mViewRoot = LayoutInflater.from(this).inflate(R.layout.layout_recording, null);
 
-        View mViewCountdown = LayoutInflater.from(this).inflate(R.layout.layout_countdown, null);
+        mViewCountdown = LayoutInflater.from(this).inflate(R.layout.layout_countdown, null);
         mViewBlur = LayoutInflater.from(this).inflate(R.layout.layout_bg_fab, null);
 
         paramViewRoot.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
@@ -568,10 +661,12 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                 toggleNavigationButton(View.GONE);
                 if (mCameraLayout.getVisibility() == View.GONE) {
                     toggleView(mCameraLayout, View.VISIBLE);
+                    toggleView(mCameraLayoutMark, View.VISIBLE);
                     mImgCapture.setImageResource(R.drawable.ic_hide_cam_fab);
                     SettingManager2.setEnableCamView(getApplicationContext(), true);
                 } else {
                     toggleView(mCameraLayout, View.GONE);
+                    toggleView(mCameraLayoutMark, View.GONE);
                     mImgCapture.setImageResource(R.drawable.ic_show_cam_fab);
                     SettingManager2.setEnableCamView(getApplicationContext(), false);
                 }
@@ -719,8 +814,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                     toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                     mRecordingStarted = true;
 
-//                    startCountTime();
-
                     if (mMode == MyUtils.MODE_RECORDING) { //mode Recording
                         mService.startPerformService();
                         mImgRec.setImageResource(R.drawable.ic_fab_with_time);
@@ -735,23 +828,18 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         });
                         counterUtil.startCounter();
                     } else { //mode livestream
-//                        if (isConnected) {
-                            mService.startPerformService();
-                            mImgRec.setImageResource(R.drawable.ic_fab_with_time);
-                            toggleView(tvTimer, View.VISIBLE);
-                            MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_LIVESTREAM_STARTED);
-                            CounterUtil counterUtil = CounterUtil.getInstance();
-                            counterUtil.setCallback(new CounterUtil.ICounterUtil() {
-                                @Override
-                                public void onTickString(String sec) {
-                                    tvTimer.setText(sec);
-                                }
-                            });
-                            counterUtil.startCounter();
-//                        } else {
-//                            mRecordingStarted = false;
-//                            MyUtils.toast(getApplicationContext(), "Please connect livestream!", Toast.LENGTH_LONG);
-//                        }
+                        mService.startPerformService();
+                        mImgRec.setImageResource(R.drawable.ic_fab_with_time);
+                        toggleView(tvTimer, View.VISIBLE);
+                        MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_LIVESTREAM_STARTED);
+                        CounterUtil counterUtil = CounterUtil.getInstance();
+                        counterUtil.setCallback(new CounterUtil.ICounterUtil() {
+                            @Override
+                            public void onTickString(String sec) {
+                                tvTimer.setText(sec);
+                            }
+                        });
+                        counterUtil.startCounter();
                     }
 
                 }
@@ -760,7 +848,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         } else {
             mRecordingStarted = false;
             MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
-//                    Log.e(TAG, "Recording Service connection has not been established");
             stopService();
         }
     }
@@ -790,8 +877,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 
     private void onClickStop() {
         toggleNavigationButton(View.GONE);
-//        handlerTimer.removeCallbacks(runnable);
-
         clickStop = true;
         if (mRecordingServiceBound) {
             //Todo: stop and save recording
@@ -801,12 +886,10 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             mImgRec.setImageResource(R.drawable.ic_fab_expand);
             mService.stopPerformService();
             if (mMode == MyUtils.MODE_RECORDING) {
-//                        ((RecordingService)mService).insertVideoToGallery();
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
                 if (clickStart)
                     MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
             } else {
-//                System.out.println("thanhlv mService.closePerformService()111111");
                 mService.closePerformService();
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_LIVESTREAM_STOPPED);
             }
@@ -827,7 +910,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             MyUtils.sendBroadCastMessageFromService(this, MyUtils.MESSAGE_DISCONNECT_LIVE);
         if (mMode == MyUtils.MODE_RECORDING)
             mService.closePerformService();
-            MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_CLOSED);
+        MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_CLOSED);
         if (!keepRunningService) {
             stopService();
             SettingManager2.setLiveStreamType(getApplicationContext(), 0);
@@ -933,7 +1016,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
 //            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
 
             timerHideFAB = 0;
-            handlerTimerFAB.removeCallbacks(runnableFAB);
+            handlerTimerFAB.removeCallbacks(runnableFAB, null);
         }
         mViewBlur.setVisibility(viewMode);
     }
@@ -972,17 +1055,17 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
     public void zoomOut() {
         camSize++;
         if (camSize > 6) {
-            camSize = 6;
+            camSize = 0;
             return;
         }
         camWidth = camViewSize[camSize];
-        camHeight = camWidth * 4 / 3f;
+        camHeight = (float) (camWidth * cameraRatio);
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
+        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         paramCam.x = (int) (paramCam.x - (camWidth - camViewSize[camSize - 1]) / 2f);
-        paramCam.y = (int) (paramCam.y - (camWidth - camViewSize[camSize - 1]) * 2 / 3f);
+        paramCam.y = (int) (paramCam.y - (camWidth - camViewSize[camSize - 1]) / 2 * cameraRatio);
         mWindowManager.updateViewLayout(mCameraLayout, paramCam);
-        hasZoom = true;
-
+        mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
     }
 
     @Override

@@ -54,6 +54,19 @@ public class SettingManager2 {
         editor.putInt(key, value);
         editor.apply();
     }
+    public static int getNumberExecute(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_show_confirm_execute_number);
+        return preferences.getInt(key, 0);
+    }
+
+    public static void setNumberExecute(Context context, int value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_show_confirm_execute_number);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
 
     public static int getNumberReactFile(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);

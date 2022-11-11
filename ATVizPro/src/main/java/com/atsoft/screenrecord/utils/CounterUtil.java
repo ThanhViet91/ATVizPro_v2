@@ -73,7 +73,7 @@ public class CounterUtil {
                     if (mCallback != null) mCallback.onTickString(MyUtils.parseLongToTime(timer * 1000));
                     if (mCallback2 != null)  mCallback2.onTickString(MyUtils.parseLongToTime(timer * 1000));
                     timer++;
-                    System.out.println("thanhlv mCallback.onTickString " + timer);
+//                    System.out.println("thanhlv mCallback.onTickString " + timer);
                     handlerTimer.postDelayed(this, 1000);
                 } catch (Exception e) {
                     e.printStackTrace();

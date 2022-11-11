@@ -61,6 +61,13 @@
                     android:layout_height="match_parent"
                     android:scaleType="center"
                     android:src="@drawable/pic_thumb" />
+
+                <ImageView
+                    android:id="@+id/view_play_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="50dp"/>
+
             </androidx.cardview.widget.CardView>
 
             <ImageView

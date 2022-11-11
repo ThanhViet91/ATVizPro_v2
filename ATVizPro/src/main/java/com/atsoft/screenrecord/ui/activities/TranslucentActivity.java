@@ -25,7 +25,7 @@ public class TranslucentActivity extends AppCompatActivity{
         setContentView(R.layout.activity_translucent);
         if (getIntent() != null) {
 
-            if (getIntent().getAction().equals(ACTION_SHOW_POPUP_CONFIRM)) {
+            if (getIntent().getAction() != null && getIntent().getAction().equals(ACTION_SHOW_POPUP_CONFIRM)) {
                 new AlertDialog.Builder(this)
                         .setTitle("Disconnect livestream!")
                         .setMessage("Do you want to disconnect livestream?")

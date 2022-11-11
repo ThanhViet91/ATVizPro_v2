@@ -36,6 +36,7 @@
     <string name="setting_enable_floating_button">setting_enable_floating_button</string>
     <string name="setting_recording_number">setting_recording_number</string>
     <string name="setting_react_number">setting_react_number</string>
+    <string name="setting_show_confirm_execute_number">setting_react_number</string>
     <string name="setting_commentary_number">setting_commentary_number</string>
     <string name="setting_edit_number">setting_edit_number</string>
 
@@ -62,7 +63,7 @@
     <string name="default_setting_countdown">3</string>
     <string name="default_setting_orientation">Auto</string>
     <string name="default_camera_mode">Front</string>
-    <string name="default_camera_position">Top Right</string>
+    <string name="default_camera_position">Top Left</string>
     <string name="default_camera_size">Medium</string>
     <string name="default_audio_source">Microphone</string>
     <string name="video_resolution">Video Resolution</string>

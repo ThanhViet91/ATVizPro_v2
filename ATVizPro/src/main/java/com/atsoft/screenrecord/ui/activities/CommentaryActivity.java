@@ -29,6 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.bumptech.glide.Glide;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
@@ -282,7 +283,12 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
         if (v == findViewById(R.id.tv_next_react_cam)) {
 //            showDialogConfirmExecute();
-            showPopupConfirm(getString(R.string.confirm_execute_react_cam), null, null, true);
+            if (SettingManager2.getNumberExecute(this) < 5) {
+                showPopupConfirm(getString(R.string.confirm_execute_react_cam), null, null, true);
+            } else {
+                showInterstitialAd();
+                finish();
+            }
         }
 
         if (v == findViewById(R.id.img_btn_react_cam)) {
@@ -365,6 +371,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void startExecuteService() {
+        SettingManager2.setNumberExecute(this, SettingManager2.getNumberExecute(this)+1);
         VideoProfileExecute videoProfile = new VideoProfileExecute(videoFile, cacheAudioFilePath,
                 0, 0, 0, 0, 0, false, false);
         Bundle bundle = new Bundle();

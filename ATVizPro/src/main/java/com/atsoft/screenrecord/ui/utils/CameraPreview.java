@@ -43,11 +43,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+
+        System.out.println("thanhlv onConfigurationChanged");
         refreshCamera(mCamera);
+        isFirstTime = false;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
+        System.out.println("thanhlv surfaceCreated");
         try {
             // create the surface and start camera preview
             if (mCamera == null) {
@@ -60,11 +64,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
     }
 
+    boolean isFirstTime = false;
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
+        System.out.println("thanhlv surfaceChanged");
         refreshCamera(mCamera);
     }
 
@@ -72,6 +78,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
 //        if(mCamera!=null)
 //            mCamera.release();
+        System.out.println("thanhlv surfaceDestroyed");
+        isFirstTime = false;
     }
 
     public void refreshCamera(Camera camera) {
@@ -79,6 +87,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // preview surface does not exist
             return;
         }
+        if (isFirstTime) return;
+        isFirstTime = true;
         // stop preview before making changes
         try {
             mCamera.stopPreview();
@@ -88,9 +98,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // set preview size and make any resize, rotate or
         // reformatting changes here
         // start preview with new settings
-
         setCameraOrientation();
-
         setCamera(camera);
 
         try {

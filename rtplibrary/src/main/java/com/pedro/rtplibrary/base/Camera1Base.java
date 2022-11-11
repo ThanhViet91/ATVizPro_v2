@@ -292,7 +292,7 @@ public abstract class Camera1Base
    */
   public boolean prepareVideo() {
     int rotation = CameraHelper.getCameraOrientation(context);
-    return prepareVideo(640, 480, 30, 1200 * 1024, rotation);
+    return prepareVideo(1280, 720, 30, 1200 * 1024, rotation);
   }
 
   /**
@@ -459,7 +459,7 @@ public abstract class Camera1Base
   }
 
   public void startPreview(CameraHelper.Facing cameraFacing) {
-    startPreview(cameraFacing, 320, 240);
+    startPreview(cameraFacing, 1280, 720);
   }
 
   public void startPreview(int width, int height) {

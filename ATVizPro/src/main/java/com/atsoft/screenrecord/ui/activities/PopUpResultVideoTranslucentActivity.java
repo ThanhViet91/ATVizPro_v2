@@ -69,11 +69,12 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
             }
         });
 
-        ImageView btnPlayVideo = findViewById(R.id.thumbnail_video);
+        ImageView btnPlayVideo = findViewById(R.id.view_play_video);
+        ImageView thumbVideo = findViewById(R.id.thumbnail_video);
         Glide.with(this)
                 .load(videoPath)
                 .thumbnail(0.1f)
-                .into(btnPlayVideo);
+                .into(thumbVideo);
         btnPlayVideo.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {

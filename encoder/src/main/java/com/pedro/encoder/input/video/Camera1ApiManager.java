@@ -86,7 +86,9 @@ public class Camera1ApiManager implements Camera.PreviewCallback, Camera.FaceDet
   }
 
   private void init() {
+
     cameraSelect = selectCameraBack();
+    System.out.println("thanhlv cameraSelect = selectCameraBack(); ");
     previewSizeBack = getPreviewSize();
     cameraSelect = selectCameraFront();
     previewSizeFront = getPreviewSize();
@@ -303,6 +305,7 @@ public class Camera1ApiManager implements Camera.PreviewCallback, Camera.FaceDet
   private List<Camera.Size> getPreviewSize() {
     List<Camera.Size> previewSizes;
     Camera.Size maxSize;
+    System.out.println("thanhlv cameraSelect = selectCameraBack();  getPreviewSize " + camera);
     if (camera != null) {
       maxSize = getMaxEncoderSizeSupported();
       previewSizes = camera.getParameters().getSupportedPreviewSizes();

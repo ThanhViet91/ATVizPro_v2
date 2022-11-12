@@ -119,6 +119,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
 
+        isOnceInitCamView = false;
         addVideoView();
 
         RelativeLayout mAdview = findViewById(R.id.adView);
@@ -154,6 +155,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     int videoDuration = 0;
 
     private void addVideoView() {
+        if (videoView != null) return;
         videoView = findViewById(R.id.video_main1);
         videoFile = getIntent().getStringExtra(KEY_PATH_VIDEO);
         if (!videoFile.equals("")) {
@@ -296,8 +298,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private ImageView imgZoom;
+    private boolean isOnceInitCamView = false;
     private void initCamView() {
-
+//        if (isOnceInitCamView) return;
+        isOnceInitCamView = true;
         root = findViewById(R.id.root_container);
 
         if (mCameraLayout != null) root.removeView(mCameraLayout);
@@ -315,8 +319,8 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (cameraPreview != null && cameraView.getParent() != null) {
             ((ViewGroup) cameraView.getParent()).removeView(cameraView); // <- fix
         }
-        cameraView = new SurfaceView(this);
-        rtmpCamera = new RtmpLiveStream(cameraView);
+        if (cameraView == null) cameraView = new SurfaceView(this);
+        if (rtmpCamera == null) rtmpCamera = new RtmpLiveStream(cameraView);
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 //        imgZoom = mCameraLayoutMark.findViewById(R.id.img_zoom);
@@ -836,14 +840,18 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             // preview surface does not exist
             return;
         }
-        rtmpCamera.startPreview(1);
+        if (rtmpCamera != null) rtmpCamera.startPreview(1);
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if (rtmpCamera != null) rtmpCamera.stopPreview();
-        if (mHolder != null) mHolder.removeCallback(null);
-        mHolder = null;
-        rtmpCamera = null;
+        if (rtmpCamera != null) {
+            rtmpCamera.stopPreview();
+//            rtmpCamera = null;
+        }
+        if (mHolder != null) {
+            mHolder.removeCallback(null);
+//            mHolder = null;
+        }
     }
 
 

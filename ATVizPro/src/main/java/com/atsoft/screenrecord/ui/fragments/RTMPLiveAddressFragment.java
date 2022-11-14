@@ -135,19 +135,19 @@ public class RTMPLiveAddressFragment extends Fragment {
 
         tvStartLiveStream.setOnClickListener(v -> {
             hideSoftInput(requireActivity());
-//            if (!SettingManager2.isProApp(requireContext())) {
-//                mFragmentManager.beginTransaction()
-//                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-//                            @Override
-//                            public void onBuySuccess() {
-//                                System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_COMMENTARY");
-//                                doStartAlready();
-//                            }
-//                        }))
-//                        .addToBackStack("")
-//                        .commit();
-//                return;
-//            }
+            if (!SettingManager2.isProApp(requireContext())) {
+                mFragmentManager.beginTransaction()
+                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
+                            @Override
+                            public void onBuySuccess() {
+                                System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_COMMENTARY");
+                                doStartAlready();
+                            }
+                        }))
+                        .addToBackStack("")
+                        .commit();
+                return;
+            }
             doStartAlready();
         });
 

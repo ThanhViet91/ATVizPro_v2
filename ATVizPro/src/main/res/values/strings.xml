@@ -138,11 +138,9 @@
 <!--    <string name="product_id_year">testing4</string>-->
 
     <!--    guideline_record-->
-    <string name="guideline_record_step_1">Step 1: Tap the flashing icon</string>
+    <string name="guideline_record_step_1">Step 1: Tap to start button</string>
     <string name="guideline_record_step_2">Step 2: Record confirmation</string>
-    <string name="guideline_record_step_3">Step 3: Record icon is displayed</string>
-    <string name="guideline_record_step_4">Step 4: Tap on the icon and click button record</string>
-    <string name="guideline_record_step_5">Step 5: Wait 3s and the screen starts recording</string>
+    <string name="guideline_record_step_5">Step 3: Wait 3s and the screen starts recording</string>
     <!--    guideline_live-->
     <string name="guideline_live_step_1">Step 1: Tap the button "Livestream" in home screen</string>
     <string name="guideline_live_step_2">Step 2: Tap to choose type of social go to live</string>

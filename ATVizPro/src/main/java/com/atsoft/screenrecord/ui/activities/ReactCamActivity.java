@@ -727,7 +727,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         public void run() {
             runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter / 1000)));
             timeCounter = timeCounter + 100;
-            System.out.println("thanhlv 12341111111111 =========== " + timeCounter);
             mCounterUpdateHandler.postDelayed(this, 100);
         }
     };

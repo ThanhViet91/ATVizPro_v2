@@ -178,6 +178,7 @@ public class MainActivity extends BaseFragmentActivity {
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
+//        SettingManager2.setProApp(this, true);
         initViews();
         Intent intent = getIntent();
         if (intent != null)

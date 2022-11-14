@@ -1047,6 +1047,8 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             mService.stopSelf();
             mRecordingServiceBound = false;
         }
+
+        cancelAutoHideMark();
     }
 
     private int camSize = 3;

@@ -222,7 +222,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
         mAdapter = new VideoProjectsAdapter(this, videoList);
         mAdapter.setVideoProjectsListener(this);
-        mAdapter.setHasStableIds(true);
+//        mAdapter.setHasStableIds(true);
         recyclerView.setAdapter(mAdapter);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, calculateSpanCount());
         recyclerView.setLayoutManager(gridLayoutManager);

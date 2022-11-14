@@ -135,7 +135,7 @@ public class FFmpegUtil {
 
     public void trimVideo(String originalVideoPath, long startTime, long endTime, ITranscoding callback) {
         outputVideoPath = StorageUtil.getCacheDir() + "/CacheTrimVideo_" + getTimeStamp() + ".mp4";
-        String cmd = "ffmpeg -ss " + parseSecond2Ms(startTime) + " -i " + originalVideoPath + " -to " + parseSecond2Ms(endTime) + " -c:v copy -c:a copy -preset ultrafast " + outputVideoPath;
+        String cmd = "ffmpeg -ss " + parseSecond2Ms(startTime) + " -to " + parseSecond2Ms(endTime) + " -i " + originalVideoPath + " -c:v copy -c:a copy -preset ultrafast " + outputVideoPath;
         transcodingAsyncTask = new TranscodingAsyncTask(context, cmd, outputVideoPath, callback);
         transcodingAsyncTask.execute();
     }

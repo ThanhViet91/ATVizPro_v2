@@ -1,5 +1,6 @@
 package com.atsoft.screenrecord.ui.fragments;
 
+import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +27,7 @@ import com.atsoft.screenrecord.utils.FFmpegUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class OptionAddTextFragment extends DialogFragmentBase implements BasicAdapter.BasicAdapterListener {
 
@@ -52,9 +55,16 @@ public class OptionAddTextFragment extends DialogFragmentBase implements BasicAd
         return R.layout.option_text_fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetDialogThemeNoFloating);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

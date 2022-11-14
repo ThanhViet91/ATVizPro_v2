@@ -2,6 +2,7 @@ package com.atsoft.screenrecord.ui.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,21 +29,32 @@ import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.atsoft.screenrecord.AppConfigs;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
+import com.atsoft.screenrecord.model.Results;
 import com.atsoft.screenrecord.model.SubscriptionsItemModel;
 import com.atsoft.screenrecord.ui.utils.NetworkUtils;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
+import com.atsoft.screenrecord.utils.RetrofitClient;
 import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SubscriptionFragment extends Fragment {
 
@@ -75,6 +87,7 @@ public class SubscriptionFragment extends Fragment {
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
         YEARLY_ID = AppConfigs.getInstance().getSubsModel().get(2).getKeyID();
+        System.out.println("thanhlv WEEKLY_ID = "+ WEEKLY_ID);
     }
 
     private View mViewRoot;
@@ -96,6 +109,7 @@ public class SubscriptionFragment extends Fragment {
     };
 
     void handlePurchase(Purchase purchase) {
+//        if (mProgressDialog != null) mProgressDialog.dismiss();
         if (!purchase.isAcknowledged()) {
             billingClient.acknowledgePurchase(AcknowledgePurchaseParams
                     .newBuilder()
@@ -108,7 +122,7 @@ public class SubscriptionFragment extends Fragment {
                         SettingManager2.setProApp(requireContext(), true);
                         System.out.println("thanhlv buy OK");
                         mCallBack.onBuySuccess();
-                        mFragmentManager.popBackStack();
+                        mFragmentManager.popBackStackImmediate();
                     }
                 }
             });
@@ -141,42 +155,43 @@ public class SubscriptionFragment extends Fragment {
                 (billingResult, prodDetailsList) -> {
                     // Process the result
 
-                    mProductDetailsList = new ArrayList<>();
-                    mProductDetailsList.addAll(prodDetailsList);
-                    Core.productDetails = new ArrayList<>(mProductDetailsList);
-                    updateSubs();
+//                    mProductDetailsList = new ArrayList<>();
+//                    mProductDetailsList.addAll(prodDetailsList);
+                    Core.productDetails = new ArrayList<>(prodDetailsList);
+//                    updateSubs();
+                    fillSubscription();
                 }
         );
     }
-    @SuppressLint("SetTextI18n")
-    public void updateSubs(){
-        for (int i = 0; i < 3; i++) {
-            String id = mProductDetailsList.get(i).getProductId();
-            String price = "";
-            if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
-                price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
-            String finalPrice = price;
-            requireActivity().runOnUiThread(() -> {
-                if (id.equals(subs.get(0).getKeyID())) {
-                    tvName1.setText(finalPrice + "/ " + subs.get(0).getName());
-                } else
-                if (id.equals(subs.get(1).getKeyID())) {
-                    tvName2.setText(finalPrice + "/ " + subs.get(1).getName());
-                } else
-                if (id.equals(subs.get(2).getKeyID())) {
-                    tvName3.setText(finalPrice + "/ " + subs.get(2).getName());
-                }
-
-
-            });
-        }
-
-        requireActivity().runOnUiThread(() -> {
-            lnHideSubs.setVisibility(View.GONE);
-            btnBuy.setAlpha(1f);
-            btnBuy.setEnabled(true);
-        });
-    }
+//    @SuppressLint("SetTextI18n")
+//    public void updateSubs(){
+//        for (int i = 0; i < 3; i++) {
+//            String id = mProductDetailsList.get(i).getProductId();
+//            String price = "";
+//            if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
+//                price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+//            String finalPrice = price;
+//            requireActivity().runOnUiThread(() -> {
+//                if (id.equals(subs.get(0).getKeyID())) {
+//                    tvName1.setText(finalPrice + "/ " + subs.get(0).getName());
+//                } else
+//                if (id.equals(subs.get(1).getKeyID())) {
+//                    tvName2.setText(finalPrice + "/ " + subs.get(1).getName());
+//                } else
+//                if (id.equals(subs.get(2).getKeyID())) {
+//                    tvName3.setText(finalPrice + "/ " + subs.get(2).getName());
+//                }
+//
+//
+//            });
+//        }
+//
+//        requireActivity().runOnUiThread(() -> {
+//            lnHideSubs.setVisibility(View.GONE);
+//            btnBuy.setAlpha(1f);
+//            btnBuy.setEnabled(true);
+//        });
+//    }
 
     @SuppressLint("SetTextI18n")
     public void fillSubscription() {
@@ -184,8 +199,8 @@ public class SubscriptionFragment extends Fragment {
             for (ProductDetails product : Core.productDetails) {
                 String id = product.getProductId();
                 String price = "";
-                if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
-                    price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+                if (product.getSubscriptionOfferDetails() != null)
+                    price = product.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
                 if (id.equals(subs.get(i).getKeyID())) {
                     if (i == 0) tvName1.setText(price + "/ " + subs.get(0).getName());
                     if (i == 1) tvName2.setText(price + "/ " + subs.get(1).getName());
@@ -244,6 +259,8 @@ public class SubscriptionFragment extends Fragment {
     ImageView btnBuy;
     LinearLayout lnHideSubs;
 
+    TextView tvRestore;
+
     @SuppressLint("SetTextI18n")
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -300,10 +317,21 @@ public class SubscriptionFragment extends Fragment {
         btnBuy.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                checkInternetConnect();
+                buildDialog();
+                btnBuy.setEnabled(false);
+                System.out.println("thanhlv setOnClickListener");
                 launchPurchaseFlow(selected);
             }
         });
+
+
+
+        billingClient = BillingClient.newBuilder(requireContext())
+                .setListener(purchasesUpdatedListener)
+                .enablePendingPurchases()
+                .build();
+        connectGooglePlayBilling();
+        System.out.println("thanhlv billingClient " +billingClient);
 
         if (Core.productDetails.size() > 0) {
             lnHideSubs.setVisibility(View.GONE);
@@ -314,20 +342,31 @@ public class SubscriptionFragment extends Fragment {
             lnHideSubs.setVisibility(View.VISIBLE);
             btnBuy.setAlpha(0.5f);
             btnBuy.setEnabled(false);
-            billingClient = BillingClient.newBuilder(requireContext())
-                    .setListener(purchasesUpdatedListener)
-                    .enablePendingPurchases()
-                    .build();
-            connectGooglePlayBilling();
+            showPopup("Something went wrong!", "Check your network connection and try again");
+
         }
 
         ImageView btn_dismiss = view.findViewById(R.id.img_btn_back_header);
         btn_dismiss.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                mFragmentManager.popBackStack();
+                mFragmentManager.popBackStackImmediate();
             }
         });
+
+
+        tvRestore = view.findViewById(R.id.tv_btn_restore);
+
+        tvRestore.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                buildDialog();
+                tvRestore.setEnabled(false);
+                getPurchaseHistory();
+
+            }
+        });
+
 
         TextView tvTermsOfService = view.findViewById(R.id.tv_terms_of_service);
         TextView tvPrivacyNotice = view.findViewById(R.id.tv_privacy_notice);
@@ -352,31 +391,41 @@ public class SubscriptionFragment extends Fragment {
         });
     }
 
-    private BillingClient billingClient;
+    private ProgressDialog mProgressDialog;
+    private void buildDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = ProgressDialog.show(getContext(), "", "Connecting...");
+        }
+    }
+
+
+    private BillingClient billingClient, billingClient2;
     private ArrayList<ProductDetails> mProductDetailsList;
-
-    ProductDetails productDetails;
-
+    ProductDetails productDetail;
     void launchPurchaseFlow(int sub) {
-        for (int i = 0; i < mProductDetailsList.size(); i++) {
-            if (mProductDetailsList.get(i).getProductId().equals(subs.get(sub).getKeyID())) {
-                productDetails = mProductDetailsList.get(i);
+        for (int i = 0; i < Core.productDetails.size(); i++) {
+            if (Core.productDetails.get(i).getProductId().equals(subs.get(sub).getKeyID())) {
+                productDetail = Core.productDetails.get(i);
                 break;
             }
         }
-        if (productDetails == null) return;
+        if (productDetail == null) return;
         ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList =
                 ImmutableList.of(
                         BillingFlowParams.ProductDetailsParams.newBuilder()
-                                .setProductDetails(productDetails)
-                                .setOfferToken(productDetails.getSubscriptionOfferDetails().get(0).getOfferToken())
+                                .setProductDetails(productDetail)
+                                .setOfferToken(productDetail.getSubscriptionOfferDetails().get(0).getOfferToken())
                                 .build()
                 );
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(productDetailsParamsList)
                 .build();
 
-        billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
+        if (mProgressDialog != null) mProgressDialog.dismiss();
+        if (billingClient != null) billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
+        btnBuy.setEnabled(true);
+        System.out.println("thanhlv launchPurchaseFlow");
+
     }
 
     @Override
@@ -402,5 +451,124 @@ public class SubscriptionFragment extends Fragment {
                 }
         );
 
+    }
+
+    private void getPurchaseHistory() {
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingServiceDisconnected() {
+                if (mProgressDialog != null) mProgressDialog.dismiss();
+//                getPurchase();
+            }
+
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    billingClient.queryPurchaseHistoryAsync(
+                            QueryPurchaseHistoryParams.newBuilder()
+                                    .setProductType(BillingClient.ProductType.SUBS)
+                                    .build(),
+                            (billingResult1, purchasesHistoryList) -> {
+                                if (mProgressDialog != null) mProgressDialog.dismiss();
+                                System.out.println("thanhlv mPurchasesHistoryList  tvRestore.setEnabled(true);" +purchasesHistoryList.size());
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        tvRestore.setEnabled(true);
+                                    }
+                                });
+                                mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                try {
+                                    System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
+                                    getPublicTime();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                }
+                            }
+                    );
+                }
+            }
+        });
+    }
+    private void showPopup(String title, String des) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(des)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                })
+                .show();
+    }
+    private ArrayList<PurchaseHistoryRecord> mPurchasesHistoryList;
+    @SuppressLint("NotifyDataSetChanged")
+    private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
+
+        if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
+            SettingManager2.setProApp(requireContext(), false);
+            showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
+            return;
+        }
+
+        boolean hasId = false;
+        for (PurchaseHistoryRecord item : mPurchasesHistoryList) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 7 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    return;
+                }
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 2592000) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    return;
+                }
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 365 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    return;
+                }
+            }
+        }
+        if (!hasId) {
+            SettingManager2.setProApp(requireContext(), false);
+            showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
+        }
+    }
+    public void getPublicTime() throws JSONException {
+        String tz = TimeZone.getDefault().getID();
+        Call<Results> call = RetrofitClient.getInstance().getMyApi().getTimeZone(tz);
+        call.enqueue(new Callback<Results>() {
+            @Override
+            public void onResponse(Call<Results> call, Response<Results> response) {
+
+                if (response.body() == null) {
+                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                } else
+                    checkPurchase(mPurchasesHistoryList, ((Results) response.body()).getDateTimeMs());
+            }
+            @Override
+            public void onFailure(Call<Results> call, Throwable t) {
+                checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+            }
+        });
     }
 }

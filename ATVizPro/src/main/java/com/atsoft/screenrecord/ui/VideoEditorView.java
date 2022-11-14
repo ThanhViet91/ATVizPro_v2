@@ -182,7 +182,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
 
     public long getVideoDuration() {
-        return mVideoView.getDuration();
+        return mDuration;
     }
 
 

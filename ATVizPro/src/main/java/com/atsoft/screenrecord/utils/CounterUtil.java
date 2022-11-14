@@ -1,27 +1,9 @@
 package com.atsoft.screenrecord.utils;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.Typeface;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.atsoft.screenrecord.App;
-import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class CounterUtil {
 

@@ -4,6 +4,7 @@ import static com.atsoft.screenrecord.ui.activities.MainActivity.initialAds;
 import static com.atsoft.screenrecord.utils.AdsUtil.AD_OPEN_APP_ID;
 import static com.atsoft.screenrecord.utils.AdsUtil.AD_OPEN_APP_ID_DEV;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
@@ -25,7 +26,9 @@ import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.google.android.gms.ads.AdError;
@@ -40,8 +43,11 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Application class that initializes, loads and show ads when activities change states.
@@ -71,8 +77,9 @@ public class App extends Application
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         appOpenAdManager = new AppOpenAdManager();
         App.context = this;
-        getPurchaseHistory();
+        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
         configs();
+        getPurchaseHistory();
         createChannelNotification();
     }
 
@@ -80,67 +87,77 @@ public class App extends Application
     private ArrayList<ProductDetails> mProductDetailsList;
 
     private void getPurchaseHistory() {
-        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
+        if (billingClient == null) return;
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                getPurchaseHistory();
+//                getPurchaseHistory();
             }
 
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
 
                 if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                    billingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
-                            (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                    SettingManager2.setProApp(context, list.size() > 0);
-                                    System.out.println("thanhlv App get subs: "+list.size());
-                                    if (list.size() == 0) {
-                                        MobileAds.initialize(context, initializationStatus -> initialAds = true);
-                                        connectGooglePlayBilling();
-                                    }
-                                }
-                            });
+                    billingClient.queryPurchaseHistoryAsync(
+                            QueryPurchaseHistoryParams.newBuilder()
+                                    .setProductType(BillingClient.ProductType.SUBS)
+                                    .build(),
+                            (billingResult1, purchasesHistoryList) -> {
+                                checkPurchase(purchasesHistoryList, System.currentTimeMillis());
+                            }
+                    );
                 }
             }
         });
     }
 
-    private void showProducts() {
-        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(getString(R.string.product_id_week))
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(getString(R.string.product_id_month))
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                        .setProductId(getString(R.string.product_id_year))
-                        .setProductType(BillingClient.ProductType.SUBS)
-                        .build()
-        );
-
-        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
-                .setProductList(productList)
-                .build();
-
-        billingClient.queryProductDetailsAsync(
-                params,
-                (billingResult, prodDetailsList) -> {
-                    // Process the result
-
-                    mProductDetailsList = new ArrayList<>();
-                    mProductDetailsList.addAll(prodDetailsList);
-                    Core.productDetails = new ArrayList<>(mProductDetailsList);
+    private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
+        if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
+            SettingManager2.setProApp(context, false);
+            MobileAds.initialize(context, initializationStatus -> initialAds = true);
+            return;
+        }
+        boolean hasId = false;
+        for (PurchaseHistoryRecord item : purchasesHistoryList) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 7 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(context, false);
+                } else {
+                    SettingManager2.setProApp(context, true);
+                    return;
                 }
-        );
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 30 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(context, false);
+                } else {
+                    SettingManager2.setProApp(context, true);
+                    return;
+                }
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 365 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(context, false);
+                } else {
+                    SettingManager2.setProApp(context, true);
+                    return;
+                }
+            }
+        }
+        if (!hasId) {   // khong co goi nao giong
+            SettingManager2.setProApp(context, false);
+            MobileAds.initialize(context, initializationStatus -> initialAds = true);
+        }
     }
 
     private void connectGooglePlayBilling() {
+        if (billingClient == null) return;
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
@@ -159,6 +176,40 @@ public class App extends Application
         });
 
     }
+    String WEEKLY_ID, MONTHLY_ID, YEARLY_ID;
+    private void showProducts() {
+        WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
+        MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
+        YEARLY_ID = AppConfigs.getInstance().getSubsModel().get(2).getKeyID();
+
+        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(WEEKLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(MONTHLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(YEARLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+        );
+
+        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                .setProductList(productList)
+                .build();
+
+        if (billingClient != null)
+        billingClient.queryProductDetailsAsync(
+                params,
+                (billingResult, prodDetailsList) -> {
+                    // Process the result
+                    Core.productDetails = new ArrayList<>(prodDetailsList);
+                }
+        );
+    }
 
     private void configs() {
         FirebaseRemoteConfig config = FirebaseRemoteConfig.getInstance();
@@ -173,14 +224,12 @@ public class App extends Application
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         initConfigs();
-                        System.out.println("thanhlv task.isSuccessful() ==== " + AppConfigs.getInstance().getConfigModel().getFeedbackEmail());
                     }
                 });
     }
 
     private void initConfigs() {
-
-
+        connectGooglePlayBilling();
     }
 
     private void createChannelNotification() {

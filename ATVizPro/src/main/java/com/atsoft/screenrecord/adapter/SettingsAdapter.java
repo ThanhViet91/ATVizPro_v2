@@ -77,14 +77,17 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if (SettingManager2.isProApp(mContext)) {
                         viewHolder1.itemView.setAlpha(0.5f);
                     } else viewHolder1.itemView.setAlpha(1f);
-
                 }
                 viewHolder1.content_settings.setText(item.getContent());
                 viewHolder1.ava_settings.setBackgroundResource(item.getResourceId());
                 viewHolder1.itemView.setOnClickListener(new OnSingleClickListener() {
                     @Override
                     public void onSingleClick(View v) {
-                        if (listener != null)
+                        if (item.getContent().equals(mContext.getString(R.string.restore_purchase))) {
+                            if (listener != null && !SettingManager2.isProApp(mContext)) {
+                                listener.onClickItem(mSettingList.get(position).getContent());
+                            }
+                        } else if (listener != null)
                             listener.onClickItem(mSettingList.get(position).getContent());
                     }
                 });

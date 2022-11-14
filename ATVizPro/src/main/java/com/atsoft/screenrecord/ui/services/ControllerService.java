@@ -1,9 +1,7 @@
 package com.atsoft.screenrecord.ui.services;
 
-import static com.atsoft.screenrecord.Core.isConnected;
 import static com.atsoft.screenrecord.ui.activities.MainActivity.KEY_PATH_VIDEO;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -17,7 +15,6 @@ import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.media.CamcorderProfile;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -29,18 +26,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NotificationCompat;
 
 import com.atsoft.screenrecord.App;
@@ -62,9 +55,6 @@ import com.atsoft.screenrecord.utils.CounterUtil;
 import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
     private static final String TAG = ControllerService.class.getSimpleName();

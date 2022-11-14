@@ -9,17 +9,14 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.widget.Toast;
 
 import static com.atsoft.screenrecord.Core.isConnected;
-import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.atsoft.screenrecord.controllers.settings.VideoSetting2;
-import com.atsoft.screenrecord.ui.activities.MainActivity;
 import com.atsoft.screenrecord.ui.services.BaseService;
 import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;

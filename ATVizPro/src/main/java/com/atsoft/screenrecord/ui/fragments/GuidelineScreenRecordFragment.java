@@ -179,19 +179,17 @@ public class GuidelineScreenRecordFragment extends Fragment {
     private void setDecs(int i) {
         if (i == 0) tvDecs.setText(getString(R.string.guideline_record_step_1));
         if (i == 1) tvDecs.setText(getString(R.string.guideline_record_step_2));
-        if (i == 2) tvDecs.setText(getString(R.string.guideline_record_step_3));
-        if (i == 3) tvDecs.setText(getString(R.string.guideline_record_step_4));
-        if (i == 4) tvDecs.setText(getString(R.string.guideline_record_step_5));
+        if (i == 2) tvDecs.setText(getString(R.string.guideline_record_step_5));
     }
 
     public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
-        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_1));
-        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_2));
-        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_3));
-        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_4));
-        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_5));
+        mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_1));
+        mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_2));
+        mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_3));
+//        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_4));
+//        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_5));
         return mListPhoto;
     }
 }

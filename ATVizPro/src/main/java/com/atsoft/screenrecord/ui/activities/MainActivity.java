@@ -5,9 +5,6 @@ import static com.atsoft.screenrecord.ui.fragments.DialogSelectVideoSource.ARG_P
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_FACEBOOK;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_TWITCH;
 import static com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment.SOCIAL_TYPE_YOUTUBE;
-import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_NEGATIVE;
-import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_POSITIVE;
-import static com.atsoft.screenrecord.ui.fragments.PopupConfirm.KEY_TITLE;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_LIVESTREAM_STARTED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_LIVESTREAM_STOPPED;
 import static com.atsoft.screenrecord.ui.services.ControllerService.NOTIFY_MSG_RECORDING_CLOSED;
@@ -36,7 +33,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -68,9 +64,7 @@ import com.atsoft.screenrecord.ui.fragments.FragmentFAQ;
 import com.atsoft.screenrecord.ui.fragments.FragmentSettings;
 import com.atsoft.screenrecord.ui.fragments.GuidelineLiveStreamFragment;
 import com.atsoft.screenrecord.ui.fragments.GuidelineScreenRecordFragment;
-import com.atsoft.screenrecord.ui.fragments.IConfirmPopupListener;
 import com.atsoft.screenrecord.ui.fragments.LiveStreamingFragment;
-import com.atsoft.screenrecord.ui.fragments.PopupConfirm;
 import com.atsoft.screenrecord.ui.fragments.SubscriptionFragment;
 import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.services.ExecuteService;
@@ -178,6 +172,8 @@ public class MainActivity extends BaseFragmentActivity {
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
+//        SettingManager2.setProApp(this, false);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         initViews();
         Intent intent = getIntent();
         if (intent != null)
@@ -282,7 +278,6 @@ public class MainActivity extends BaseFragmentActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private void initViews() {
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         RelativeLayout mAdViewRoot = findViewById(R.id.adView);
         mAdManager = new AdsUtil(this, mAdViewRoot);
         mAdManager.createInterstitialAdmob();
@@ -310,6 +305,7 @@ public class MainActivity extends BaseFragmentActivity {
 
         mImgRec = findViewById(R.id.img_record);
         mImgRec.setOnClickListener(view -> {
+            FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_start_record");
             if (isFirstTimeReach(THE_FIRST_TIME_SCREEN_RECORD)) return;
             openRecordService();
         });
@@ -333,6 +329,7 @@ public class MainActivity extends BaseFragmentActivity {
         liveStreaming = findViewById(R.id.tv_live_streaming);
         ImageView btn_live = findViewById(R.id.img_live);
         btn_live.setOnClickListener(view -> {
+            FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_livestream");
             if (isFirstTimeReach(THE_FIRST_TIME_LIVESTREAM)) return;
             if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
 
@@ -356,7 +353,7 @@ public class MainActivity extends BaseFragmentActivity {
 
         LinearLayout react_cam = findViewById(R.id.ln_react_cam);
         react_cam.setOnClickListener(view -> {
-
+            FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_react_cam");
             if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
                 MyUtils.showSnackBarNotification(mImgRec, "Camera is busy. Please stop screen recording before use this function!", Snackbar.LENGTH_LONG);
                 return;
@@ -368,12 +365,18 @@ public class MainActivity extends BaseFragmentActivity {
 
         LinearLayout btn_editor = findViewById(R.id.ln_btn_video_editor);
         btn_editor.setOnClickListener(view -> {
+            FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_video_editor");
             if (checkExecuteServiceBusy()) return;
             showInterstitialAd(REQUEST_VIDEO_FOR_VIDEO_EDIT);
         });
 
         LinearLayout btn_commentary = findViewById(R.id.ln_btn_commentary);
         btn_commentary.setOnClickListener(view -> {
+            if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
+                MyUtils.showSnackBarNotification(mImgRec, "Microphone is busy. Please stop screen recording before use this function!", Snackbar.LENGTH_LONG);
+                return;
+            }
+            FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_commentary");
             if (checkExecuteServiceBusy()) return;
             showInterstitialAd(REQUEST_VIDEO_FOR_COMMENTARY);
         });
@@ -381,6 +384,7 @@ public class MainActivity extends BaseFragmentActivity {
         btn_projects.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                FirebaseUtils.logEventToFirebase(mFirebaseAnalytics, "", "click_my_project");
                 showInterstitialAd(REQUEST_SHOW_PROJECTS_DEFAULT);
             }
         });

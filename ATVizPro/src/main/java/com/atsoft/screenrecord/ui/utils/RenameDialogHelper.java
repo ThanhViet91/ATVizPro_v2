@@ -3,6 +3,7 @@ package com.atsoft.screenrecord.ui.utils;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,10 +56,11 @@ public class RenameDialogHelper {
             Button btnOk = dialog.findViewById(R.id.rename_btn_ok);
             // if button is clicked, close the custom dialog
             btnOk.setOnClickListener(v -> {
-                String newTitle = editText.getText().toString();
+                String newTitle = editText.getText().toString().trim();
                 if (!oldVideo.getName().equals(newTitle)) {
                     try {
                         renameFile(oldVideo.getPath(), newTitle);
+                        editText.setText(newTitle);
                         mCallback.onClickOK(newTitle);
                         dialog.dismiss();
                     } catch (Exception e) {
@@ -80,7 +82,9 @@ public class RenameDialogHelper {
 
     }
 
-    public void renameFile(final String videoPath, final String newName) throws Exception {
+    public void renameFile(final String videoPath, final String newNames) throws Exception {
+        String newName = newNames.trim();
+        if (TextUtils.isEmpty(newName)) throw new Exception("File name cannot be empty.");
         if (MyUtils.isValidFilenameSynctax(newName)){
             System.out.println("thanhlv A filename cannot contain any of the following character:");
             throw new Exception("A filename cannot contain any of the following character: \\/\":*<>| is not n");

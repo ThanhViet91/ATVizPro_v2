@@ -6,6 +6,6 @@
   </entry>
   <entry>
     <key>Subscriptions</key>
-    <value>[{"name":" week, auto renewable","keyID":"com.atsoft.screenrecorder.weekly","description":"BEST VALUE","selected":false,"sort":0},{"name":" month, auto renewable","keyID":"com.atsoft.screenrecorder.monthly","description":"3 days FREE TRIAL","selected":false,"sort":1},{"name":" year, auto renewable","keyID":"com.atsoft.screenrecorder.yearly","description":"7 days FREE TRIAL","selected":true,"sort":2}]</value>
+    <value>[{"name":" week, auto renewable","keyID":"com.atsoft.screenrecord.weekly","description":"BEST VALUE","selected":false,"sort":0},{"name":" month, auto renewable","keyID":"com.atsoft.screenrecord.monthly","description":"3 days FREE TRIAL","selected":false,"sort":1},{"name":" year, auto renewable","keyID":"com.atsoft.screenrecord.yearly","description":"7 days FREE TRIAL","selected":true,"sort":2}]</value>
   </entry>
 </defaults>

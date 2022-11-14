@@ -23,4 +23,11 @@ public class FirebaseUtils {
         System.out.println("thanhlv logEventShowInterstitialAd " + action);
     }
 
+    public static void logEventToFirebase(FirebaseAnalytics firebaseAnalytics, String action, String func) {
+        Bundle bundle = new Bundle();
+        bundle.putString("action", action);
+        firebaseAnalytics.logEvent(func, bundle);
+        System.out.println("thanhlv logEventToFirebase " + func);
+    }
+
 }

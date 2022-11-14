@@ -24,11 +24,6 @@ import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class OptionTrimFragment extends DialogFragmentBase {
 
-
-    public static final String ARG_PARAM1 = "param1";
-    public static final String ARG_PARAM2 = "param2";
-    private static final String TAG = OptionTrimFragment.class.getSimpleName();
-
     public static OptionTrimFragment newInstance(IOptionFragmentListener callback, SeekbarCallback callback2, Bundle args) {
         OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback, callback2);
         dialogSelectVideoSource.setArguments(args);
@@ -73,10 +68,8 @@ public class OptionTrimFragment extends DialogFragmentBase {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         videoDuration = getArguments() != null ? getArguments().getLong("video_duration", 0) : 0;
         video_path = getArguments() != null ? getArguments().getString("video_path", "") : "";
-
         ImageView btn_close = view.findViewById(R.id.iv_close);
         btn_done = view.findViewById(R.id.iv_done);
         tvStartTime = view.findViewById(R.id.actvStartTime);

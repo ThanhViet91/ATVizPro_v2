@@ -177,7 +177,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
             videoPrepared(mp);
             mediaPlayer = mp;
-            videoView.setOnCompletionListener(mediaPlayer -> getEndCommentary());
+            videoView.setOnCompletionListener(mediaPlayer -> getEndCommentary(true));
         });
     }
 
@@ -210,7 +210,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             }
         }
         videoView.setLayoutParams(lpVideo);
-        videoView.seekTo(100);
+        videoView.seekTo(0);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -226,7 +226,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         super.onPause();
 //        mCounterUpdateHandler.removeCallbacks(mUpdateCounter);
         if (!hasEndCommentary) {
-            getEndCommentary();
+            getEndCommentary(false);
         } else {
             countDownTimer.cancel();
             layoutCountdown.setVisibility(View.GONE);
@@ -296,7 +296,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
             if (hasAudioFile) return;
             if (!pauseRecord) {
                 //
-                getEndCommentary();
+                getEndCommentary(false);
             } else {
                 countDownTimer.start();
             }
@@ -430,8 +430,8 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         @Override
         public void run() {
             runOnUiThread(() -> tvDurationCounter.setText(parseTime(timeCounter / 1000)));
-            timeCounter = timeCounter + 50;
-            mCounterUpdateHandler.postDelayed(this, 50);
+            timeCounter = timeCounter + 100;
+            mCounterUpdateHandler.postDelayed(this, 100);
         }
     };
 
@@ -463,14 +463,15 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
     boolean hasEndCommentary = true;
 
-    private void getEndCommentary() {
+    private void getEndCommentary(boolean EOV) {
         if (videoView.isPlaying()) videoView.pause();
-        endTime = timeCounter;
+        endTime = timeCounter + 50;
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.release();
         }
         mediaRecorder = null;
+        if (EOV) progressBar.setProgress(500);
         progressBar.clearAnimation();
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();

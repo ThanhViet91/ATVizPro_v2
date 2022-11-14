@@ -6,6 +6,7 @@ import static com.atsoft.screenrecord.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getBaseStorageDirectory;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,20 +31,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.QueryPurchasesParams;
+import com.android.billingclient.api.PurchaseHistoryRecord;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.atsoft.screenrecord.AppConfigs;
+import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.adapter.SettingsAdapter;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
+import com.atsoft.screenrecord.model.Results;
 import com.atsoft.screenrecord.model.SettingsItem;
 import com.atsoft.screenrecord.ui.activities.MainActivity;
 import com.atsoft.screenrecord.utils.AdsUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
+import com.atsoft.screenrecord.utils.RetrofitClient;
+import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.TimeZone;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FragmentSettings extends Fragment implements SettingsAdapter.SettingsListener {
 
@@ -52,6 +67,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     private MainActivity mActivity;
     private SettingsAdapter adapter;
     View mViewRoot;
+    private AdsUtil mAdManager;
 
     @SuppressLint("DefaultLocale")
     @Nullable
@@ -70,6 +86,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
         settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + String.format("%.1f MB", dirSize(new File(getBaseStorageDirectory())) * 1f / (1024 * 1024)), R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
+
+        mAdView = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(requireContext(), mAdView);
 
         return mViewRoot;
     }
@@ -93,6 +112,16 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             }
         });
 
+        System.out.println("thanhlv onViewCreatedonViewCreatedonViewCreated" + savedInstanceState);
+
+        billingClient = BillingClient.newBuilder(requireContext())
+                .enablePendingPurchases()
+                .setListener((billingResult, list) -> {
+
+                })
+                .build();
+        connectGooglePlayBilling();
+
     }
 
     @Override
@@ -101,13 +130,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         mFragmentManager = getParentFragmentManager();
         mActivity = (MainActivity) getActivity();
     }
-
+    RelativeLayout mAdView;
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
         super.onResume();
-        RelativeLayout mAdView = mViewRoot.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdView).loadBanner();
+        if (mAdManager != null) mAdManager.loadBanner();
         if (adapter != null) adapter.notifyDataSetChanged();
     }
 
@@ -122,28 +150,129 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     }
 
     private BillingClient billingClient;
-
-    private void getPurchase() {
-        billingClient = BillingClient.newBuilder(requireContext()).enablePendingPurchases().setListener((billingResult, list) -> {
-        }).build();
+    private void getPurchaseHistory() {
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                getPurchase();
+                if (mProgressDialog != null) mProgressDialog.dismiss();
             }
 
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-
                 if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    billingClient.queryPurchasesAsync(
-                            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build(),
-                            (billingResult1, list) -> {
-                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    SettingManager2.setProApp(requireContext(), list.size() > 0);
+                    billingClient.queryPurchaseHistoryAsync(
+                            QueryPurchaseHistoryParams.newBuilder()
+                                    .setProductType(BillingClient.ProductType.SUBS)
+                                    .build(),
+                            (billingResult1, purchasesHistoryList) -> {
+                                if (mProgressDialog != null) mProgressDialog.dismiss();
+                                mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                try {
+                                    getPublicTime();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
                                 }
-                            });
+                            }
+                    );
                 }
+            }
+        });
+    }
+    private ProgressDialog mProgressDialog;
+    private void buildDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = ProgressDialog.show(getContext(), "", "Connecting...");
+        }
+    }
+    private void showPopup(String title, String des) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(title)
+                .setMessage(des)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                })
+                .show();
+    }
+    private ArrayList<PurchaseHistoryRecord> mPurchasesHistoryList;
+    @SuppressLint("NotifyDataSetChanged")
+    private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
+
+        if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
+            SettingManager2.setProApp(requireContext(), false);
+            showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
+            if (adapter != null) adapter.notifyDataSetChanged();
+            if (mAdManager != null) mAdManager.loadBanner();
+            return;
+        }
+
+        boolean hasId = false;
+        for (PurchaseHistoryRecord item : mPurchasesHistoryList) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 7 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    if (adapter != null) adapter.notifyDataSetChanged();
+                    if (mAdManager != null) mAdManager.loadBanner();
+                    return;
+                }
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 2592000) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    if (adapter != null) adapter.notifyDataSetChanged();
+                    if (mAdManager != null) mAdManager.loadBanner();
+                    return;
+                }
+            }
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
+                hasId = true;
+                if ((currentTime - item.getPurchaseTime())/1000 > 365 * 24 * 60 * 60) {
+                    // qua han
+                    SettingManager2.setProApp(requireContext(), false);
+                    showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
+                } else {
+                    SettingManager2.setProApp(requireContext(), true);
+                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    if (adapter != null) adapter.notifyDataSetChanged();
+                    if (mAdManager != null) mAdManager.loadBanner();
+                    return;
+                }
+            }
+
+        }
+        if (!hasId) {
+            SettingManager2.setProApp(requireContext(), false);
+            showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
+        }
+        if (adapter != null) adapter.notifyDataSetChanged();
+        if (mAdManager != null) mAdManager.loadBanner();
+    }
+    public void getPublicTime() throws JSONException {
+        String tz = TimeZone.getDefault().getID();
+        Call<Results> call = RetrofitClient.getInstance().getMyApi().getTimeZone(tz);
+        call.enqueue(new Callback<Results>() {
+            @Override
+            public void onResponse(Call<Results> call, Response<Results> response) {
+
+                if (response.body() == null) {
+                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                } else
+                    checkPurchase(mPurchasesHistoryList, ((Results) response.body()).getDateTimeMs());
+            }
+            @Override
+            public void onFailure(Call<Results> call, Throwable t) {
+                checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
             }
         });
     }
@@ -152,6 +281,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     public void onClickItem(String code) {
 
         if (code.equals(getString(R.string.upgrade_to_pro))) {
+//            Core.productDetails = new ArrayList<>();
             System.out.println("thanhlv upgrade_to_pro");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
@@ -159,8 +289,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                     .commit();
         }
         if (code.equals(getString(R.string.restore_purchase))) {
+            buildDialog();
             System.out.println("thanhlv restore_purchase");
-            getPurchase();
+            getPurchaseHistory();
         }
 
         if (code.equals(getString(R.string.share_app_to_friends))) {
@@ -243,5 +374,58 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
         intent.addFlags(flags);
         return intent;
+    }
+
+    private void connectGooglePlayBilling() {
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                    // The BillingClient is ready. You can query purchases here.
+                    showProducts();
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+                // Try to restart the connection on the next request to
+                // Google Play by calling the startConnection() method.
+                connectGooglePlayBilling();
+            }
+        });
+
+    }
+    String WEEKLY_ID, MONTHLY_ID, YEARLY_ID;
+    private void showProducts() {
+        WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
+        MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
+        YEARLY_ID = AppConfigs.getInstance().getSubsModel().get(2).getKeyID();
+
+        ImmutableList<QueryProductDetailsParams.Product> productList = ImmutableList.of(
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(WEEKLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(MONTHLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(YEARLY_ID)
+                        .setProductType(BillingClient.ProductType.SUBS)
+                        .build()
+        );
+
+        QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
+                .setProductList(productList)
+                .build();
+
+        billingClient.queryProductDetailsAsync(
+                params,
+                (billingResult, prodDetailsList) -> {
+                    // Process the result
+                    Core.productDetails = new ArrayList<>(prodDetailsList);
+                }
+        );
     }
 }

@@ -24,6 +24,7 @@ import it.sephiroth.android.library.rangeseekbar.RangeSeekBar;
 
 public class OptionTrimFragment extends DialogFragmentBase {
 
+    private final int minTrimDuration = 1000;
     public static OptionTrimFragment newInstance(IOptionFragmentListener callback, SeekbarCallback callback2, Bundle args) {
         OptionTrimFragment dialogSelectVideoSource = new OptionTrimFragment(callback, callback2);
         dialogSelectVideoSource.setArguments(args);
@@ -105,9 +106,9 @@ public class OptionTrimFragment extends DialogFragmentBase {
                 if (i != oldLeft) {  // change left
                     isChangeLeft = true;
                     isChangeRight = false;
-                    if (i1 - i < 1000) {
+                    if (i1 - i < minTrimDuration) {
                         rangeSeekBar.setPressed(false);
-                        oldLeft = oldRight - 1000;
+                        oldLeft = oldRight - minTrimDuration;
                         isMinRange = true;
                     } else {
                         rangeSeekBar.setPressed(true);
@@ -120,9 +121,9 @@ public class OptionTrimFragment extends DialogFragmentBase {
                 if (i1 != oldRight) {  // change right
                     isChangeLeft = false;
                     isChangeRight = true;
-                    if (i1 - i < 1000) {
+                    if (i1 - i < minTrimDuration) {
                         rangeSeekBar.setPressed(false);
-                        oldRight = oldLeft + 1000;
+                        oldRight = oldLeft + minTrimDuration;
                         isMinRange = true;
                     } else {
                         rangeSeekBar.setPressed(true);
@@ -151,14 +152,14 @@ public class OptionTrimFragment extends DialogFragmentBase {
                 if (isChangeLeft) {
                     if (isMinRange) {
                         oldRight = rangeSeekBar.getProgressEnd();
-                        oldLeft = oldRight - 1000;
+                        oldLeft = oldRight - minTrimDuration;
                     }
                     seekbarCallback.onSeekTo((long) oldLeft);
                 }
                 if (isChangeRight) {
                     if (isMinRange) {
                         oldLeft = rangeSeekBar.getProgressStart();
-                        oldRight = oldLeft + 1000;
+                        oldRight = oldLeft + minTrimDuration;
                     }
                     seekbarCallback.onSeekTo((long) oldRight);
                 }
@@ -177,7 +178,15 @@ public class OptionTrimFragment extends DialogFragmentBase {
     private void processingTrimming() {
         callback.onClickDone();
         dismiss();
-        FFmpegUtil.getInstance().trimVideo(video_path, startTime, endTime, new FFmpegUtil.ITranscoding() {
+
+        long startT = Math.max(0, startTime);
+        if (endTime - startT < minTrimDuration) {
+            System.out.println("thanhlv processingTrimming if (endTime - startT < minTrimDuration) { ");
+            if (callback != null) callback.onFinishProcess(video_path);
+            return;
+        }
+        System.out.println("thanhlv processingTrimming startTime = " + startT + " fff endTime = " + endTime);
+        FFmpegUtil.getInstance().trimVideo(video_path, startT, endTime, new FFmpegUtil.ITranscoding() {
             @Override
             public void onStartTranscoding(String outPath) {
             }

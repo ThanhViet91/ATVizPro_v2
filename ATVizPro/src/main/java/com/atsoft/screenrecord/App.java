@@ -84,8 +84,6 @@ public class App extends Application
     }
 
     private BillingClient billingClient;
-    private ArrayList<ProductDetails> mProductDetailsList;
-
     private void getPurchaseHistory() {
         if (billingClient == null) return;
         billingClient.startConnection(new BillingClientStateListener() {
@@ -96,14 +94,15 @@ public class App extends Application
 
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-
                 if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
                     billingClient.queryPurchaseHistoryAsync(
                             QueryPurchaseHistoryParams.newBuilder()
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                checkPurchase(purchasesHistoryList, System.currentTimeMillis());
+                                if(billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                    checkPurchase(purchasesHistoryList, System.currentTimeMillis());
+                                }
                             }
                     );
                 }
@@ -115,45 +114,37 @@ public class App extends Application
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(context, false);
             MobileAds.initialize(context, initializationStatus -> initialAds = true);
+            System.out.println("thanhlv (purchasesHistoryList == null || purchasesHistoryList.size() == 0");
             return;
         }
-        boolean hasId = false;
         for (PurchaseHistoryRecord item : purchasesHistoryList) {
             if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
-                hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 7 * 24 * 60 * 60) {
-                    // qua han
-                    SettingManager2.setProApp(context, false);
-                } else {
+                if ((currentTime - item.getPurchaseTime())/1000 < 7 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
+                    System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 7 * 24 * 60 * 60) ");
                     return;
                 }
             }
             if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
-                hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 30 * 24 * 60 * 60) {
-                    // qua han
-                    SettingManager2.setProApp(context, false);
-                } else {
+                if ((currentTime - item.getPurchaseTime())/1000 < 30 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
+                    System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 30 * 24 * 60 * 60) ");
                     return;
                 }
             }
             if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
-                hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 365 * 24 * 60 * 60) {
-                    // qua han
-                    SettingManager2.setProApp(context, false);
-                } else {
+                if ((currentTime - item.getPurchaseTime())/1000 < 365 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
+                    System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 365 * 24 * 60 * 60) ");
                     return;
                 }
             }
         }
-        if (!hasId) {   // khong co goi nao giong
+          // khong co goi nao giong hoac da het han
             SettingManager2.setProApp(context, false);
             MobileAds.initialize(context, initializationStatus -> initialAds = true);
-        }
+        System.out.println("thanhlv  // khong co goi nao giong hoac da het han");
+
     }
 
     private void connectGooglePlayBilling() {
@@ -171,12 +162,12 @@ public class App extends Application
             public void onBillingServiceDisconnected() {
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
-                connectGooglePlayBilling();
+//                connectGooglePlayBilling();
             }
         });
 
     }
-    String WEEKLY_ID, MONTHLY_ID, YEARLY_ID;
+    String WEEKLY_ID = "", MONTHLY_ID = "", YEARLY_ID = "";
     private void showProducts() {
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
@@ -223,19 +214,15 @@ public class App extends Application
         config.fetchAndActivate()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        initConfigs();
+                        connectGooglePlayBilling();
                     }
                 });
-    }
-
-    private void initConfigs() {
-        connectGooglePlayBilling();
     }
 
     private void createChannelNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    "Screen Recorder", NotificationManager.IMPORTANCE_NONE);
+                    getString(R.string.full_app_name), NotificationManager.IMPORTANCE_NONE);
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);

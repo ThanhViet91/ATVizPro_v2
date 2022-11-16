@@ -122,7 +122,7 @@ public class SubscriptionFragment extends Fragment {
                         SettingManager2.setProApp(requireContext(), true);
                         System.out.println("thanhlv buy OK");
                         mCallBack.onBuySuccess();
-                        mFragmentManager.popBackStackImmediate();
+                        mFragmentManager.popBackStack();
                     }
                 }
             });
@@ -155,43 +155,16 @@ public class SubscriptionFragment extends Fragment {
                 (billingResult, prodDetailsList) -> {
                     // Process the result
 
-//                    mProductDetailsList = new ArrayList<>();
-//                    mProductDetailsList.addAll(prodDetailsList);
                     Core.productDetails = new ArrayList<>(prodDetailsList);
-//                    updateSubs();
-                    fillSubscription();
+                    requireActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fillSubscription();
+                        }
+                    });
                 }
         );
     }
-//    @SuppressLint("SetTextI18n")
-//    public void updateSubs(){
-//        for (int i = 0; i < 3; i++) {
-//            String id = mProductDetailsList.get(i).getProductId();
-//            String price = "";
-//            if (mProductDetailsList.get(i).getSubscriptionOfferDetails() != null)
-//                price = mProductDetailsList.get(i).getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
-//            String finalPrice = price;
-//            requireActivity().runOnUiThread(() -> {
-//                if (id.equals(subs.get(0).getKeyID())) {
-//                    tvName1.setText(finalPrice + "/ " + subs.get(0).getName());
-//                } else
-//                if (id.equals(subs.get(1).getKeyID())) {
-//                    tvName2.setText(finalPrice + "/ " + subs.get(1).getName());
-//                } else
-//                if (id.equals(subs.get(2).getKeyID())) {
-//                    tvName3.setText(finalPrice + "/ " + subs.get(2).getName());
-//                }
-//
-//
-//            });
-//        }
-//
-//        requireActivity().runOnUiThread(() -> {
-//            lnHideSubs.setVisibility(View.GONE);
-//            btnBuy.setAlpha(1f);
-//            btnBuy.setEnabled(true);
-//        });
-//    }
 
     @SuppressLint("SetTextI18n")
     public void fillSubscription() {
@@ -236,6 +209,11 @@ public class SubscriptionFragment extends Fragment {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
 
+        billingClient = BillingClient.newBuilder(requireContext())
+                .setListener(purchasesUpdatedListener)
+                .enablePendingPurchases()
+                .build();
+        connectGooglePlayBilling();
 
         return mViewRoot;
     }
@@ -325,12 +303,6 @@ public class SubscriptionFragment extends Fragment {
         });
 
 
-
-        billingClient = BillingClient.newBuilder(requireContext())
-                .setListener(purchasesUpdatedListener)
-                .enablePendingPurchases()
-                .build();
-        connectGooglePlayBilling();
         System.out.println("thanhlv billingClient " +billingClient);
 
         if (Core.productDetails.size() > 0) {
@@ -350,7 +322,7 @@ public class SubscriptionFragment extends Fragment {
         btn_dismiss.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                mFragmentManager.popBackStackImmediate();
+                mFragmentManager.popBackStack();
             }
         });
 
@@ -453,11 +425,22 @@ public class SubscriptionFragment extends Fragment {
 
     }
 
+    public void setEnableButton() {
+        requireActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                tvRestore.setEnabled(true);
+            }
+        });
+    }
+
     private void getPurchaseHistory() {
+        setEnableButton();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
                 if (mProgressDialog != null) mProgressDialog.dismiss();
+                tvRestore.setEnabled(true);
 //                getPurchase();
             }
 
@@ -470,20 +453,26 @@ public class SubscriptionFragment extends Fragment {
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
                                 if (mProgressDialog != null) mProgressDialog.dismiss();
-                                System.out.println("thanhlv mPurchasesHistoryList  tvRestore.setEnabled(true);" +purchasesHistoryList.size());
-                                requireActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvRestore.setEnabled(true);
+//                                System.out.println("thanhlv mPurchasesHistoryList  tvRestore.setEnabled(true);" +purchasesHistoryList.size());
+                                setEnableButton();
+
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                    mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                    try {
+                                        System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
+                                        getPublicTime();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
                                     }
-                                });
-                                mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
-                                try {
-                                    System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
-                                    getPublicTime();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                } else {
+                                    requireActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            tvRestore.setEnabled(true);
+                                            showPopup("Something went wrong!", "Check your network connection and try again");
+                                        }
+                                    });
                                 }
                             }
                     );

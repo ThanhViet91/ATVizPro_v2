@@ -466,6 +466,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
     private void getEndCommentary(boolean EOV) {
         if (videoView.isPlaying()) videoView.pause();
         endTime = timeCounter + 50;
+        if (endTime > videoDuration) endTime = videoDuration;
         if (mediaRecorder != null) {
             mediaRecorder.stop();
             mediaRecorder.release();

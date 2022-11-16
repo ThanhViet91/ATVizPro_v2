@@ -47,7 +47,7 @@ public class RenameDialogHelper {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (MyUtils.isValidFilenameSynctax(s.toString())) {
-                        tilEdittext.setError("A filename cannot contain any of the following character: \\/\":*<>| is not n");
+                        tilEdittext.setError("A filename cannot contain any of the following character: \\/\":*<>|%");
                     } else {
                         tilEdittext.setError("");
                     }
@@ -87,7 +87,7 @@ public class RenameDialogHelper {
         if (TextUtils.isEmpty(newName)) throw new Exception("File name cannot be empty.");
         if (MyUtils.isValidFilenameSynctax(newName)){
             System.out.println("thanhlv A filename cannot contain any of the following character:");
-            throw new Exception("A filename cannot contain any of the following character: \\/\":*<>| is not n");
+            throw new Exception("A filename cannot contain any of the following character: \\/\":*<>|%");
         }
 
         File file = new File(videoPath);

@@ -171,7 +171,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             mediaPlayer = mp;
             videoView.setOnCompletionListener(mediaPlayer -> {
 //                endTime = mediaPlayer.getCurrentPosition() + 50;
-                getEndReactCam();
+                getEndReactCam(true);
             });
             initCamView();
         });
@@ -242,7 +242,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     public void onPause() {
         super.onPause();
         if (!hasEndReact) {
-            getEndReactCam();
+            getEndReactCam(false);
         } else {
             countDownTimer.cancel();
             layoutCountdown.setVisibility(View.GONE);
@@ -605,7 +605,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                     countDownTimer.start();
                 }
             } else {
-                getEndReactCam();
+                getEndReactCam(false);
             }
         }
 
@@ -773,7 +773,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
     boolean hasEndReact = true;
 
-    private void getEndReactCam() {
+    private void getEndReactCam(boolean isEOV) {
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
 
@@ -790,6 +790,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             }
         }, 50);
         progressBar.clearAnimation();
+        if (isEOV) progressBar.setProgress(500);
         progressBar.setBackgroundResource(R.drawable.ic_play_react_svg_pause);
         animationProgressBar.cancel();
         mCounterUpdateHandler.removeCallbacks(mUpdateCounter);

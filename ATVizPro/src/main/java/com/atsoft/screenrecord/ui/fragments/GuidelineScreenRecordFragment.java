@@ -188,8 +188,6 @@ public class GuidelineScreenRecordFragment extends Fragment {
         mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_1));
         mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_2));
         mListPhoto.add(new PhotoModel(R.drawable.img_how_to_record_3));
-//        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_4));
-//        mListPhoto.add(new PhotoModel(R.drawable.how_to_record_5));
         return mListPhoto;
     }
 }

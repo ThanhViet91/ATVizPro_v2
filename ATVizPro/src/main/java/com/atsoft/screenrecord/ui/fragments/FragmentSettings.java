@@ -2,6 +2,7 @@ package com.atsoft.screenrecord.ui.fragments;
 
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_UPDATE_SHOW_HIDE_FAB;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.dirSize;
+import static com.atsoft.screenrecord.ui.utils.MyUtils.dirSizeString;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getBaseStorageDirectory;
 
@@ -73,7 +74,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        if (mViewRoot != null) return mViewRoot;
         mViewRoot = inflater.inflate(R.layout.fragment_settings_home, container, false);
         settingsItems.clear();
         settingsItems.add(new SettingsItem(getString(R.string.upgrade_to_pro), R.drawable.ic_crown));
@@ -84,7 +85,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.share_app_to_friends), R.drawable.ic_share_settings2));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
-        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + String.format("%.1f MB", dirSize(new File(getBaseStorageDirectory())) * 1f / (1024 * 1024)), R.drawable.ic_recording_cache));
+        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + dirSizeString(new File(getBaseStorageDirectory())) , R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
         mAdView = mViewRoot.findViewById(R.id.adView);
@@ -112,7 +113,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             }
         });
 
-        System.out.println("thanhlv onViewCreatedonViewCreatedonViewCreated" + savedInstanceState);
 
         billingClient = BillingClient.newBuilder(requireContext())
                 .enablePendingPurchases()
@@ -166,12 +166,21 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
                                 if (mProgressDialog != null) mProgressDialog.dismiss();
-                                mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
-                                try {
-                                    getPublicTime();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                    mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                    try {
+                                        getPublicTime();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                    }
+                                } else {
+                                    requireActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            showPopup("Something went wrong!", "Check your network connection and try again");
+                                        }
+                                    });
                                 }
                             }
                     );
@@ -281,7 +290,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     public void onClickItem(String code) {
 
         if (code.equals(getString(R.string.upgrade_to_pro))) {
-//            Core.productDetails = new ArrayList<>();
             System.out.println("thanhlv upgrade_to_pro");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
@@ -300,7 +308,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                     AppConfigs.getInstance().getConfigModel().getShareText());
             sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, "choose one"));
+            startActivity(Intent.createChooser(sendIntent, "Choose one"));
         }
 
 
@@ -321,8 +329,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
 
         if (code.equals(getString(R.string.floating_button))) {
-//            boolean ss = SettingManager2.isEnableFAB(requireContext());
-//            SettingManager2.setEnableFAB(requireContext(), !ss);
             mActivity.sendActionToService(ACTION_UPDATE_SHOW_HIDE_FAB);
             System.out.println("thanhlv floating_button " + SettingManager2.isEnableFAB(requireContext()));
         }

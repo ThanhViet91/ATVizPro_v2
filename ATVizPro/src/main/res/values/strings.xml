@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Screen Recorder</string>
-    <string name="full_app_name">Screen Recorder</string>
+    <string name="app_name">AT Record</string>
+    <string name="full_app_name">AT Record</string>
 
     <string name="cancel">Cancel</string>
     <string name="select">Select</string>
@@ -185,11 +185,11 @@
     <string name="question_2">How do I turn on the microphone?</string>
     <string name="answer_2">Make sure you long press (or 3D touch it available) the record button, so a menu will appear to turn on the microphone.</string>
     <string name="question_3">I want to Face Cam while I screen record</string>
-    <string name="answer_3">Currently, it is not possible to Face Cam and record your screen at the same time. However, you can add a Face Cam reaction after you finish your recording. Just open the video recording in our app and select “ Face Cam”.</string>
+    <string name="answer_3">In screen record mode, you can add a Face Cam reaction with floating button: Open Settings and tap to show floating button, tap to icon camera (show/hide Camera).</string>
     <string name="question_4">My Video is saved to camera roll and I want to save it on the app</string>
     <string name="answer_4">Just make sure you long press (or 3D touch if available) the record button on the control center. Then, select Record it! as the destination app.</string>
     <string name="question_5">Error while recording or recording won’t stop</string>
-    <string name="answer_5">Somethings the recording engine gets stuck due to a memory bug on some IOS devices. Try restarting you device and close all other apps.</string>
+    <string name="answer_5">Somethings the recording engine gets stuck due to a memory bug on some devices. Try restarting you device and close all other apps.</string>
     <string name="question_6">My record button is greyed out</string>
     <string name="answer_6">Make sure Screen Recording is Not Restricted with Parental Control: Open Settings and Tap on General, Tap on Restrictions. You need to enter your Restrictions passcode. Then scroll and look if Screen Recorder is restricted. If so, turn it off.</string>
     <string name="question_7">I still have a question</string>

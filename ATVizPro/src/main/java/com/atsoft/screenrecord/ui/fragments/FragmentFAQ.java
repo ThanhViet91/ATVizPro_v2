@@ -35,11 +35,11 @@ public class FragmentFAQ extends Fragment {
         View mViewRoot = inflater.inflate(R.layout.fragment_faq, container, false);
 
         mFAQs.add(new FAQItem(getString(R.string.question_1), getString(R.string.answer_1), false));
-        mFAQs.add(new FAQItem(getString(R.string.question_2), getString(R.string.answer_2), false));
+//        mFAQs.add(new FAQItem(getString(R.string.question_2), getString(R.string.answer_2), false));
         mFAQs.add(new FAQItem(getString(R.string.question_3), getString(R.string.answer_3), false));
-        mFAQs.add(new FAQItem(getString(R.string.question_4), getString(R.string.answer_4), false));
+//        mFAQs.add(new FAQItem(getString(R.string.question_4), getString(R.string.answer_4), false));
         mFAQs.add(new FAQItem(getString(R.string.question_5), getString(R.string.answer_5), false));
-        mFAQs.add(new FAQItem(getString(R.string.question_6), getString(R.string.answer_6), false));
+//        mFAQs.add(new FAQItem(getString(R.string.question_6), getString(R.string.answer_6), false));
         mFAQs.add(new FAQItem(getString(R.string.question_8), getString(R.string.answer_8), false));
         mFAQs.add(new FAQItem(getString(R.string.question_7), String.format(getString(R.string.answer_7), AppConfigs.getInstance().getConfigModel().getFeedbackEmail()), false));
         return mViewRoot;

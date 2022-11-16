@@ -220,7 +220,7 @@ public class ExecuteService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, NOTIFICATION_ID, intent, PendingIntent.FLAG_MUTABLE);
         RemoteViews notificationLayoutExpanded = new RemoteViews(getPackageName(), R.layout.notification_layout);
         if (type.equals(MyUtils.ACTION_FOR_REACT))
-            notificationLayoutExpanded.setTextViewText(R.id.des, "React in processing");
+            notificationLayoutExpanded.setTextViewText(R.id.des, "ReactCam in processing");
         if (type.equals(MyUtils.ACTION_FOR_COMMENTARY))
             notificationLayoutExpanded.setTextViewText(R.id.des, "Commentary in processing");
         notificationLayoutExpanded.setImageViewResource(R.id.ic_app, R.drawable.ic_app);
@@ -235,8 +235,7 @@ public class ExecuteService extends Service {
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_MAX)
                 .setCustomBigContentView(notificationLayoutExpanded)
-                .setContentTitle("Screen Recorder")
-//                .setContentText("In progress...")
+                .setContentTitle(getString(R.string.full_app_name))
                 .setSmallIcon(R.drawable.ic_app)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)

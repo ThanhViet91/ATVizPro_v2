@@ -170,9 +170,26 @@ public class MyUtils {
                     }
                 }
             }
-            return result; // return the file size
+
+            return result; // return the file size in byte
         }
+
+
         return 0;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String dirSizeString(File dir) {
+
+        if (dir.exists()) {
+            long  result = 0;
+            result = dirSize(dir);
+            if (result < 500 * 1024 * 1024) {
+                return String.format("%.1f MB",result * 1f/ (1024 * 1024)); // return the file size in MB
+            } else
+                return String.format("%.1f GB",result * 1f/ (1024 * 1024 * 1024));
+        }
+        return "";
     }
 
     public static float fileSize(File file) {
@@ -289,35 +306,12 @@ public class MyUtils {
     public static boolean isValidFilenameSynctax(String filename) {
         for (int i = 0; i < filename.length(); i++) {
             char c = filename.charAt(i);
-            if (c == '/' || c == '\\' || c == '"' || c == ':' || c == '*' || c == '<' || c == '>' || c == '|') {
+            if (c == '/' || c == '\\' || c == '%' || c == '"' || c == ':' || c == '*' || c == '<' || c == '>' || c == '|') {
                 System.out.println("thanhlv isValidFilenameSynctax");
                 return true;
             }
         }
         return false;
-    }
-
-    public static void saveCanvas(Canvas canvas) {
-
-    }
-
-    public static void logBytes(String msg, byte[] bytes) {
-        StringBuilder str = new StringBuilder(msg + ": " + bytes.length + "\n");
-
-        if (bytes == null || bytes.length < 1)
-            str.append("bytes is null or length < 1");
-        else {
-
-            String base64Encoded = Base64.encodeToString(bytes, Base64.DEFAULT);
-            str.append("\nbase64: ").append(base64Encoded);//.append("\nbytes: ");
-//            for(int i = 0; i < bytes.length; i++){
-////                str.append( bytes[i]).append(" ");
-//                str.append(String.format("%02x ", bytes[i]));
-//            }
-//            str.append(getHex(bytes));
-
-        }
-        Log.i(TAG, str.toString());
     }
 
     static final String HEXES = "0123456789ABCDEF";
@@ -333,47 +327,6 @@ public class MyUtils {
         }
         return hex.toString();
     }
-
-//    public static void shootPicture(ByteBuffer buf, int mWidth, int mHeight) {
-//
-//        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-//
-//        File captureFile = new File(MyUtils.getBaseStorageDirectory(), MyUtils.createFileName(".jpg"));
-//
-//        if (!captureFile.getParentFile().exists()) {
-//            captureFile.getParentFile().mkdirs();
-//        }
-//
-//        if (captureFile.toString().endsWith(".jpg")) {
-//            compressFormat = Bitmap.CompressFormat.JPEG;
-//        }
-//        BufferedOutputStream os = null;
-//        try {
-//            try {
-//                os = new BufferedOutputStream(new FileOutputStream(captureFile));
-//                final Bitmap bmp = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-//                buf.clear();
-//                bmp.copyPixelsFromBuffer(buf);
-//                bmp.compress(compressFormat, 100, os);
-//
-//                //Log
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                bmp.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-//                byte[] byteArray = byteArrayOutputStream .toByteArray();
-//
-//                String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
-//                Log.i(TAG, "shootPicture: "+encoded);
-//                //endlog
-//
-//                bmp.recycle();
-//                os.flush();
-//            } finally {
-//                if (os != null) os.close();
-//            }
-//        } catch (final IOException e) {
-//            Log.w(TAG, "failed to save file", e);
-//        }
-//    }
 
     public static final String IP_ADDRESS_PATTERN =
             "^rtmp://" +
@@ -401,17 +354,6 @@ public class MyUtils {
             }
         }
         return false;
-    }
-
-    public static boolean isRunningOnEmulator() {
-        return Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                || "google_sdk".equals(Build.PRODUCT);
     }
 
 

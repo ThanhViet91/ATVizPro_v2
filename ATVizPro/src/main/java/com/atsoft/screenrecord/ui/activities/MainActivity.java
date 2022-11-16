@@ -172,7 +172,7 @@ public class MainActivity extends BaseFragmentActivity {
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
 //        if (!hasPermission()) requestPermissions();
-//        SettingManager2.setProApp(this, false);
+//        SettingManager2.setProApp(this, true);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         initViews();
         Intent intent = getIntent();

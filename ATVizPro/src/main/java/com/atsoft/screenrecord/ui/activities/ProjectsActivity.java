@@ -362,6 +362,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         isRecording = isMyServiceRunning(getApplicationContext(), RecordingService.class);
         readData();
         processingData();
+//        for (VideoModel video : videoList) System.out.println("thanhlv  fetchData  === " + video.getName());
         if (mAdapter != null) {
             mAdapter.updateData(videoList);
         }
@@ -394,7 +395,10 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     MediaMetadataRetriever retriever;
     public boolean isVideo(String path) {
         try {
-
+            if (new File(path).getName().contains("%")) {
+                StorageUtil.deleteFile(path);
+                return false;
+            }
             retriever.setDataSource(this, Uri.fromFile(new File(path)));
             String hasVideo = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO);
 

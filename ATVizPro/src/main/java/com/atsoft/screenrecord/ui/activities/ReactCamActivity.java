@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -37,6 +38,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
+import com.atsoft.screenrecord.ui.fragments.PopupNotSupportVideo;
 import com.bumptech.glide.Glide;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
@@ -90,8 +92,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         hideStatusBar(this);
         updateScreenSize();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        LottieAnimationView animationView = findViewById(R.id.animation_view);
-        animationView.setVisibility(View.GONE);
         toggleReactCam = findViewById(R.id.img_btn_react_cam);
         thumbVideo = findViewById(R.id.thumbnail_video);
         btnInformation = findViewById(R.id.img_btn_info);
@@ -116,7 +116,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         layoutCountdown = findViewById(R.id.ln_countdown);
         number_countdown = findViewById(R.id.tv_number_countdown);
 
-        isOnceInitCamView = false;
         addVideoView();
 
         RelativeLayout mAdview = findViewById(R.id.adView);
@@ -168,13 +167,32 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             animationProgressBar.setDuration(videoDuration);
             mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
             videoPrepared(mp);
+
+//            float videoRatio = 1f * mp.getVideoWidth() / mp.getVideoHeight();
+//            if ((Math.abs(videoRatio - 4f/3) < 0.01) || (Math.abs(videoRatio - 16f/9) < 0.01)
+//                    || (Math.abs(videoRatio - 3f/4) < 0.01) || (Math.abs(videoRatio - 9f/16) < 0.01)) {
+//            } else {
+//                showPopupNotSupport();
+//            }
             mediaPlayer = mp;
             videoView.setOnCompletionListener(mediaPlayer -> {
-//                endTime = mediaPlayer.getCurrentPosition() + 50;
                 getEndReactCam(true);
             });
             initCamView();
         });
+    }
+
+    private void showPopupNotSupport() {
+        PopupNotSupportVideo.newInstance(new IConfirmPopupListener() {
+            @Override
+            public void onClickPositiveButton() {
+                    finish();
+            }
+
+            @Override
+            public void onClickNegativeButton() {
+            }
+        }).show(getSupportFragmentManager(), "");
     }
 
 
@@ -207,13 +225,20 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             }
         }
         videoView.setLayoutParams(lpVideo);
+//        screenVideo.post(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        });
         videoView.seekTo(100);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+//                thumbVideo.setVisibility(View.GONE);
                 videoView.setAlpha(1);
             }
-        }, 1000);
+        }, 500);
 
         if (hasChangeViewPos) {
             xLeftOld = xLeft;
@@ -294,11 +319,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         mScreenHeight = metrics.heightPixels;
     }
 
-    private ImageView imgZoom;
-    private boolean isOnceInitCamView = false;
     private void initCamView() {
-//        if (isOnceInitCamView) return;
-        isOnceInitCamView = true;
         root = findViewById(R.id.root_container);
 
         if (mCameraLayout != null) root.removeView(mCameraLayout);
@@ -351,7 +372,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
+                if (inRecording) return true;
                 switch (event.getAction()) {
 
                     case MotionEvent.ACTION_UP:
@@ -366,7 +387,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                             ww = ww + 10;
                             x = (int) event.getRawX();
                             y = (int) event.getRawY();
-                            if (ww <= newVideoWidth / 2f) {
+                            if (ww <= newVideoWidth / 2f && ww * 16f/9 <= newVideoHeight) {
                                 updateCameraPreview(ww);
                             } else return false;
                         } else if (event.getRawX() - x < -20 || event.getRawY() - y < -20) {
@@ -777,7 +798,7 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         if (videoView.isPlaying()) videoView.pause();
 //        endTime = mediaPlayer.getCurrentPosition() + 50; //laggy of mediaplayer refer https://issuetracker.google.com/issues/36907697
 
-        endTime = timeCounter + 50;
+        endTime = timeCounter+50;
         if (endTime > videoDuration) endTime = videoDuration;
         new Handler().postDelayed(new Runnable() {
             @Override

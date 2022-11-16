@@ -149,6 +149,9 @@
     <!--    ConfirmExecute-->
     <string name="confirm_execute_react_cam">This video is being processed in the background. This may take some time depending on the size of the video and the power of your device.</string>
 
+
+    <string name="not_supported_for_react">React feature is not available for the current video. We recommend using a standard aspect ratio such as 16:9 or 4:3.</string>
+
     <!--    FAQ fragment-->
     <string name="faq">FAQ</string>
     <string name="sound_is_not_working">Sound is not working</string>

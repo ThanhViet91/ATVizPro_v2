@@ -100,6 +100,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     return;
                 if (NOTIFY_MSG_RECORDING_DONE.equals(notify_msg)) {
                     fetchData();
+                    if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+                        toggleView(tv_select, View.VISIBLE);
+                    }
                 }
             }
         }
@@ -186,7 +189,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             public void onSingleClick(View v) {
                 if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
                     for (VideoModel video : videoList) video.setSelected(false);
-                    mAdapter.setSelectable(false);
+                    if (mAdapter != null) mAdapter.setSelectable(false);
                     toggleView(btn_back, View.VISIBLE);
                     toggleView(tv_cancel, View.GONE);
                     modeSelect = 0;
@@ -286,8 +289,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             SettingManager2.setNumberCommentaryFile(this, 0);
             toggleView(tv_cancel, View.GONE);
             toggleView(btn_back, View.VISIBLE);
-            toggleView(tv_select, View.GONE);
+            modeSelect = 0;
+            tv_select.setText(getString(R.string.select));
             toggleView(tv_noData, View.VISIBLE);
+            toggleView(tv_select, View.GONE);
+            if (mAdapter != null) mAdapter.setSelectable(false);
         }
         toggleView(findViewById(R.id.option), View.GONE);
 

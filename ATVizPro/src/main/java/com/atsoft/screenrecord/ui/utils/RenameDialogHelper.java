@@ -31,6 +31,7 @@ public class RenameDialogHelper {
             final Dialog dialog = new Dialog(context);
             dialog.setContentView(R.layout.layout_rename);
             dialog.setTitle("Rename");
+
             final TextInputLayout tilEdittext = dialog.findViewById(R.id.tilRename);
 
             final EditText editText = dialog.findViewById(R.id.edRename);
@@ -86,7 +87,6 @@ public class RenameDialogHelper {
         String newName = newNames.trim();
         if (TextUtils.isEmpty(newName)) throw new Exception("File name cannot be empty.");
         if (MyUtils.isValidFilenameSynctax(newName)){
-            System.out.println("thanhlv A filename cannot contain any of the following character:");
             throw new Exception("A filename cannot contain any of the following character: \\/\":*<>|%");
         }
 
@@ -94,7 +94,6 @@ public class RenameDialogHelper {
 
         final File fileWithNewName = new File(file.getParentFile(), newName + ".mp4");
         if (fileWithNewName.exists()) {
-            System.out.println("thanhlv This filename is exists. Please choose another name");
             throw new IOException("This filename is exists. Please choose another name");
         }
 

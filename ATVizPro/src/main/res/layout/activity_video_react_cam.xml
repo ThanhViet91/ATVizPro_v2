@@ -77,8 +77,8 @@
             <VideoView
                 android:alpha="0"
                 android:id="@+id/video_main1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_gravity="center" />
 
         </FrameLayout>
@@ -86,7 +86,7 @@
         <ImageView
             android:id="@+id/thumbnail_video"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             tools:ignore="ContentDescription" />
 
 
@@ -94,15 +94,6 @@
     </RelativeLayout>
 
 
-
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animation_view"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_centerInParent="true"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/reload" />
 
     <LinearLayout
         android:id="@+id/ln_countdown"

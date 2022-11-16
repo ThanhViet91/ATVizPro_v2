@@ -56,7 +56,7 @@ import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-public class ControllerService extends Service implements CustomOnScaleDetector.OnScaleListener {
+public class ControllerService extends Service{
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
     public static final String NOTIFY_MSG_RECORDING_CLOSED = "NOTIFY_MSG_RECORDING_CLOSED";
@@ -673,6 +673,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         mImgStart.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                mImgStart.setEnabled(false);
                 handleStartRecording();
             }
         });
@@ -805,6 +806,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                     mRecordingStarted = true;
 
                     if (mMode == MyUtils.MODE_RECORDING) { //mode Recording
+                        if (mService == null) return;
                         mService.startPerformService();
                         mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                         toggleView(tvTimer, View.VISIBLE);
@@ -818,6 +820,7 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
                         });
                         counterUtil.startCounter();
                     } else { //mode livestream
+                        if (mService == null) return;
                         mService.startPerformService();
                         mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                         toggleView(tvTimer, View.VISIBLE);
@@ -1027,6 +1030,13 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
         if (mViewRoot != null) {
             mWindowManager.removeViewImmediate(mViewRoot);
         }
+
+        cancelAutoHideMark();
+        if (mCameraLayoutMark != null) {
+            mCameraLayoutMark.setVisibility(View.GONE);
+            mWindowManager.removeViewImmediate(mCameraLayoutMark);
+        }
+
         if (mCameraLayout != null) {
             mWindowManager.removeView(mCameraLayout);
             releaseCamera();
@@ -1038,41 +1048,6 @@ public class ControllerService extends Service implements CustomOnScaleDetector.
             mRecordingServiceBound = false;
         }
 
-        cancelAutoHideMark();
     }
-
     private int camSize = 3;
-
-    @Override
-    public void zoomOut() {
-        camSize++;
-        if (camSize > 6) {
-            camSize = 0;
-            return;
-        }
-        camWidth = camViewSize[camSize];
-        camHeight = (float) (camWidth * cameraRatio);
-        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
-        cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
-        paramCam.x = (int) (paramCam.x - (camWidth - camViewSize[camSize - 1]) / 2f);
-        paramCam.y = (int) (paramCam.y - (camWidth - camViewSize[camSize - 1]) / 2 * cameraRatio);
-        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
-        mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
-    }
-
-    @Override
-    public void zoomIn() {
-        camSize--;
-        if (camSize < 0) {
-            camSize = 0;
-            return;
-        }
-        camWidth = camViewSize[camSize];
-        camHeight = camWidth * 4 / 3f;
-        cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
-        paramCam.x = (int) (paramCam.x + (camViewSize[camSize + 1] - camWidth) / 2f);
-        paramCam.y = (int) (paramCam.y + (camViewSize[camSize + 1] - camWidth) * 2 / 3f);
-        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
-        hasZoom = true;
-    }
 }

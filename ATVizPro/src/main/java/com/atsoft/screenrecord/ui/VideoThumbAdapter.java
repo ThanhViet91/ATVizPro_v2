@@ -56,7 +56,7 @@ public class VideoThumbAdapter extends RecyclerView.Adapter {
 
   public void resetBitmap() {
     mBitmaps = new ArrayList<>();
-    mBitmaps.clear();
+//    mBitmaps.clear();
   }
   private final class ThumbViewHolder extends RecyclerView.ViewHolder {
     ImageView thumbImageView;

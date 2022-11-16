@@ -15,9 +15,11 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -74,8 +76,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         hideStatusBar(this);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        LottieAnimationView animationView = findViewById(R.id.animation_view);
-        animationView.setVisibility(View.GONE);
 
         TextView tvTitle = findViewById(R.id.tv_title);
         tvTitle.setText(getString(R.string.commentary));
@@ -267,7 +267,6 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
         public void onFinish() {
             layoutCountdown.setVisibility(View.GONE);
-            toggleReactCam.setEnabled(true);
             getStartCommentary();
         }
     };
@@ -465,7 +464,7 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
 
     private void getEndCommentary(boolean EOV) {
         if (videoView.isPlaying()) videoView.pause();
-        endTime = timeCounter + 50;
+        endTime = timeCounter;
         if (endTime > videoDuration) endTime = videoDuration;
         if (mediaRecorder != null) {
             mediaRecorder.stop();
@@ -494,6 +493,13 @@ public class CommentaryActivity extends AppCompatActivity implements View.OnClic
         hasAudioFile = false;
         pauseRecord = false;
         hasEndCommentary = false;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                toggleReactCam.setEnabled(true);
+            }
+        }, 100);
     }
 
 }

@@ -41,7 +41,9 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_app"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:allowNativeHeapPointerTagging="false"
+        android:theme="@style/AppTheme"
+        tools:ignore="UnusedAttribute">
 
         <provider
             android:name="androidx.core.content.FileProvider"

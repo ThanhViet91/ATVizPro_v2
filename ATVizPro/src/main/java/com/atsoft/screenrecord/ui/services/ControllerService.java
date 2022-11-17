@@ -881,7 +881,7 @@ public class ControllerService extends Service{
             if (mMode == MyUtils.MODE_RECORDING) {
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_RECORDING_STOPPED);
                 if (clickStart)
-                    MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_LONG);
+                    MyUtils.toast(getApplicationContext(), "Record saving...", Toast.LENGTH_SHORT);
             } else {
                 mService.closePerformService();
                 MyUtils.sendBroadCastMessageFromService(this, NOTIFY_MSG_LIVESTREAM_STOPPED);

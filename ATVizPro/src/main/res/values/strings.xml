@@ -58,7 +58,7 @@
 
     <!--Default setting-->
     <string name="default_setting_resolution">720p (HD)</string>
-    <string name="default_setting_bitrate">4Mbps</string>
+    <string name="default_setting_bitrate">8Mbps</string>
     <string name="default_setting_fps">30fps</string>
     <string name="default_setting_countdown">3</string>
     <string name="default_setting_orientation">Auto</string>
@@ -115,6 +115,8 @@
     <string name="you_can_live_stream">You can live stream</string>
     <string name="remove_ads">Remove Ads</string>
     <string name="skip"><u>Skip</u></string>
+    <string name="start"><u>START</u></string>
+    <string name="stop"><u>STOP</u></string>
 
     <!--    id admod release-->
     <string name="admob_sdk_id">ca-app-pub-2210513256218688~4750691232</string>

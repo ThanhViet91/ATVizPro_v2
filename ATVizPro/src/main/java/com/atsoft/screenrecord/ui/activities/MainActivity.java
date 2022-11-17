@@ -119,16 +119,14 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
             mMode = savedInstanceState.getInt(MyUtils.KEY_CONTROLlER_MODE);
-        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent != null)
-            handleIncomingRequest(intent);
+        if (intent != null) handleIncomingRequest(intent);
     }
 
     @Override
@@ -159,11 +157,8 @@ public class MainActivity extends BaseFragmentActivity {
     @Override
     public void onBackPressed() {
         int all_frags = getSupportFragmentManager().getBackStackEntryCount();
-        if (all_frags == 0) {
-            moveTaskToBack(true);
-        } else {
-            getSupportFragmentManager().popBackStack();
-        }
+        if (all_frags == 0) moveTaskToBack(true);
+        else getSupportFragmentManager().popBackStack();
     }
 
     @Override
@@ -174,11 +169,9 @@ public class MainActivity extends BaseFragmentActivity {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         initViews();
         Intent intent = getIntent();
-        if (intent != null)
-            handleIncomingRequest(intent);
+        if (intent != null) handleIncomingRequest(intent);
     }
 
-    public static boolean initialAds = false;
     private boolean isStarted = false;
 
     protected void onResume() {
@@ -189,21 +182,15 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void updateService() {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-            if (DisplayUtil.getDeviceWidthDpi() > 500) {
+            if (DisplayUtil.getDeviceWidthDpi() > 500)
                 liveStreaming.setText(getString(R.string.disconnect_livestream));
-            } else {
-                liveStreaming.setText(getString(R.string.disconnect_live__));
-            }
+            else liveStreaming.setText(getString(R.string.disconnect_live__));
             updateUILivestreamHome(mRecordingStarted);
         } else if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-            if (!mRecordingStarted) {
-                updateUIRecordingHome(false);
-            } else if (!isStarted)
-                updateUIRecordingHome(true);
+            if (!mRecordingStarted) updateUIRecordingHome(false);
+            else if (!isStarted) updateUIRecordingHome(true);
+        } else showUIDefaultRecord();
 
-        } else {
-            showUIDefaultRecord();
-        }
     }
 
     public void showUIDefaultRecord() {
@@ -215,7 +202,7 @@ public class MainActivity extends BaseFragmentActivity {
         mStartRec.setVisibility(View.GONE);
         mStopRec.setVisibility(View.GONE);
         tvStartStop.setVisibility(View.VISIBLE);
-        tvStartStop.setText("START");
+        tvStartStop.setText(getString(R.string.start));
         liveStreaming.setText(getString(R.string.livestreaming));
         if (pulsator != null) pulsator.stop();
     }
@@ -232,8 +219,6 @@ public class MainActivity extends BaseFragmentActivity {
                 case MyUtils.ACTION_START_CAPTURE_NOW:
                     mImgRec.performClick();
                     break;
-                case "from_notification":
-                    break;
                 case ACTION_GO_TO_EDIT:
                     navigate_to = ACTION_GO_TO_EDIT;
                     fromFunction = REQUEST_VIDEO_FOR_VIDEO_EDIT;
@@ -249,10 +234,8 @@ public class MainActivity extends BaseFragmentActivity {
                 case ACTION_GO_HOME:
                     removeAllFragment();
                     break;
-
                 case ACTION_CLOSE_POPUP:
                     finish();
-                    break;
             }
         }
     }
@@ -305,20 +288,13 @@ public class MainActivity extends BaseFragmentActivity {
         });
 
         mStartRec = findViewById(R.id.img_start_record);
-        mStartRec.setOnClickListener(view -> {
-            startRecordFromHome();
-        });
-
+        mStartRec.setOnClickListener(view -> startRecordFromHome());
 
         mStopRec = findViewById(R.id.img_stop_record);
-        mStopRec.setOnClickListener(view -> {
-            stopRecordFromHome();
-        });
+        mStopRec.setOnClickListener(view -> stopRecordFromHome());
 
         imgStartLive = findViewById(R.id.img_start_live_home);
-        imgStartLive.setOnClickListener(view -> {
-            toggleLiveStreamFromHome();
-        });
+        imgStartLive.setOnClickListener(view -> toggleLiveStreamFromHome());
 
         liveStreaming = findViewById(R.id.tv_live_streaming);
         ImageView btn_live = findViewById(R.id.img_live);
@@ -330,13 +306,8 @@ public class MainActivity extends BaseFragmentActivity {
                 new AlertDialog.Builder(this)
                         .setTitle("Disconnect livestream!")
                         .setMessage("Do you want to disconnect livestream?")
-                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                            // Continue with delete operation
-                            sendDisconnectToService();
-                        })
-                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
-
-                        })
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> sendDisconnectToService())
+                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {})
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
                 return;
@@ -395,9 +366,7 @@ public class MainActivity extends BaseFragmentActivity {
     private boolean isLiveStarted = false;
 
     private void toggleLiveStreamFromHome() {
-        System.out.println("thanhlv press toggleLiveStreamFromHome");
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-            //
             if (!isLiveStarted) {
                 sendActionToService(MyUtils.ACTION_START_LIVESTREAM_FROM_HOME);
                 isLiveStarted = true;
@@ -406,7 +375,6 @@ public class MainActivity extends BaseFragmentActivity {
                 isLiveStarted = false;
             }
         }
-
     }
 
     public void sendActionToService(String action) {
@@ -419,7 +387,6 @@ public class MainActivity extends BaseFragmentActivity {
                 startService(controller);
             }
         }
-
     }
 
     public boolean hasAllPermissionForReact() {
@@ -445,7 +412,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public boolean hasAllPermissionForEdit() {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -494,7 +460,6 @@ public class MainActivity extends BaseFragmentActivity {
             MyUtils.showSnackBarNotification(mImgRec, "Recording is running!", Snackbar.LENGTH_LONG);
             return;
         }
-
         mMode = MyUtils.MODE_RECORDING;
         shouldStartControllerService();
     }
@@ -502,9 +467,7 @@ public class MainActivity extends BaseFragmentActivity {
     private void stopRecordFromHome() {
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
             controller.setAction(MyUtils.ACTION_STOP_RECORDING_FROM_HOME);
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
             } else {
@@ -516,9 +479,7 @@ public class MainActivity extends BaseFragmentActivity {
     private void startRecordFromHome() {
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
             controller.setAction(MyUtils.ACTION_START_RECORDING_FROM_HOME);
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
             } else {
@@ -550,8 +511,7 @@ public class MainActivity extends BaseFragmentActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Please wait!")
                     .setMessage("Your previous video in processing, please check in status bar!")
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    })
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {})
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
         }
@@ -650,7 +610,7 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void showDialogPickFromGallery(int from_code) {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI); // todo: this thing might need some work :/, eg open from google drive, stuff like that
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
         intent.setTypeAndNormalize("video/*");
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
         App.ignoreOpenAd = true;
@@ -664,22 +624,15 @@ public class MainActivity extends BaseFragmentActivity {
 
         @Override
         public void onAdDismissedFullScreenContent() {
-
             AdsUtil.lastTime = (new Date()).getTime();
-            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT) {
+            if (fromFunction == REQUEST_SHOW_PROJECTS_DEFAULT)
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
-            }
-
-            if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
+            if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact())
                 showDialogPickVideo(fromFunction);
-            }
-            if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary()) {
+            if (fromFunction == REQUEST_VIDEO_FOR_COMMENTARY && hasAllPermissionForCommentary())
                 showDialogPickVideo(fromFunction);
-            }
-
-            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
+            if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit())
                 showDialogPickVideo(fromFunction);
-            }
             mAdManager.createInterstitialAdmob();
         }
 
@@ -689,7 +642,6 @@ public class MainActivity extends BaseFragmentActivity {
                 showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
                 return;
             }
-
             if (fromFunction == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
                 showDialogPickVideo(fromFunction);
                 return;
@@ -698,7 +650,6 @@ public class MainActivity extends BaseFragmentActivity {
                 showDialogPickVideo(fromFunction);
                 return;
             }
-
             if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
                 showDialogPickVideo(fromFunction);
             }
@@ -711,7 +662,7 @@ public class MainActivity extends BaseFragmentActivity {
         @Override
         public void onAdShowedFullScreenContent() {
             if (Core.countAdsShown == 5) {
-                String action = "";
+                String action;
                 switch (fromFunction) {
                     case REQUEST_VIDEO_FOR_COMMENTARY:
                         action = "Commentary";
@@ -741,7 +692,6 @@ public class MainActivity extends BaseFragmentActivity {
                 showMyRecordings(from_code);
                 return;
             }
-
             if (from_code == REQUEST_VIDEO_FOR_REACT_CAM && hasAllPermissionForReact()) {
                 showDialogPickVideo(from_code);
                 return;
@@ -750,7 +700,6 @@ public class MainActivity extends BaseFragmentActivity {
                 showDialogPickVideo(from_code);
                 return;
             }
-
             if (from_code == REQUEST_VIDEO_FOR_VIDEO_EDIT && hasAllPermissionForEdit()) {
                 showDialogPickVideo(from_code);
             }
@@ -765,14 +714,50 @@ public class MainActivity extends BaseFragmentActivity {
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
             App.ignoreOpenAd = true;
         }
-
         ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
-
     }
 
+    public void showPopupGo2DeviceSettings(int type){
+        if (type == 1) {//manual
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("Change Permissions in Settings");
+            alertDialogBuilder
+                    .setMessage("" +
+                            "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
+                    .setCancelable(true)
+                    .setPositiveButton("SETTINGS", (dialog, id) -> {
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, 1000);
+                        App.ignoreOpenAd = true;
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+        if (type == 2) { // retry second time
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("Second Chance");
+            alertDialogBuilder
+                    .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
+                    .setCancelable(true)
+                    .setPositiveButton("RETRY", (dialog, id) -> {
+                        Intent i = new Intent(MainActivity.this, MainActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        App.ignoreOpenAd = true;
+                    })
+                    .setNegativeButton("EXIT", (dialog, id) -> {
+                        dialog.cancel();
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+
+    }
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         App.ignoreOpenAd = true;
         switch (requestCode) {
@@ -782,22 +767,7 @@ public class MainActivity extends BaseFragmentActivity {
                     for (int grantResult : grantResults) {
                         if (grantResult != granted) {
                             MyUtils.showSnackBarNotification(mImgRec, "Please grant all permissions to record screen.", Snackbar.LENGTH_LONG);
-                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                            alertDialogBuilder.setTitle("Change Permissions in Settings");
-                            alertDialogBuilder
-                                    .setMessage("" +
-                                            "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
-                                    .setCancelable(true)
-                                    .setPositiveButton("SETTINGS", (dialog, id) -> {
-                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                        intent.setData(uri);
-                                        startActivityForResult(intent, 1000);     // Comment 3.
-                                        App.ignoreOpenAd = true;
-                                    });
-
-                            AlertDialog alertDialog = alertDialogBuilder.create();
-                            alertDialog.show();
+                            showPopupGo2DeviceSettings(1);
                             return;
                         }
                     }
@@ -811,53 +781,19 @@ public class MainActivity extends BaseFragmentActivity {
                         && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
                     showDialogPickVideo(fromFunction);
-
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])
                         || !shouldShowRequestPermissionRationale(permissions[1])
                         || !shouldShowRequestPermissionRationale(permissions[2])
                         || !shouldShowRequestPermissionRationale(permissions[3])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                    alertDialogBuilder.setTitle("Change Permissions in Settings");
-                    alertDialogBuilder
-                            .setMessage("" +
-                                    "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
-                            .setCancelable(true)
-                            .setPositiveButton("SETTINGS", (dialog, id) -> {
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                intent.setData(uri);
-                                startActivityForResult(intent, 1001);     // Comment 3.
-                                App.ignoreOpenAd = true;
-                            });
-
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-
+                    showPopupGo2DeviceSettings(1);
                 } else {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                        alertDialogBuilder.setTitle("Second Chance");
-                        alertDialogBuilder
-                                .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
-                                .setCancelable(true)
-                                .setPositiveButton("RETRY", (dialog, id) -> {
-                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(i);
-                                })
-                                .setNegativeButton("EXIT", (dialog, id) -> {
-//                                        finish();
-                                    dialog.cancel();
-                                });
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
+                        showPopupGo2DeviceSettings(2);
                     }
                 }
                 break;
@@ -873,50 +809,16 @@ public class MainActivity extends BaseFragmentActivity {
                         || !shouldShowRequestPermissionRationale(permissions[1])
                         || !shouldShowRequestPermissionRationale(permissions[2])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                    alertDialogBuilder.setTitle("Change Permissions in Settings");
-                    alertDialogBuilder
-                            .setMessage("" +
-                                    "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
-                            .setCancelable(true)
-                            .setPositiveButton("SETTINGS", (dialog, id) -> {
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                intent.setData(uri);
-                                startActivityForResult(intent, 1002);     // Comment 3.
-                                App.ignoreOpenAd = true;
-                            });
-
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-
+                    showPopupGo2DeviceSettings(1);
                 } else {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                        alertDialogBuilder.setTitle("Second Chance");
-                        alertDialogBuilder
-                                .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
-                                .setCancelable(true)
-                                .setPositiveButton("RETRY", (dialog, id) -> {
-                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(i);
-                                })
-                                .setNegativeButton("EXIT", (dialog, id) -> {
-//                                        finish();
-                                    dialog.cancel();
-                                });
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
+                        showPopupGo2DeviceSettings(2);
                     }
                 }
                 break;
-
             case 777: // Allowed was selected so Permission granted for Edit
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -926,45 +828,12 @@ public class MainActivity extends BaseFragmentActivity {
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])
                         || !shouldShowRequestPermissionRationale(permissions[1])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                    alertDialogBuilder.setTitle("Change Permissions in Settings");
-                    alertDialogBuilder
-                            .setMessage("" +
-                                    "\nClick SETTINGS to Manually Set\n" + "Permissions to use this function")
-                            .setCancelable(true)
-                            .setPositiveButton("SETTINGS", (dialog, id) -> {
-                                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                intent.setData(uri);
-                                startActivityForResult(intent, 1003);     // Comment 3.
-                                App.ignoreOpenAd = true;
-                            });
-
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-
+                    showPopupGo2DeviceSettings(1);
                 } else {
                     // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
                     if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                             || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                        alertDialogBuilder.setTitle("Second Chance");
-                        alertDialogBuilder
-                                .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
-                                .setCancelable(true)
-                                .setPositiveButton("RETRY", (dialog, id) -> {
-                                    //ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Integer.parseInt(WRITE_EXTERNAL_STORAGE));
-                                    Intent i = new Intent(MainActivity.this, MainActivity.class);
-                                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(i);
-                                })
-                                .setNegativeButton("EXIT", (dialog, id) -> {
-//                                        finish();
-                                    dialog.cancel();
-                                });
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
+                        showPopupGo2DeviceSettings(2);
                     }
                 }
                 break;
@@ -1124,11 +993,9 @@ public class MainActivity extends BaseFragmentActivity {
                 mScreenCaptureIntent = null;
             } else {
                 mScreenCaptureIntent = data;
-                if (mScreenCaptureIntent != null) {
+                if (mScreenCaptureIntent != null)
                     mScreenCaptureIntent.putExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, resultCode);
-                }
                 mScreenCaptureResultCode = resultCode;
-
                 shouldStartControllerService();
             }
         } else {
@@ -1137,10 +1004,8 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public void sendDisconnectToService() {
-
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
             controller.setAction(MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(controller);
@@ -1148,7 +1013,6 @@ public class MainActivity extends BaseFragmentActivity {
                 startService(controller);
             }
         }
-
     }
 
     public void updateIconService() {
@@ -1166,15 +1030,10 @@ public class MainActivity extends BaseFragmentActivity {
 
     private void startControllerService() {
         Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
         controller.setAction(MyUtils.ACTION_INIT_CONTROLLER);
-
         controller.putExtra(MyUtils.KEY_CAMERA_AVAILABLE, checkCameraHardware(this));
-
         controller.putExtra(MyUtils.KEY_CONTROLlER_MODE, mMode);
-
         controller.putExtra(Intent.EXTRA_INTENT, mScreenCaptureIntent);
-
         if (mMode == MyUtils.MODE_STREAMING) {
             Bundle bundle = new Bundle();
             bundle.putSerializable(MyUtils.STREAM_PROFILE, mStreamProfile);
@@ -1185,36 +1044,14 @@ public class MainActivity extends BaseFragmentActivity {
         } else {
             startService(controller);
         }
-        startRecordingImmediately();
-    }
-
-    private void startRecordingImmediately() {
-
-    }
-
-    public void getTimerFromService() {
-        if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-            Intent controller = new Intent(MainActivity.this, ControllerService.class);
-
-            controller.setAction(MyUtils.ACTION_GET_TIMER);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(controller);
-            } else {
-                startService(controller);
-            }
-        }
     }
 
     public void removeAllFragment() {
-
         FragmentManager fm = getSupportFragmentManager();
         if (!fm.isStateSaved())
             for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
                 getSupportFragmentManager().popBackStack();
             }
-
-
     }
 
     /**
@@ -1252,7 +1089,6 @@ public class MainActivity extends BaseFragmentActivity {
         }
     }
 
-
     private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1260,58 +1096,37 @@ public class MainActivity extends BaseFragmentActivity {
             String action = intent.getAction();
             if (!TextUtils.isEmpty(action) && MyUtils.ACTION_SEND_MESSAGE_FROM_SERVICE.equals(action)) {
                 String notify_msg = intent.getStringExtra(KEY_MESSAGE);
-                if (TextUtils.isEmpty(notify_msg))
-                    return;
+                if (TextUtils.isEmpty(notify_msg)) return;
                 if (NOTIFY_MSG_CONNECTION_FAILED.equals(notify_msg)) {
                     updateService();
                     showUIDefaultRecord();
                     isStarted = false;
                 }
-
                 if (MESSAGE_DISCONNECT_LIVE.equals(notify_msg)) {
                     isConnected = false;
                     updateService();
                 }
-
-                if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) {
-                    updateUIRecordingHome(false);
-                }
-                if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) {
-                    updateUIRecordingHome(true);
-                }
-
-                if (NOTIFY_MSG_LIVESTREAM_STARTED.equals(notify_msg)) {
-                    updateUILivestreamHome(true);
-                }
-                if (NOTIFY_MSG_LIVESTREAM_STOPPED.equals(notify_msg)) {
-                    updateUILivestreamHome(false);
-                }
-
+                if (NOTIFY_MSG_RECORDING_STOPPED.equals(notify_msg)) updateUIRecordingHome(false);
+                if (NOTIFY_MSG_RECORDING_STARTED.equals(notify_msg)) updateUIRecordingHome(true);
+                if (NOTIFY_MSG_LIVESTREAM_STARTED.equals(notify_msg)) updateUILivestreamHome(true);
+                if (NOTIFY_MSG_LIVESTREAM_STOPPED.equals(notify_msg)) updateUILivestreamHome(false);
                 if (NOTIFY_MSG_RECORDING_CLOSED.equals(notify_msg)) {
                     showUIDefaultRecord();
                     isStarted = false;
                 }
-
             }
         }
     };
 
     private void updateUIRecordingHome(boolean started) {
-
         if (!MyUtils.isMyServiceRunning(MainActivity.this, RecordingService.class)) return;
         if (started) {
-
             pulsator.start();
-            CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
-                @Override
-                public void onTickString(String sec) {
-                    tvTimer.setText(sec);
-                }
-            });
+            CounterUtil.getInstance().setCallback((CounterUtil.ICounterUtil2) sec -> tvTimer.setText(sec));
             mImgRec.setVisibility(View.GONE);
             mStartRec.setVisibility(View.GONE);
             mStopRec.setVisibility(View.VISIBLE);
-            tvStartStop.setText("STOP");
+            tvStartStop.setText(getString(R.string.stop));
             tvDes.setVisibility(View.GONE);
             tvTimer.setVisibility(View.VISIBLE);
             isStarted = true;
@@ -1319,13 +1134,12 @@ public class MainActivity extends BaseFragmentActivity {
             mImgRec.setVisibility(View.GONE);
             mStartRec.setVisibility(View.VISIBLE);
             mStopRec.setVisibility(View.GONE);
-            tvStartStop.setText("START");
+            tvStartStop.setText(getString(R.string.start));
             tvDes.setVisibility(View.VISIBLE);
             tvTimer.setVisibility(View.GONE);
             pulsator.stop();
             isStarted = false;
         }
-
     }
 
     int typeLive;
@@ -1333,7 +1147,6 @@ public class MainActivity extends BaseFragmentActivity {
     public void updateUILivestreamHome(boolean started) {
         if (!MyUtils.isMyServiceRunning(MainActivity.this, StreamingService.class)) return;
         typeLive = SettingManager2.getLiveStreamType(this);
-
         mImgRec.setVisibility(View.GONE);
         mStartRec.setVisibility(View.GONE);
         mStopRec.setVisibility(View.GONE);
@@ -1346,23 +1159,18 @@ public class MainActivity extends BaseFragmentActivity {
             tvDes.setVisibility(View.GONE);
             tvTimer.setVisibility(View.VISIBLE);
             CounterUtil.getInstance().setCallback((CounterUtil.ICounterUtil2) sec -> tvTimer.setText(sec));
-
-            if (typeLive == SOCIAL_TYPE_YOUTUBE) {
+            if (typeLive == SOCIAL_TYPE_YOUTUBE)
                 imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home_load);
-            }
-            if (typeLive == SOCIAL_TYPE_FACEBOOK) {
+            if (typeLive == SOCIAL_TYPE_FACEBOOK)
                 imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home_load);
-            }
             if (typeLive == SOCIAL_TYPE_TWITCH)
                 imgStartLive.setBackgroundResource(R.drawable.ic_tw_live_home_load);
             isLiveStarted = true;
         } else {
-            if (typeLive == SOCIAL_TYPE_YOUTUBE) {
+            if (typeLive == SOCIAL_TYPE_YOUTUBE)
                 imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home);
-            }
-            if (typeLive == SOCIAL_TYPE_FACEBOOK) {
+            if (typeLive == SOCIAL_TYPE_FACEBOOK)
                 imgStartLive.setBackgroundResource(R.drawable.ic_fb_live_home);
-            }
             if (typeLive == SOCIAL_TYPE_TWITCH)
                 imgStartLive.setBackgroundResource(R.drawable.ic_tw_live_home);
             tvDes.setVisibility(View.VISIBLE);
@@ -1370,7 +1178,6 @@ public class MainActivity extends BaseFragmentActivity {
             pulsator.stop();
             isLiveStarted = false;
         }
-
     }
 }
 

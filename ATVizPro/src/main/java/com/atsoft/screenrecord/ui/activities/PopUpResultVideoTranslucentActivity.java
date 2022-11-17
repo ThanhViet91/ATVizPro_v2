@@ -12,18 +12,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.atsoft.screenrecord.ui.services.ControllerService;
-import com.bumptech.glide.Glide;
-import com.atsoft.screenrecord.App;
 import com.atsoft.screenrecord.R;
+import com.atsoft.screenrecord.ui.services.ControllerService;
 import com.atsoft.screenrecord.ui.services.ExecuteService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.utils.AdsUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.atsoft.screenrecord.utils.StorageUtil;
+import com.bumptech.glide.Glide;
 
 public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
 
@@ -132,7 +132,6 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
 
     private void gotoShareVideo() {
         MyUtils.shareVideo(this, videoPath);
-//        onBackPressed();
     }
 
     private void stopExecuteService() {
@@ -161,21 +160,5 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
         mAdManager.loadBanner();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        App.ignoreOpenAd = true;
     }
 }

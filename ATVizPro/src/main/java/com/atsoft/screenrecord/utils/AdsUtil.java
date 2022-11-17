@@ -48,7 +48,6 @@ public class AdsUtil {
     private ViewGroup mAdViewRoot;
     private AdView adView;
     private boolean isLoaded = false;
-    private AdRequest adRequest;
 
     public AdView getAdView() {
         return this.adView;
@@ -69,7 +68,7 @@ public class AdsUtil {
         adView.setAdSize(AdSize.BANNER);
         adView.setAdUnitId(BuildConfig.DEBUG ? AD_BANNER_ID_DEV : AD_BANNER_ID);
         mAdViewRoot.addView(adView);
-        adRequest = new AdRequest.Builder().build();
+        AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
         adView.setAdListener(new AdListener() {
             @Override

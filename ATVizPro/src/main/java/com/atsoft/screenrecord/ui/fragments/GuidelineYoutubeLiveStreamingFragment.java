@@ -50,11 +50,14 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
         super.onAttach(context);
         mFragmentManager = getParentFragmentManager();
     }
-
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View mViewRoot = inflater.inflate(R.layout.fragment_facebook_live_streaming, container, false);
+        if (mViewRoot != null) return mViewRoot;
+        mViewRoot = inflater.inflate(R.layout.fragment_facebook_live_streaming, container, false);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
         isFirstTime  = SettingManager2.getFirstTimeLiveStreamYoutube(requireContext());
         SettingManager2.setFirstTimeLiveStreamYoutube(requireContext(), false);
         return mViewRoot;
@@ -63,6 +66,7 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (mAdManager != null) mAdManager.loadBanner();
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
         circleIndicator3 = view.findViewById(R.id.circle_indicator);
         btnContinue = view.findViewById(R.id.btn_continue_);
@@ -130,8 +134,6 @@ public class GuidelineYoutubeLiveStreamingFragment extends Fragment {
                 mFragmentManager.popBackStack();
             }
         });
-        RelativeLayout mAdview = view.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdview).loadBanner();
     }
 
     public List<PhotoModel> getListPhoto() {

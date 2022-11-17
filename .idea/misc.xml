@@ -23,10 +23,12 @@
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/layout/video_stream_view.xml" value="0.25416666666666665" />
         <entry key="..\:/ATSoft/ATVizPro_v2/ATVizPro/src/main/res/layout/video_trimmer_view.xml" value="0.25416666666666665" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable-mdpi/ic_home_live.xml" value="0.196" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ava_live.xml" value="0.268" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_border_header_settings.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_circle.xml" value="0.1955" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_home.xml" value="0.292" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_home_live.xml" value="0.2065" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_item_home.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_live_home.xml" value="0.2815" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_livestream_home.xml" value="0.2065" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_round_white_20.xml" value="0.216" />
@@ -35,16 +37,20 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/checkboxunselected.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/circle_progress.xml" value="0.1735" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/custom_edt.xml" value="0.268" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_ava_live.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_back_header_24.xml" value="0.216" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_baseline_close_24px.xml" value="0.206" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_baseline_zoom_out_map_24.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_camera.xml" value="0.189" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_capture_disable.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_close.xml" value="0.189" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_close_service.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_crown.xml" value="0.2035" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_down.xml" value="0.2035" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_fb_live_home.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_floating_button.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_group_575.xml" value="0.33" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_heart.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_hide_cam_fab.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_home_live.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_how_to_live.xml" value="0.2035" />
@@ -52,6 +58,7 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_launcher_foreground.xml" value="0.207" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_play_react_svg.xml" value="0.207" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_play_react_svg_pause.xml" value="0.207" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_rec.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_rec_home_stop.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_recorder_settings.xml" value="0.2035" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_remove_ads.xml" value="0.2675" />
@@ -65,6 +72,7 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_unlimited.xml" value="0.273" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_unselected.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_up.xml" value="0.2035" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_video_editor_svg.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_youcan_live.xml" value="0.1" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/img_btn_record_home.xml" value="0.2065" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_circle_pink_btn_record.xml" value="0.2675" />
@@ -158,7 +166,10 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/video_list_item.xml" value="0.3625" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/video_stream_view.xml" value="0.25" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/layout/video_trimmer_view.xml" value="0.3625" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/menu/main.xml" value="0.1" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/menu/video_setting_menu.xml" value="0.3625" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.268" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/xml/setting_preferences.xml" value="0.18541666666666667" />
       </map>
     </option>

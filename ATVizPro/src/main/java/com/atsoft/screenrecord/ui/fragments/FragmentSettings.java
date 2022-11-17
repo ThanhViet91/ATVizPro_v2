@@ -1,7 +1,6 @@
 package com.atsoft.screenrecord.ui.fragments;
 
 import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_UPDATE_SHOW_HIDE_FAB;
-import static com.atsoft.screenrecord.ui.utils.MyUtils.dirSize;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.dirSizeString;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getAvailableSizeExternal;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.getBaseStorageDirectory;
@@ -85,7 +84,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.share_app_to_friends), R.drawable.ic_share_settings2));
         settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
-        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + dirSizeString(new File(getBaseStorageDirectory())) , R.drawable.ic_recording_cache));
+        settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + dirSizeString(new File(getBaseStorageDirectory())), R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
         mAdView = mViewRoot.findViewById(R.id.adView);
@@ -130,7 +129,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         mFragmentManager = getParentFragmentManager();
         mActivity = (MainActivity) getActivity();
     }
+
     RelativeLayout mAdView;
+
     @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onResume() {
@@ -150,6 +151,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     }
 
     private BillingClient billingClient;
+
     private void getPurchaseHistory() {
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
@@ -167,7 +169,8 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                             (billingResult1, purchasesHistoryList) -> {
                                 if (mProgressDialog != null) mProgressDialog.dismiss();
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                    if (purchasesHistoryList != null)
+                                        mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
                                     try {
                                         getPublicTime();
                                     } catch (JSONException e) {
@@ -175,12 +178,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                         checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
                                     }
                                 } else {
-                                    requireActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            showPopup("Something went wrong!", "Check your network connection and try again");
-                                        }
-                                    });
+                                    requireActivity().runOnUiThread(() -> showPopup("Something went wrong!", "Check your network connection and try again"));
                                 }
                             }
                     );
@@ -188,12 +186,15 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             }
         });
     }
+
     private ProgressDialog mProgressDialog;
+
     private void buildDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = ProgressDialog.show(getContext(), "", "Connecting...");
         }
     }
+
     private void showPopup(String title, String des) {
         new AlertDialog.Builder(requireContext())
                 .setTitle(title)
@@ -202,7 +203,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                 })
                 .show();
     }
+
     private ArrayList<PurchaseHistoryRecord> mPurchasesHistoryList;
+
     @SuppressLint("NotifyDataSetChanged")
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
 
@@ -216,43 +219,43 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         boolean hasId = false;
         for (PurchaseHistoryRecord item : mPurchasesHistoryList) {
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID())) {
                 hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 7 * 24 * 60 * 60) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 > 7 * 24 * 60 * 60) {
                     // qua han
                     SettingManager2.setProApp(requireContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
                     SettingManager2.setProApp(requireContext(), true);
-                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
                     return;
                 }
             }
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID())) {
                 hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 2592000) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 > 2592000) {
                     // qua han
                     SettingManager2.setProApp(requireContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
                     SettingManager2.setProApp(requireContext(), true);
-                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
                     return;
                 }
             }
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID())) {
                 hasId = true;
-                if ((currentTime - item.getPurchaseTime())/1000 > 365 * 24 * 60 * 60) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 > 365 * 24 * 60 * 60) {
                     // qua han
                     SettingManager2.setProApp(requireContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
                     SettingManager2.setProApp(requireContext(), true);
-                    showPopup( "Restore Successfully!", "You've successfully restored your purchase!");
+                    showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
                     return;
@@ -267,20 +270,22 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (adapter != null) adapter.notifyDataSetChanged();
         if (mAdManager != null) mAdManager.loadBanner();
     }
+
     public void getPublicTime() throws JSONException {
         String tz = TimeZone.getDefault().getID();
         Call<Results> call = RetrofitClient.getInstance().getMyApi().getTimeZone(tz);
         call.enqueue(new Callback<Results>() {
             @Override
-            public void onResponse(Call<Results> call, Response<Results> response) {
+            public void onResponse(@NonNull Call<Results> call, @NonNull Response<Results> response) {
 
                 if (response.body() == null) {
                     checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
                 } else
-                    checkPurchase(mPurchasesHistoryList, ((Results) response.body()).getDateTimeMs());
+                    checkPurchase(mPurchasesHistoryList, response.body().getDateTimeMs());
             }
+
             @Override
-            public void onFailure(Call<Results> call, Throwable t) {
+            public void onFailure(@NonNull Call<Results> call, @NonNull Throwable t) {
                 checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
             }
         });
@@ -401,7 +406,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         });
 
     }
+
     String WEEKLY_ID, MONTHLY_ID, YEARLY_ID;
+
     private void showProducts() {
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();

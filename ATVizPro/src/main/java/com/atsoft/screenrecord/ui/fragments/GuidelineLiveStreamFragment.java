@@ -46,10 +46,12 @@ public class GuidelineLiveStreamFragment extends Fragment {
     private Activity mParentActivity = null;
     private FragmentManager mFragmentManager;
     private TextView tvDecs;
-    boolean fromSettings = false;
+    boolean fromSettings;
+
     public GuidelineLiveStreamFragment(boolean fromSettings) {
         this.fromSettings = fromSettings;
     }
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -57,12 +59,15 @@ public class GuidelineLiveStreamFragment extends Fragment {
         this.mParentActivity = (MainActivity) context;
     }
 
-    private View mViewRoot;
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        if (mViewRoot != null) return mViewRoot;
         mViewRoot = inflater.inflate(R.layout.fragment_guideline, container, false);
-        isFirstTime  = SettingManager2.getFirstTimeLiveStream(requireContext());
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
+        isFirstTime = SettingManager2.getFirstTimeLiveStream(requireContext());
         SettingManager2.setFirstTimeLiveStream(requireContext(), false);
         return mViewRoot;
     }
@@ -74,12 +79,12 @@ public class GuidelineLiveStreamFragment extends Fragment {
 
         TextView tvTitle = view.findViewById(R.id.title);
         tvTitle.setText(getString(R.string.how_to_livestream));
-        btnBack =  view.findViewById(R.id.img_btn_back_header);
+        btnBack = view.findViewById(R.id.img_btn_back_header);
 
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
-        circleIndicator3 = view. findViewById(R.id.circle_indicator);
-        btnContinue =  view.findViewById(R.id.btn_continue_);
-        tvSkip =  view.findViewById(R.id.tv_btn_skip);
+        circleIndicator3 = view.findViewById(R.id.circle_indicator);
+        btnContinue = view.findViewById(R.id.btn_continue_);
+        tvSkip = view.findViewById(R.id.tv_btn_skip);
 
         if (isFirstTime && !fromSettings) {
             btnBack.setVisibility(View.GONE);
@@ -88,7 +93,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
             btnBack.setVisibility(View.VISIBLE);
             tvSkip.setVisibility(View.GONE);
         }
-        tvDecs =  view.findViewById(R.id.tv_decs);
+        tvDecs = view.findViewById(R.id.tv_decs);
 
         photoAdapter = new PhotoAdapter(getContext(), getListPhoto());
         viewPager2.setAdapter(photoAdapter);
@@ -101,12 +106,9 @@ public class GuidelineLiveStreamFragment extends Fragment {
 
         CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
         compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-        compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View page, float position) {
-                float r = 1 - Math.abs(position);
-                page.setScaleY(0.85f + r*0.15f);
-            }
+        compositePageTransformer.addTransformer((page, position) -> {
+            float r = 1 - Math.abs(position);
+            page.setScaleY(0.85f + r * 0.15f);
         });
 
         viewPager2.setPageTransformer(compositePageTransformer);
@@ -114,7 +116,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                if (position == getListPhoto().size()-1) {
+                if (position == getListPhoto().size() - 1) {
                     btnContinue.setText(getString(R.string.done_));
                     if (isFirstTime) {
                         tvSkip.setText(getString(R.string.done_));
@@ -129,23 +131,25 @@ public class GuidelineLiveStreamFragment extends Fragment {
                 i = position;
             }
         });
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                i = i +1;
-                if (i == getListPhoto().size() - 1){
-                    btnContinue.setText(getString(R.string.done_));
-                    if (isFirstTime) {
-                        tvSkip.setText(getString(R.string.done_));
-                    }
-                }
-                if (i >= getListPhoto().size()) {
-                    mFragmentManager.popBackStack();
-                    return;
-                }
-                viewPager2.setCurrentItem(i);
-                setDecs(i);
+        btnContinue.setOnClickListener(v -> {
+            i = i + 1;
+            if (i == getListPhoto().size() && isFirstTime && !fromSettings) {
+                mFragmentManager.popBackStack();
+                ((MainActivity) mParentActivity).showLiveStreamFragment();
+                return;
             }
+            if (i == getListPhoto().size() - 1) {
+                btnContinue.setText(getString(R.string.done_));
+                if (isFirstTime) {
+                    tvSkip.setText(getString(R.string.done_));
+                }
+            }
+            if (i >= getListPhoto().size()) {
+                mFragmentManager.popBackStack();
+                return;
+            }
+            viewPager2.setCurrentItem(i);
+            setDecs(i);
         });
         tvSkip.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -165,14 +169,12 @@ public class GuidelineLiveStreamFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        SettingManager2.setFirstTimeLiveStream(requireContext(), false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdview).loadBanner();
+        if (mAdManager != null) mAdManager.loadBanner();
     }
 
     private void setDecs(int i) {
@@ -181,7 +183,7 @@ public class GuidelineLiveStreamFragment extends Fragment {
         if (i == 2) tvDecs.setText(getString(R.string.guideline_live_step_3));
     }
 
-    public List<PhotoModel> getListPhoto(){
+    public List<PhotoModel> getListPhoto() {
         List<PhotoModel> mListPhoto;
         mListPhoto = new ArrayList<>();
         mListPhoto.add(new PhotoModel(R.drawable.how_to_livestream_1));

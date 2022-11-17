@@ -59,7 +59,6 @@ public class RTMPLiveAddressFragment extends Fragment {
     private TextView tvStartLiveStream;
     private TextView tvPasteRTMPAddress;
     private TextView tvPasteStreamKey;
-    private String mUrl;
     private StreamingReceiver mStreamReceiver = null;
     private MainActivity mParentActivity = null;
     private App mApplication;
@@ -105,15 +104,22 @@ public class RTMPLiveAddressFragment extends Fragment {
         this.type = type;
     }
 
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_rtmplive_address, container, false);
+        if (mViewRoot != null) return mViewRoot;
+        mViewRoot = inflater.inflate(R.layout.fragment_rtmplive_address, container, false);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
+        return mViewRoot;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (mAdManager != null) mAdManager.loadBanner();
         ImageView imgBack = view.findViewById(R.id.img_back_rtmp);
         btnClearRTMP = view.findViewById(R.id.img_clear_rtmp);
         btnClearStreamKey = view.findViewById(R.id.img_clear_stream_key);
@@ -137,13 +143,7 @@ public class RTMPLiveAddressFragment extends Fragment {
             hideSoftInput(requireActivity());
             if (!SettingManager2.isProApp(requireContext())) {
                 mFragmentManager.beginTransaction()
-                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment(new SubscriptionFragment.SubscriptionListener() {
-                            @Override
-                            public void onBuySuccess() {
-                                System.out.println("thanhlv continueTask in Main REQUEST_VIDEO_FOR_COMMENTARY");
-                                doStartAlready();
-                            }
-                        }))
+                        .replace(R.id.frame_layout_fragment, new SubscriptionFragment(this::doStartAlready))
                         .addToBackStack("")
                         .commit();
                 return;
@@ -249,13 +249,11 @@ public class RTMPLiveAddressFragment extends Fragment {
         btnClearStreamKey.setOnClickListener(v -> edtStreamKey.setText(""));
         RelativeLayout rootView = view.findViewById(R.id.root_container);
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
-        RelativeLayout mAdview = view.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdview).loadBanner();
     }
 
     public void doStartAlready() {
         mParentActivity.mMode = MyUtils.MODE_STREAMING;
-        mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
+        String mUrl = fixRTMPAddress(edtRTMPAddress.getText().toString()) + edtStreamKey.getText().toString();
         if (isMyServiceRunning(requireContext(), RecordingService.class)) {
             MyUtils.showSnackBarNotification(edtRTMPAddress, "You are in RECORDING Mode. Please close Recording controller", Snackbar.LENGTH_LONG);
             return;

@@ -28,12 +28,16 @@ public class FragmentFAQ extends Fragment {
     RecyclerView recyclerView;
     ArrayList<FAQItem> mFAQs = new ArrayList<>();
 
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (mViewRoot != null) return mViewRoot;
 
-        View mViewRoot = inflater.inflate(R.layout.fragment_faq, container, false);
-
+        mViewRoot = inflater.inflate(R.layout.fragment_faq, container, false);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
         mFAQs.add(new FAQItem(getString(R.string.question_1), getString(R.string.answer_1), false));
 //        mFAQs.add(new FAQItem(getString(R.string.question_2), getString(R.string.answer_2), false));
         mFAQs.add(new FAQItem(getString(R.string.question_3), getString(R.string.answer_3), false));
@@ -48,6 +52,8 @@ public class FragmentFAQ extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (mAdManager != null) mAdManager.loadBanner();
         recyclerView = view.findViewById(R.id.recycler_view_position);
         FAQAdapter adapter = new FAQAdapter(getContext(), mFAQs);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -57,8 +63,6 @@ public class FragmentFAQ extends Fragment {
         ImageView btn_back = view.findViewById(R.id.img_btn_back_header);
         btn_back.setOnClickListener(view1 -> getParentFragmentManager().popBackStack());
 
-        RelativeLayout mAdView = view.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdView).loadBanner();
     }
 
     @Override

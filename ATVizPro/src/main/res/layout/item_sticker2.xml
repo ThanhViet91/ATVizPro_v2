@@ -4,7 +4,6 @@
     android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/img_sticker"
-        android:src="@drawable/youtube_slider1"
         android:padding="8dp"
         android:adjustViewBounds="true"
         android:layout_width="70dp"

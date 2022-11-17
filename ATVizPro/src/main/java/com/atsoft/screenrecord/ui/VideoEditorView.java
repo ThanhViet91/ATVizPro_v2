@@ -126,6 +126,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         mRedProgressIcon = findViewById(R.id.positionIcon);
 
         mAdview = findViewById(R.id.adView);
+        mAdManager = new AdsUtil(mContext, mAdview);
 
         videoOptions.add("Trim");
         videoOptions.add("Rotate");
@@ -153,9 +154,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
     private AdsUtil mAdManager;
     public void showOrHideAdBanner(){
-        mAdview = findViewById(R.id.adView);
-        mAdManager = new AdsUtil(mContext, mAdview);
-        mAdManager.loadBanner();
+        if (mAdManager != null) mAdManager.loadBanner();
         if (mAdManager.getAdView() != null) mAdManager.getAdView().setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {

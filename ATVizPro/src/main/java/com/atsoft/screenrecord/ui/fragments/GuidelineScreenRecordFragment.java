@@ -63,12 +63,15 @@ public class GuidelineScreenRecordFragment extends Fragment {
 
     }
 
-    private View mViewRoot;
 
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        if (mViewRoot != null) return mViewRoot;
         mViewRoot = inflater.inflate(R.layout.fragment_guideline, container, false);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
         isFirstTime = SettingManager2.getFirstTimeRecord(requireContext());
         SettingManager2.setFirstTimeRecord(requireContext(), false);
         return mViewRoot;
@@ -172,8 +175,7 @@ public class GuidelineScreenRecordFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdview).loadBanner();
+        if (mAdManager != null) mAdManager.loadBanner();
     }
 
     private void setDecs(int i) {

@@ -457,7 +457,7 @@ public class SubscriptionFragment extends Fragment {
                                 setEnableButton();
 
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                    if (purchasesHistoryList != null) mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
                                     try {
                                         System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
                                         getPublicTime();

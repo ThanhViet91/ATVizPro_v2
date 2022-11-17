@@ -51,10 +51,15 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
 
     }
 
+    View mViewRoot;
+    private AdsUtil mAdManager;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (mViewRoot != null) return mViewRoot;
 
-        View mViewRoot = inflater.inflate(R.layout.fragment_facebook_live_streaming, container, false);
+        mViewRoot = inflater.inflate(R.layout.fragment_facebook_live_streaming, container, false);
+        RelativeLayout mAdview = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdview);
         isFirstTime  = SettingManager2.getFirstTimeLiveStreamTwitch(requireContext());
         SettingManager2.setFirstTimeLiveStreamTwitch(requireContext(), false);
         return mViewRoot;
@@ -64,6 +69,7 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (mAdManager != null) mAdManager.loadBanner();
 
         viewPager2 = view.findViewById(R.id.view_pager_img_tutorial);
         circleIndicator3 = view.findViewById(R.id.circle_indicator);
@@ -133,8 +139,6 @@ public class GuidelineTwitchLiveStreamingFragment extends Fragment {
                 mFragmentManager.popBackStack();
             }
         });
-        RelativeLayout mAdview = view.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdview).loadBanner();
 
     }
 

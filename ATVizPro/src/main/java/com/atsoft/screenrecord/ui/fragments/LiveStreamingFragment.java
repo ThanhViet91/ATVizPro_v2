@@ -26,13 +26,13 @@ import org.jetbrains.annotations.NotNull;
 public class LiveStreamingFragment extends Fragment {
 
     ImageView imgBack, imgFacebook, imgYoutube, imgTwitch;
-
     public static final int SOCIAL_TYPE_YOUTUBE = 1;
     public static final int SOCIAL_TYPE_FACEBOOK = 2;
     public static final int SOCIAL_TYPE_TWITCH = 3;
     private MainActivity mParentActivity = null;
     private App mApplication;
     private FragmentManager mFragmentManager;
+    private AdsUtil mAdManager;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -42,10 +42,13 @@ public class LiveStreamingFragment extends Fragment {
         mFragmentManager = getParentFragmentManager();
     }
 
+    View mViewRoot;
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
-        View mViewRoot = inflater.inflate(R.layout.fragment_live_streaming, container, false);
+        if (mViewRoot != null) return mViewRoot;
+        mViewRoot = inflater.inflate(R.layout.fragment_live_streaming, container, false);
+        RelativeLayout mAdView = mViewRoot.findViewById(R.id.adView);
+        mAdManager = new AdsUtil(getContext(), mAdView);
         return mViewRoot;
     }
 
@@ -76,9 +79,7 @@ public class LiveStreamingFragment extends Fragment {
                 handleSocialLive(SOCIAL_TYPE_TWITCH);
             }
         });
-
-        RelativeLayout mAdView = view.findViewById(R.id.adView);
-        new AdsUtil(getContext(), mAdView).loadBanner();
+        if (mAdManager != null) mAdManager.loadBanner();
     }
 
 

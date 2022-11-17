@@ -5,7 +5,6 @@
     android:layout_height="match_parent">
     <ImageView
         android:id="@+id/img_item_video_thumb"
-        android:src="@drawable/youtube_slider1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>

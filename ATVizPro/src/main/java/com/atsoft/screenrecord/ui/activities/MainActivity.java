@@ -171,8 +171,6 @@ public class MainActivity extends BaseFragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         hideStatusBar(this);
-//        if (!hasPermission()) requestPermissions();
-//        SettingManager2.setProApp(this, true);
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         initViews();
         Intent intent = getIntent();
@@ -181,12 +179,10 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public static boolean initialAds = false;
-    private boolean hasTimer = false;
     private boolean isStarted = false;
 
     protected void onResume() {
         super.onResume();
-        System.out.println("thanhlv onResume mainnnnnn");
         updateService();
         checkShowAd();
     }
@@ -198,10 +194,7 @@ public class MainActivity extends BaseFragmentActivity {
             } else {
                 liveStreaming.setText(getString(R.string.disconnect_live__));
             }
-            if (!mRecordingStarted) {
-                updateUILivestreamHome(false);
-            } else
-                updateUILivestreamHome(true);
+            updateUILivestreamHome(mRecordingStarted);
         } else if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             if (!mRecordingStarted) {
                 updateUIRecordingHome(false);
@@ -268,6 +261,7 @@ public class MainActivity extends BaseFragmentActivity {
         if (mScreenCaptureIntent == null) {
             MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
             startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), PERMISSION_RECORD_DISPLAY);
+            App.ignoreOpenAd = true;
         }
     }
 
@@ -440,6 +434,7 @@ public class MainActivity extends BaseFragmentActivity {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + getPackageName()));
                 startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
+                App.ignoreOpenAd = true;
             }
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
                     Manifest.permission.RECORD_AUDIO,
@@ -455,6 +450,7 @@ public class MainActivity extends BaseFragmentActivity {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                 startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                App.ignoreOpenAd = true;
                 return false;
             } else return true;
         } else {
@@ -462,7 +458,8 @@ public class MainActivity extends BaseFragmentActivity {
                     && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 return true;
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 777);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE}, 777);
             }
         }
         return false;
@@ -479,6 +476,7 @@ public class MainActivity extends BaseFragmentActivity {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:" + getPackageName()));
                 startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
+                App.ignoreOpenAd = true;
             }
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -489,11 +487,11 @@ public class MainActivity extends BaseFragmentActivity {
 
     public void openRecordService() {
         if (isMyServiceRunning(getApplicationContext(), StreamingService.class)) {
-            MyUtils.showSnackBarNotification(mImgRec, "LiveStream service is running!", Snackbar.LENGTH_LONG);
+            MyUtils.showSnackBarNotification(mImgRec, "LiveStreaming is running!", Snackbar.LENGTH_LONG);
             return;
         }
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
-            MyUtils.showSnackBarNotification(mImgRec, "Recording service is running!", Snackbar.LENGTH_LONG);
+            MyUtils.showSnackBarNotification(mImgRec, "Recording is running!", Snackbar.LENGTH_LONG);
             return;
         }
 
@@ -502,7 +500,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void stopRecordFromHome() {
-        System.out.println("thanhlv press stopRecordFromHome");
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
 
@@ -517,7 +514,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void startRecordFromHome() {
-        System.out.println("thanhlv press startRecordFromHome");
         if (isMyServiceRunning(getApplicationContext(), RecordingService.class)) {
             Intent controller = new Intent(MainActivity.this, ControllerService.class);
 
@@ -618,7 +614,6 @@ public class MainActivity extends BaseFragmentActivity {
 
             @Override
             public void onClickMyRecordings() {
-//                show_project_for = requestVideoFor;
                 showMyRecordings(requestVideoFor);
             }
         }, bundle).show(getSupportFragmentManager(), "");
@@ -629,6 +624,7 @@ public class MainActivity extends BaseFragmentActivity {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                 startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                App.ignoreOpenAd = true;
                 return;
             }
         }
@@ -642,6 +638,7 @@ public class MainActivity extends BaseFragmentActivity {
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                 startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+                App.ignoreOpenAd = true;
                 return;
             }
         }
@@ -656,6 +653,7 @@ public class MainActivity extends BaseFragmentActivity {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI); // todo: this thing might need some work :/, eg open from google drive, stuff like that
         intent.setTypeAndNormalize("video/*");
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
+        App.ignoreOpenAd = true;
     }
 
     private int fromFunction;
@@ -765,14 +763,8 @@ public class MainActivity extends BaseFragmentActivity {
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
             startActivityForResult(intent, PERMISSION_DRAW_OVER_WINDOW);
+            App.ignoreOpenAd = true;
         }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            if (!Environment.isExternalStorageManager()) {
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-//                return;
-//            }
-//        }
 
         ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
 
@@ -801,6 +793,7 @@ public class MainActivity extends BaseFragmentActivity {
                                         Uri uri = Uri.fromParts("package", getPackageName(), null);
                                         intent.setData(uri);
                                         startActivityForResult(intent, 1000);     // Comment 3.
+                                        App.ignoreOpenAd = true;
                                     });
 
                             AlertDialog alertDialog = alertDialogBuilder.create();
@@ -834,7 +827,8 @@ public class MainActivity extends BaseFragmentActivity {
                                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                                 Uri uri = Uri.fromParts("package", getPackageName(), null);
                                 intent.setData(uri);
-                                startActivityForResult(intent, 1000);     // Comment 3.
+                                startActivityForResult(intent, 1001);     // Comment 3.
+                                App.ignoreOpenAd = true;
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -868,7 +862,7 @@ public class MainActivity extends BaseFragmentActivity {
                 }
                 break;
 
-            case 888: // Allowed was selected so Permission granted for React
+            case 888: // Allowed was selected so Permission granted for Commentary
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
@@ -889,7 +883,8 @@ public class MainActivity extends BaseFragmentActivity {
                                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                                 Uri uri = Uri.fromParts("package", getPackageName(), null);
                                 intent.setData(uri);
-                                startActivityForResult(intent, 1000);     // Comment 3.
+                                startActivityForResult(intent, 1002);     // Comment 3.
+                                App.ignoreOpenAd = true;
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -922,7 +917,7 @@ public class MainActivity extends BaseFragmentActivity {
                 }
                 break;
 
-            case 777: // Allowed was selected so Permission granted for React
+            case 777: // Allowed was selected so Permission granted for Edit
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
@@ -941,7 +936,8 @@ public class MainActivity extends BaseFragmentActivity {
                                 Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                                 Uri uri = Uri.fromParts("package", getPackageName(), null);
                                 intent.setData(uri);
-                                startActivityForResult(intent, 1000);     // Comment 3.
+                                startActivityForResult(intent, 1003);     // Comment 3.
+                                App.ignoreOpenAd = true;
                             });
 
                     AlertDialog alertDialog = alertDialogBuilder.create();
@@ -1349,12 +1345,7 @@ public class MainActivity extends BaseFragmentActivity {
             pulsator.start();
             tvDes.setVisibility(View.GONE);
             tvTimer.setVisibility(View.VISIBLE);
-            CounterUtil.getInstance().setCallback(new CounterUtil.ICounterUtil2() {
-                @Override
-                public void onTickString(String sec) {
-                    tvTimer.setText(sec);
-                }
-            });
+            CounterUtil.getInstance().setCallback((CounterUtil.ICounterUtil2) sec -> tvTimer.setText(sec));
 
             if (typeLive == SOCIAL_TYPE_YOUTUBE) {
                 imgStartLive.setBackgroundResource(R.drawable.ic_yt_live_home_load);

@@ -1,10 +1,8 @@
 package com.atsoft.screenrecord;
 
-import static com.atsoft.screenrecord.ui.activities.MainActivity.initialAds;
 import static com.atsoft.screenrecord.utils.AdsUtil.AD_OPEN_APP_ID;
 import static com.atsoft.screenrecord.utils.AdsUtil.AD_OPEN_APP_ID_DEV;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
@@ -25,11 +23,9 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
-import com.android.billingclient.api.QueryPurchasesParams;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
@@ -42,8 +38,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
-
-import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,6 +84,7 @@ public class App extends Application
             @Override
             public void onBillingServiceDisconnected() {
 //                getPurchaseHistory();
+                MobileAds.initialize(context, initializationStatus -> {});
             }
 
             @Override
@@ -102,6 +97,8 @@ public class App extends Application
                             (billingResult1, purchasesHistoryList) -> {
                                 if(billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
                                     checkPurchase(purchasesHistoryList, System.currentTimeMillis());
+                                }  else  {
+                                    MobileAds.initialize(context, initializationStatus -> {});
                                 }
                             }
                     );
@@ -113,7 +110,7 @@ public class App extends Application
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(context, false);
-            MobileAds.initialize(context, initializationStatus -> initialAds = true);
+            MobileAds.initialize(context, initializationStatus -> {});
             System.out.println("thanhlv (purchasesHistoryList == null || purchasesHistoryList.size() == 0");
             return;
         }
@@ -142,7 +139,7 @@ public class App extends Application
         }
           // khong co goi nao giong hoac da het han
             SettingManager2.setProApp(context, false);
-            MobileAds.initialize(context, initializationStatus -> initialAds = true);
+        MobileAds.initialize(context, initializationStatus -> {});
         System.out.println("thanhlv  // khong co goi nao giong hoac da het han");
 
     }
@@ -163,6 +160,7 @@ public class App extends Application
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
 //                connectGooglePlayBilling();
+                MobileAds.initialize(context, initializationStatus -> {});
             }
         });
 

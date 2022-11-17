@@ -401,26 +401,29 @@ public class SettingManager2 {
         String bitrate = getVideoBitrate(context);
 
         switch (bitrate) {
-            case "16Mbps":
-                videoSetting.setBitrate(16000*1024);
-                break;
             case "12Mbps":
                 videoSetting.setBitrate(12000*1024);
                 break;
-            case "10Mbps":
-                videoSetting.setBitrate(10000*1024);
+            case "8Mbps":
+                videoSetting.setBitrate(8000*1024);
                 break;
             case "6Mbps":
                 videoSetting.setBitrate(6000*1024);
                 break;
-            case "4Mbps":
-                videoSetting.setBitrate(4000*1024);
+            case "5Mbps":
+                videoSetting.setBitrate(5000*1024);
+                break;
+            case "3Mbps":
+                videoSetting.setBitrate(3000*1024);
                 break;
             case "2Mbps":
                 videoSetting.setBitrate(2000*1024);
                 break;
+            case "1Mbps":
+                videoSetting.setBitrate(1000*1024);
+                break;
             default:
-                videoSetting.setBitrate(8000*1024);
+                videoSetting.setBitrate(4000*1024);
         }
 
 

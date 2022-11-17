@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#99000000">
@@ -19,7 +20,9 @@
             android:layout_marginTop="@dimen/medium_margin"
             android:layout_marginEnd="@dimen/medium_margin"
             android:padding="6dp"
-            android:src="@drawable/ic_dismiss_subscription" />
+            android:src="@drawable/ic_dismiss_subscription"
+            android:contentDescription="Close"
+            tools:ignore="HardcodedText" />
 
         <ImageView
             android:id="@+id/icon"
@@ -92,7 +95,9 @@
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/medium_margin"
                     android:padding="8dp"
-                    android:src="@drawable/ic_share" />
+                    android:src="@drawable/ic_share"
+                    android:contentDescription="Share"
+                    tools:ignore="HardcodedText" />
 
                 <ImageView
                     android:id="@+id/btn_edit"
@@ -100,7 +105,9 @@
                     android:layout_height="42dp"
                     android:layout_centerInParent="true"
                     android:padding="8dp"
-                    android:src="@drawable/ic_edit_video" />
+                    android:src="@drawable/ic_edit_video"
+                    android:contentDescription="Edit"
+                    tools:ignore="HardcodedText"/>
 
                 <ImageView
                     android:id="@+id/btn_delete"
@@ -110,7 +117,9 @@
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/medium_margin"
                     android:padding="8dp"
-                    android:src="@drawable/ic_delete" />
+                    android:src="@drawable/ic_delete"
+                    android:contentDescription="Delete"
+                    tools:ignore="HardcodedText"/>
             </RelativeLayout>
 
         </RelativeLayout>

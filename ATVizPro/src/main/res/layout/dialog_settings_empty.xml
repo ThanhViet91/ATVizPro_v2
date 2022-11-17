@@ -28,7 +28,7 @@
             android:text="Title"
             android:textColor="@color/white"
             android:textFontWeight="600"
-            android:textSize="24dp" />
+            android:textSize="24sp" />
     </RelativeLayout>
 
     <LinearLayout
@@ -55,7 +55,7 @@
                 android:text="Item 1"
                 android:textColor="@color/white"
                 android:textFontWeight="600"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/check0"
@@ -83,7 +83,7 @@
                 android:text="Item 1"
                 android:textColor="@color/white"
                 android:textFontWeight="600"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/check1"
@@ -111,7 +111,7 @@
                 android:text="Item 1"
                 android:textColor="@color/white"
                 android:textFontWeight="600"
-                android:textSize="20dp" />
+                android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/check2"

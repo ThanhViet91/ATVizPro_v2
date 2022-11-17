@@ -58,7 +58,7 @@
 
     <!--Default setting-->
     <string name="default_setting_resolution">720p (HD)</string>
-    <string name="default_setting_bitrate">8Mbps</string>
+    <string name="default_setting_bitrate">4Mbps</string>
     <string name="default_setting_fps">30fps</string>
     <string name="default_setting_countdown">3</string>
     <string name="default_setting_orientation">Auto</string>
@@ -130,9 +130,9 @@
 
     <!--    product_id_remove_ads-->
     <string name="product_id_remove_ads">testing2</string>
-    <string name="product_id_week">com.atsoft.screenrecorder.weekly</string>
-    <string name="product_id_month">com.atsoft.screenrecorder.monthly</string>
-    <string name="product_id_year">com.atsoft.screenrecorder.yearly</string>
+    <string name="product_id_week">com.atsoft.screenrecord.weekly</string>
+    <string name="product_id_month">com.atsoft.screenrecord.monthly</string>
+    <string name="product_id_year">com.atsoft.screenrecord.yearly</string>
 <!--    <string name="product_id_week">testing2</string>-->
 <!--    <string name="product_id_month">testing3</string>-->
 <!--    <string name="product_id_year">testing4</string>-->

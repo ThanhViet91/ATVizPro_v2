@@ -73,9 +73,9 @@ public class FAQAdapter extends RecyclerView.Adapter<FAQAdapter.ViewHolder>{
             ic_down = itemView.findViewById(R.id.ic_down);
             rl_head_faq = itemView.findViewById(R.id.rl_head_faq);
 
-            rl_head_faq.setOnClickListener(new OnSingleClickListener() {
+            rl_head_faq.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onSingleClick(View v) {
+                public void onClick(View view) {
                     if (mFAQs.get(getLayoutPosition()).getShown()) {
                         hideAnswer(getLayoutPosition());
                     } else

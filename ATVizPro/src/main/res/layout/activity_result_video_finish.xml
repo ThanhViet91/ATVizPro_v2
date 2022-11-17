@@ -20,7 +20,8 @@
             android:id="@+id/title_result"
             style="@style/Title_Box_White"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:gravity="center"
             android:text="@string/react_cam" />
 

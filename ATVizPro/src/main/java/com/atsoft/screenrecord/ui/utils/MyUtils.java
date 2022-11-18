@@ -232,7 +232,11 @@ public class MyUtils {
         }
         long timeInMs = 0;
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(context, Uri.parse(path));
+        try {
+            retriever.setDataSource(context, Uri.parse(path));
+        } catch (Exception ignored) {
+
+        }
         String time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         retriever.release();
         if (time == null) return 0;

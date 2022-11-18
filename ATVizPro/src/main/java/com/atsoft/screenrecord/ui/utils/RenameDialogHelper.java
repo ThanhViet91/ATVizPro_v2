@@ -22,6 +22,7 @@ public class RenameDialogHelper {
     public interface IDialogHelper {
         void onClickOK(String result);
         void onClickCancel(String result);
+        void onRequireConfirm(String result);
     }
 
     private final IDialogHelper mCallback;
@@ -62,7 +63,6 @@ public class RenameDialogHelper {
                     try {
                         renameFile(oldVideo.getPath(), newTitle);
                         editText.setText(newTitle);
-                        mCallback.onClickOK(newTitle);
                         dialog.dismiss();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -99,12 +99,8 @@ public class RenameDialogHelper {
 
         // Rename file (or directory)
         boolean success = file.renameTo(fileWithNewName);
-
-        if (!success) {
-            // File was not successfully renamed
-            throw new Exception("Cannot rename this video. This video file might not available.");
-        } else {
-            System.out.println("thanhlv rename successsssssssss " + fileWithNewName.getAbsolutePath());
-        }
+        if (!success) mCallback.onRequireConfirm(newNames);
+        else
+            mCallback.onClickOK(newNames);
     }
 }

@@ -307,7 +307,8 @@ public class MainActivity extends BaseFragmentActivity {
                         .setTitle("Disconnect livestream!")
                         .setMessage("Do you want to disconnect livestream?")
                         .setPositiveButton(android.R.string.yes, (dialog, which) -> sendDisconnectToService())
-                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {})
+                        .setNegativeButton(android.R.string.no, (dialogInterface, i) -> {
+                        })
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
                 return;
@@ -412,22 +413,22 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public boolean hasAllPermissionForEdit() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-                App.ignoreOpenAd = true;
-                return false;
-            } else return true;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            if (!Environment.isExternalStorageManager()) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+//                App.ignoreOpenAd = true;
+//                return false;
+//            } else return true;
+//        } else {
+        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            return true;
         } else {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                    && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE}, 777);
-            }
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.READ_EXTERNAL_STORAGE}, 777);
         }
+//        }
         return false;
     }
 
@@ -511,7 +512,8 @@ public class MainActivity extends BaseFragmentActivity {
             new AlertDialog.Builder(this)
                     .setTitle("Please wait!")
                     .setMessage("Your previous video in processing, please check in status bar!")
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {})
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                    })
                     .setIcon(android.R.drawable.ic_dialog_info)
                     .show();
         }
@@ -580,33 +582,37 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void showMyRecordings(int fromFunction) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-                App.ignoreOpenAd = true;
-                return;
-            }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            if (!Environment.isExternalStorageManager()) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+//                App.ignoreOpenAd = true;
+//                return;
+//            }
+//        }
+        if (hasAllPermissionForEdit()) {
+            Intent intent = new Intent(this, ProjectsActivity.class);
+            intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
+            startActivity(intent);
         }
-        Intent intent = new Intent(this, ProjectsActivity.class);
-        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
-        startActivity(intent);
     }
 
     private void showMyRecordings(int fromFunction, String navigate, String videoPath) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-                App.ignoreOpenAd = true;
-                return;
-            }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            if (!Environment.isExternalStorageManager()) {
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
+//                App.ignoreOpenAd = true;
+//                return;
+//            }
+//        }
+        if (hasAllPermissionForEdit()) {
+            Intent intent = new Intent(this, ProjectsActivity.class);
+            intent.setAction(navigate);
+            intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
+            intent.putExtra(KEY_PATH_VIDEO, videoPath);
+            startActivity(intent);
         }
-        Intent intent = new Intent(this, ProjectsActivity.class);
-        intent.setAction(navigate);
-        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
-        intent.putExtra(KEY_PATH_VIDEO, videoPath);
-        startActivity(intent);
     }
 
     public void showDialogPickFromGallery(int from_code) {
@@ -717,7 +723,7 @@ public class MainActivity extends BaseFragmentActivity {
         ActivityCompat.requestPermissions(this, mPermission, PERMISSION_REQUEST_CODE);
     }
 
-    public void showPopupGo2DeviceSettings(int type){
+    public void showPopupGo2DeviceSettings(int type) {
         if (type == 1) {//manual
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Change Permissions in Settings");
@@ -756,6 +762,7 @@ public class MainActivity extends BaseFragmentActivity {
         }
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -967,20 +974,20 @@ public class MainActivity extends BaseFragmentActivity {
             }
         }
 
-        if (requestCode == PERMISSION_ACCESS_ALL_FILE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                //Check if the permission is granted or not.
-                if (!Environment.isExternalStorageManager()) { //Permission is not available
-                    MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
-                } else {
-                    if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && !video_input.contains(".")) {
-                        showDialogPickVideo(fromFunction);
-                    } else {
-                        showMyRecordings(fromFunction, navigate_to, video_input);
-                    }
-                }
-            }
-        }
+//        if (requestCode == PERMISSION_ACCESS_ALL_FILE) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                //Check if the permission is granted or not.
+//                if (!Environment.isExternalStorageManager()) { //Permission is not available
+//                    MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
+//                } else {
+//                    if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && !video_input.contains(".")) {
+//                        showDialogPickVideo(fromFunction);
+//                    } else {
+//                        showMyRecordings(fromFunction, navigate_to, video_input);
+//                    }
+//                }
+//            }
+//        }
 
         if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
             //Check if the permission is granted or not.

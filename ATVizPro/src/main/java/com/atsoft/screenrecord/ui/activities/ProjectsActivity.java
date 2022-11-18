@@ -18,20 +18,31 @@ import static com.atsoft.screenrecord.ui.utils.MyUtils.hideStatusBar;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.app.RecoverableSecurityException;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -236,19 +247,18 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         return (int) screenWidth / 180 + 1;
     }
 
-    private VideoModel videoModelOld;
     private String oldPath;
     private String oldName;
+    private String newName;
 
     private void handleRenameButton(VideoModel oldVideo) {
-        videoModelOld = oldVideo;
+        oldPath = oldVideo.getPath();
+        oldName = oldVideo.getName();
         new RenameDialogHelper(new RenameDialogHelper.IDialogHelper() {
             @Override
             public void onClickOK(String result) {
-                oldPath = videoModelOld.getPath();
-                oldName = videoModelOld.getName();
                 for (VideoModel videoModel : videoList) {
-                    if (videoModel.getPath().equals(videoModelOld.getPath())) {
+                    if (videoModel.getPath().equals(oldPath)) {
                         videoModel.setPath(oldPath.replace(oldName, result));
                         videoModel.setName(result);
                         mAdapter.updateData(videoList);
@@ -256,9 +266,14 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                     }
                 }
             }
-
             @Override
             public void onClickCancel(String result) {
+            }
+
+            @Override
+            public void onRequireConfirm(String result) {
+                newName = result;
+                renameVideo(oldVideo, result);
             }
         }).showRenameDialog(this, oldVideo);
     }
@@ -274,9 +289,52 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 .show();
     }
 
+
+    private void renameVideo(VideoModel video, String newName_) {
+        File file = new File(video.getPath());
+        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
+                (s, uri) -> {
+                    ContentValues contentValues = new ContentValues(2);
+                    contentValues.put(MediaStore.Video.Media.TITLE, newName_);
+                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, newName_ + StorageUtil.getExtensionFile(video.getPath()));
+                    ContentResolver contentResolver = getApplicationContext().getContentResolver();
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            contentResolver.update(uri, contentValues, null);
+                        } else {
+                            //
+
+                        }
+                    } catch (SecurityException e) {
+                        rename(e, renameResultHandler, uri, contentResolver);
+                    }
+                });
+    }
+
+
+    int count = 0;
+
     private void deleteVideos(ArrayList<VideoModel> listSelected) {
-        for (VideoModel video : listSelected) {
-            if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
+        count = 0;
+        ArrayList<Uri> collection = new ArrayList<>();
+        for (VideoModel videoModel : listSelected) {
+            File file = new File(videoModel.getPath());
+            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
+                    (s, uri) -> {
+                        collection.add(uri);
+                        count++;
+                        if (count == listSelected.size()) {
+                            ContentResolver contentResolver = getApplicationContext().getContentResolver();
+                            try {
+                                //delete object using resolver
+                                contentResolver.delete(collection.get(0), null, null);
+                                for (VideoModel video : listSelected) videoList.remove(video);
+                                runOnUiThread(() -> mAdapter.updateData(videoList));
+                            } catch (SecurityException e) {
+                                delete(e, deleteResultHandler, collection, contentResolver);
+                            }
+                        }
+                    });
         }
 
         if (mAdapter != null) {
@@ -368,7 +426,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         isRecording = isMyServiceRunning(getApplicationContext(), RecordingService.class);
         readData();
         processingData();
-//        for (VideoModel video : videoList) System.out.println("thanhlv  fetchData  === " + video.getName());
         if (mAdapter != null) {
             mAdapter.updateData(videoList);
         }
@@ -399,10 +456,11 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
 
     Boolean isRecording = false;
     MediaMetadataRetriever retriever;
+
     public boolean isVideo(String path) {
         try {
             if (new File(path).getName().contains("%")) {
-                StorageUtil.deleteFile(path);
+//                StorageUtil.deleteFile(path);
                 return false;
             }
             retriever.setDataSource(this, Uri.fromFile(new File(path)));
@@ -413,7 +471,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 if (isRecording) {
                     return false;
                 }
-                StorageUtil.deleteFile(path);
+//                StorageUtil.deleteFile(path);
             } else {
                 if (hasVideo.equals("yes")) { // neu la file video
                     return true;
@@ -432,13 +490,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             } else {
                 String path = fileEntry.getAbsolutePath();
                 if (isVideo(path)) {
-                    videoList.add(0,
-                            new VideoModel(StorageUtil.getFileNameWithoutExtension(path),
-                                    path,
-                                    MyUtils.getDurationTime(this, path),
-                                    fileEntry.lastModified())
-                    );
-                    totalVideos++;
+                videoList.add(0,
+                        new VideoModel(StorageUtil.getFileNameWithoutExtension(path),
+                                path,
+                                MyUtils.getDurationTime(this, path),
+                                fileEntry.lastModified())
+                );
+                totalVideos++;
                 }
             }
         }
@@ -448,7 +506,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             toggleView(tv_select, View.GONE);
         }
     }
+
     String selectedVideoPath = "";
+
     @Override
     public void onSelected(VideoModel video) {
         if (mAdapter.getSelectable()) {
@@ -536,34 +596,83 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         context.startActivity(intent);
     }
 
-//    public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
-//        PendingIntent pendingIntent = null;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            ArrayList<Uri> collection = new ArrayList<>();
-//            collection.add(uri);
-//            pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
-//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//            //if exception is recoverable then again send delete request using intent
-//            if (e instanceof RecoverableSecurityException) {
-//                RecoverableSecurityException exception = (RecoverableSecurityException) e;
-//                pendingIntent = exception.getUserAction().getActionIntent();
-//            }
-//        }
-//        if (pendingIntent != null) {
-//            IntentSender sender = pendingIntent.getIntentSender();
-//            IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
-//            launcher.launch(request);
-//        }
-//    }
-//
-//    public void rename(Uri uri, String rename) {
-//        //create content values with new name and update
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, rename);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            ContentResolver contentResolver = getApplicationContext().getContentResolver();
-//            contentResolver.update(uri, contentValues, null);
-//        }
-//    }
+
+    private ActivityResultLauncher<IntentSenderRequest> deleteResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+        // handle intent result here
+        if (result.getResultCode() == RESULT_OK) {
+            ArrayList<VideoModel> videoSelected = new ArrayList<>(getVideoListSelected());
+            if (videoSelected.size() == 0) return;
+            Toast.makeText(this, videoSelected.size() > 1 ? "The videos are deleted!" : "The video is deleted!", Toast.LENGTH_SHORT).show();
+            for (VideoModel video : videoSelected) videoList.remove(video);
+            if (mAdapter != null) mAdapter.updateData(videoList);
+
+        }
+    });
+
+
+    private ActivityResultLauncher<IntentSenderRequest> renameResultHandler = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), result -> {
+        // handle intent result here
+        if (result.getResultCode() == RESULT_OK) {
+            File file = new File(oldPath);
+            final File fileWithNewName = new File(file.getParentFile(), newName + StorageUtil.getExtensionFile(oldPath));
+            boolean success = file.renameTo(fileWithNewName);
+            if (success) {
+                for (VideoModel videoModel : videoList) {
+                    if (videoModel.getPath().equals(oldPath)) {
+                        videoModel.setPath(oldPath.replace(oldName, newName));
+                        videoModel.setName(newName);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAdapter.updateData(videoList);
+                            }
+                        });
+                        break;
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Opp! Rename is fail", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+
+
+    public void delete(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, ArrayList<Uri> uris, ContentResolver contentResolver) {
+        PendingIntent pendingIntent = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ArrayList<Uri> collection = new ArrayList<>(uris);
+            pendingIntent = MediaStore.createDeleteRequest(contentResolver, collection);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //if exception is recoverable then again send delete request using intent
+            if (e instanceof RecoverableSecurityException) {
+                RecoverableSecurityException exception = (RecoverableSecurityException) e;
+                pendingIntent = exception.getUserAction().getActionIntent();
+            }
+        }
+        if (pendingIntent != null) {
+            IntentSender sender = pendingIntent.getIntentSender();
+            IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+            launcher.launch(request);
+        }
+    }
+
+    public void rename(SecurityException e, ActivityResultLauncher<IntentSenderRequest> launcher, Uri uri, ContentResolver contentResolver) {
+        PendingIntent pendingIntent = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ArrayList<Uri> collection = new ArrayList<>();
+            collection.add(uri);
+            pendingIntent = MediaStore.createWriteRequest(contentResolver, collection);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            //if exception is recoverable then again send delete request using intent
+            if (e instanceof RecoverableSecurityException) {
+                RecoverableSecurityException exception = (RecoverableSecurityException) e;
+                pendingIntent = exception.getUserAction().getActionIntent();
+            }
+        }
+        if (pendingIntent != null) {
+            IntentSender sender = pendingIntent.getIntentSender();
+            IntentSenderRequest request = new IntentSenderRequest.Builder(sender).build();
+            launcher.launch(request);
+        }
+    }
 }

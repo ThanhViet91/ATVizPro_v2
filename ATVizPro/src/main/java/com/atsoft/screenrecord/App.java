@@ -423,6 +423,7 @@ public class App extends Application
                 @NonNull OnShowAdCompleteListener onShowAdCompleteListener) {
             // If the app open ad is already showing, do not show the ad again.
             if (isShowingAd) {
+                System.out.println("thanhlv splassssss onFinish showAdIfAvailable " +isShowingAd);
                 Log.d(LOG_TAG, "The app open ad is already showing.");
                 return;
             }
@@ -446,7 +447,7 @@ public class App extends Application
                             appOpenAd = null;
                             isShowingAd = false;
 
-                            Log.d(LOG_TAG, "onAdDismissedFullScreenContent.");
+//                            Log.d(LOG_TAG, "onAdDismissedFullScreenContent.");
                             onShowAdCompleteListener.onShowAdComplete();
                             loadAd(activity);
                         }
@@ -456,7 +457,7 @@ public class App extends Application
                         public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                             appOpenAd = null;
                             isShowingAd = false;
-                            Log.d(LOG_TAG, "onAdFailedToShowFullScreenContent: " + adError.getMessage());
+//                            Log.d(LOG_TAG, "onAdFailedToShowFullScreenContent: " + adError.getMessage());
                             onShowAdCompleteListener.onShowAdComplete();
                             loadAd(activity);
                         }

@@ -27,12 +27,12 @@ public class SplashActivity extends AppCompatActivity {
         hideStatusBar(this);
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-        createTimer();
-//        if (SettingManager2.isProApp(App.getAppContext())) {
-//            new Handler().postDelayed(this::startMainActivity, 3000);
-//        } else {
-//            createTimer();
-//        }
+//        createTimer();
+        if (SettingManager2.isProApp(App.getAppContext())) {
+            new Handler().postDelayed(this::startMainActivity, 3000);
+        } else {
+            createTimer();
+        }
     }
 
     @Override
@@ -56,6 +56,10 @@ public class SplashActivity extends AppCompatActivity {
                     @Override
                     public void onFinish() {
                         System.out.println("thanhlv splassssss onFinish ");
+                        if (SettingManager2.isProApp(App.getAppContext())) {
+                            startMainActivity();
+                            return;
+                        }
                         Application application = getApplication();
 
                         // If the application is not an instance of MyApplication, log an error message and

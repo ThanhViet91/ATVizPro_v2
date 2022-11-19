@@ -32,7 +32,6 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -51,7 +50,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.atsoft.screenrecord.App;
-import com.atsoft.screenrecord.BuildConfig;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
@@ -590,11 +588,11 @@ public class MainActivity extends BaseFragmentActivity {
 //                return;
 //            }
 //        }
-        if (hasAllPermissionForEdit()) {
+//        if (hasAllPermissionForEdit()) {
             Intent intent = new Intent(this, ProjectsActivity.class);
             intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
             startActivity(intent);
-        }
+//        }
     }
 
     private void showMyRecordings(int fromFunction, String navigate, String videoPath) {
@@ -606,13 +604,13 @@ public class MainActivity extends BaseFragmentActivity {
 //                return;
 //            }
 //        }
-        if (hasAllPermissionForEdit()) {
+//        if (hasAllPermissionForEdit()) {
             Intent intent = new Intent(this, ProjectsActivity.class);
             intent.setAction(navigate);
             intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
             intent.putExtra(KEY_PATH_VIDEO, videoPath);
             startActivity(intent);
-        }
+//        }
     }
 
     public void showDialogPickFromGallery(int from_code) {
@@ -831,7 +829,11 @@ public class MainActivity extends BaseFragmentActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
-                    showDialogPickVideo(fromFunction);
+                    if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT) {
+                        showDialogPickVideo(fromFunction);
+                    } else {
+                        showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
+                    }
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])
                         || !shouldShowRequestPermissionRationale(permissions[1])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually

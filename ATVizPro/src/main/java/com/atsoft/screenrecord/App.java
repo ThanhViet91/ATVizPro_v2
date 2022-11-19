@@ -35,7 +35,6 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.appopen.AppOpenAd.AppOpenAdLoadCallback;
 import com.google.common.collect.ImmutableList;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -54,10 +53,9 @@ public class App extends Application
     private static final String TAG = "MyApplication";
     public static final String CHANNEL_ID = "com.atsoft.screenrecord";
     private static Application context;
-    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static Application getAppContext() {
-        return App.context;
+        return context;
     }
 
     @Override
@@ -68,37 +66,40 @@ public class App extends Application
         // Log the Mobile Ads SDK version.
         Log.d(TAG, "Google Mobile Ads SDK Version: " + MobileAds.getVersion());
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        context = this;
         appOpenAdManager = new AppOpenAdManager();
-        App.context = this;
-        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {}).build();
+        billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener((billingResult, list) -> {
+        }).build();
         configs();
         getPurchaseHistory();
         createChannelNotification();
     }
 
     private BillingClient billingClient;
+
     private void getPurchaseHistory() {
         if (billingClient == null) return;
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
 //                getPurchaseHistory();
-                MobileAds.initialize(context, initializationStatus -> {});
+                MobileAds.initialize(context, initializationStatus -> {
+                });
             }
 
             @Override
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                     billingClient.queryPurchaseHistoryAsync(
                             QueryPurchaseHistoryParams.newBuilder()
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                if(billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     checkPurchase(purchasesHistoryList, System.currentTimeMillis());
-                                }  else  {
-                                    MobileAds.initialize(context, initializationStatus -> {});
+                                } else {
+                                    MobileAds.initialize(context, initializationStatus -> {
+                                    });
                                 }
                             }
                     );
@@ -110,35 +111,36 @@ public class App extends Application
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(context, false);
-            MobileAds.initialize(context, initializationStatus -> {});
+            MobileAds.initialize(context, initializationStatus -> {
+            });
             System.out.println("thanhlv (purchasesHistoryList == null || purchasesHistoryList.size() == 0");
             return;
         }
         for (PurchaseHistoryRecord item : purchasesHistoryList) {
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID()) ) {
-                if ((currentTime - item.getPurchaseTime())/1000 < 7 * 24 * 60 * 60) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(0).getKeyID())) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 < 7 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
                     System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 7 * 24 * 60 * 60) ");
                     return;
                 }
             }
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID()) ) {
-                if ((currentTime - item.getPurchaseTime())/1000 < 30 * 24 * 60 * 60) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID())) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 < 30 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
                     System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 30 * 24 * 60 * 60) ");
                     return;
                 }
             }
-            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID()) ) {
-                if ((currentTime - item.getPurchaseTime())/1000 < 365 * 24 * 60 * 60) {
+            if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(2).getKeyID())) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 < 365 * 24 * 60 * 60) {
                     SettingManager2.setProApp(context, true);
                     System.out.println("thanhlv ((currentTime - item.getPurchaseTime())/1000 < 365 * 24 * 60 * 60) ");
                     return;
                 }
             }
         }
-          // khong co goi nao giong hoac da het han
-            SettingManager2.setProApp(context, false);
+        // khong co goi nao giong hoac da het han
+        SettingManager2.setProApp(context, false);
         MobileAds.initialize(context, initializationStatus -> {});
         System.out.println("thanhlv  // khong co goi nao giong hoac da het han");
 
@@ -160,12 +162,15 @@ public class App extends Application
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
 //                connectGooglePlayBilling();
-                MobileAds.initialize(context, initializationStatus -> {});
+                MobileAds.initialize(context, initializationStatus -> {
+                });
             }
         });
 
     }
+
     String WEEKLY_ID = "", MONTHLY_ID = "", YEARLY_ID = "";
+
     private void showProducts() {
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
@@ -191,13 +196,13 @@ public class App extends Application
                 .build();
 
         if (billingClient != null)
-        billingClient.queryProductDetailsAsync(
-                params,
-                (billingResult, prodDetailsList) -> {
-                    // Process the result
-                    Core.productDetails = new ArrayList<>(prodDetailsList);
-                }
-        );
+            billingClient.queryProductDetailsAsync(
+                    params,
+                    (billingResult, prodDetailsList) -> {
+                        // Process the result
+                        Core.productDetails = new ArrayList<>(prodDetailsList);
+                    }
+            );
     }
 
     private void configs() {
@@ -240,7 +245,7 @@ public class App extends Application
         if (SettingManager2.isProApp(App.getAppContext())) {
             return;
         }
-        if (ignoreOpenAd){
+        if (ignoreOpenAd) {
             ignoreOpenAd = false;
             return;
         }
@@ -300,7 +305,7 @@ public class App extends Application
         if (SettingManager2.isProApp(App.getAppContext())) {
             return;
         }
-        if (ignoreOpenAd){
+        if (ignoreOpenAd) {
             ignoreOpenAd = false;
             return;
         }
@@ -423,7 +428,7 @@ public class App extends Application
                 @NonNull OnShowAdCompleteListener onShowAdCompleteListener) {
             // If the app open ad is already showing, do not show the ad again.
             if (isShowingAd) {
-                System.out.println("thanhlv splassssss onFinish showAdIfAvailable " +isShowingAd);
+                System.out.println("thanhlv splassssss onFinish showAdIfAvailable " + isShowingAd);
                 Log.d(LOG_TAG, "The app open ad is already showing.");
                 return;
             }

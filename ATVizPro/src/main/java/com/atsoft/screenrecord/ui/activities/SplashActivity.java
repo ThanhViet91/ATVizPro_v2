@@ -20,6 +20,7 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
     PulsatorLayout pulsator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,12 +28,12 @@ public class SplashActivity extends AppCompatActivity {
         hideStatusBar(this);
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-        createTimer();
-//        if (SettingManager2.isProApp(App.getAppContext())) {
-//            new Handler().postDelayed(this::startMainActivity, 3000);
-//        } else {
-//            createTimer();
-//        }
+//        createTimer();
+        if (SettingManager2.isProApp(App.getAppContext())) {
+            new Handler().postDelayed(this::startMainActivity, 3000);
+        } else {
+            createTimer();
+        }
     }
 
     @Override
@@ -50,11 +51,15 @@ public class SplashActivity extends AppCompatActivity {
                 new CountDownTimer((long) 4910, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        System.out.println("thanhlv splassssss onTick "+millisUntilFinished);
+                        System.out.println("thanhlv splassssss onTick " + millisUntilFinished);
                     }
 
                     @Override
                     public void onFinish() {
+                        if (SettingManager2.isProApp(App.getAppContext())) {
+                            startMainActivity();
+                            return;
+                        }
                         System.out.println("thanhlv splassssss onFinish ");
                         Application application = getApplication();
 

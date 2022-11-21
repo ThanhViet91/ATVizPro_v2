@@ -455,7 +455,12 @@ public class SubscriptionFragment extends Fragment {
             @Override
             public void onBillingServiceDisconnected() {
                 if (mProgressDialog != null) mProgressDialog.dismiss();
-                tvRestore.setEnabled(true);
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tvRestore.setEnabled(true);
+                    }
+                });
 //                getPurchase();
             }
 
@@ -472,13 +477,18 @@ public class SubscriptionFragment extends Fragment {
                                 setEnableButton();
 
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                    if (purchasesHistoryList != null) mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                    requireActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            if (purchasesHistoryList != null) mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
+                                        }
+                                    });
                                     try {
-                                        System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
+//                                        System.out.println("thanhlv mPurchasesHistoryList" + mPurchasesHistoryList.size());
                                         getPublicTime();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+                                        requireActivity().runOnUiThread(() -> checkPurchase(mPurchasesHistoryList, System.currentTimeMillis()));
                                     }
                                 } else {
                                     requireActivity().runOnUiThread(new Runnable() {

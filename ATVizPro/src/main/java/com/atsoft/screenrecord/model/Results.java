@@ -34,8 +34,11 @@ public class Results {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date mDate = sdf.parse(dateTime);
-            timeInMilliseconds = mDate.getTime();
-            System.out.println("thanhlv getDateTimeMs in milli :: " + timeInMilliseconds);
+            if (mDate != null) {
+                timeInMilliseconds = mDate.getTime();
+            } else
+                return System.currentTimeMillis();
+//            System.out.println("thanhlv getDateTimeMs in milli :: " + timeInMilliseconds);
         } catch (ParseException e) {
             e.printStackTrace();
 

@@ -156,7 +156,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                if (mProgressDialog != null) mProgressDialog.dismiss();
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mProgressDialog != null) mProgressDialog.dismiss();
+                    }
+                });
             }
 
             @Override
@@ -167,15 +172,20 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                if (mProgressDialog != null) mProgressDialog.dismiss();
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (mProgressDialog != null) mProgressDialog.dismiss();
+                                    }
+                                });
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     if (purchasesHistoryList != null)
                                         mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
                                     try {
                                         getPublicTime();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                        checkPurchase(mPurchasesHistoryList, System.currentTimeMillis());
+                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+                                        requireActivity().runOnUiThread(() -> checkPurchase(mPurchasesHistoryList, System.currentTimeMillis()));
                                     }
                                 } else {
                                     requireActivity().runOnUiThread(() -> showPopup("Something went wrong!", "Check your network connection and try again"));
@@ -212,7 +222,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(requireContext(), false);
             showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
-            if (adapter != null) adapter.notifyDataSetChanged();
+//            if (adapter != null) adapter.notifyDataSetChanged();
             if (mAdManager != null) mAdManager.loadBanner();
             return;
         }
@@ -335,7 +345,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         if (code.equals(getString(R.string.floating_button))) {
             mActivity.sendActionToService(ACTION_UPDATE_SHOW_HIDE_FAB);
-            System.out.println("thanhlv floating_button " + SettingManager2.isEnableFAB(requireContext()));
+//            System.out.println("thanhlv floating_button " + SettingManager2.isEnableFAB(requireContext()));
         }
 
         if (code.equals(getString(R.string.contact_us))) {

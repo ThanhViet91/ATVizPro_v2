@@ -269,12 +269,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             @Override
             public void onClickCancel(String result) {
             }
-
-            @Override
-            public void onRequireConfirm(String result) {
-                newName = result;
-                renameVideo(oldVideo, result);
-            }
         }).showRenameDialog(this, oldVideo);
     }
 
@@ -289,52 +283,9 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 .show();
     }
 
-
-    private void renameVideo(VideoModel video, String newName_) {
-        File file = new File(video.getPath());
-        MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-                (s, uri) -> {
-                    ContentValues contentValues = new ContentValues(2);
-                    contentValues.put(MediaStore.Video.Media.TITLE, newName_);
-                    contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, newName_ + StorageUtil.getExtensionFile(video.getPath()));
-                    ContentResolver contentResolver = getApplicationContext().getContentResolver();
-                    try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            contentResolver.update(uri, contentValues, null);
-                        } else {
-                            //
-
-                        }
-                    } catch (SecurityException e) {
-                        rename(e, renameResultHandler, uri, contentResolver);
-                    }
-                });
-    }
-
-
-    int count = 0;
-
     private void deleteVideos(ArrayList<VideoModel> listSelected) {
-        count = 0;
-        ArrayList<Uri> collection = new ArrayList<>();
-        for (VideoModel videoModel : listSelected) {
-            File file = new File(videoModel.getPath());
-            MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{file.getName()},
-                    (s, uri) -> {
-                        collection.add(uri);
-                        count++;
-                        if (count == listSelected.size()) {
-                            ContentResolver contentResolver = getApplicationContext().getContentResolver();
-                            try {
-                                //delete object using resolver
-                                contentResolver.delete(collection.get(0), null, null);
-                                for (VideoModel video : listSelected) videoList.remove(video);
-                                runOnUiThread(() -> mAdapter.updateData(videoList));
-                            } catch (SecurityException e) {
-                                delete(e, deleteResultHandler, collection, contentResolver);
-                            }
-                        }
-                    });
+        for (VideoModel video : listSelected) {
+            if (StorageUtil.deleteFile(video.getPath())) videoList.remove(video);
         }
 
         if (mAdapter != null) {
@@ -460,7 +411,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
     public boolean isVideo(String path) {
         try {
             if (new File(path).getName().contains("%")) {
-//                StorageUtil.deleteFile(path);
+                StorageUtil.deleteFile(path);
                 return false;
             }
             retriever.setDataSource(this, Uri.fromFile(new File(path)));
@@ -471,7 +422,7 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 if (isRecording) {
                     return false;
                 }
-//                StorageUtil.deleteFile(path);
+                StorageUtil.deleteFile(path);
             } else {
                 if (hasVideo.equals("yes")) { // neu la file video
                     return true;
@@ -490,13 +441,13 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
             } else {
                 String path = fileEntry.getAbsolutePath();
                 if (isVideo(path)) {
-                videoList.add(0,
-                        new VideoModel(StorageUtil.getFileNameWithoutExtension(path),
-                                path,
-                                MyUtils.getDurationTime(this, path),
-                                fileEntry.lastModified())
-                );
-                totalVideos++;
+                    videoList.add(0,
+                            new VideoModel(StorageUtil.getFileNameWithoutExtension(path),
+                                    path,
+                                    MyUtils.getDurationTime(this, path),
+                                    fileEntry.lastModified())
+                    );
+                    totalVideos++;
                 }
             }
         }

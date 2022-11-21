@@ -27,7 +27,6 @@ public class SplashActivity extends AppCompatActivity {
         hideStatusBar(this);
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-//        createTimer();
         if (SettingManager2.isProApp(App.getAppContext())) {
             new Handler().postDelayed(this::startMainActivity, 3000);
         } else {
@@ -50,26 +49,20 @@ public class SplashActivity extends AppCompatActivity {
                 new CountDownTimer((long) 4910, 1000) {
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        System.out.println("thanhlv splassssss onTick "+millisUntilFinished);
                     }
-
                     @Override
                     public void onFinish() {
-                        System.out.println("thanhlv splassssss onFinish ");
                         if (SettingManager2.isProApp(App.getAppContext())) {
                             startMainActivity();
                             return;
                         }
                         Application application = getApplication();
-
                         // If the application is not an instance of MyApplication, log an error message and
                         // start the MainActivity without showing the app open ad.
                         if (!(application instanceof App)) {
                             startMainActivity();
-                            System.out.println("thanhlv splassssss onFinish if (!(application instanceof App)) ");
                             return;
                         }
-
                         // Show the app open ad.
                         ((App) application).showAdIfAvailable(SplashActivity.this, () -> startMainActivity());
                     }

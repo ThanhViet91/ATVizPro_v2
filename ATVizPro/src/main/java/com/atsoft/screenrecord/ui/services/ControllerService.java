@@ -260,7 +260,7 @@ public class ControllerService extends Service{
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID);
                 Notification notification = notificationBuilder.setOngoing(true)
                         .setSmallIcon(R.drawable.ic_launcher_2_foreground)
-                        .setContentTitle("Screen Recorder is running in background")
+                        .setContentTitle("AT Record is running in background")
                         .setPriority(NotificationManager.IMPORTANCE_MIN)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build();
@@ -340,8 +340,6 @@ public class ControllerService extends Service{
         else
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
-
-        System.out.println("thanhlv initCameraView");
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 
@@ -353,7 +351,6 @@ public class ControllerService extends Service{
         paramCam.x = 0;
         paramCam.y = DisplayUtil.getDeviceHeight() / 3;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
-        System.out.println("thanhlv initCameraView 222");
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mCameraLayout, paramCam);
@@ -493,9 +490,7 @@ public class ControllerService extends Service{
     private CountDownTimer countDownTimerMark;
 
     private void autoHideMark() {
-        System.out.println("thanhlv autoHideMarkautoHideMark ");
         if (countDownTimerMark == null) {
-            System.out.println("thanhlv autoHideMarkautoHideMark newwwwww ");
             mCameraLayoutMark.setVisibility(View.VISIBLE);
             countDownTimerMark = new CountDownTimer(3000, 1000) {
 
@@ -523,9 +518,6 @@ public class ControllerService extends Service{
     float camWidth, camHeight;
     int[] camViewSize = {240, 270, 300, 330, 360, 390, 420};
 
-    boolean hasZoom = false;
-
-
     private void calculateCameraSize(CameraSetting cameraProfile) {
         int factor;
         switch (cameraProfile.getSize()) {
@@ -545,14 +537,11 @@ public class ControllerService extends Service{
             mCameraWidth = mScreenHeight / factor;
         }
         mCameraHeight = mCameraWidth * 3 / 4;
-//        if (DEBUG) Log.i(TAG, "calculateCameraSize: " + mScreenWidth + "x" + mScreenHeight);
     }
 
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//        if (DEBUG) Log.i(TAG, "onConfigurationChanged: DETECTED" + newConfig.orientation);
         updateScreenSize();
 
         if (paramViewRoot != null) {
@@ -1003,11 +992,8 @@ public class ControllerService extends Service{
                 public void run() {
                     if (paramViewRoot.x == 0) mViewRoot.setX(-36);
                     if (paramViewRoot.x == mScreenWidth) mViewRoot.setX(36);
-//                    System.out.println("thanhlv mViewRoot.updateViewLayout= " + paramViewRoot.x);
                 }
             }, 1500);
-//            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
-
             timerHideFAB = 0;
             handlerTimerFAB.removeCallbacks(runnableFAB, null);
         }

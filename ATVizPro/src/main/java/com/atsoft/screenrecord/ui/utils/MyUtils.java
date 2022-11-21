@@ -209,7 +209,8 @@ public class MyUtils {
 
     @NonNull
     public static String getBaseStorageDirectory() {
-        File directory = new File(APP_DIRECTORY_PATH);
+//        File directory = new File(APP_DIRECTORY_PATH);
+        File directory = new File(App.getAppContext().getFilesDir(), "Projects");
         if (!directory.exists()) {
             boolean a = directory.mkdirs();
         }

@@ -87,7 +87,7 @@ public class SubscriptionFragment extends Fragment {
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
         YEARLY_ID = AppConfigs.getInstance().getSubsModel().get(2).getKeyID();
-        System.out.println("thanhlv WEEKLY_ID = "+ WEEKLY_ID);
+        System.out.println("thanhlv WEEKLY_ID = "+ YEARLY_ID);
     }
 
     private View mViewRoot;
@@ -173,7 +173,7 @@ public class SubscriptionFragment extends Fragment {
                 String id = product.getProductId();
                 String price = "";
                 if (product.getSubscriptionOfferDetails() != null)
-                    price = product.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList().get(0).getFormattedPrice();
+                    price = getPrice(product.getSubscriptionOfferDetails().get(0).getPricingPhases().getPricingPhaseList());
                 if (id.equals(subs.get(i).getKeyID())) {
                     if (i == 0) tvName1.setText(price + "/ " + subs.get(0).getName());
                     if (i == 1) tvName2.setText(price + "/ " + subs.get(1).getName());
@@ -183,6 +183,21 @@ public class SubscriptionFragment extends Fragment {
             }
         }
     }
+
+    private long maxPrice = -1;
+    private String formatPrice = "";
+    private String getPrice(List<ProductDetails.PricingPhase> pricingPhaseList) {
+        maxPrice = -1;
+        formatPrice = "";
+        for (ProductDetails.PricingPhase pricingPhase: pricingPhaseList) {
+            if (pricingPhase.getPriceAmountMicros() > maxPrice) {
+                maxPrice = pricingPhase.getPriceAmountMicros();
+                formatPrice = pricingPhase.getFormattedPrice();
+            }
+        }
+        return formatPrice;
+    }
+
 
     private void connectGooglePlayBilling() {
         billingClient.startConnection(new BillingClientStateListener() {

@@ -48,7 +48,6 @@ import com.atsoft.screenrecord.ui.services.recording.RecordingService.RecordingB
 import com.atsoft.screenrecord.ui.services.streaming.StreamingService;
 import com.atsoft.screenrecord.ui.services.streaming.StreamingService.StreamingBinder;
 import com.atsoft.screenrecord.ui.utils.CameraPreview;
-import com.atsoft.screenrecord.ui.utils.CustomOnScaleDetector;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.ui.utils.NotificationHelper;
 import com.atsoft.screenrecord.utils.CounterUtil;
@@ -86,7 +85,6 @@ public class ControllerService extends Service{
     private int mCameraWidth = 160, mCameraHeight = 120;
     private StreamProfile mStreamProfile;
     private int mMode;
-    private String videoFileEndRecord = "";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -95,7 +93,6 @@ public class ControllerService extends Service{
         String action = intent.getAction();
         if (action != null) {
             handleIncomeAction(intent);
-//            if (DEBUG) Log.i(TAG, "return START_REDELIVER_INTENT" + action);
             return START_NOT_STICKY;
         }
         return super.onStartCommand(intent, flags, startId);
@@ -109,17 +106,12 @@ public class ControllerService extends Service{
         switch (action) {
 
             case MyUtils.ACTION_START_LIVESTREAM_FROM_HOME:
-                System.out.println("thanhlv case MyUtils.ACTION_START_LIVESTREAM_FROM_HOME");
+            case MyUtils.ACTION_START_RECORDING_FROM_HOME:
                 handleStartRecording();
                 break;
             case MyUtils.ACTION_STOP_LIVESTREAM_FROM_HOME:
             case MyUtils.ACTION_STOP_RECORDING_FROM_HOME:
-                System.out.println("thanhlv case MyUtils.ACTION_STOP_RECORDING_FROM_HOME ACTION_STOP_LIVESTREAM_FROM_HOME");
                 onClickStop();
-                break;
-            case MyUtils.ACTION_START_RECORDING_FROM_HOME:
-                System.out.println("thanhlv case MyUtils.ACTION_START_RECORDING_FROM_HOME");
-                handleStartRecording();
                 break;
             case MyUtils.ACTION_DISCONNECT_LIVE_FROM_HOME:
                 onClickStop();
@@ -135,7 +127,6 @@ public class ControllerService extends Service{
                     toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                 break;
             case MyUtils.ACTION_INIT_CONTROLLER:
-                System.out.println("thanhlv case MyUtils.ACTION_INIT_CONTROLLER:");
                 mMode = intent.getIntExtra(MyUtils.KEY_CONTROLlER_MODE, MyUtils.MODE_RECORDING);
                 mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
                 if (mMode == MyUtils.MODE_STREAMING)
@@ -143,39 +134,19 @@ public class ControllerService extends Service{
                 boolean isCamera = intent.getBooleanExtra(MyUtils.KEY_CAMERA_AVAILABLE, false);
 
                 if (isCamera && mCamera == null) {
-//                    if (DEBUG) Log.i(TAG, "onStartCommand: before initCameraView");
                     initCameraView();
                 }
                 if (mScreenCaptureIntent == null) {
                     Log.i(TAG, "mScreenCaptureIntent is NULL");
                     stopService();
                 } else if (!mRecordingServiceBound) {
-//                    if (DEBUG) Log.i(TAG, "before run bindStreamService()" + action);
                     bindStreamingService();
                 }
-//                updateUI();
                 if (mMode == MyUtils.MODE_RECORDING) {
                     toggleView(mViewRoot, View.GONE);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            System.out.println("thanhlv case MyUtils.ACTION_INIT_CONTROLLER: ---> handleStartRecording");
-                            handleStartRecording();
-                        }
-                    }, 600);
+                    new Handler().postDelayed(this::handleStartRecording, 600);
                 }
                 break;
-
-//            case MyUtils.ACTION_UPDATE_SETTING:
-//                handleUpdateSetting(intent);
-//                break;
-//            case MyUtils.ACTION_UPDATE_TYPE_LIVE:
-//                updateUI();
-//                break;
-//            case MyUtils.ACTION_END_RECORD:
-//                videoFileEndRecord = intent.getStringExtra(KEY_PATH_VIDEO);
-//                break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
                     String url = intent.getStringExtra(MyUtils.NEW_URL);
@@ -234,7 +205,6 @@ public class ControllerService extends Service{
     }
 
     public ControllerService() {
-
     }
 
     @Override
@@ -252,28 +222,24 @@ public class ControllerService extends Service{
                 NotificationChannel chan = new NotificationChannel(NotificationHelper.CHANNEL_ID, NotificationHelper.CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
                 chan.setLightColor(Color.BLUE);
                 chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-
                 NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 assert manager != null;
                 manager.createNotificationChannel(chan);
-
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID);
                 Notification notification = notificationBuilder.setOngoing(true)
                         .setSmallIcon(R.drawable.ic_launcher_2_foreground)
-                        .setContentTitle("Screen Recorder is running in background")
+                        .setContentTitle("AT Record is running in background")
                         .setPriority(NotificationManager.IMPORTANCE_MIN)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build();
                 startForeground(2, notification);
             }
-
         }
         if (mViewRoot == null)
             initializeViews();
     }
 
     private void initParam() {
-//        if (DEBUG) Log.i(TAG, "initParam: ");
         int LAYOUT_FLAG;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -327,7 +293,6 @@ public class ControllerService extends Service{
     }
 
     private float cameraRatio;
-
     @SuppressLint({"ClickableViewAccessibility", "InflateParams"})
     private void initCameraView() {
         CameraSetting cameraProfile = SettingManager.getCameraProfile(getApplication());
@@ -340,8 +305,6 @@ public class ControllerService extends Service{
         else
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
-
-        System.out.println("thanhlv initCameraView");
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 
@@ -353,7 +316,6 @@ public class ControllerService extends Service{
         paramCam.x = 0;
         paramCam.y = DisplayUtil.getDeviceHeight() / 3;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
-        System.out.println("thanhlv initCameraView 222");
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mCameraLayout, paramCam);
@@ -371,6 +333,7 @@ public class ControllerService extends Service{
         if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
             toggleView(cameraPreview, View.GONE);
 
+        int camSize = 3;
         camWidth = camViewSize[camSize];  // ~270px
         camHeight = (float) (camWidth * cameraRatio);
 
@@ -493,9 +456,7 @@ public class ControllerService extends Service{
     private CountDownTimer countDownTimerMark;
 
     private void autoHideMark() {
-        System.out.println("thanhlv autoHideMarkautoHideMark ");
         if (countDownTimerMark == null) {
-            System.out.println("thanhlv autoHideMarkautoHideMark newwwwww ");
             mCameraLayoutMark.setVisibility(View.VISIBLE);
             countDownTimerMark = new CountDownTimer(3000, 1000) {
 
@@ -523,9 +484,6 @@ public class ControllerService extends Service{
     float camWidth, camHeight;
     int[] camViewSize = {240, 270, 300, 330, 360, 390, 420};
 
-    boolean hasZoom = false;
-
-
     private void calculateCameraSize(CameraSetting cameraProfile) {
         int factor;
         switch (cameraProfile.getSize()) {
@@ -545,14 +503,11 @@ public class ControllerService extends Service{
             mCameraWidth = mScreenHeight / factor;
         }
         mCameraHeight = mCameraWidth * 3 / 4;
-//        if (DEBUG) Log.i(TAG, "calculateCameraSize: " + mScreenWidth + "x" + mScreenHeight);
     }
 
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-//        super.onConfigurationChanged(newConfig);
-//        if (DEBUG) Log.i(TAG, "onConfigurationChanged: DETECTED" + newConfig.orientation);
         updateScreenSize();
 
         if (paramViewRoot != null) {
@@ -602,25 +557,18 @@ public class ControllerService extends Service{
         handlerTimerFAB.postDelayed(runnableFAB, 0);
     }
 
-    TextView tvTimer;
-    View mViewCountdown;
-
-    @SuppressLint("InflateParams")
+    private TextView tvTimer;
+    private View mViewCountdown;
+    @SuppressLint({"InflateParams", "ClickableViewAccessibility"})
     private void initializeViews() {
-//        if (DEBUG) Log.i(TAG, "StreamingControllerService: initializeViews()");
-
         mViewRoot = LayoutInflater.from(this).inflate(R.layout.layout_recording, null);
-
         mViewCountdown = LayoutInflater.from(this).inflate(R.layout.layout_countdown, null);
         mViewBlur = LayoutInflater.from(this).inflate(R.layout.layout_bg_fab, null);
-
         paramViewRoot.gravity = Gravity.CENTER_VERTICAL | Gravity.START;
         paramViewRoot.x = 0;
         paramViewRoot.y = 0;
-
         paramBlur.x = 0;
         paramBlur.y = 0;
-
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mViewCountdown, paramCountdown);
         mWindowManager.addView(mViewRoot, paramViewRoot);
@@ -629,9 +577,7 @@ public class ControllerService extends Service{
 
         mCountdownLayout = mViewCountdown.findViewById(R.id.countdown_container);
         mTvCountdown = mViewCountdown.findViewById(R.id.tvCountDown);
-
         toggleView(mCountdownLayout, View.GONE);
-
         mImgRec = mViewRoot.findViewById(R.id.imgRec);
         tvTimer = mViewRoot.findViewById(R.id.tvTimer);
         mImgCapture = mViewRoot.findViewById(R.id.imgCapture);
@@ -643,11 +589,9 @@ public class ControllerService extends Service{
         toggleView(tvTimer, View.GONE);
         toggleNavigationButton(View.GONE);
 
-
         mImgCapture.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-//                MyUtils.toast(getApplicationContext(), "Capture clicked", Toast.LENGTH_SHORT);
                 toggleNavigationButton(View.GONE);
                 if (mCameraLayout.getVisibility() == View.GONE) {
                     toggleView(mCameraLayout, View.VISIBLE);
@@ -691,7 +635,6 @@ public class ControllerService extends Service{
                 if (mMode == MyUtils.MODE_STREAMING) {
                     goShowPopupConfirmClose();
                 } else onClickClose(false);
-
             }
         });
 
@@ -700,7 +643,7 @@ public class ControllerService extends Service{
             private int initialY;
             private float initialTouchX;
             private float initialTouchY;
-
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -725,14 +668,10 @@ public class ControllerService extends Service{
                         if (event.getRawY() > mScreenHeight - 40) {
                             paramViewRoot.y = initialY + (int) (mScreenHeight - 40 - initialTouchY);
                         }
-
                         //Update the layout with new X & Y coordinate
                         mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
-
-
                         int Xdiff = (int) (event.getRawX() - initialTouchX);
                         int Ydiff = (int) (event.getRawY() - initialTouchY);
-
                         //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
                         //So that is click event.
                         if (Xdiff < 10 && Ydiff < 10) {
@@ -753,31 +692,23 @@ public class ControllerService extends Service{
                         mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
                         return true;
                 }
-
                 return false;
             }
         });
 
-        mViewBlur.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (!isViewCollapsed()) {
-                            toggleNavigationButton(View.GONE);
-                        }
-                        return true;
-                }
-                return false;
-            }
-        });
-
-        mViewRoot.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus)
+        mViewBlur.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (!isViewCollapsed()) {
                     toggleNavigationButton(View.GONE);
+                }
+                return true;
             }
+            return false;
+        });
+
+        mViewRoot.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus)
+                toggleNavigationButton(View.GONE);
         });
     }
 
@@ -786,25 +717,18 @@ public class ControllerService extends Service{
         clickStart = true;
         clickStop = false;
         if (mRecordingServiceBound) {
-
             toggleView(mCountdownLayout, View.VISIBLE);
-
             int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
-
             new CountDownTimer(countdown, 1000) {
-
                 @SuppressLint("DefaultLocale")
                 public void onTick(long millisUntilFinished) {
                     toggleView(mViewRoot, View.GONE);
                     mTvCountdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
                 }
-
                 public void onFinish() {
                     toggleView(mCountdownLayout, View.GONE);
-
                     toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                     mRecordingStarted = true;
-
                     if (mMode == MyUtils.MODE_RECORDING) { //mode Recording
                         if (mService == null) return;
                         mService.startPerformService();
@@ -812,12 +736,7 @@ public class ControllerService extends Service{
                         toggleView(tvTimer, View.VISIBLE);
                         MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_RECORDING_STARTED);
                         CounterUtil counterUtil = CounterUtil.getInstance();
-                        counterUtil.setCallback(new CounterUtil.ICounterUtil() {
-                            @Override
-                            public void onTickString(String sec) {
-                                tvTimer.setText(sec);
-                            }
-                        });
+                        counterUtil.setCallback((CounterUtil.ICounterUtil) sec -> tvTimer.setText(sec));
                         counterUtil.startCounter();
                     } else { //mode livestream
                         if (mService == null) return;
@@ -826,18 +745,11 @@ public class ControllerService extends Service{
                         toggleView(tvTimer, View.VISIBLE);
                         MyUtils.sendBroadCastMessageFromService(getApplicationContext(), NOTIFY_MSG_LIVESTREAM_STARTED);
                         CounterUtil counterUtil = CounterUtil.getInstance();
-                        counterUtil.setCallback(new CounterUtil.ICounterUtil() {
-                            @Override
-                            public void onTickString(String sec) {
-                                tvTimer.setText(sec);
-                            }
-                        });
+                        counterUtil.setCallback((CounterUtil.ICounterUtil) sec -> tvTimer.setText(sec));
                         counterUtil.startCounter();
                     }
-
                 }
             }.start();
-
         } else {
             mRecordingStarted = false;
             MyUtils.toast(getApplicationContext(), "Recording Service connection has not been established", Toast.LENGTH_LONG);
@@ -859,14 +771,14 @@ public class ControllerService extends Service{
         App.ignoreOpenAd = true;
         Intent intent = new Intent(getApplicationContext(), TranslucentActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        String videoFileEndRecord = "";
         intent.putExtra(KEY_PATH_VIDEO, videoFileEndRecord);
         intent.setAction(MyUtils.ACTION_SHOW_POPUP_CONFIRM);
         startActivity(intent);
     }
 
-
-    boolean clickStop = false;
-    boolean clickStart = false;
+    private boolean clickStop = false;
+    private boolean clickStart = false;
 
     private void onClickStop() {
         toggleNavigationButton(View.GONE);
@@ -927,11 +839,10 @@ public class ControllerService extends Service{
     }
 
     private void bindStreamingService() {
-//        if (DEBUG) Log.i(TAG, "Controller: bindService()");
         Intent service;
         if (mMode == MyUtils.MODE_STREAMING) {
             if (mStreamProfile == null)
-                throw new RuntimeException("Streaming proflie is null");
+                throw new RuntimeException("Streaming profile is null");
 
             service = new Intent(getApplicationContext(), StreamingService.class);
             Bundle bundle = new Bundle();
@@ -957,12 +868,9 @@ public class ControllerService extends Service{
                 binder = (StreamingBinder) service;
                 mService = ((StreamingBinder) binder).getService();
                 mService.openPerformService();
-//                MyUtils.toast(getApplicationContext(), "Livestream service connected", Toast.LENGTH_SHORT);
             } else {
                 binder = (RecordingBinder) service;
                 mService = ((RecordingBinder) binder).getService();
-//                handleStartRecording();
-//                MyUtils.toast(getApplicationContext(), "Recording service connected", Toast.LENGTH_SHORT);
             }
             mRecordingServiceBound = true;
         }
@@ -998,16 +906,10 @@ public class ControllerService extends Service{
             mViewRoot.setPadding(40, 40, 40, 40);
         } else {
             mViewRoot.setPadding(0, 0, 0, 0);
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (paramViewRoot.x == 0) mViewRoot.setX(-36);
-                    if (paramViewRoot.x == mScreenWidth) mViewRoot.setX(36);
-//                    System.out.println("thanhlv mViewRoot.updateViewLayout= " + paramViewRoot.x);
-                }
+            new Handler().postDelayed(() -> {
+                if (paramViewRoot.x == 0) mViewRoot.setX(-30);
+                if (paramViewRoot.x == mScreenWidth) mViewRoot.setX(30);
             }, 1500);
-//            System.out.println("thanhlv mViewRoot.setPadding(0, 0, 0, 0); " + paramViewRoot.x);
-
             timerHideFAB = 0;
             handlerTimerFAB.removeCallbacks(runnableFAB, null);
         }
@@ -1047,7 +949,5 @@ public class ControllerService extends Service{
             mService.stopSelf();
             mRecordingServiceBound = false;
         }
-
     }
-    private int camSize = 3;
 }

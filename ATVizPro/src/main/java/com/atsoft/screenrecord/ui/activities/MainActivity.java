@@ -32,6 +32,7 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -50,6 +51,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.atsoft.screenrecord.App;
+import com.atsoft.screenrecord.BuildConfig;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
@@ -98,7 +100,6 @@ public class MainActivity extends BaseFragmentActivity {
     private static final int PERMISSION_REQUEST_CODE = 3004;
     private static final int PERMISSION_DRAW_OVER_WINDOW = 3005;
     private static final int PERMISSION_RECORD_DISPLAY = 3006;
-    private static final int PERMISSION_ACCESS_ALL_FILE = 3007;
     public static final String KEY_PATH_VIDEO = "key_video_selected_path";
     public static final String KEY_VIDEO_NAME = "key_video_selected_name";
     public static final String KEY_FROM_FUNCTION = "key_from_code";
@@ -411,14 +412,6 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     public boolean hasAllPermissionForEdit() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            if (!Environment.isExternalStorageManager()) {
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-//                App.ignoreOpenAd = true;
-//                return false;
-//            } else return true;
-//        } else {
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
                 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -580,37 +573,18 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void showMyRecordings(int fromFunction) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            if (!Environment.isExternalStorageManager()) {
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-//                App.ignoreOpenAd = true;
-//                return;
-//            }
-//        }
-//        if (hasAllPermissionForEdit()) {
             Intent intent = new Intent(this, ProjectsActivity.class);
             intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
             startActivity(intent);
-//        }
+
     }
 
     private void showMyRecordings(int fromFunction, String navigate, String videoPath) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//            if (!Environment.isExternalStorageManager()) {
-//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-//                startActivityForResult(intent, PERMISSION_ACCESS_ALL_FILE);
-//                App.ignoreOpenAd = true;
-//                return;
-//            }
-//        }
-//        if (hasAllPermissionForEdit()) {
             Intent intent = new Intent(this, ProjectsActivity.class);
             intent.setAction(navigate);
             intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
             intent.putExtra(KEY_PATH_VIDEO, videoPath);
             startActivity(intent);
-//        }
     }
 
     public void showDialogPickFromGallery(int from_code) {
@@ -744,7 +718,7 @@ public class MainActivity extends BaseFragmentActivity {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Second Chance");
             alertDialogBuilder
-                    .setMessage("Click RETRY to Set Permissions to Allow\n\n" + "Click EXIT to the Close App")
+                    .setMessage("Click RETRY to Set Permissions to Allow\n\n")
                     .setCancelable(true)
                     .setPositiveButton("RETRY", (dialog, id) -> {
                         Intent i = new Intent(MainActivity.this, MainActivity.class);
@@ -752,7 +726,7 @@ public class MainActivity extends BaseFragmentActivity {
                         startActivity(i);
                         App.ignoreOpenAd = true;
                     })
-                    .setNegativeButton("EXIT", (dialog, id) -> {
+                    .setNegativeButton("CANCEL", (dialog, id) -> {
                         dialog.cancel();
                     });
             AlertDialog alertDialog = alertDialogBuilder.create();
@@ -829,11 +803,7 @@ public class MainActivity extends BaseFragmentActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // do your work here
-                    if (fromFunction != REQUEST_SHOW_PROJECTS_DEFAULT) {
-                        showDialogPickVideo(fromFunction);
-                    } else {
-                        showMyRecordings(REQUEST_SHOW_PROJECTS_DEFAULT);
-                    }
+                    showDialogPickVideo(fromFunction);
                 } else if (!shouldShowRequestPermissionRationale(permissions[0])
                         || !shouldShowRequestPermissionRationale(permissions[1])) {
                     // User selected the Never Ask Again Option Change settings in app settings manually
@@ -975,21 +945,6 @@ public class MainActivity extends BaseFragmentActivity {
                 startActivity(intent);
             }
         }
-
-//        if (requestCode == PERMISSION_ACCESS_ALL_FILE) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-//                //Check if the permission is granted or not.
-//                if (!Environment.isExternalStorageManager()) { //Permission is not available
-//                    MyUtils.showSnackBarNotification(mImgRec, "Manager files permission not available.", Snackbar.LENGTH_SHORT);
-//                } else {
-//                    if (fromFunction == REQUEST_VIDEO_FOR_VIDEO_EDIT && !video_input.contains(".")) {
-//                        showDialogPickVideo(fromFunction);
-//                    } else {
-//                        showMyRecordings(fromFunction, navigate_to, video_input);
-//                    }
-//                }
-//            }
-//        }
 
         if (requestCode == PERMISSION_DRAW_OVER_WINDOW) {
             //Check if the permission is granted or not.

@@ -105,9 +105,8 @@
 
         <activity
             android:name="com.atsoft.screenrecord.ui.activities.PopUpResultVideoTranslucentActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Transparent"
-            tools:ignore="LockedOrientationActivity" />
+            android:screenOrientation="behind"
+            android:theme="@style/Theme.Transparent"/>
 
         <service
             android:name="com.atsoft.screenrecord.ui.services.BaseService"

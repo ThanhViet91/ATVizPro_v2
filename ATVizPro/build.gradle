@@ -7,7 +7,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file('D:\\ATSoft\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
+            storeFile file('D:\\Repo v2\\ATVizPro_v3\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
             storePassword 'recorder'
             keyAlias 'recorder'
             keyPassword 'recorder'

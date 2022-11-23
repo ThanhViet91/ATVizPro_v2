@@ -98,7 +98,7 @@ public class RTMPLiveAddressFragment extends Fragment {
     }
 
     private int type;
-    private String mRTMP, mStreamKey;
+    private String mRTMP = "", mStreamKey = "";
 
     public void setSocialType(int type) {
         this.type = type;

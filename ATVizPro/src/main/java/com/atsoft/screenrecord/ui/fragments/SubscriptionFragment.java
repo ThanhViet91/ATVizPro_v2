@@ -49,6 +49,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -82,7 +84,7 @@ public class SubscriptionFragment extends Fragment {
         mFragmentManager = getParentFragmentManager();
 
         subs = new ArrayList<>(AppConfigs.getInstance().getSubsModel());
-        subs.sort((t, t1) -> t.getSort() < t1.getSort() ? 1 : 0);
+        Collections.sort(subs, (t, t1) -> t.getSort() < t1.getSort() ? 1 : 0);
 
         WEEKLY_ID = AppConfigs.getInstance().getSubsModel().get(0).getKeyID();
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();

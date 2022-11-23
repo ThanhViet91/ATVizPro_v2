@@ -573,18 +573,18 @@ public class MainActivity extends BaseFragmentActivity {
     }
 
     private void showMyRecordings(int fromFunction) {
-            Intent intent = new Intent(this, ProjectsActivity.class);
-            intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
-            startActivity(intent);
+        Intent intent = new Intent(this, ProjectsActivity.class);
+        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
+        startActivity(intent);
 
     }
 
     private void showMyRecordings(int fromFunction, String navigate, String videoPath) {
-            Intent intent = new Intent(this, ProjectsActivity.class);
-            intent.setAction(navigate);
-            intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
-            intent.putExtra(KEY_PATH_VIDEO, videoPath);
-            startActivity(intent);
+        Intent intent = new Intent(this, ProjectsActivity.class);
+        intent.setAction(navigate);
+        intent.putExtra(KEY_FROM_FUNCTION, fromFunction);
+        intent.putExtra(KEY_PATH_VIDEO, videoPath);
+        startActivity(intent);
     }
 
     public void showDialogPickFromGallery(int from_code) {
@@ -726,9 +726,7 @@ public class MainActivity extends BaseFragmentActivity {
                         startActivity(i);
                         App.ignoreOpenAd = true;
                     })
-                    .setNegativeButton("CANCEL", (dialog, id) -> {
-                        dialog.cancel();
-                    });
+                    .setNegativeButton("CANCEL", (dialog, id) -> dialog.cancel());
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
@@ -753,67 +751,80 @@ public class MainActivity extends BaseFragmentActivity {
                 }
                 break;
             case 666: // Allowed was selected so Permission granted for React
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
-                    // do your work here
-                    showDialogPickVideo(fromFunction);
-                } else if (!shouldShowRequestPermissionRationale(permissions[0])
-                        || !shouldShowRequestPermissionRationale(permissions[1])
-                        || !shouldShowRequestPermissionRationale(permissions[2])
-                        || !shouldShowRequestPermissionRationale(permissions[3])) {
-                    // User selected the Never Ask Again Option Change settings in app settings manually
-                    showPopupGo2DeviceSettings(1);
-                } else {
-                    // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
-                    if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                        showPopupGo2DeviceSettings(2);
+                try {
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[2] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[3] == PackageManager.PERMISSION_GRANTED) {
+                        // do your work here
+                        showDialogPickVideo(fromFunction);
+                    } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                            || !shouldShowRequestPermissionRationale(permissions[1])
+                            || !shouldShowRequestPermissionRationale(permissions[2])
+                            || !shouldShowRequestPermissionRationale(permissions[3])) {
+                        // User selected the Never Ask Again Option Change settings in app settings manually
+                        showPopupGo2DeviceSettings(1);
+                    } else {
+                        // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
+                        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            showPopupGo2DeviceSettings(2);
+                        }
                     }
+                } catch (Exception ignored) {
+
                 }
+
                 break;
 
             case 888: // Allowed was selected so Permission granted for Commentary
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-                    // do your work here
-                    showDialogPickVideo(fromFunction);
-                } else if (!shouldShowRequestPermissionRationale(permissions[0])
-                        || !shouldShowRequestPermissionRationale(permissions[1])
-                        || !shouldShowRequestPermissionRationale(permissions[2])) {
-                    // User selected the Never Ask Again Option Change settings in app settings manually
-                    showPopupGo2DeviceSettings(1);
-                } else {
-                    // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
-                    if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                        showPopupGo2DeviceSettings(2);
+                try {
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
+                        // do your work here
+                        showDialogPickVideo(fromFunction);
+                    } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                            || !shouldShowRequestPermissionRationale(permissions[1])
+                            || !shouldShowRequestPermissionRationale(permissions[2])) {
+                        // User selected the Never Ask Again Option Change settings in app settings manually
+                        showPopupGo2DeviceSettings(1);
+                    } else {
+                        // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
+                        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            showPopupGo2DeviceSettings(2);
+                        }
                     }
+                } catch (Exception ignored) {
+
                 }
                 break;
             case 777: // Allowed was selected so Permission granted for Edit
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    // do your work here
-                    showDialogPickVideo(fromFunction);
-                } else if (!shouldShowRequestPermissionRationale(permissions[0])
-                        || !shouldShowRequestPermissionRationale(permissions[1])) {
-                    // User selected the Never Ask Again Option Change settings in app settings manually
-                    showPopupGo2DeviceSettings(1);
-                } else {
-                    // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
-                    if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                            || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                        showPopupGo2DeviceSettings(2);
+                try {
+                    if (grantResults.length > 0
+                            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                        // do your work here
+                        showDialogPickVideo(fromFunction);
+                    } else if (!shouldShowRequestPermissionRationale(permissions[0])
+                            || !shouldShowRequestPermissionRationale(permissions[1])) {
+                        // User selected the Never Ask Again Option Change settings in app settings manually
+                        showPopupGo2DeviceSettings(1);
+                    } else {
+                        // User selected Deny Dialog to EXIT App ==> OR <== RETRY to have a second chance to Allow Permissions
+                        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                                || checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                            showPopupGo2DeviceSettings(2);
+                        }
                     }
+                } catch (Exception ignored) {
+
                 }
                 break;
         }

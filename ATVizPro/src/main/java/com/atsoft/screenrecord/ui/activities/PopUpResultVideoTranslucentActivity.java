@@ -7,6 +7,7 @@ import static com.atsoft.screenrecord.ui.utils.MyUtils.ACTION_GO_TO_PLAY;
 import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -33,6 +34,9 @@ public class PopUpResultVideoTranslucentActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (android.os.Build.VERSION.SDK_INT != Build.VERSION_CODES.O) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
         setContentView(R.layout.popup_result_video_layout);
         Intent intent = getIntent();
         if (intent != null) {

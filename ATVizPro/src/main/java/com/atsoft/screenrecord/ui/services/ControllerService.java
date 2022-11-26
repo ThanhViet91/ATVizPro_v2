@@ -144,7 +144,7 @@ public class ControllerService extends Service{
                 }
                 if (mMode == MyUtils.MODE_RECORDING) {
                     toggleView(mViewRoot, View.GONE);
-                    new Handler().postDelayed(this::handleStartRecording, 600);
+                    new Handler().postDelayed(this::handleStartRecording, 700);
                 }
                 break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
@@ -300,10 +300,10 @@ public class ControllerService extends Service{
         mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
         mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
 
-        if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_BACK))
-            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-        else
-            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+//        if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_BACK))
+//            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+//        else
+        mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);

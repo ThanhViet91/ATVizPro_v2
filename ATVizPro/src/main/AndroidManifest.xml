@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission
@@ -118,14 +120,14 @@
             android:name="com.atsoft.screenrecord.ui.services.recording.RecordingService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection|location|camera|microphone"
+            android:foregroundServiceType="mediaProjection"
             android:stopWithTask="true" />
 
         <service android:name="com.atsoft.screenrecord.ui.services.streaming.StreamingService" />
 
         <service
             android:name="com.atsoft.screenrecord.ui.services.ControllerService"
-            android:foregroundServiceType="mediaProjection|location|camera|microphone" />
+            android:foregroundServiceType="mediaProjection" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

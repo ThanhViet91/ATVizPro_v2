@@ -210,7 +210,11 @@ public class MediaMuxerWrapper {
     /*package*/
     public synchronized void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
         if (mStatredCount > 0)
-            mMediaMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
+            try {
+                mMediaMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
+            } catch (Exception ignored) {
+
+            }
     }
 
 //**********************************************************************

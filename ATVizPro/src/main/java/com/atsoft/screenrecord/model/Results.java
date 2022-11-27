@@ -38,7 +38,6 @@ public class Results {
                 timeInMilliseconds = mDate.getTime();
             } else
                 return System.currentTimeMillis();
-//            System.out.println("thanhlv getDateTimeMs in milli :: " + timeInMilliseconds);
         } catch (ParseException e) {
             e.printStackTrace();
 

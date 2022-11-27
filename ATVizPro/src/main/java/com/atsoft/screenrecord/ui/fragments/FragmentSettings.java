@@ -11,7 +11,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +33,7 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
+import com.atsoft.screenrecord.App;
 import com.atsoft.screenrecord.AppConfigs;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
@@ -48,7 +48,6 @@ import com.atsoft.screenrecord.utils.RetrofitClient;
 import com.google.common.collect.ImmutableList;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -156,12 +155,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (mProgressDialog != null) mProgressDialog.dismiss();
-                    }
-                });
+                    if (mProgressDialog != null) mProgressDialog.dismiss();
             }
 
             @Override
@@ -172,19 +166,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                requireActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (mProgressDialog != null) mProgressDialog.dismiss();
-                                    }
-                                });
+                                    if (mProgressDialog != null) mProgressDialog.dismiss();
+
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     if (purchasesHistoryList != null)
                                         mPurchasesHistoryList = new ArrayList<>(purchasesHistoryList);
                                     try {
                                         getPublicTime();
                                     } catch (Exception e) {
-//                                        e.printStackTrace();
                                         requireActivity().runOnUiThread(() -> checkPurchase(mPurchasesHistoryList, System.currentTimeMillis()));
                                     }
                                 } else {
@@ -206,6 +195,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     }
 
     private void showPopup(String title, String des) {
+        if (getContext() == null) return;
         new AlertDialog.Builder(requireContext())
                 .setTitle(title)
                 .setMessage(des)
@@ -220,9 +210,8 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
 
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
-            SettingManager2.setProApp(requireContext(), false);
+            SettingManager2.setProApp(App.getAppContext(), false);
             showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
-//            if (adapter != null) adapter.notifyDataSetChanged();
             if (mAdManager != null) mAdManager.loadBanner();
             return;
         }
@@ -233,10 +222,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                 hasId = true;
                 if ((currentTime - item.getPurchaseTime()) / 1000 > 7 * 24 * 60 * 60) {
                     // qua han
-                    SettingManager2.setProApp(requireContext(), false);
+                    SettingManager2.setProApp(App.getAppContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
-                    SettingManager2.setProApp(requireContext(), true);
+                    SettingManager2.setProApp(App.getAppContext(), true);
                     showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
@@ -245,12 +234,12 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
             }
             if (item.getProducts().get(0).contains(AppConfigs.getInstance().getSubsModel().get(1).getKeyID())) {
                 hasId = true;
-                if ((currentTime - item.getPurchaseTime()) / 1000 > 2592000) {
+                if ((currentTime - item.getPurchaseTime()) / 1000 > 30 * 24 * 60 * 60) {
                     // qua han
-                    SettingManager2.setProApp(requireContext(), false);
+                    SettingManager2.setProApp(App.getAppContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
-                    SettingManager2.setProApp(requireContext(), true);
+                    SettingManager2.setProApp(App.getAppContext(), true);
                     showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
@@ -261,10 +250,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                 hasId = true;
                 if ((currentTime - item.getPurchaseTime()) / 1000 > 365 * 24 * 60 * 60) {
                     // qua han
-                    SettingManager2.setProApp(requireContext(), false);
+                    SettingManager2.setProApp(App.getAppContext(), false);
                     showPopup("Restore Failed!", "Your subscription has expired, please upgrade to proversion!");
                 } else {
-                    SettingManager2.setProApp(requireContext(), true);
+                    SettingManager2.setProApp(App.getAppContext(), true);
                     showPopup("Restore Successfully!", "You've successfully restored your purchase!");
                     if (adapter != null) adapter.notifyDataSetChanged();
                     if (mAdManager != null) mAdManager.loadBanner();
@@ -274,14 +263,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         }
         if (!hasId) {
-            SettingManager2.setProApp(requireContext(), false);
+            SettingManager2.setProApp(App.getAppContext(), false);
             showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");
         }
         if (adapter != null) adapter.notifyDataSetChanged();
         if (mAdManager != null) mAdManager.loadBanner();
     }
 
-    public void getPublicTime() throws JSONException {
+    public void getPublicTime() {
         String tz = TimeZone.getDefault().getID();
         Call<Results> call = RetrofitClient.getInstance().getMyApi().getTimeZone(tz);
         call.enqueue(new Callback<Results>() {
@@ -305,7 +294,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     public void onClickItem(String code) {
 
         if (code.equals(getString(R.string.upgrade_to_pro))) {
-            System.out.println("thanhlv upgrade_to_pro");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new SubscriptionFragment())
                     .addToBackStack("")
@@ -313,12 +301,10 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
         if (code.equals(getString(R.string.restore_purchase))) {
             buildDialog();
-            System.out.println("thanhlv restore_purchase");
             getPurchaseHistory();
         }
 
         if (code.equals(getString(R.string.share_app_to_friends))) {
-            System.out.println("thanhlv share_app_to_friends");
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
                     AppConfigs.getInstance().getConfigModel().getShareText());
@@ -328,7 +314,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
 
         if (code.equals(getString(R.string.how_to_record_your_screen))) {
-            System.out.println("thanhlv how_to_record_your_screen");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new GuidelineScreenRecordFragment(true))
                     .addToBackStack("")
@@ -336,7 +321,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
 
         if (code.equals(getString(R.string.how_to_livestream))) {
-            System.out.println("thanhlv how_to_livestream");
             mFragmentManager.beginTransaction()
                     .replace(R.id.frame_layout_fragment, new GuidelineLiveStreamFragment(true))
                     .addToBackStack("")
@@ -345,16 +329,14 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
         if (code.equals(getString(R.string.floating_button))) {
             mActivity.sendActionToService(ACTION_UPDATE_SHOW_HIDE_FAB);
-//            System.out.println("thanhlv floating_button " + SettingManager2.isEnableFAB(requireContext()));
         }
 
         if (code.equals(getString(R.string.contact_us))) {
-            System.out.println("thanhlv contact_us");
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
             intent.putExtra(Intent.EXTRA_EMAIL, new String[]{AppConfigs.getInstance().getConfigModel().getFeedbackEmail()});
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Hi ATSoft");
-            intent.putExtra(Intent.EXTRA_TEXT, "Hi ATSoft,\n");
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+            intent.putExtra(Intent.EXTRA_TEXT, "Enter text,\n");
             try {
                 startActivity(Intent.createChooser(intent, "Send mail"));
             } catch (android.content.ActivityNotFoundException e) {
@@ -363,11 +345,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         }
 
         if (code.equals(getString(R.string.support_us_by_rating_our_app))) {
-            System.out.println("thanhlv support_us_by_rating_our_app");
-//            String url = "https://play.google.com/store/apps/developer?id=Zzic&hl=vi&gl=US";
-//            Intent i = new Intent(Intent.ACTION_VIEW);
-//            i.setData(Uri.parse(url));
-//            startActivity(i);
             rateApp();
         }
 
@@ -387,12 +364,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
     private Intent rateIntentForUrl(String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("%s?id=%s", url, requireContext().getPackageName())));
         int flags = Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
-        if (Build.VERSION.SDK_INT >= 21) {
-            flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
-        } else {
-            //noinspection deprecation
-            flags |= Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
-        }
+        flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
         intent.addFlags(flags);
         return intent;
     }

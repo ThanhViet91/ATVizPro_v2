@@ -300,9 +300,6 @@ public class ControllerService extends Service{
         mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
         mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
 
-//        if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_BACK))
-//            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-//        else
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);

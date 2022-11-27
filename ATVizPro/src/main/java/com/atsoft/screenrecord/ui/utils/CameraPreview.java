@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -43,15 +42,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
-        System.out.println("thanhlv onConfigurationChanged");
         refreshCamera(mCamera);
         isFirstTime = false;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        System.out.println("thanhlv surfaceCreated");
         try {
             // create the surface and start camera preview
             if (mCamera == null) {
@@ -60,7 +56,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             }
         }
         catch (IOException e){
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
         }
     }
 
@@ -70,7 +65,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
-        System.out.println("thanhlv surfaceChanged");
         refreshCamera(mCamera);
     }
 
@@ -78,7 +72,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
 //        if(mCamera!=null)
 //            mCamera.release();
-        System.out.println("thanhlv surfaceDestroyed");
         isFirstTime = false;
     }
 
@@ -105,7 +98,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
         } catch (Exception e) {
-            Log.d(VIEW_LOG_TAG, "Error starting camera preview: " + e.getMessage());
+//            Log.d(VIEW_LOG_TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 

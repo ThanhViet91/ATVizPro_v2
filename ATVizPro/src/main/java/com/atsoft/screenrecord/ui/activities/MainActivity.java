@@ -32,7 +32,6 @@ import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -46,12 +45,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.atsoft.screenrecord.App;
-import com.atsoft.screenrecord.BuildConfig;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
@@ -89,7 +88,7 @@ import java.util.Date;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-public class MainActivity extends BaseFragmentActivity {
+public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;

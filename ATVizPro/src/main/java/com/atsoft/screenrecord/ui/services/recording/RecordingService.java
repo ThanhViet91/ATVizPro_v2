@@ -121,6 +121,11 @@ public class RecordingService extends BaseService {
         synchronized (sSync) {
             if (mMuxer == null) {
                 getScreenSize();
+                try {
+                    sSync.wait(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
                 DisplayManager dm = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
                 Display defaultDisplay;
@@ -180,15 +185,12 @@ public class RecordingService extends BaseService {
                 mCurrentVideoSetting.setOutputPath(outputFile);
                 mMuxer.stopRecording();
                 mMuxer = null;
-//                System.out.println("thanhlv stopRecording 1" + outputFile);
                 try {
                     sSync.wait(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-//                System.out.println("thanhlv stopRecording 2" + outputFile);
                 showResultActivity(outputFile);
-
             }
         }
         return mCurrentVideoSetting;

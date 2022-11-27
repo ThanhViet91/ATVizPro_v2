@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -212,7 +210,6 @@ public class SubscriptionFragment extends Fragment {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
@@ -249,7 +246,6 @@ public class SubscriptionFragment extends Fragment {
     TextView tvRestore;
 
     @SuppressLint("SetTextI18n")
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -381,8 +377,7 @@ public class SubscriptionFragment extends Fragment {
     }
 
 
-    private BillingClient billingClient, billingClient2;
-    private ArrayList<ProductDetails> mProductDetailsList;
+    private BillingClient billingClient;
     ProductDetails productDetail;
 
     void launchPurchaseFlow(int sub) {

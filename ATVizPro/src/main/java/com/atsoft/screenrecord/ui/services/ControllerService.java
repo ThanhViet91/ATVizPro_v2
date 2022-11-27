@@ -301,7 +301,11 @@ public class ControllerService extends Service{
         mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
 
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
+        try {
+            cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
+        } catch (Exception e) {
+            cameraRatio = 16/9f;
+        }
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 

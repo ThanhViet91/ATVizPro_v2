@@ -1,7 +1,6 @@
 package com.atsoft.screenrecord.ui.services.recording;
 
 import static com.atsoft.screenrecord.ui.services.ExecuteService.KEY_VIDEO_PATH;
-import static com.atsoft.screenrecord.ui.utils.MyUtils.DEBUG;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -89,10 +88,8 @@ public class RecordingService extends BaseService {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "RecordingService: onBind()");
         mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
-        Log.i(TAG, "onBind: " + mScreenCaptureIntent);
 
         return mIBinder;
     }
@@ -103,7 +100,6 @@ public class RecordingService extends BaseService {
 
     @Override
     public void startPerformService() {
-        Log.i(TAG, "startPerformService: from RecordingService");
         startRecording();
     }
 
@@ -138,8 +134,6 @@ public class RecordingService extends BaseService {
                     throw new RuntimeException("No display found.");
                 }
 
-
-                if (DEBUG) Log.i(TAG, "startStreaming:");
                 try {
                     mMuxer = new MediaMuxerWrapper(this, ".mp4");    // if you record audio only, ".m4a" is also OK.
 
@@ -149,8 +143,7 @@ public class RecordingService extends BaseService {
 
                     mMuxer.prepare();
                     mMuxer.startRecording();
-                } catch (final IOException e) {
-                    Log.e(TAG, "startScreenRecord:", e);
+                } catch (final IOException ignored) {
                 }
             }
         }
@@ -176,9 +169,7 @@ public class RecordingService extends BaseService {
 
     //Return output file
     public VideoSetting2 stopRecording() {
-        if (DEBUG) Log.v(TAG, "stopStreaming:mMuxer=" + mMuxer);
-
-        String outputFile = "";
+        String outputFile;
         synchronized (sSync) {
             if (mMuxer != null) {
                 outputFile = mMuxer.getOutputPath();
@@ -209,7 +200,6 @@ public class RecordingService extends BaseService {
     }
 
     public void insertVideoToGallery() {
-        Log.i(TAG, "insertVideoToGallery: ");
         String outputFile = mResultVideo.getOutputPath();
         if (TextUtils.isEmpty(outputFile))
             return;
@@ -233,12 +223,10 @@ public class RecordingService extends BaseService {
     private static final MediaEncoder.MediaEncoderListener mMediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
         @Override
         public void onPrepared(final MediaEncoder encoder) {
-            if (DEBUG) Log.i(TAG, "onPrepared:encoder=" + encoder);
         }
 
         @Override
         public void onStopped(final MediaEncoder encoder) {
-            if (DEBUG) Log.i(TAG, "onStopped:encoder=" + encoder);
         }
     };
 }

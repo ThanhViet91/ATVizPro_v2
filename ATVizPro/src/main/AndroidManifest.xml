@@ -101,7 +101,7 @@
 
         <activity
             android:name="com.atsoft.screenrecord.ui.activities.TranslucentActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="behind"
             android:theme="@style/Theme.Transparent"
             tools:ignore="LockedOrientationActivity" />
 
@@ -134,8 +134,7 @@
             android:value="@string/admob_sdk_id" />
 
         <service
-            android:name="com.atsoft.screenrecord.ui.services.ExecuteService"
-            android:foregroundServiceType="mediaProjection|location|camera|microphone" />
+            android:name="com.atsoft.screenrecord.ui.services.ExecuteService" />
 
     </application>
 

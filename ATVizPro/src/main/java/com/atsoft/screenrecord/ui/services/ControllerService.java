@@ -300,7 +300,11 @@ public class ControllerService extends Service{
         mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
         mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
 
-        mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        try {
+            mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        } catch (RuntimeException e) {
+            MyUtils.toast(getApplicationContext(), "Camera failed to open.", Toast.LENGTH_SHORT);
+        }
         try {
             cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
         } catch (Exception e) {

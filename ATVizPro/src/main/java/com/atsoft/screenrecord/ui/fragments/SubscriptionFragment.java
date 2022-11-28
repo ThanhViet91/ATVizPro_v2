@@ -38,7 +38,6 @@ import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
 import com.atsoft.screenrecord.model.Results;
 import com.atsoft.screenrecord.model.SubscriptionsItemModel;
-import com.atsoft.screenrecord.ui.utils.NetworkUtils;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.atsoft.screenrecord.utils.RetrofitClient;
 import com.google.common.collect.ImmutableList;
@@ -85,8 +84,6 @@ public class SubscriptionFragment extends Fragment {
         MONTHLY_ID = AppConfigs.getInstance().getSubsModel().get(1).getKeyID();
         YEARLY_ID = AppConfigs.getInstance().getSubsModel().get(2).getKeyID();
     }
-
-    private View mViewRoot;
 
     private final PurchasesUpdatedListener purchasesUpdatedListener = (billingResult, purchases) -> {
         // To be implemented in a later section.
@@ -189,7 +186,6 @@ public class SubscriptionFragment extends Fragment {
         return formatPrice;
     }
 
-
     private void connectGooglePlayBilling() {
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
@@ -207,12 +203,11 @@ public class SubscriptionFragment extends Fragment {
                 connectGooglePlayBilling();
             }
         });
-
     }
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
+        View mViewRoot = inflater.inflate(R.layout.subscriptions_layout, container, false);
 
         billingClient = BillingClient.newBuilder(requireContext())
                 .setListener(purchasesUpdatedListener)
@@ -223,19 +218,19 @@ public class SubscriptionFragment extends Fragment {
         return mViewRoot;
     }
 
-    private void checkInternetConnect() {
-        if (!NetworkUtils.isConnected(requireContext())) {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Internet unavailable.")
-                    .setMessage("Please connect to network to purchase service.")
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                    })
-                    .setNegativeButton(android.R.string.no, (dialog, which) -> {
-                    })
-                    .show();
-        }
-    }
+//    private void checkInternetConnect() {
+//        if (!NetworkUtils.isConnected(requireContext())) {
+//            new AlertDialog.Builder(requireContext())
+//                    .setTitle("Internet unavailable.")
+//                    .setMessage("Please connect to network to purchase service.")
+//                    .setIcon(android.R.drawable.ic_dialog_alert)
+//                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+//                    })
+//                    .setNegativeButton(android.R.string.no, (dialog, which) -> {
+//                    })
+//                    .show();
+//        }
+//    }
 
     ArrayList<SubscriptionsItemModel> subs;
     int selected = 0;
@@ -302,13 +297,9 @@ public class SubscriptionFragment extends Fragment {
             public void onSingleClick(View v) {
                 buildDialog();
                 btnBuy.setEnabled(false);
-                System.out.println("thanhlv setOnClickListener");
                 launchPurchaseFlow(selected);
             }
         });
-
-
-        System.out.println("thanhlv billingClient " + billingClient);
 
         if (Core.productDetails.size() > 0) {
             lnHideSubs.setVisibility(View.GONE);
@@ -392,7 +383,8 @@ public class SubscriptionFragment extends Fragment {
                 ImmutableList.of(
                         BillingFlowParams.ProductDetailsParams.newBuilder()
                                 .setProductDetails(productDetail)
-                                .setOfferToken(productDetail.getSubscriptionOfferDetails().get(0).getOfferToken())
+                                .setOfferToken(productDetail.getSubscriptionOfferDetails() == null ? ""
+                                        : productDetail.getSubscriptionOfferDetails().get(0).getOfferToken())
                                 .build()
                 );
         BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
@@ -403,8 +395,6 @@ public class SubscriptionFragment extends Fragment {
         if (billingClient != null)
             billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
         btnBuy.setEnabled(true);
-        System.out.println("thanhlv launchPurchaseFlow");
-
     }
 
     @Override

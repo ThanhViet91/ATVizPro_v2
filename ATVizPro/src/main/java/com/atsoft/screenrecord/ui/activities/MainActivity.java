@@ -175,9 +175,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkVer() {
-        System.out.println("thanhlv ver from config = " + AppConfigs.getInstance().getConfigModel().getAppVersion());
-        System.out.println("thanhlv ver from history = " + SettingManager2.getVersionApp(this));
-        System.out.println("thanhlv ver from local = " + BuildConfig.VERSION_CODE);
 
         int newVersion = AppConfigs.getInstance().getConfigModel().getAppVersion();
         int currentVersion = BuildConfig.VERSION_CODE;

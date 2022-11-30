@@ -166,10 +166,17 @@ public class FFmpegUtil {
         Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(image);
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
         canvas.drawText(text, 0, baseline, paint);
-        String extStorageDirectory = App.getAppContext().getExternalFilesDir(Environment.DIRECTORY_DCIM).toString();
+
+        File directory = new File(App.getAppContext().getFilesDir(), "Stickers");
+        if (!directory.exists()) {
+            boolean a = directory.mkdirs();
+        }
+        String extStorageDirectory = directory.getAbsolutePath();
         overlayImagePath = new File(extStorageDirectory, "text.png");
+
+//        String extStorageDirectory = App.getAppContext().getExternalFilesDir(Environment.DIRECTORY_DCIM).toString();
+//        overlayImagePath = new File(extStorageDirectory, "text.png");
         FileOutputStream outStream = null;
         try {
             outStream = new FileOutputStream(overlayImagePath);

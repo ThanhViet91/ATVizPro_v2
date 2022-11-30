@@ -43,7 +43,7 @@ public class GeneralUtils {
 				}
 				
 				complexCommand[i] =  sb.toString();
-				Log.d(Prefs.TAG, "command " + i + ": " + sb.toString());
+//				Log.d(Prefs.TAG, "command " + i + ": " + sb.toString());
 			}
 		}
 		return complexCommand;
@@ -60,7 +60,7 @@ public class GeneralUtils {
 			  sb.append(",");
 		}
 		sb.append("}");
-		Log.d(Prefs.TAG, sb.toString());
+//		Log.d(Prefs.TAG, sb.toString());
 	}
 	
 	

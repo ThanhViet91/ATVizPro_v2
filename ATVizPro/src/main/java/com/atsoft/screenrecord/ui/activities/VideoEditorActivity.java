@@ -52,13 +52,13 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
     private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_editor);
         hideStatusBar(this);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        videoEditorView = findViewById(R.id.trimmer_view);
+        videoEditorView = findViewById(R.id.trimmer_view2);
         Intent intent = getIntent();
         if (intent != null) {
             pathOriginalVideo = intent.getStringExtra(KEY_PATH_VIDEO);
@@ -148,6 +148,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
             copyFile(new File(cacheOutputPath), new File(FFmpegUtil.generateFileOutput("Edit")));
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(getApplicationContext(), "Saving is fail!", Toast.LENGTH_SHORT).show();
         }
         showInterstitialAd();
         finishEdit = true;
@@ -258,9 +259,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                         finishEdit = true;
                         finish();
                     })
-                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
-                        finish();
-                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         } else {
@@ -302,9 +301,7 @@ public class VideoEditorActivity extends AppCompatActivity implements IOptionFra
                         finishEdit = true;
                         finish();
                     })
-                    .setNegativeButton(android.R.string.no, (dialogInterface, i) ->{
-                        finish();
-                    })
+                    .setNegativeButton(android.R.string.no, (dialogInterface, i) -> finish())
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
         } else {

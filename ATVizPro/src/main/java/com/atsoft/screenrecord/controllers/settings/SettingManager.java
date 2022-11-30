@@ -114,7 +114,6 @@ public class SettingManager {
         videoSetting.swapResolutionMatchToOrientation();
 
         videoSetting.setFPS(fps);
-        if( MyUtils.DEBUG) Log.i("chienpm", "getVideoProfile: "+ videoSetting.toString());
         return videoSetting;
     }
 

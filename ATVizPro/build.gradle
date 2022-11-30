@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 android {
-
     signingConfigs {
         release {
             storeFile file('D:\\Repo v2\\ATVizPro_v3\\ATVizPro_v2\\ScreenRecorderKeyStore.jks')
@@ -18,6 +17,10 @@ android {
         applicationId "com.atsoft.screenrecord"
         minSdkVersion 24
         targetSdkVersion 31
+//        versionCode 105 // for release
+//        versionName "1.0.5" // for release
+        versionCode 99 // for debug
+        versionName "9.9.9" // for debug
 //        ndk {
 //            abiFilter "armeabi-v7a"
 //            abiFilter "arm64-v8a"
@@ -115,5 +118,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.7.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
     implementation 'com.squareup.okhttp3:okhttp:3.6.0'
+
+//    implementation 'com.google.android.play:app-update:2.0.1'
 
 }

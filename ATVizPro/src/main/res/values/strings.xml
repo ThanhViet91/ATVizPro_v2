@@ -35,6 +35,7 @@
     <string name="setting_enable_camera_view">setting_enable_camera_view</string>
     <string name="setting_enable_floating_button">setting_enable_floating_button</string>
     <string name="setting_recording_number">setting_recording_number</string>
+    <string name="setting_version_app">setting_version_app</string>
     <string name="setting_react_number">setting_react_number</string>
     <string name="setting_show_confirm_execute_number">setting_show_confirm_execute_number</string>
     <string name="setting_commentary_number">setting_commentary_number</string>

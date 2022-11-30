@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_home">
 
-
     <TextView
         android:id="@+id/tv_btn_cancel"
         style="@style/Title_Box_White"
@@ -67,7 +66,7 @@
 
             <VideoView
                 android:alpha="0"
-                android:id="@+id/video_loader"
+                android:id="@+id/video_loader2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center" />

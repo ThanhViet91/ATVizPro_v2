@@ -20,6 +20,7 @@ import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.adapter.BasicAdapter;
 import com.atsoft.screenrecord.adapter.StickerAdapter;
 import com.atsoft.screenrecord.model.PhotoModel;
+import com.atsoft.screenrecord.ui.utils.MyUtils;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.atsoft.screenrecord.utils.FFmpegUtil;
 
@@ -120,12 +121,7 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
                         R.drawable.sticker_6,
                         R.drawable.sticker_7,
                         R.drawable.sticker_8,
-                        R.drawable.sticker_12,
-//                        R.drawable.sticker_15,
-//                        R.drawable.sticker_16,
-//                        R.drawable.sticker_17,
-//                        R.drawable.sticker_18,
-//                        R.drawable.sticker_19,
+                        R.drawable.sticker_12
     };
     private List<PhotoModel> getListSticker() {
 
@@ -144,7 +140,12 @@ public class OptionAddImageFragment extends DialogFragmentBase implements BasicA
     ArrayList<String> listStickerPath = new ArrayList<>();
     public void copyResourceToFile(String resourceName, int id) {
 
-        String extStorageDirectory = App.getAppContext().getExternalFilesDir(null).toString();
+//        String extStorageDirectory = App.getAppContext().getExternalFilesDir(null).getAbsolutePath();
+        File directory = new File(App.getAppContext().getFilesDir(), "Stickers");
+        if (!directory.exists()) {
+            boolean a = directory.mkdirs();
+        }
+        String extStorageDirectory = directory.getAbsolutePath();
 
         File file = new File(extStorageDirectory, resourceName);
         FileOutputStream outStream = null;

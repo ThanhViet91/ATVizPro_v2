@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.multidex.BuildConfig;
 
 import com.atsoft.screenrecord.App;
 
@@ -27,32 +26,32 @@ import java.util.Locale;
 public class StorageUtil {
 
   private static final String TAG = "StorageUtil";
-  private static String APP_DATA_PATH = "/Android/data/" + BuildConfig.APPLICATION_ID;
+//  private static String APP_DATA_PATH = "/Android/data/" + BuildConfig.APPLICATION_ID;
   private static String sDataDir;
   private static String sCacheDir;
 
-  public static String getAppDataDir() {
-    if (TextUtils.isEmpty(sDataDir)) {
-      try {
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-          sDataDir = Environment.getExternalStorageDirectory().getPath() + APP_DATA_PATH;
-          if (TextUtils.isEmpty(sDataDir)) {
-            sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
-          }
-        } else {
-          sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
-        }
-      } catch (Throwable e) {
-        e.printStackTrace();
-        sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
-      }
-      File file = new File(sDataDir);
-      if (!file.exists()) {//判断文件目录是否存在
-        file.mkdirs();
-      }
-    }
-    return sDataDir;
-  }
+//  public static String getAppDataDir() {
+//    if (TextUtils.isEmpty(sDataDir)) {
+//      try {
+//        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+//          sDataDir = Environment.getExternalStorageDirectory().getPath() + APP_DATA_PATH;
+//          if (TextUtils.isEmpty(sDataDir)) {
+//            sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
+//          }
+//        } else {
+//          sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
+//        }
+//      } catch (Throwable e) {
+//        e.printStackTrace();
+//        sDataDir = App.getAppContext().getFilesDir().getAbsolutePath();
+//      }
+//      File file = new File(sDataDir);
+//      if (!file.exists()) {//判断文件目录是否存在
+//        file.mkdirs();
+//      }
+//    }
+//    return sDataDir;
+//  }
 
   public static String getCacheDir() {
     if (TextUtils.isEmpty(sCacheDir)) {

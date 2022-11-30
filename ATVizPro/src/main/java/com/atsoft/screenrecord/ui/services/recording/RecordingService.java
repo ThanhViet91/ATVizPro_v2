@@ -39,7 +39,7 @@ public class RecordingService extends BaseService {
     private MediaProjectionManager mMediaProjectionManager;
     private MediaProjection mMediaProjection;
     private Intent mScreenCaptureIntent;
-    private int mScreenCaptureResultCode;
+    private int mScreenCaptureResultCode = -999999;
     private int mScreenWidth, mScreenHeight, mScreenDensity;
     private MediaMuxerWrapper mMuxer;
     private static final Object sSync = new Object();
@@ -67,23 +67,6 @@ public class RecordingService extends BaseService {
     private void getScreenSize() {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
         mScreenDensity = metrics.densityDpi;
-//        int width = metrics.widthPixels;
-//        int height = metrics.heightPixels;
-//        if (width > height) {
-//            final float scale_x = width / 1920f;
-//            final float scale_y = height / 1080f;
-//            final float scale = Math.max(scale_x, scale_y);
-//            width = (int) (width / scale);
-//            height = (int) (height / scale);
-//        } else {
-//            final float scale_x = width / 1080f;
-//            final float scale_y = height / 1920f;
-//            final float scale = Math.max(scale_x, scale_y);
-//            width = (int) (width / scale);
-//            height = (int) (height / scale);
-//        }
-//        mScreenWidth = width;
-//        mScreenHeight = height;
     }
 
     @Override
@@ -91,6 +74,18 @@ public class RecordingService extends BaseService {
         mScreenCaptureIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
 
+        getScreenSize();
+        mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
+        DisplayManager dm = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
+        Display defaultDisplay;
+        if (dm != null) {
+            defaultDisplay = dm.getDisplay(Display.DEFAULT_DISPLAY);
+        } else {
+            throw new IllegalStateException("Cannot display manager?!?");
+        }
+        if (defaultDisplay == null) {
+            throw new RuntimeException("No display found.");
+        }
         return mIBinder;
     }
 
@@ -116,23 +111,6 @@ public class RecordingService extends BaseService {
     public void startRecording() {
         synchronized (sSync) {
             if (mMuxer == null) {
-                getScreenSize();
-                try {
-                    sSync.wait(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
-                DisplayManager dm = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
-                Display defaultDisplay;
-                if (dm != null) {
-                    defaultDisplay = dm.getDisplay(Display.DEFAULT_DISPLAY);
-                } else {
-                    throw new IllegalStateException("Cannot display manager?!?");
-                }
-                if (defaultDisplay == null) {
-                    throw new RuntimeException("No display found.");
-                }
 
                 try {
                     mMuxer = new MediaMuxerWrapper(this, ".mp4");    // if you record audio only, ".m4a" is also OK.
@@ -191,7 +169,6 @@ public class RecordingService extends BaseService {
 
         App.ignoreOpenAd = true;
         Intent myIntent = new Intent(getApplicationContext(), PopUpResultVideoTranslucentActivity.class);
-//        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         myIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         myIntent.putExtra(KEY_VIDEO_PATH, finalVideoCachePath);

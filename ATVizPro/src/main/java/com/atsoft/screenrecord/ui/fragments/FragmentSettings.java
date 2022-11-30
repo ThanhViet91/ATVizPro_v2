@@ -82,7 +82,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         settingsItems.add(new SettingsItem(getString(R.string.floating_button), R.drawable.ic_fab_settings));
         settingsItems.add(new SettingsItem(getString(R.string.support_us_by_rating_our_app), R.drawable.ic_heart));
         settingsItems.add(new SettingsItem(getString(R.string.share_app_to_friends), R.drawable.ic_share_settings2));
-        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f", getAvailableSizeExternal()) + " GB", R.drawable.ic_available_storage));
+        settingsItems.add(new SettingsItem(getString(R.string.available_storage_2_43gb) + " " + String.format("%.1f GB", getAvailableSizeExternal()), R.drawable.ic_available_storage));
         settingsItems.add(new SettingsItem(getString(R.string.recording_cache_0_kb) + " " + dirSizeString(new File(getBaseStorageDirectory())), R.drawable.ic_recording_cache));
         settingsItems.add(new SettingsItem(getString(R.string.contact_us), R.drawable.ic_letter));
 
@@ -155,7 +155,9 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                    if (mProgressDialog != null) mProgressDialog.dismiss();
+                if (getActivity() == null) return;
+                if (mProgressDialog != null) mProgressDialog.dismiss();
+                requireActivity().runOnUiThread(() -> showPopup("Something went wrong!", "Check your network connection and try again"));
             }
 
             @Override
@@ -166,7 +168,6 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                    if (mProgressDialog != null) mProgressDialog.dismiss();
 
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     if (purchasesHistoryList != null)
@@ -177,6 +178,8 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
                                         requireActivity().runOnUiThread(() -> checkPurchase(mPurchasesHistoryList, System.currentTimeMillis()));
                                     }
                                 } else {
+                                    if (getActivity() == null) return;
+                                    if (mProgressDialog != null) mProgressDialog.dismiss();
                                     requireActivity().runOnUiThread(() -> showPopup("Something went wrong!", "Check your network connection and try again"));
                                 }
                             }
@@ -208,7 +211,7 @@ public class FragmentSettings extends Fragment implements SettingsAdapter.Settin
 
     @SuppressLint("NotifyDataSetChanged")
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
-
+        if (mProgressDialog != null) mProgressDialog.dismiss();
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(App.getAppContext(), false);
             showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");

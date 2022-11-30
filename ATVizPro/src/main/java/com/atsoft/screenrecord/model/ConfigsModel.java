@@ -7,6 +7,7 @@ public class ConfigsModel {
     int frequencyCapping;
     String termsURL;
     String privacyPolicyURL;
+    int appVersion;
 
     public ConfigsModel() {
     }
@@ -57,5 +58,13 @@ public class ConfigsModel {
 
     public void setPrivacyPolicyURL(String privacyPolicyURL) {
         this.privacyPolicyURL = privacyPolicyURL;
+    }
+
+    public int getAppVersion() {
+        return appVersion;
+    }
+
+    public void setAppVersion(int appVersion) {
+        this.appVersion = appVersion;
     }
 }

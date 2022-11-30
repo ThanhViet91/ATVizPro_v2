@@ -51,6 +51,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.atsoft.screenrecord.App;
+import com.atsoft.screenrecord.AppConfigs;
+import com.atsoft.screenrecord.BuildConfig;
 import com.atsoft.screenrecord.Core;
 import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.settings.SettingManager2;
@@ -168,7 +170,28 @@ public class MainActivity extends AppCompatActivity {
         initViews();
         Intent intent = getIntent();
         if (intent != null) handleIncomingRequest(intent);
+
+//        checkVer();
     }
+
+    private void checkVer() {
+        System.out.println("thanhlv ver from config = " + AppConfigs.getInstance().getConfigModel().getAppVersion());
+        System.out.println("thanhlv ver from history = " + SettingManager2.getVersionApp(this));
+        System.out.println("thanhlv ver from local = " + BuildConfig.VERSION_CODE);
+
+        int newVersion = AppConfigs.getInstance().getConfigModel().getAppVersion();
+        int currentVersion = BuildConfig.VERSION_CODE;
+
+        if (newVersion > currentVersion) { // co ban update moi tren store >>> yeu cau user update
+            Toast.makeText(this, "Co ban moi, update k???", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse
+                    ("market://details?id="+ this.getPackageName())));
+        } else {
+
+        }
+
+    }
+
 
     private boolean isStarted = false;
 
@@ -587,8 +610,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showDialogPickFromGallery(int from_code) {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        intent.setTypeAndNormalize("video/*");
+        Intent intent = new Intent();
+        intent.setType("video/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.select_video_source)), from_code);
         App.ignoreOpenAd = true;
     }
@@ -960,6 +984,8 @@ public class MainActivity extends AppCompatActivity {
             //Check if the permission is granted or not.
             if (!Settings.canDrawOverlays(this)) { //Permission is not available
                 MyUtils.showSnackBarNotification(mImgRec, "Draw over other app permission not available.", Snackbar.LENGTH_SHORT);
+            } else {
+                updateService();
             }
         } else if (requestCode == PERMISSION_RECORD_DISPLAY) {
             if (resultCode != RESULT_OK) {

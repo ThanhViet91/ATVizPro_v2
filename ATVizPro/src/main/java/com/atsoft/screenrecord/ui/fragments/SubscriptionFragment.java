@@ -391,7 +391,6 @@ public class SubscriptionFragment extends Fragment {
                 .setProductDetailsParamsList(productDetailsParamsList)
                 .build();
 
-        if (mProgressDialog != null) mProgressDialog.dismiss();
         if (billingClient != null)
             billingClient.launchBillingFlow(requireActivity(), billingFlowParams);
         btnBuy.setEnabled(true);
@@ -432,9 +431,12 @@ public class SubscriptionFragment extends Fragment {
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
             public void onBillingServiceDisconnected() {
-                if (mProgressDialog != null) mProgressDialog.dismiss();
                 if (getActivity() == null) return;
-                requireActivity().runOnUiThread(() -> tvRestore.setEnabled(true));
+                if (mProgressDialog != null) mProgressDialog.dismiss();
+                requireActivity().runOnUiThread(() -> {
+                    tvRestore.setEnabled(true);
+                    showPopup("Something went wrong!", "Check your network connection and try again");
+                });
             }
 
             @Override
@@ -445,7 +447,6 @@ public class SubscriptionFragment extends Fragment {
                                     .setProductType(BillingClient.ProductType.SUBS)
                                     .build(),
                             (billingResult1, purchasesHistoryList) -> {
-                                if (mProgressDialog != null) mProgressDialog.dismiss();
                                 setEnableButton();
                                 if (billingResult1.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                     if (purchasesHistoryList != null)
@@ -457,6 +458,7 @@ public class SubscriptionFragment extends Fragment {
                                     }
                                 } else {
                                     if (getActivity() == null) return;
+                                    if (mProgressDialog != null) mProgressDialog.dismiss();
                                     requireActivity().runOnUiThread(() -> {
                                         tvRestore.setEnabled(true);
                                         showPopup("Something went wrong!", "Check your network connection and try again");
@@ -483,7 +485,7 @@ public class SubscriptionFragment extends Fragment {
 
     @SuppressLint("NotifyDataSetChanged")
     private void checkPurchase(List<PurchaseHistoryRecord> purchasesHistoryList, long currentTime) {
-
+        if (mProgressDialog != null) mProgressDialog.dismiss();
         if (purchasesHistoryList == null || purchasesHistoryList.size() == 0) {
             SettingManager2.setProApp(App.getAppContext(), false);
             showPopup("Something went wrong!", "This item maybe purchased by a different account. Please change account and try again");

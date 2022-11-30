@@ -170,7 +170,7 @@ public class EglSurfaceBase {
         // our output will look upside down relative to what appears on screen if the
         // typical GL conventions are used.
 
-        String filename = file.toString();
+        String filename = file.getAbsolutePath();
 
         int width = getWidth();
         int height = getHeight();

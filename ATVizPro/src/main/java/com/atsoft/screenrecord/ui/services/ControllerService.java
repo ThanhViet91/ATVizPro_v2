@@ -98,8 +98,9 @@ public class ControllerService extends Service{
         return super.onStartCommand(intent, flags, startId);
     }
 
+    String action;
     private void handleIncomeAction(Intent intent) {
-        String action = intent.getAction();
+        action = intent.getAction();
         if (TextUtils.isEmpty(action))
             return;
 
@@ -137,15 +138,18 @@ public class ControllerService extends Service{
                     initCameraView();
                 }
                 if (mScreenCaptureIntent == null) {
-                    Log.i(TAG, "mScreenCaptureIntent is NULL");
+//                    Log.i(TAG, "mScreenCaptureIntent is NULL");
                     stopService();
                 } else if (!mRecordingServiceBound) {
                     bindStreamingService();
+//                    if (mMode == MyUtils.MODE_RECORDING) {
+//                        new Handler().postDelayed(this::handleStartRecording, 500);
+//                    }
                 }
                 if (mMode == MyUtils.MODE_RECORDING) {
                     toggleView(mViewRoot, View.GONE);
-                    new Handler().postDelayed(this::handleStartRecording, 700);
                 }
+
                 break;
             case MyUtils.ACTION_UPDATE_STREAM_PROFILE:
                 if (mMode == MyUtils.MODE_STREAMING && mService != null && mRecordingServiceBound) {
@@ -723,8 +727,8 @@ public class ControllerService extends Service{
         clickStop = false;
         if (mRecordingServiceBound) {
             toggleView(mCountdownLayout, View.VISIBLE);
-            int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
-            new CountDownTimer(countdown, 1000) {
+//            int countdown = (SettingManager.getCountdown(getApplication())) * 1000;
+            new CountDownTimer(2900, 1000) {
                 @SuppressLint("DefaultLocale")
                 public void onTick(long millisUntilFinished) {
                     toggleView(mViewRoot, View.GONE);
@@ -869,6 +873,7 @@ public class ControllerService extends Service{
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             IBinder binder;
+            mRecordingServiceBound = true;
             if (mMode == MyUtils.MODE_STREAMING) {
                 binder = (StreamingBinder) service;
                 mService = ((StreamingBinder) binder).getService();
@@ -876,14 +881,15 @@ public class ControllerService extends Service{
             } else {
                 binder = (RecordingBinder) service;
                 mService = ((RecordingBinder) binder).getService();
+                if (MyUtils.ACTION_INIT_CONTROLLER.equals(action))
+                    handleStartRecording();
             }
-            mRecordingServiceBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mRecordingServiceBound = false;
-            MyUtils.toast(getApplicationContext(), "Service disconnected " + name.toString(), Toast.LENGTH_SHORT);
+            MyUtils.toast(getApplicationContext(), "Service disconnected.", Toast.LENGTH_SHORT);
         }
     };
 

@@ -27,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,7 +35,6 @@ import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.adapter.VideoOptionAdapter;
 import com.atsoft.screenrecord.utils.AdsUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
-import com.google.android.gms.ads.AdListener;
 
 import java.util.ArrayList;
 
@@ -52,16 +52,16 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
     private static final String TAG = VideoEditorView.class.getSimpleName();
 
-    private int mMaxWidth = VIDEO_FRAMES_WIDTH;
+    private final int mMaxWidth = VIDEO_FRAMES_WIDTH;
     private Context mContext;
     private RelativeLayout mLinearVideo;
     private VideoView mVideoView;
-    private ImageView mPlayView;
-    private RecyclerView mVideoThumbRecyclerView, rcVideoOptions;
+//    private ImageView mPlayView;
+    private RecyclerView mVideoThumbRecyclerView;
     private RangeSeekBarView mRangeSeekBarView;
     private LinearLayout mSeekBarLayout;
     private ImageView mRedProgressIcon;
-    private TextView mVideoShootTipTv;
+//    private TextView mVideoShootTipTv;
     private float mAverageMsPx;//每毫秒所占的px
     private float averagePxMs;//每px所占用的ms毫秒
     private Uri mSourceUri;
@@ -73,22 +73,17 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private long mLeftProgressPos, mRightProgressPos;
     private long mRedProgressBarPos = 0;
     private long scrollPos = 0;
-    private int mScaledTouchSlop;
     private int lastScrollX;
-    private boolean isSeeking;
-    private boolean isOverScaledTouchSlop;
     private int mThumbsTotalCount;
     private ValueAnimator mRedProgressAnimator;
     private Handler mAnimationHandler = new Handler();
 
-    private TextView btn_cancel, btn_save, number_countdown;
-    private LinearLayout layoutCountdown;
+    private TextView btn_save;
 
     private ArrayList<String> videoOptions = new ArrayList<>();
     private VideoOptionAdapter mAdapter;
 
     private RelativeLayout mAdview;
-    private MediaPlayer mediaPlayer;
 
     public interface VideoEditorListener {
         void onClickVideoOption(String opt);
@@ -101,26 +96,25 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
 
     public VideoEditorView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public VideoEditorView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        super(context, attrs);
         init(context);
     }
 
+//    public VideoEditorView(Context context, AttributeSet attrs, int defStyleAttr) {
+//        super(context, attrs, defStyleAttr);
+//        init(context);
+//    }
+
 
     private void init(Context context) {
+        if (context == null) return;
         this.mContext = context;
         LayoutInflater.from(context).inflate(R.layout.video_editor_view, this, true);
 
         mLinearVideo = findViewById(R.id.screenVideo);
-        layoutCountdown = findViewById(R.id.ln_countdown);
-        number_countdown = findViewById(R.id.tv_number_countdown);
-        btn_cancel = findViewById(R.id.tv_btn_cancel);
         btn_save = findViewById(R.id.tv_btn_done);
-        mVideoView = findViewById(R.id.video_loader);
-        MediaController mediaController = new MediaController(getContext());
+        mVideoView = findViewById(R.id.video_loader2);
+        MediaController mediaController = new MediaController(mContext);
         mVideoView.setMediaController(mediaController);
         mSeekBarLayout = findViewById(R.id.seekBarLayout);
         mRedProgressIcon = findViewById(R.id.positionIcon);
@@ -133,7 +127,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         videoOptions.add("Speed");
         videoOptions.add("Text");
         videoOptions.add("Image");
-        rcVideoOptions = findViewById(R.id.recycler_view_position);
+        RecyclerView rcVideoOptions = findViewById(R.id.recycler_view_position);
         mAdapter = new VideoOptionAdapter(context, videoOptions, this);
         rcVideoOptions.setAdapter(mAdapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false);
@@ -155,30 +149,30 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     private AdsUtil mAdManager;
     public void showOrHideAdBanner(){
         if (mAdManager != null) mAdManager.loadBanner();
-        if (mAdManager.getAdView() != null) mAdManager.getAdView().setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                if (mediaPlayer != null) {
-                    hasChangeVideoView();
-                }
-            }
-        });
+//        if (mAdManager.getAdView() != null) mAdManager.getAdView().setAdListener(new AdListener() {
+//            @Override
+//            public void onAdLoaded() {
+//                super.onAdLoaded();
+//                if (mediaPlayer != null) {
+//                    hasChangeVideoView();
+//                }
+//            }
+//        });
     }
-    private void hasChangeVideoView() {
-        if (mLinearVideo == null) return;
-        int screenWidth = mLinearVideo.getWidth();
-        int screenHeight = mLinearVideo.getHeight();
-        mLinearVideo.post(new Runnable() {
-            @Override
-            public void run() {
-                if (screenWidth != mLinearVideo.getWidth()
-                        || screenHeight != mLinearVideo.getHeight()) {
-                    updateVideoView(mediaPlayer);
-                }
-            }
-        });
-    }
+//    private void hasChangeVideoView() {
+//        if (mLinearVideo == null) return;
+//        int screenWidth = mLinearVideo.getWidth();
+//        int screenHeight = mLinearVideo.getHeight();
+//        mLinearVideo.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (screenWidth != mLinearVideo.getWidth()
+//                        || screenHeight != mLinearVideo.getHeight()) {
+//                    updateVideoView(mediaPlayer);
+//                }
+//            }
+//        });
+//    }
 
     public long getVideoDuration() {
         return mDuration;
@@ -223,20 +217,12 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         mVideoView.requestFocus();
     }
 
-    private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long startPosition, long endPosition) {
+    private void startShootVideoThumbs(final Context context, final Uri videoUri, int totalThumbsCount, long endPosition) {
         mVideoThumbAdapter.resetBitmap();
-        VideoTrimmerUtil.shootVideoThumbInBackground(context, videoUri, totalThumbsCount, startPosition, endPosition,
-                new SingleCallback<Bitmap, Integer>() {
-                    @Override
-                    public void onSingleCallback(final Bitmap bitmap, final Integer interval) {
-                        if (bitmap != null) {
-                            UiThreadExecutor.runTask("", new Runnable() {
-                                @Override
-                                public void run() {
-                                    mVideoThumbAdapter.addBitmaps(bitmap);
-                                }
-                            }, 0L);
-                        }
+        VideoTrimmerUtil.shootVideoThumbInBackground(context, videoUri, totalThumbsCount, 0, endPosition,
+                (bitmap, interval) -> {
+                    if (bitmap != null) {
+                        UiThreadExecutor.runTask("", () -> mVideoThumbAdapter.addBitmaps(bitmap), 0L);
                     }
                 });
     }
@@ -278,19 +264,14 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     }
     private void videoPrepared(MediaPlayer mp) {
         updateVideoView(mp);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mVideoView.setAlpha(1);
-            }
-        }, 1000);
+        new Handler().postDelayed(() -> mVideoView.setAlpha(1), 600);
         mDuration = mVideoView.getDuration();
         if (getRestoreState()) {
             setRestoreState(false);
         }
         seekTo((int) mRedProgressBarPos);
         initRangeSeekBarView();
-        startShootVideoThumbs(mContext, mSourceUri, mThumbsTotalCount, 0, mDuration);
+        startShootVideoThumbs(mContext, mSourceUri, mThumbsTotalCount, mDuration);
     }
 
     private void videoCompleted() {
@@ -328,20 +309,11 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
             }
         });
 
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mediaPlayer = mp;
-                mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
-                videoPrepared(mp);
-            }
+        mVideoView.setOnPreparedListener(mp -> {
+            mp.setVideoScalingMode(MediaPlayer.VIDEO_SCALING_MODE_SCALE_TO_FIT);
+            videoPrepared(mp);
         });
-        mVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                videoCompleted();
-            }
-        });
+        mVideoView.setOnCompletionListener(mp -> videoCompleted());
     }
 
     public void toggleSaveButton(boolean status) {
@@ -356,7 +328,6 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
     public void seekTo(long msec) {
         if (mVideoView != null)
             mVideoView.seekTo((int) msec);
-        Log.d(TAG, "seekTo = " + msec);
     }
 
     private boolean getRestoreState() {
@@ -372,23 +343,14 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         @Override
         public void onRangeSeekBarValuesChanged(RangeSeekBarView bar, long minValue, long maxValue, int action, boolean isMin,
                                                 RangeSeekBarView.Thumb pressedThumb) {
-            Log.d(TAG, "-----minValue----->>>>>>" + minValue);
-            Log.d(TAG, "-----maxValue----->>>>>>" + maxValue);
             mLeftProgressPos = minValue + scrollPos;
             mRedProgressBarPos = mLeftProgressPos;
             mRightProgressPos = maxValue + scrollPos;
-            Log.d(TAG, "-----mLeftProgressPos----->>>>>>" + mLeftProgressPos);
-            Log.d(TAG, "-----mRightProgressPos----->>>>>>" + mRightProgressPos);
             switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    isSeeking = false;
-                    break;
                 case MotionEvent.ACTION_MOVE:
-                    isSeeking = true;
                     seekTo((int) (pressedThumb == RangeSeekBarView.Thumb.MIN ? mLeftProgressPos : mRightProgressPos));
                     break;
                 case MotionEvent.ACTION_UP:
-                    isSeeking = false;
                     seekTo((int) mLeftProgressPos);
                     break;
                 default:
@@ -401,31 +363,26 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
 
     private final RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
             super.onScrollStateChanged(recyclerView, newState);
-            Log.d(TAG, "newState = " + newState);
         }
 
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
-            isSeeking = false;
             int scrollX = calcScrollXDistance();
             //达不到滑动的距离
+            int mScaledTouchSlop = 10;
             if (Math.abs(lastScrollX - scrollX) < mScaledTouchSlop) {
-                isOverScaledTouchSlop = false;
                 return;
             }
-            isOverScaledTouchSlop = true;
             //初始状态,why ? 因为默认的时候有35dp的空白！
             if (scrollX == -RECYCLER_VIEW_PADDING) {
                 scrollPos = 0;
             } else {
-                isSeeking = true;
                 scrollPos = (long) (mAverageMsPx * (RECYCLER_VIEW_PADDING + scrollX) / THUMB_WIDTH);
                 mLeftProgressPos = mRangeSeekBarView.getSelectedMinValue() + scrollPos;
                 mRightProgressPos = mRangeSeekBarView.getSelectedMaxValue() + scrollPos;
-                Log.d(TAG, "onScrolled >>>> mLeftProgressPos = " + mLeftProgressPos);
                 mRedProgressBarPos = mLeftProgressPos;
                 if (mVideoView.isPlaying()) {
                     mVideoView.pause();
@@ -444,10 +401,22 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
      */
     private int calcScrollXDistance() {
         LinearLayoutManager layoutManager = (LinearLayoutManager) mVideoThumbRecyclerView.getLayoutManager();
-        int position = layoutManager.findFirstVisibleItemPosition();
-        View firstVisibleChildView = layoutManager.findViewByPosition(position);
-        int itemWidth = firstVisibleChildView.getWidth();
-        return (position) * itemWidth - firstVisibleChildView.getLeft();
+        int position = 0;
+        if (layoutManager != null) {
+            position = layoutManager.findFirstVisibleItemPosition();
+        }
+        View firstVisibleChildView = null;
+        if (layoutManager != null) {
+            firstVisibleChildView = layoutManager.findViewByPosition(position);
+        }
+        int itemWidth = 0;
+        if (firstVisibleChildView != null) {
+            itemWidth = firstVisibleChildView.getWidth();
+        }
+        if (firstVisibleChildView != null) {
+            return (position) * itemWidth - firstVisibleChildView.getLeft();
+        }
+        return 0;
     }
 
     private void playingRedProgressAnimation() {
@@ -465,13 +434,9 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         int end = (int) (RECYCLER_VIEW_PADDING + (mRightProgressPos - scrollPos) * averagePxMs);
         mRedProgressAnimator = ValueAnimator.ofInt(start, end).setDuration((mRightProgressPos - scrollPos) - (mRedProgressBarPos - scrollPos));
         mRedProgressAnimator.setInterpolator(new LinearInterpolator());
-        mRedProgressAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                params.leftMargin = (int) animation.getAnimatedValue();
-                mRedProgressIcon.setLayoutParams(params);
-                Log.d(TAG, "----onAnimationUpdate--->>>>>>>" + mRedProgressBarPos);
-            }
+        mRedProgressAnimator.addUpdateListener(animation -> {
+            params.leftMargin = (int) animation.getAnimatedValue();
+            mRedProgressIcon.setLayoutParams(params);
         });
         mRedProgressAnimator.start();
     }
@@ -484,13 +449,7 @@ public class VideoEditorView extends FrameLayout implements IVideoCustomView, Vi
         }
     }
 
-    private Runnable mAnimationRunnable = new Runnable() {
-
-        @Override
-        public void run() {
-            updateVideoProgress();
-        }
-    };
+    private Runnable mAnimationRunnable = this::updateVideoProgress;
 
     private void updateVideoProgress() {
         long currentPosition = mVideoView.getCurrentPosition();

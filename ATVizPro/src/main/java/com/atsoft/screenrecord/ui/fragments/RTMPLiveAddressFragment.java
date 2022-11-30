@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -136,11 +137,12 @@ public class RTMPLiveAddressFragment extends Fragment {
 
         imgBack.setOnClickListener(v -> {
             hideSoftInput(requireActivity());
-            mFragmentManager.popBackStack();
+            new Handler().postDelayed(() -> mFragmentManager.popBackStack(), 600);
         });
 
         tvStartLiveStream.setOnClickListener(v -> {
             hideSoftInput(requireActivity());
+            saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());
             if (!SettingManager2.isProApp(requireContext())) {
                 mFragmentManager.beginTransaction()
                         .replace(R.id.frame_layout_fragment, new SubscriptionFragment(this::doStartAlready))
@@ -157,6 +159,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                 CharSequence textToPaste = clipboard.getPrimaryClip().getItemAt(0).getText();
                 if (!textToPaste.equals("")) {
                     edtStreamKey.setText(textToPaste);
+                    edtStreamKey.requestFocus();
                     edtStreamKey.setSelection(textToPaste.length());
                 }
             } catch (Exception ignored) {
@@ -168,6 +171,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                 CharSequence textToPaste = clipboard.getPrimaryClip().getItemAt(0).getText();
                 if (!textToPaste.equals("")) {
                     edtRTMPAddress.setText(textToPaste);
+                    edtRTMPAddress.requestFocus();
                     edtRTMPAddress.setSelection(textToPaste.length());
                 }
             } catch (Exception ignored) {
@@ -245,8 +249,14 @@ public class RTMPLiveAddressFragment extends Fragment {
 
             }
         });
-        btnClearRTMP.setOnClickListener(v -> edtRTMPAddress.setText(""));
-        btnClearStreamKey.setOnClickListener(v -> edtStreamKey.setText(""));
+        btnClearRTMP.setOnClickListener(v -> {
+            edtRTMPAddress.setText("");
+            edtRTMPAddress.requestFocus();
+        });
+        btnClearStreamKey.setOnClickListener(v -> {
+            edtStreamKey.setText("");
+            edtStreamKey.requestFocus();
+        });
         RelativeLayout rootView = view.findViewById(R.id.root_container);
         rootView.setOnClickListener(view1 -> hideSoftInput(requireActivity()));
     }
@@ -267,7 +277,7 @@ public class RTMPLiveAddressFragment extends Fragment {
                 mParentActivity.notifyUpdateStreamProfile(mUrl);
             } else {
                 MyUtils.showSnackBarNotification(edtRTMPAddress, String.format("Livestream on %s is running!",
-                        parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_LONG);
+                        parseType(SettingManager2.getLiveStreamType(requireContext()))), Snackbar.LENGTH_SHORT);
             }
         } else {
             saveData(edtRTMPAddress.getText().toString(), edtStreamKey.getText().toString());

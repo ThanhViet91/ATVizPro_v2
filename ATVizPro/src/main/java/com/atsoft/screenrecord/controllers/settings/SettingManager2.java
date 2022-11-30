@@ -12,6 +12,20 @@ import com.atsoft.screenrecord.R;
 public class SettingManager2 {
 
 
+    public static int getVersionApp(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_version_app);
+        return preferences.getInt(key, 0);
+    }
+
+    public static void setVersionApp(Context context, int value) {
+        SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
+        String key = getStringRes(context, R.string.setting_version_app);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(key, value);
+        editor.apply();
+    }
+
     public static void setEnableFAB(Context context, boolean value) {
         SharedPreferences preferences = context.getSharedPreferences(getStringRes(context, R.string.setting_common_shared_preferences), MODE_PRIVATE);
         String key = getStringRes(context, R.string.setting_enable_floating_button);

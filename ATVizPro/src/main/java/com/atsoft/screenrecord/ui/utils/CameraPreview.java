@@ -46,15 +46,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        try {
-            // create the surface and start camera preview
-            if (mCamera == null) {
-                mCamera.setPreviewDisplay(holder);
-                mCamera.startPreview();
-            }
-        }
-        catch (IOException e){
-        }
+//        try {
+//            // create the surface and start camera preview
+//            if (mCamera == null) {
+//                mCamera.setPreviewDisplay(holder);
+//                mCamera.startPreview();
+//            }
+//        }
+//        catch (IOException ignored){
+//        }
     }
 
     boolean isFirstTime = false;
@@ -83,13 +83,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // stop preview before making changes
         try {
             mCamera.stopPreview();
+            setCameraOrientation();
         } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
         // set preview size and make any resize, rotate or
         // reformatting changes here
         // start preview with new settings
-        setCameraOrientation();
         setCamera(camera);
 
         try {
@@ -107,6 +107,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private void setCameraOrientation() {
 //        Camera.Parameters parameters = mCamera.getParameters();
+        if (mCamera == null) return;
 
         Camera.CameraInfo camInfo =
                 new Camera.CameraInfo();

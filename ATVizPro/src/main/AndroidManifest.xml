@@ -112,7 +112,7 @@
             android:name=".ui.services.BaseService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaProjection|location|camera|microphone" />
+            android:foregroundServiceType="mediaProjection" />
 
         <service
             android:name=".ui.services.recording.RecordingService"
@@ -121,10 +121,14 @@
             android:foregroundServiceType="mediaProjection"
             android:stopWithTask="true" />
 
-        <service android:name=".ui.services.streaming.StreamingService" />
-
+        <service android:name=".ui.services.streaming.StreamingService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"/>
         <service
             android:name=".ui.services.ControllerService"
+            android:enabled="true"
+            android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
         <meta-data

@@ -2,15 +2,22 @@ package com.atsoft.screenrecord.ui.services.recording;
 
 import static com.atsoft.screenrecord.ui.services.ExecuteService.KEY_VIDEO_PATH;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
+import android.graphics.Color;
 import android.hardware.display.DisplayManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -18,7 +25,10 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 
+import androidx.core.app.NotificationCompat;
+
 import com.atsoft.screenrecord.App;
+import com.atsoft.screenrecord.R;
 import com.atsoft.screenrecord.controllers.encoder.MediaAudioEncoder;
 import com.atsoft.screenrecord.controllers.encoder.MediaEncoder;
 import com.atsoft.screenrecord.controllers.encoder.MediaMuxerWrapper;
@@ -28,6 +38,7 @@ import com.atsoft.screenrecord.controllers.settings.VideoSetting2;
 import com.atsoft.screenrecord.ui.activities.PopUpResultVideoTranslucentActivity;
 import com.atsoft.screenrecord.ui.services.BaseService;
 import com.atsoft.screenrecord.ui.utils.MyUtils;
+import com.atsoft.screenrecord.ui.utils.NotificationHelper;
 
 import java.io.IOException;
 
@@ -75,7 +86,11 @@ public class RecordingService extends BaseService {
         mScreenCaptureResultCode = mScreenCaptureIntent.getIntExtra(MyUtils.SCREEN_CAPTURE_INTENT_RESULT_CODE, MyUtils.RESULT_CODE_FAILED);
 
         getScreenSize();
-        mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
+        try {
+            mMediaProjection = mMediaProjectionManager.getMediaProjection(mScreenCaptureResultCode, mScreenCaptureIntent);
+        } catch (Exception ignored) {
+
+        }
         DisplayManager dm = (DisplayManager) getSystemService(Context.DISPLAY_SERVICE);
         Display defaultDisplay;
         if (dm != null) {
@@ -143,8 +158,6 @@ public class RecordingService extends BaseService {
         }
     }
 
-
-
     //Return output file
     public VideoSetting2 stopRecording() {
         String outputFile;
@@ -191,7 +204,6 @@ public class RecordingService extends BaseService {
 
         // Add a new record (identified by uri) without the video, but with the values just set.
         Uri uri = cr.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
-        Log.i(TAG, "insertVideoToGallery: " + uri.getPath());
 
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
     }

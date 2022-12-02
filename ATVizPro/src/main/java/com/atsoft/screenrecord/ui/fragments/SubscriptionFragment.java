@@ -295,7 +295,6 @@ public class SubscriptionFragment extends Fragment {
         btnBuy.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                buildDialog();
                 btnBuy.setEnabled(false);
                 launchPurchaseFlow(selected);
             }

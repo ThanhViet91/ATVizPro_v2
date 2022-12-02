@@ -4,6 +4,7 @@ import static com.atsoft.screenrecord.ui.activities.MainActivity.REQUEST_VIDEO_F
 import static com.atsoft.screenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_REACT_CAM;
 import static com.atsoft.screenrecord.ui.activities.MainActivity.REQUEST_VIDEO_FOR_VIDEO_EDIT;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,9 +19,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.atsoft.screenrecord.R;
+import com.atsoft.screenrecord.ui.activities.MainActivity;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class DialogSelectVideoSource extends DialogFragmentBase {
 
@@ -29,16 +33,36 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
     public static final String ARG_PARAM2 = "param2";
     private static final String TAG = DialogSelectVideoSource.class.getSimpleName();
 
-    public static DialogSelectVideoSource newInstance(ISelectVideoSourceListener callBack, Bundle args) {
-        DialogSelectVideoSource dialogSelectVideoSource = new DialogSelectVideoSource(callBack);
-        dialogSelectVideoSource.setArguments(args);
-        return dialogSelectVideoSource;
+    public static DialogSelectVideoSource newInstance(Bundle args) {
+        try {
+            DialogSelectVideoSource dialogSelectVideoSource = new DialogSelectVideoSource();
+            dialogSelectVideoSource.setArguments(args);
+            return dialogSelectVideoSource;
+        } catch (InstantiationException e) {
+            throw new InstantiationException("Unable to instantiate fragment: make sure class name exists, " +
+                    "is public, and has an empty constructor that is public", e);
+        }
     }
     public ISelectVideoSourceListener callback;
+
+    public DialogSelectVideoSource() {
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            callback = (ISelectVideoSourceListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement LogoutUser");
+        }
+    }
 
     public DialogSelectVideoSource(ISelectVideoSourceListener callback) {
         this.callback = callback;
     }
+
     @Override
     public int getLayout() {
         return R.layout.dialog_select_video_source;

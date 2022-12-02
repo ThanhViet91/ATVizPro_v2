@@ -23,6 +23,7 @@ import static com.atsoft.screenrecord.ui.utils.MyUtils.isMyServiceRunning;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -90,7 +91,7 @@ import java.util.Date;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogFragmentBase.ISelectVideoSourceListener{
     public static final int REQUEST_VIDEO_FOR_REACT_CAM = 1102;
     public static final int REQUEST_VIDEO_FOR_COMMENTARY = 1105;
     public static final int REQUEST_VIDEO_FOR_VIDEO_EDIT = 1107;
@@ -575,20 +576,20 @@ public class MainActivity extends AppCompatActivity {
         Core.frameRate = SettingManager2.getVideoFPS(this);
     }
 
+    @Override
+    public void onClickCameraRoll() {
+        showDialogPickFromGallery(fromFunction);
+    }
+
+    @Override
+    public void onClickMyRecordings() {
+        showMyRecordings(fromFunction);
+    }
+
     private void showDialogPickVideo(int requestVideoFor) {
         Bundle bundle = new Bundle();
         bundle.putInt(ARG_PARAM1, requestVideoFor);
-        DialogSelectVideoSource.newInstance(new DialogFragmentBase.ISelectVideoSourceListener() {
-            @Override
-            public void onClickCameraRoll() {
-                showDialogPickFromGallery(requestVideoFor);
-            }
-
-            @Override
-            public void onClickMyRecordings() {
-                showMyRecordings(requestVideoFor);
-            }
-        }, bundle).show(getSupportFragmentManager(), "");
+        DialogSelectVideoSource.newInstance(bundle).show(getSupportFragmentManager(), "");
     }
 
     private void showMyRecordings(int fromFunction) {

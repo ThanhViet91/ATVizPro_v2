@@ -19,7 +19,7 @@ android {
         targetSdkVersion 31
 //        versionCode 105 // for release
 //        versionName "1.0.5" // for release
-        versionCode 99 // for debug
+        versionCode 999 // for debug
         versionName "9.9.9" // for debug
 //        ndk {
 //            abiFilter "armeabi-v7a"

@@ -20,14 +20,14 @@ public class FirebaseUtils {
         Bundle bundle = new Bundle();
         bundle.putString("action", action);
         firebaseAnalytics.logEvent("show_interstitial_5_times", bundle);
-        System.out.println("thanhlv logEventShowInterstitialAd " + action);
+//        System.out.println("thanhlv logEventShowInterstitialAd " + action);
     }
 
     public static void logEventToFirebase(FirebaseAnalytics firebaseAnalytics, String action, String func) {
         Bundle bundle = new Bundle();
         bundle.putString("action", action);
         firebaseAnalytics.logEvent(func, bundle);
-        System.out.println("thanhlv logEventToFirebase " + func);
+//        System.out.println("thanhlv logEventToFirebase " + func);
     }
 
 }

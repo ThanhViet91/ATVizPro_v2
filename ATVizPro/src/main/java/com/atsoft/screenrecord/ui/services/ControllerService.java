@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ServiceInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
@@ -134,7 +135,7 @@ public class ControllerService extends Service{
                     mStreamProfile = (StreamProfile) intent.getSerializableExtra(MyUtils.STREAM_PROFILE);
                 boolean isCamera = intent.getBooleanExtra(MyUtils.KEY_CAMERA_AVAILABLE, false);
 
-                if (isCamera && mCamera == null) {
+                if (isCamera) {
                     initCameraView();
                 }
                 if (mScreenCaptureIntent == null) {
@@ -216,6 +217,7 @@ public class ControllerService extends Service{
         return null;
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -232,11 +234,14 @@ public class ControllerService extends Service{
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NotificationHelper.CHANNEL_ID);
                 Notification notification = notificationBuilder.setOngoing(true)
                         .setSmallIcon(R.drawable.ic_launcher_2_foreground)
-                        .setContentTitle("AT Record is running in background")
+                        .setContentTitle("AT Record is running")
                         .setPriority(NotificationManager.IMPORTANCE_MIN)
                         .setCategory(Notification.CATEGORY_SERVICE)
                         .build();
-                startForeground(2, notification);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(2, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
+                } else
+                    startForeground(2, notification);
             }
         }
         if (mViewRoot == null)
@@ -307,7 +312,12 @@ public class ControllerService extends Service{
         try {
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         } catch (RuntimeException e) {
-            MyUtils.toast(getApplicationContext(), "Camera failed to open.", Toast.LENGTH_SHORT);
+            try {
+                mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
+            } catch (RuntimeException e1) {
+                MyUtils.toast(getApplicationContext(), "Camera failed to open. Please check your camera!", Toast.LENGTH_SHORT);
+                return;
+            }
         }
         try {
             cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
@@ -739,7 +749,6 @@ public class ControllerService extends Service{
                     toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
                     mRecordingStarted = true;
                     if (mMode == MyUtils.MODE_RECORDING) { //mode Recording
-                        if (mService == null) return;
                         mService.startPerformService();
                         mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                         toggleView(tvTimer, View.VISIBLE);
@@ -748,7 +757,6 @@ public class ControllerService extends Service{
                         counterUtil.setCallback((CounterUtil.ICounterUtil) sec -> tvTimer.setText(sec));
                         counterUtil.startCounter();
                     } else { //mode livestream
-                        if (mService == null) return;
                         mService.startPerformService();
                         mImgRec.setImageResource(R.drawable.ic_fab_with_time);
                         toggleView(tvTimer, View.VISIBLE);
@@ -771,7 +779,6 @@ public class ControllerService extends Service{
         toggleNavigationButton(View.GONE);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        intent.setAction(MyUtils.ACTION_OPEN_SETTING_ACTIVITY);
         startActivity(intent);
     }
 
@@ -930,10 +937,9 @@ public class ControllerService extends Service{
     private void releaseCamera() {
         // stop and release camera
         if (mCamera != null) {
-            mCamera.stopPreview();
             mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
             mCamera.release();
-            mCamera = null;
         }
     }
 
@@ -951,7 +957,7 @@ public class ControllerService extends Service{
         }
 
         if (mCameraLayout != null) {
-            mWindowManager.removeView(mCameraLayout);
+            mWindowManager.removeViewImmediate(mCameraLayout);
             releaseCamera();
         }
 

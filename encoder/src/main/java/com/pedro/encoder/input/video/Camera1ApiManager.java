@@ -86,9 +86,7 @@ public class Camera1ApiManager implements Camera.PreviewCallback, Camera.FaceDet
   }
 
   private void init() {
-
     cameraSelect = selectCameraBack();
-    System.out.println("thanhlv cameraSelect = selectCameraBack(); ");
     previewSizeBack = getPreviewSize();
     cameraSelect = selectCameraFront();
     previewSizeFront = getPreviewSize();

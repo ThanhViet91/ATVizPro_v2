@@ -63,6 +63,8 @@ import com.atsoft.screenrecord.utils.StorageUtil;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class ProjectsActivity extends AppCompatActivity implements VideoProjectsAdapter.VideoProjectsListener {
@@ -81,7 +83,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_video_projects);
         hideStatusBar(this);
-
         if (getIntent() != null) {
             fromFunction = getIntent().getIntExtra(KEY_FROM_FUNCTION, 0);
             if (getIntent().getAction() != null) {
@@ -94,7 +95,6 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
                 }
             }
         }
-
         fetchData();
         initViews();
     }
@@ -400,8 +400,8 @@ public class ProjectsActivity extends AppCompatActivity implements VideoProjects
         retriever = new MediaMetadataRetriever();
         listFilesForFolder(new File(MyUtils.getBaseStorageDirectory()));
         retriever.release();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && videoList.size() > 1) {
-            videoList.sort((t0, t1) -> t0.getLastModified() > t1.getLastModified() ? -1 : 0);
+        if (videoList.size() > 1) {
+            Collections.sort(videoList, (t0, t1) -> (t0.getLastModified() > t1.getLastModified() ? -1 : 0));
         }
     }
 

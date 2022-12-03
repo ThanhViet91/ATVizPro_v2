@@ -108,12 +108,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private void setCameraOrientation() {
 //        Camera.Parameters parameters = mCamera.getParameters();
         if (mCamera == null) return;
-
-        Camera.CameraInfo camInfo =
-                new Camera.CameraInfo();
+        Camera.CameraInfo camInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(getBackFacingCameraId(), camInfo);
-
-
         Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int rotation = display.getRotation();
         int degrees = 0;
@@ -150,7 +146,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             Camera.CameraInfo info = new Camera.CameraInfo();
             Camera.getCameraInfo(i, info);
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-
                 cameraId = i;
                 break;
             }

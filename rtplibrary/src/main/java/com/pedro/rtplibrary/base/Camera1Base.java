@@ -443,9 +443,6 @@ public abstract class Camera1Base
 //        cameraManager.setSurfaceTexture(glInterface.getSurfaceTexture());
 //      }
       cameraManager.setRotation(rotation);
-
-//      System.out.println("thanh ====> Camera1Base --- " + cameraFacing.name());
-
       cameraManager.start(cameraFacing, width, height, videoEncoder.getFps());
 
       onPreview = true;

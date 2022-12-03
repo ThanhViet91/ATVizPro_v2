@@ -56,7 +56,9 @@ import com.atsoft.screenrecord.utils.DisplayUtil;
 import com.atsoft.screenrecord.utils.OnSingleClickListener;
 import com.takusemba.rtmppublisher.helper.StreamProfile;
 
-public class ControllerService extends Service{
+import java.util.ArrayList;
+
+public class ControllerService extends Service {
     private static final String TAG = ControllerService.class.getSimpleName();
     public static final String NOTIFY_MSG_RECORDING_STARTED = "NOTIFY_MSG_RECORDING_STARTED";
     public static final String NOTIFY_MSG_RECORDING_CLOSED = "NOTIFY_MSG_RECORDING_CLOSED";
@@ -100,6 +102,7 @@ public class ControllerService extends Service{
     }
 
     String action;
+
     private void handleIncomeAction(Intent intent) {
         action = intent.getAction();
         if (TextUtils.isEmpty(action))
@@ -267,7 +270,10 @@ public class ControllerService extends Service{
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 LAYOUT_FLAG,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 PixelFormat.TRANSLUCENT
         );
 
@@ -302,38 +308,43 @@ public class ControllerService extends Service{
     }
 
     private float cameraRatio;
+    private boolean camUnavailable = false;
     @SuppressLint({"ClickableViewAccessibility", "InflateParams"})
     private void initCameraView() {
-        CameraSetting cameraProfile = SettingManager.getCameraProfile(getApplication());
-
-        mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
-        mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
-
         try {
+            camUnavailable = false;
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        } catch (RuntimeException e) {
-            try {
-                mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
-            } catch (RuntimeException e1) {
-                MyUtils.toast(getApplicationContext(), "Camera failed to open. Please check your camera!", Toast.LENGTH_SHORT);
-                return;
-            }
-        }
-        try {
             cameraRatio = 1f * mCamera.getParameters().getPreviewSize().width / mCamera.getParameters().getPreviewSize().height;
         } catch (Exception e) {
-            cameraRatio = 16/9f;
+            camUnavailable = true;
+            if (SettingManager2.isEnableCamView(getApplicationContext())) {
+                MyUtils.toast(getApplicationContext(), "Camera failed to open. Please check your front camera!", Toast.LENGTH_SHORT);
+                if (mImgCapture != null) {
+                    mImgCapture.setImageResource(R.drawable.ic_hide_cam_fab);
+                    mImgCapture.setAlpha(0.5f);
+                }
+            } else {
+                if (mImgCapture != null) {
+                    mImgCapture.setImageResource(R.drawable.ic_show_cam_fab);
+                    mImgCapture.setAlpha(0.5f);
+                }
+            }
+            cameraRatio = 16 / 9f;
+            return;
         }
+        mCameraLayout = LayoutInflater.from(this).inflate(R.layout.layout_camera_view, null);
+        mCameraLayoutMark = LayoutInflater.from(this).inflate(R.layout.layout_camera_view_mark, null);
         cameraPreview = mCameraLayout.findViewById(R.id.camera_preview);
         cameraPreview2 = mCameraLayoutMark.findViewById(R.id.camera_preview2);
 
-        calculateCameraSize(cameraProfile);
+        CameraSetting cameraProfile = SettingManager.getCameraProfile(getApplication());
+//        calculateCameraSize(cameraProfile);
 
         onConfigurationChanged(getResources().getConfiguration());
 
         paramCam.gravity = cameraProfile.getParamGravity();
         paramCam.x = 0;
-        paramCam.y = DisplayUtil.getDeviceHeight() / 3;
+        paramCam.y = 0;
         CameraPreview mPreview = new CameraPreview(this, mCamera);
         cameraPreview.addView(mPreview);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -352,9 +363,8 @@ public class ControllerService extends Service{
         if (cameraProfile.getMode().equals(CameraSetting.CAMERA_MODE_OFF))
             toggleView(cameraPreview, View.GONE);
 
-        int camSize = 3;
-        camWidth = camViewSize[camSize];  // ~270px
-        camHeight = (float) (camWidth * cameraRatio);
+        float camWidth = DisplayUtil.getDeviceWidth() / 3f;  // ~270px
+        float camHeight = (float) (camWidth * cameraRatio);
 
         cameraPreview.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
         cameraPreview2.setLayoutParams(new FrameLayout.LayoutParams((int) camWidth, (int) camHeight));
@@ -371,6 +381,7 @@ public class ControllerService extends Service{
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y, xx, yy;
 
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
@@ -384,8 +395,10 @@ public class ControllerService extends Service{
                     case MotionEvent.ACTION_MOVE:
                         paramCam.x = xx + (int) (event.getRawX() - x);
                         paramCam.y = yy + (int) (event.getRawY() - y);
-                        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
-                        mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
+                        if (mCameraLayout.isAttachedToWindow())
+                            mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        if (mCameraLayoutMark.isAttachedToWindow())
+                            mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
                         return false;
                     case MotionEvent.ACTION_UP:
                         return false;
@@ -398,7 +411,7 @@ public class ControllerService extends Service{
         mCameraLayoutMark.findViewById(R.id.img_zoom).setOnTouchListener(new View.OnTouchListener() {
             private int x, y;
             private float ww;
-
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -416,16 +429,22 @@ public class ControllerService extends Service{
                             ww = ww + 10;
                             x = (int) event.getRawX();
                             y = (int) event.getRawY();
-                            if (ww <= mScreenWidth/2.5) {
+                            if (ww <= mScreenWidth / 2.5f) {
                                 updateCameraPreview(ww);
-                            } else return false;
+                            } else {
+                                ww = mScreenWidth / 2.5f;
+                                return false;
+                            }
                         } else if (event.getRawX() - x < -20 || event.getRawY() - y < -20) {
                             ww = ww - 10;
                             x = (int) event.getRawX();
                             y = (int) event.getRawY();
-                            if (ww >= mScreenWidth/4f) {
+                            if (ww >= mScreenWidth / 4f) {
                                 updateCameraPreview(ww);
-                            } else return false;
+                            } else {
+                                ww = mScreenWidth / 4f;
+                                return false;
+                            }
                         }
                     default:
                         return true;
@@ -436,12 +455,10 @@ public class ControllerService extends Service{
         mCameraLayoutMark.setOnTouchListener(new View.OnTouchListener() {
             private int x, y, xx, yy;
 
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-
                 switch (event.getAction()) {
-
                     case MotionEvent.ACTION_DOWN:
                         x = (int) event.getRawX();
                         y = (int) event.getRawY();
@@ -452,7 +469,9 @@ public class ControllerService extends Service{
                     case MotionEvent.ACTION_MOVE:
                         paramCam.x = xx + (int) (event.getRawX() - x);
                         paramCam.y = yy + (int) (event.getRawY() - y);
-                        mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        if (mCameraLayout.isAttachedToWindow())
+                            mWindowManager.updateViewLayout(mCameraLayout, paramCam);
+                        if (mCameraLayoutMark.isAttachedToWindow())
                         mWindowManager.updateViewLayout(mCameraLayoutMark, paramCam);
 
                         return false;
@@ -500,29 +519,6 @@ public class ControllerService extends Service{
         }
     }
 
-    float camWidth, camHeight;
-    int[] camViewSize = {240, 270, 300, 330, 360, 390, 420};
-
-    private void calculateCameraSize(CameraSetting cameraProfile) {
-        int factor;
-        switch (cameraProfile.getSize()) {
-            case CameraSetting.SIZE_BIG:
-                factor = 3;
-                break;
-            case CameraSetting.SIZE_MEDIUM:
-                factor = 4;
-                break;
-            default: //small
-                factor = 5;
-                break;
-        }
-        if (mScreenWidth > mScreenHeight) {//landscape
-            mCameraWidth = mScreenWidth / factor;
-        } else {
-            mCameraWidth = mScreenHeight / factor;
-        }
-        mCameraHeight = mCameraWidth * 3 / 4;
-    }
 
 
     @Override
@@ -578,6 +574,7 @@ public class ControllerService extends Service{
 
     private TextView tvTimer;
     private View mViewCountdown;
+
     @SuppressLint({"InflateParams", "ClickableViewAccessibility"})
     private void initializeViews() {
         mViewRoot = LayoutInflater.from(this).inflate(R.layout.layout_recording, null);
@@ -590,9 +587,9 @@ public class ControllerService extends Service{
         paramBlur.y = 0;
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mViewCountdown, paramCountdown);
+        mWindowManager.addView(mViewBlur, paramBlur);
         mWindowManager.addView(mViewRoot, paramViewRoot);
         toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);
-        mWindowManager.addView(mViewBlur, paramBlur);
 
         mCountdownLayout = mViewCountdown.findViewById(R.id.countdown_container);
         mTvCountdown = mViewCountdown.findViewById(R.id.tvCountDown);
@@ -612,6 +609,11 @@ public class ControllerService extends Service{
             @Override
             public void onSingleClick(View v) {
                 toggleNavigationButton(View.GONE);
+                if (camUnavailable) {
+                    mImgCapture.setEnabled(false);
+                    MyUtils.toast(getApplicationContext(), "Camera failed to open. Please check your front camera!", Toast.LENGTH_SHORT);
+                    return;
+                }
                 if (mCameraLayout.getVisibility() == View.GONE) {
                     toggleView(mCameraLayout, View.VISIBLE);
                     toggleView(mCameraLayoutMark, View.VISIBLE);
@@ -662,6 +664,7 @@ public class ControllerService extends Service{
             private int initialY;
             private float initialTouchX;
             private float initialTouchY;
+
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -688,7 +691,8 @@ public class ControllerService extends Service{
                             paramViewRoot.y = initialY + (int) (mScreenHeight - 40 - initialTouchY);
                         }
                         //Update the layout with new X & Y coordinate
-                        mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
+                        if (mViewRoot.isAttachedToWindow())
+                            mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
                         int Xdiff = (int) (event.getRawX() - initialTouchX);
                         int Ydiff = (int) (event.getRawY() - initialTouchY);
                         //The check for Xdiff <10 && YDiff< 10 because sometime elements moves a little while clicking.
@@ -706,9 +710,9 @@ public class ControllerService extends Service{
                         //Calculate the X and Y coordinates of the view.
                         paramViewRoot.x = initialX + (int) (event.getRawX() - initialTouchX);
                         paramViewRoot.y = initialY + (int) (event.getRawY() - initialTouchY);
-
                         //Update the layout with new X & Y coordinate
-                        mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
+                        if (mViewRoot.isAttachedToWindow())
+                            mWindowManager.updateViewLayout(mViewRoot, paramViewRoot);
                         return true;
                 }
                 return false;
@@ -744,6 +748,7 @@ public class ControllerService extends Service{
                     toggleView(mViewRoot, View.GONE);
                     mTvCountdown.setText(String.format("%d", millisUntilFinished / 1000 + 1));
                 }
+
                 public void onFinish() {
                     toggleView(mCountdownLayout, View.GONE);
                     toggleView(mViewRoot, SettingManager2.isEnableFAB(getApplicationContext()) ? View.VISIBLE : View.GONE);

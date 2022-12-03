@@ -62,16 +62,12 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
     private SurfaceHolder mHolder;
     VideoView videoView;
 //    private SeekBar seekbar;
-
     public RtmpLiveStream rtmpCamera;
-
     private ImageView btnRetake;
-
     private boolean inRecording = false;
     private ProgressBar progressBar;
-    ObjectAnimator animationProgressBar;
+    private ObjectAnimator animationProgressBar;
     private TextView tvDurationCounter, btnNext;
-
     int timeCounter = 0;
     private TextView number_countdown;
     private LinearLayout layoutCountdown;
@@ -248,11 +244,10 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
         cameraPreview.addView(cameraView);
         mHolder = cameraView.getHolder();
         mHolder.addCallback(this);
-//        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
         camWidth = newVideoWidth / 3f;
-        camHeight = camWidth * 1920 / 1080f;
-
+        camHeight = camWidth * 16 / 9f;
         if (camHeight > newVideoHeight / 1.5f) {
             camHeight = newVideoHeight / 1.5f;
             camWidth = camHeight * 1080f / 1920;
@@ -268,10 +263,11 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
             mCameraLayout.setAlpha(1);
         });
 
+        float minCamWidth = newVideoWidth / 6f;
+        float maxCamWidth = Math.min(newVideoWidth / 2f, newVideoHeight * 9 / 16f);
         mCameraLayoutMark.findViewById(R.id.img_zoom).setOnTouchListener(new View.OnTouchListener() {
             private int x, y;
             private float ww;
-
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -290,16 +286,22 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
                             ww = ww + 10;
                             x = (int) event.getRawX();
                             y = (int) event.getRawY();
-                            if (ww <= newVideoWidth / 2f && ww * 16f / 9 <= newVideoHeight) {
+                            if (ww <= maxCamWidth) {
                                 updateCameraPreview(ww);
-                            } else return false;
-                        } else if (event.getRawX() - x < -20 || event.getRawY() - y < -20) {
+                            } else {
+                                ww = maxCamWidth;
+                                return false;
+                            }
+                        } else if (event.getRawX() - x < -20 || event.getRawY() - y < -25) {
                             ww = ww - 10;
                             x = (int) event.getRawX();
                             y = (int) event.getRawY();
-                            if (ww >= newVideoWidth / 6f) {
+                            if (ww >= minCamWidth) {
                                 updateCameraPreview(ww);
-                            } else return false;
+                            } else {
+                                ww = minCamWidth;
+                                return false;
+                            }
                         }
                     default:
                         return true;
@@ -309,7 +311,6 @@ public class ReactCamActivity extends AppCompatActivity implements View.OnClickL
 
         mCameraLayout.setOnTouchListener(new View.OnTouchListener() {
             private int x, y;
-
             @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View v, MotionEvent event) {

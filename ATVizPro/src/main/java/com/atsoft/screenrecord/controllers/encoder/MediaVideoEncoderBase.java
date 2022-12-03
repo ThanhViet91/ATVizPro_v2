@@ -42,7 +42,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 	private static final String TAG = MediaVideoEncoderBase.class.getSimpleName();
 
 	// parameters for recording
-    private static final float BPP = 0.25f;
+    private static final float BPP = 0.32f;
 
     protected final int mWidth;
     protected final int mHeight;
@@ -64,7 +64,7 @@ public abstract class MediaVideoEncoderBase extends MediaEncoder {
 		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
 //		MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, 1920, 1080);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);	// API >= 18
-        format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate > 0 ? bitrate : calcBitRate(frame_rate));
+        format.setInteger(MediaFormat.KEY_BIT_RATE, calcBitRate(frame_rate));
         format.setInteger(MediaFormat.KEY_FRAME_RATE, frame_rate);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2);
 		format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 0);

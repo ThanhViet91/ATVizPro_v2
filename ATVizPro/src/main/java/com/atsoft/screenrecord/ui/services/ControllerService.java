@@ -350,7 +350,7 @@ public class ControllerService extends Service {
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(mCameraLayout, paramCam);
         mWindowManager.addView(mCameraLayoutMark, paramCam);
-        mCamera.startPreview();
+//        mCamera.startPreview();
 
         //re-inflate controller
         mWindowManager.removeViewImmediate(mViewRoot);

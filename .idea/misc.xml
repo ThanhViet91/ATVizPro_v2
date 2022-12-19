@@ -31,11 +31,14 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_item_home.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_live_home.xml" value="0.2815" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_livestream_home.xml" value="0.2065" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_round_15_white_20.xml" value="0.21" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/bg_round_white_20.xml" value="0.216" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/buttonstate.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/checkbox_selector.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/checkboxunselected.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/circle_progress.xml" value="0.1735" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/custom_background.xml" value="0.21" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/custom_background_tv_startlivestreaming.xml" value="0.21" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/custom_edt.xml" value="0.268" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_ava_live.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_back_header_24.xml" value="0.216" />
@@ -54,6 +57,7 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_hide_cam_fab.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_home_live.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_how_to_live.xml" value="0.2035" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_how_to_live_setting.xml" value="0.21" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_launcher_2_foreground.xml" value="0.207" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_launcher_foreground.xml" value="0.207" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_play_react_svg.xml" value="0.207" />
@@ -75,9 +79,11 @@
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_video_editor_svg.xml" value="0.1105" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/ic_youcan_live.xml" value="0.1" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/img_btn_record_home.xml" value="0.2065" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/img_button_record_home.xml" value="0.21" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_circle_pink_btn_record.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_circle_white.xml" value="0.206" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_circle_white_60.xml" value="0.1105" />
+        <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_15_white_camera_roll.xml" value="0.21" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_bg_video_item.xml" value="0.1565" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_bg_video_list.xml" value="0.2675" />
         <entry key="..\:/Repo v2/ATVizPro_v3/ATVizPro_v2/ATVizPro/src/main/res/drawable/shape_round_bg_video_list2.xml" value="0.2675" />

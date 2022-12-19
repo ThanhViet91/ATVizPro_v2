@@ -54,7 +54,7 @@ public class DialogSelectVideoSource extends DialogFragmentBase {
         try {
             callback = (ISelectVideoSourceListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
+            throw new ClassCastException(context
                     + " must implement LogoutUser");
         }
     }
